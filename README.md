@@ -3,6 +3,18 @@ Prototype
 Typescrypt based IoT framework for general purpose remote monitoring/control.
 Built using react, mongodb, express and socketio.
 
+
+
+![alt text](https://i.imgur.com/GPRoU1h.png)
+
+See a live realtime list of your devices, when they were last active and a summary of the raw data state.
+
+
+![alt text](https://i.imgur.com/rpgVIff.png)
+
+You can set javascript code to process the device JSON data server side (using sandboxed VM) to make REST calls or perform different actions depending on the state of other devices.
+
+
 Install instructions
 ====================
 

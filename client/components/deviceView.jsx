@@ -575,7 +575,7 @@ export class DeviceView extends Component {
 
           <div className="col-xs-12 col-md-12 col-lg-8 col-xl-6">
             <div>
-              <h4 className="spot">PROCESSING1</h4>
+              <h4 className="spot">PROCESSING</h4>
                 <Editor deviceId={this.props.view.id} state={this.props.state} />              
             </div>
           </div>
