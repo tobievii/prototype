@@ -1,7 +1,19 @@
 # Prototype
 
-Typescrypt based IoT framework for general purpose remote monitoring/control.
-Built using react, mongodb, express and socketio.
+IoT framework for general purpose remote monitoring/control.   
+Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://webpack.js.org/),[react](https://reactjs.org/), [mongoDB](https://www.mongodb.com/), [express](https://expressjs.com/) and [socket.io](https://socket.io/).
+
+## Features
+
+- Simple as possible to connect your devices. See /examples or the documentation below.
+- Multi protocol support: HTTP/S, MQTT, socketio, raw TCP, USB serialports and more. 
+- Opensource so you can be sure what happens with your data.
+- Runs on windows/mac/linux, in the cloud or even a raspberry pi.
+- Fast mongodb for the data.
+- Extendable plugin architecture.
+- Edit code in the browser using the VSCode editor with intellisense autocompletion and deploy custom code instantly.
+
+## Screenshots
 
 ![alt text](https://i.imgur.com/GPRoU1h.png)
 
