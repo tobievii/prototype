@@ -23,15 +23,15 @@ export class PortList extends React.Component {
   state = { ports : [] };
 
 
-  removePort = port => {
+  removeroute = route => {
     return event => {
-      fetch("/api/v3/tcp/removeport", {
+      fetch("/api/v3/http/removeroute", {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(port)
+        body: JSON.stringify(route)
       })
         .then(response => response.json())
         .then(data => {
@@ -41,24 +41,7 @@ export class PortList extends React.Component {
     };
   };
 
-  setApikey = port => {
-    return event => {
 
-      if (port.apikey) {
-        port.apikey = "1234";
-      }
-
-      fetch("/api/v3/tcp/setapikey", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(port)
-      }).then(res=>res.json()).then(data=>{ if (this.props.update) { this.props.update(); }
-    }).catch(err=>console.error(err.toString()))
-    }
-  }
 
 
   render() {
@@ -70,15 +53,16 @@ export class PortList extends React.Component {
         return (
           <div style={blockstyle}>
             <div className="row" style={gridHeadingStyle}>
-              <div className="col-2" style={{paddingLeft:37}}>Port</div>
-              <div className="col-6" style={{textAlign:"left"}}>Description</div>
+              <div className="col-2" style={{paddingLeft:37}}>ID</div>
+              <div className="col-1" style={{textAlign:"left"}}>METHOD</div>
+              <div className="col-4" style={{textAlign:"left"}}>ROUTE</div>
               <div className="col-4" />
             </div>
 
-            {this.props.list.map(port => {
-              console.log(port);
+            {this.props.list.map(route => {
+              console.log(route);
               return (
-                <div key={port.portNum} className="row" style={gridstyle}>
+                <div key={route._id} className="row" style={gridstyle}>
                   <div className="col-2" style={{ padding: 10 }}>
 
                     <div                      
@@ -95,17 +79,21 @@ export class PortList extends React.Component {
                       <FontAwesomeIcon icon={ "check-circle" }  />
                     </div>
 
-                    {port.portNum}
+                    {route.id}
                   </div>
                   
-                  <div className="col-6" style={{padding: "10px 0px 10px 15px", textAlign:"left"}} >
-                    { port.description }
+                  <div className="col-1" style={{padding: "10px 0px 10px 15px", textAlign:"left"}} >
+                    { route.method }
+                  </div>
+
+                  <div className="col-4" style={{padding: "10px 0px 10px 15px", textAlign:"left"}} >
+                    <span>/plugin/http/</span>{ route.route }
                   </div>
 
                   <div className="col-4" style={{padding: 10, textAlign:"right"}} >
                     
 
-                    <div onClick={this.removePort(port)} title={"Delete"} 
+                    <div onClick={this.removeroute(route)} title={"Delete"} 
                       style={{
                         paddingRight: 10,
                         paddingTop: 1,
@@ -117,20 +105,20 @@ export class PortList extends React.Component {
                       <FontAwesomeIcon icon="trash-alt" />
                     </div>
 
-                    <div onClick={this.setApikey(port)} style={{
+                    {/* <div onClick={this.setApikey(port)} style={{
                         paddingRight: 10,
                         paddingTop: 1,
                         opacity: port.apikey ? 1.0 : 0.25,
                         cursor: "pointer",
                         float : "right"
                       }}><FontAwesomeIcon icon="user" />
-                    </div>
+                    </div> */}
 
 
-                    <div style={{float:"right",                        
+                    {/* <div style={{float:"right",                        
                         paddingRight: 10,
-                        paddingTop: 1}}>{port.connections}</div>
-                  </div>
+                        paddingTop: 1}}>{port.connections}</div>*/}
+                  </div> 
 
 
                  

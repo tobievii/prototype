@@ -400,6 +400,9 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
       state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
 
+        console.log("!!")
+        console.log(apikey);
+
         if (options) {
           if (options.socketio == true) {
             io.to(apikey).emit('post', packet.payload);
@@ -557,6 +560,8 @@ export function processPacketWorkflow(db:any, apikey:string, deviceId:string, pa
       if (state.workflowCode) {
         // WORKFLOW EXISTS ON THIS DEVICE
         
+        console.log("test tcp")
+
         var sandbox:any = {
           http : require("http"),
           https : require("https"),
