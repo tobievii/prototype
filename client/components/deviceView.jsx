@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
+import moment from 'moment'
+
 library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
@@ -422,6 +424,28 @@ export class DeviceView extends Component {
 
   constructor(props) {
     super(props);
+
+    
+
+  }
+
+
+  updateTime = () => {
+    
+    if (this.props.view) {
+      
+      var timeago = moment(this.props.view.timestamp).fromNow()
+      this.setState({timeago})
+    }
+    
+  }
+
+
+  componentDidMount = () => {
+    this.updateTime();
+    setInterval( () => {
+      this.updateTime();
+    },500)
   }
 
   getName() {
@@ -522,8 +546,9 @@ export class DeviceView extends Component {
           }}
         >
           <div className="col-md-8">
-            <span className="spot">ID</span>
+            
             <h3>{this.props.view.id}</h3>
+            <span className="faded" >{this.state.timeago}</span>
           </div>
 
 
