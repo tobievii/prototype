@@ -2,6 +2,21 @@ import * as events from 'events';
 import * as mqtt from 'mqtt';
 import * as crypto from 'crypto';
 
+var file = "/src/plugins/iotnxxt/iotnxtqueue.ts"
+
+
+var mqttcfg = {
+  protocol : "mqtts://",
+  port: ":8883"
+}
+
+/*
+var mqttcfg = {
+  protocol : "mqtt://",
+  port: ":1883"
+}
+*/
+
 export class IotnxtQueue extends events.EventEmitter {
   RoutingKeyBase:any;
   connected:boolean = false;
@@ -17,7 +32,7 @@ export class IotnxtQueue extends events.EventEmitter {
   Make:string = "";
   Model:string = "";
   FirmwareVersion:string = "";
-  Location:string="";
+  Location:any=undefined;
   
   Devices:any={};
   GatewayFirstContact:boolean=false;
@@ -39,7 +54,11 @@ export class IotnxtQueue extends events.EventEmitter {
     this.Make = config.Make;
     this.Model = config.Model;
     this.FirmwareVersion = config.FirmwareVersion;
-    this.Location = config.Location;
+    
+    if (config.Location) {
+      this.Location = config.Location;
+    }
+
     this.secretkey = config.secretkey
 
     this.modulus = config.publickey.split("<").join(',').split(">").join(',').split(',')[8];
@@ -59,14 +78,14 @@ export class IotnxtQueue extends events.EventEmitter {
             if (result) {
               this.register((err:Error, result:any)=>{
 
-                console.log("subscribe to routingkeybase")
-                console.log(this.secret.RoutingKeyBase);
+                //console.log("subscribe to routingkeybase")
+                //console.log(this.secret.RoutingKeyBase);
                 this.mqttRed.subscribe(this.secret.RoutingKeyBase+".REQ", (err:Error)=>{
                   if (err) console.log(err);
                 });
 
                 this.mqttRed.on('message', (topic: any, message: any) => {
-                  console.log("!!!!!!!!!!")
+                  //console.log("!!!!!!!!!!")
                   var json = JSON.parse(message.toString());
                   var payload = JSON.parse(Buffer.from(json.Payload, "base64").toString());
                   this.emit('request', payload);
@@ -99,7 +118,7 @@ export class IotnxtQueue extends events.EventEmitter {
 
 
     var replyKey = "MessageAuthNotify.".toUpperCase() + getGUID().toUpperCase();
-    var mqttGreen = mqtt.connect("mqtts://" + this.hostaddress + ":8883", greenOptions);
+    var mqttGreen = mqtt.connect(mqttcfg.protocol + this.hostaddress + mqttcfg.port, greenOptions);
 
     mqttGreen.on('error', (err: any) => { cb(err,undefined); })
     mqttGreen.on("offline", function(err:any) { cb(err,undefined); })
@@ -142,6 +161,8 @@ export class IotnxtQueue extends events.EventEmitter {
               ReplyKey: replyKey.toUpperCase()
           }
 
+          console.log(wrappedMessage)
+
           mqttGreen.publish("MESSAGEAUTHREQUEST", JSON.stringify(wrappedMessage), { qos: 1 }, function (err: any) {
               if (err) { console.error("publisherror:" + err) }
           });
@@ -163,7 +184,7 @@ export class IotnxtQueue extends events.EventEmitter {
       
       mqttGreen.end(undefined, () => {
         if (secret.Success == true) {
-          console.log(secret);
+          //console.log(secret);
           this.secret = secret;
           cb(undefined, secret);
         } else {
@@ -194,7 +215,7 @@ export class IotnxtQueue extends events.EventEmitter {
       //keepalive: 5
     }
 
-    this.mqttRed = mqtt.connect("mqtts://" + this.secret.Hosts[0] + ":8883", redoptions);
+    this.mqttRed = mqtt.connect(mqttcfg.protocol + this.secret.Hosts[0] + mqttcfg.port, redoptions);
     
     this.mqttRed.on('connect', () => { 
       this.connected = true;
@@ -222,7 +243,9 @@ export class IotnxtQueue extends events.EventEmitter {
       "args": { "gateway": {
         "GatewayId": this.GatewayId,
         "Make" : this.Make,
-        "FirmwaveVersion": this.FirmwareVersion,
+        "Model" : this.Model,
+        //"FirmwareVersion": "1.0.1",//this.FirmwareVersion,
+        "FirmwareVersion": this.FirmwareVersion,
         "Location": this.Location,
         "Secret": this.secretkey,
         "Devices": this.Devices,
@@ -233,8 +256,8 @@ export class IotnxtQueue extends events.EventEmitter {
       "expiresAt": new Date(new Date().getTime() + 15 * 1000).toISOString()
     }
 
-    //console.log("=============================== !!!!")
-    //console.log(JSON.stringify(packet));
+    // console.log("=============================== !!!!")
+    //console.log(JSON.stringify(packet, null, 2));
 
     var textBuffer = Buffer.from(JSON.stringify(packet));
 
@@ -304,7 +327,7 @@ export class IotnxtQueue extends events.EventEmitter {
     packet.fromUtc = fromUtc.toISOString();
     packet.sourceMessageID = getGUID();
 
-    //console.log(packet);
+    console.log(packet);
 
     var textBuffer = Buffer.from(JSON.stringify(packet));
 
@@ -321,13 +344,16 @@ export class IotnxtQueue extends events.EventEmitter {
     try {
 
         var routingkey = this.secret.RoutingKeyBase + ".NFY"
-
+        console.log(routingkey)
         this.mqttRed.publish(routingkey, JSON.stringify(wrappedMessage), { qos: 0 }, function (err:Error) {
+
             if (err) { 
               console.log("ERROR:" + err) 
               cb(err, undefined);
+            } else {
+              cb(undefined, true); 
             }
-            cb(undefined, true); 
+            
         });
 
     } catch (err) {

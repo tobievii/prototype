@@ -13,7 +13,7 @@ class StatesViewerItem extends Component {
 
   updateTime = () => {
     if (this.props.timestamp) {
-      var timeago = moment(this.props.timestamp).fromNow()
+      var timeago = moment(this.props.timestamp).fromNow(1)
       this.setState({timeago})
     }
     
@@ -36,10 +36,16 @@ class StatesViewerItem extends Component {
 
     return (
       <a className="statesViewerItem" href={"/view/" + this.props.id}>
-        <div className="row commanderBgPanel commanderBgPanelClickable" key={this.props.id}>
-          <div className="col-md-3">{this.props.id}</div>
+        <div className="row commanderBgPanel commanderBgPanelClickable" key={this.props._id} style={{marginBottom:5}}>
+          
+        <div className="col-md-12">{this.props.id}<br />
+          <span className="faded" style={{fontSize:12}}>{ this.state.timeago }</span></div>
+
+          {/* <div className="col-md-3">{this.props.id}</div>
           <div className="d-none d-md-block col-md-5">{dataPreview}</div>
-          <div className="col-md-4 faded" style={{ textAlign: "right" }}>  { this.state.timeago } </div>
+          <div className="col-md-4 faded" style={{ textAlign: "right" }}>  { this.state.timeago } </div> */}
+
+
         </div>
       </a>
     );
@@ -64,11 +70,11 @@ export class StatesViewer extends Component {
             </div>
           </div>
   
-          <div className="row">
+          {/* <div className="row">
             <div className="d-none d-md-block col-md-3"><h6>ID</h6></div>
             <div className="d-none d-md-block col-md-5"><h6>DATA</h6></div>
             <div className="d-none d-md-block col-md-4" style={{ textAlign: "right" }}>timestamp</div>
-          </div>
+          </div> */}
   
           {this.props.states.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} />)}
   
