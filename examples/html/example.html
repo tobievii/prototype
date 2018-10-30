@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#000000">
+  <title>PR0T0TYP3</title>
+</head>
+<body>  
+  <div id="action" class="button">ACTION</div><br><br>
+  <div id="content" style="height: 20px; background: #ccc"></div>
+</body>
+
+<script src="socket.io.slim.js"></script>
+<script>
+  log("loading...")
+
+  var socket = io("https://prototype.iotnxt.io");;
+
+  socket.on("connect", function (data) {
+    log("connected")
+    socket.emit("join", "mfradh6drivbykz7s4p3vlyeljb8666v"); // your api key
+    socket.on("post", data => { log(data); });
+    socket.on('event', function (data) { console.log(data) });
+    socket.on('disconnect', function () { console.log("disconnect"); });
+  });
+
+
+  function log(content) {
+    console.log("connected.");
+
+    if (typeof content == "object") { 
+      document.getElementById("content").innerHTML = JSON.stringify(content);
+    } else {
+      document.getElementById("content").innerHTML = content;
+    }
+    
+  }
+
+  document.getElementById("action").onmousedown = function () {
+    log("click!")
+    socket.emit("post", { id: "yourDevice001", data: { action: true, hover: true } })
+  };
+
+  document.getElementById("action").onmouseenter = function () {
+    socket.emit("post", { id: "yourDevice001", data: { hover: true, action: false } })
+  }
+
+  document.getElementById("action").onmouseleave = function () {
+    socket.emit("post", { id: "yourDevice001", data: { hover: false, action: false } })
+  }
+
+</script>
+
+<style>
+  .button {
+    background: rgb(119, 132, 156);
+    float: left;
+    padding: 5px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .button:hover {
+    background: rgb(17, 93, 165);
+  }
+
+  .button:active {
+    background: #f00;
+  }
+</style>
+
+</html>
