@@ -12,22 +12,66 @@ export class mqttConnection extends EventEmitter {
     }
 
     handleData = (socket:net.Socket) => {
+        // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180831
         return (data:Buffer) => {         
+
+            console.log("\n---- mqtt packet ---- ")
             var packetTypeHex = data.slice(0,1).toString('hex')[0]
             var mqttPacketType =  Buffer.from('0'+packetTypeHex, 'hex')[0];
+            console.log("mqttPacketType:"+mqttPacketType);
+            var remainingLength = data.readInt8(1)
+            console.log("remainLength:"+remainingLength)
+            console.log("total Length"+data.length)
+            console.log(data.toString("hex"));
 
             if (mqttPacketType == 1) {
-                this.emit("connect", {
-                    clientid : data.toString().split("\u0004�\u0000<\u0000\u000f")[1].split("\u0000\u0003")[0],
-                    username : data.toString().split("\u0000\u0003")[1].split("\u0000$")[0],
-                    password : data.toString().split("\u0000$")[1]
-                })                
+
+                var connect:any = {
+                    lengthMSB : data.readInt8(2),
+                    lengthLSB : data.readInt8(3)
+                    
+                }
+                connect.protocol = data.slice(4,4+connect.lengthLSB).toString();
+                
+                connect.protocolLevel = data.readInt8(8);
+
+                connect.flagsBinaryStr = data.readUInt8(9).toString(2)
+                connect.flags = {
+                    reserved : checkBit(data.slice(9,10),0),
+                    cleanSession : checkBit(data.slice(9,10),1),
+                    willFlag : checkBit(data.slice(9,10),2),
+                    willQosA : checkBit(data.slice(9,10),3),
+                    willQosB : checkBit(data.slice(9,10),4),
+                    willRetain : checkBit(data.slice(9,10),5),
+                    passwordFlag : checkBit(data.slice(9,10),6),
+                    usernameFlag : checkBit(data.slice(9,10),7)
+                }
+
+                connect.keepAlive = data.readInt16BE(10)
+
+                var clientidLength = data.readInt16BE(12)
+                connect.clientid = data.slice(14, 14+clientidLength).toString()
+
+                var usernameLength = data.readInt16BE(14+clientidLength)
+                var usernameOffset = 14+clientidLength+2
+                connect.username = data.slice(usernameOffset, usernameOffset+usernameLength).toString()
+                
+
+                var passwordLength = data.readInt16BE(usernameOffset+usernameLength)
+                var passwordOffset = usernameOffset+usernameLength+2
+                connect.password = data.slice(passwordOffset, passwordOffset+passwordLength).toString()
+
+                console.log(connect);
+
+                
+                this.emit("connect", connect)                
+
                 socket.write(" \u0002\u0000\u0000");
                 return;
             }
        
             if (mqttPacketType == 2) { 
-                //console.log("CONNACK") 
+                console.log("CONNACK") 
             }
 
             if (mqttPacketType == 3) { 
@@ -59,6 +103,10 @@ export class mqttConnection extends EventEmitter {
             }
             
             if (mqttPacketType == 8) {
+                console.log("SUBSCRIBE")
+
+
+
                 this.emit("subscribe", {
                     subscribe: data.toString().split("\u0000")[1].slice(1)
                 })
@@ -81,3 +129,16 @@ export class mqttConnection extends EventEmitter {
   
 }   
 
+
+
+
+function checkBit(data:Buffer,bitnum:number) {
+    //bitnum from right
+    try {
+        var binaryStr = data.readUInt8(0).toString(2);
+        return parseInt(binaryStr.slice(binaryStr.length - bitnum - 1 , binaryStr.length - bitnum))
+    } catch (err) {
+        return undefined
+    }
+    
+}

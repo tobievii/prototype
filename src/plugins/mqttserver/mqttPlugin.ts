@@ -8,6 +8,7 @@ import { mqttConnection } from "./mqttConnection"
 export var mqttConnections:any = [];
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
+    console.log("mqtt plugin")
 
     var server = net.createServer(function (socket: any) {
         var client = new mqttConnection(socket)
@@ -26,6 +27,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
                 console.log(err);
             }
             console.log(mqttConnections)
+        })
+
+        client.on("error", (err)=>{
+            console.log(err);
         })
     });
 

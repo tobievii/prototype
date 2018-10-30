@@ -770,4 +770,4 @@ server.on('error', (e: any) => {
 
 
 process.on('unhandledRejection', console.log);
-//process.on("uncaughtException", console.error);
+process.on("uncaughtException", console.log);

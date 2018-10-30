@@ -8,10 +8,15 @@ export var iotnxtqueues: any = {};
 
 import { version } from "../../config";
 
+var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
+
 export function handlePacket(db:any, packet: any, cb: any) {
-  //console.log("plugin:"+name + " handlePacket()");
+
+  console.log("plugin:"+name + " handlePacket()");
   
   iotnxtUpdateDevice(db,packet,(err:Error, result:any)=>{
+    console.log("======")
+    console.log(result)
     if (err) console.log(err);
     if (result) {
       cb(packet);
@@ -142,11 +147,9 @@ function connectgateway(db:any, gatewayToconnect:any, eventHub:any, cb:any) {
         /////////
 
   
-        console.log("iotnxtqueue.linking event request");
+        
         
         iotnxtqueue.on("request", (request: any) => {
-          console.log("=-====")
-          console.log(request);
           
           for (var key in request.deviceGroups) {
             if (request.deviceGroups.hasOwnProperty(key)) {
@@ -335,8 +338,11 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
 
 // callsback with this device's gateway
 export function findDeviceGateway(db: any, apikey:string, devid:string, cb: any) {  
+  
 
   db.states.findOne({apikey:apikey, devid:devid}, (e:Error, deviceState:any)=>{
+
+    
     
     if (deviceState == null) { cb(new Error("no device")); return; }
 
@@ -385,13 +391,15 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
     console.error("ERROR gateway.HostAddress undefined");
   }
 
+  
+
   var iotnxtqueue = new iotnxt.IotnxtQueue(
     {
       GatewayId: gateway.GatewayId,
       secretkey: gateway.Secret,
-      FirmwareVersion: version,
+      FirmwareVersion: version.version,
       Make: "IoT.nxt",
-      Model: "API Server",
+      Model: version.description,
       id: "rouanApi",
       publickey: gateway.PublicKey,
       hostaddress: gateway.HostAddress
@@ -414,19 +422,28 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
 }
 
 function iotnxtUpdateDevice(db:any, packet: any, cb: any) {
+
+
   findDeviceGateway(db, packet.apikey, packet.devid, (deviceState:any, gateway:any)=>{
+
+    // console.log("----")
+    //  console.log(deviceState);
+    //  console.log(gateway);
+
     calcDeviceTree(db, gateway, (gateway:any, deviceTree:any)=>{
 
       var gatewayIdent = gateway.GatewayId+"|"+gateway.HostAddress
 
       if (deviceTrees[gatewayIdent]) {
 
+        //console.log(deviceTrees)
 
         var diff = difference(deviceTree, deviceTrees[gatewayIdent])
         if (_.isEmpty(diff)) { 
+          console.log("no need to register new endpoints");
           iotnxtUpdateDevicePublish(gateway,packet, cb);
         } else {
-          // "need to register new endpoints"
+          console.log("need to register new endpoints");
           if (iotnxtqueues[gatewayIdent]) {
             iotnxtqueues[gatewayIdent].registerEndpoints(deviceTree, (err:Error,result:any) => {
               if (err) console.log(err);
