@@ -29,10 +29,9 @@ class StatesViewerItem extends Component {
 
   render() {
 
-    var dataPreview = JSON.stringify(this.props.data)
-
-    var maxlength = 40;
-    if (dataPreview.length > 40) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
+    // var dataPreview = JSON.stringify(this.props.data)
+    // var maxlength = 40;
+    // if (dataPreview.length > 40) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
 
     return (
       <a className="statesViewerItem" href={"/view/" + this.props.id}>
