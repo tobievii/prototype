@@ -46,7 +46,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       if (err) {
         res.json({ err: err.toString() });
       } else {
+        listenRoute(app, result, eventHub);
         res.json(result);
+        
+        
       }
     });
   });
@@ -63,27 +66,38 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   getroutes(db, (err: Error, routes: any) => {
     if (routes) {
       for (var route of routes) {
-        app[route.method]("/plugin/http/"+route.route, (req:any, res:any)=>{
-          //console.log(req.body);
 
-
-          eventHub.emit("device", {
-            //apikey: config.apikey,
-            apikey: route.apikey,
-            packet: {
-              id: route.id,
-              data: req.body,
-              //http: { route: route },
-              meta: { method: "http" }
-            }});
+        ///////
+        listenRoute(app, route, eventHub)
 
 
 
-          res.end("success")
-        })
+        ////////////
       }
     }
   });
+}
+
+
+export function listenRoute(app:any, route:any, eventHub:events.EventEmitter) {
+  app[route.method]("/plugin/http/"+route.route, (req:any, res:any)=>{
+    //console.log(req.body);
+
+
+    eventHub.emit("device", {
+      //apikey: config.apikey,
+      apikey: route.apikey,
+      packet: {
+        id: route.id,
+        data: req.body,
+        //http: { route: route },
+        meta: { method: "http" }
+      }});
+
+      res.end("success")
+      
+      
+  })
 }
 
 export function getroutes(db: any, cb: any) {
@@ -99,6 +113,7 @@ export function addroute(db: any, routeOptions: any, apikey:any, cb: any) {
       if (err) console.log(err);
 
       if (conflictingroutes.length == 0) {
+        
         db.plugins_http.save(routeOptions, cb);
       } else {
         cb(new Error("route already taken"), undefined);
