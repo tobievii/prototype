@@ -13,7 +13,7 @@ export const name = "serialports";
 
 export const workflowDefinitions = [
   "var serialports = { ",
-  "write: (comName:string, data:string, cb:Function)=>{}",
+  "write: (comName:string, data:string, cb:Function)=>{},",
   "list: ()",
   "}"
 ];

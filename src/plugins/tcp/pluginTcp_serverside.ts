@@ -7,25 +7,31 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   console.log("init tcp plugin");
 
   app.get("/api/v3/tcp/ports", (req: any, res: any) => {
-    getports(db, (err: Error, ports: any) => {
-      
-      if (err) res.json({ err: err.toString() });
-      
-      var cleanports:any = []
-      for (var p in ports) {
-        //delete ports[p].apikey
-        if (ports[p].apikey == req.user.apikey) {
-          // keep the apikey
-          ports[p].apikey = true
-        } else {
-          ports[p].apikey = false
-        } 
-        // cleanports
-        
-      }      
 
+    db.plugins_tcp.find({}, (err:Error, ports:any)=>{
+      if (err) { res.json(err); return; }
       res.json(ports);
     });
+
+    // getports(db, (err: Error, ports: any) => {
+      
+    //   if (err) res.json({ err: err.toString() });
+      
+    //   var cleanports:any = []
+    //   for (var p in ports) {
+    //     //delete ports[p].apikey
+    //     if (ports[p].apikey == req.user.apikey) {
+    //       // keep the apikey
+    //       ports[p].apikey = true
+    //     } else {
+    //       ports[p].apikey = false
+    //     } 
+    //     // cleanports
+        
+    //   }      
+
+    //   res.json(ports);
+    // });
   });
 
   app.post("/api/v3/tcp/setapikey", (req:any, res:any)=>{
@@ -51,11 +57,18 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       return;
     }
 
-    addport(db, req.body, (err: Error, result: any) => {
+    var port = req.body
+    port.apikey = req.user.apikey
+
+
+    addport(db, port, (err: Error, result: any) => {
       if (err) {
         res.json({ err: err.toString() });
       } else {
-        res.json(result);
+        connectport(db, port, eventHub, (err: any, result: any) => {
+          res.json(result);
+        });
+        
       }
     });
   });
@@ -132,7 +145,7 @@ export function connectport(db: any, portOptions: any, eventHub: any, cb: any) {
       console.log(data);
       eventHub.emit("device", {
         //apikey: config.apikey,
-        apikey: "mfradh6drivbykz7s4p3vlyeljb8666v",
+        apikey: portOptions.apikey,
         packet: {
           id: "tcpPort"+portOptions.portNum,
           level: 1,
@@ -161,6 +174,7 @@ export function connectport(db: any, portOptions: any, eventHub: any, cb: any) {
 
   server.listen(portOptions.portNum, () => {
     console.log("TCP Server " + portOptions.portNum + " \t| ready.");
+    cb(undefined, portOptions);
   });
 
   server.on("close", function() {
