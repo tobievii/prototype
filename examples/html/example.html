@@ -8,48 +8,68 @@
   <title>PR0T0TYP3</title>
 </head>
 <body>  
-  <div id="action" class="button">ACTION</div><br><br>
+  <div id="actionLedOn" class="button">ON</div> 
+  <div id="actionLedOff" class="button">OFF</div><br><br>
   <div id="content" style="height: 20px; background: #ccc"></div>
 </body>
 
 <script src="socket.io.slim.js"></script>
 <script>
-  log("loading...")
 
-  var socket = io("https://prototype.iotnxt.io");;
+
+  var socket = io("http://localhost:8080");;
 
   socket.on("connect", function (data) {
-    log("connected")
-    socket.emit("join", "mfradh6drivbykz7s4p3vlyeljb8666v"); // your api key
-    socket.on("post", data => { log(data); });
+    console.log("connected")
+    socket.emit("join", "glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9"); // your api key
+
+    socket.on("post", packet => { 
+      console.log(packet);
+      if (packet) {
+        if (packet.data.raw == "1") {
+        console.log("BUTTON DOWN")
+        } 
+
+        if (packet.data.raw == "0") {
+          console.log("BUTTON UP")
+        } 
+      }      
+    });
+
+
     socket.on('event', function (data) { console.log(data) });
     socket.on('disconnect', function () { console.log("disconnect"); });
   });
 
 
-  function log(content) {
-    console.log("connected.");
+  // function log(content) {
+  //   console.log("connected.");
 
-    if (typeof content == "object") { 
-      document.getElementById("content").innerHTML = JSON.stringify(content);
-    } else {
-      document.getElementById("content").innerHTML = content;
-    }
+  //   if (typeof content == "object") { 
+  //     document.getElementById("content").innerHTML = JSON.stringify(content);
+  //   } else {
+  //     document.getElementById("content").innerHTML = content;
+  //   }
     
-  }
+  // }
 
-  document.getElementById("action").onmousedown = function () {
-    log("click!")
-    socket.emit("post", { id: "yourDevice001", data: { action: true, hover: true } })
+  document.getElementById("actionLedOn").onmousedown = function () {
+    console.log("click!")
+    socket.emit("post", { id: "usb-FTDI_FT232R_USB_UART_A505TASE-if00-port0", data: { led: "on" } })
   };
 
-  document.getElementById("action").onmouseenter = function () {
-    socket.emit("post", { id: "yourDevice001", data: { hover: true, action: false } })
-  }
+document.getElementById("actionLedOff").onmousedown = function () {
+    console.log("click!")
+    socket.emit("post", { id: "usb-FTDI_FT232R_USB_UART_A505TASE-if00-port0", data: { led: "off" } })
+  };
 
-  document.getElementById("action").onmouseleave = function () {
-    socket.emit("post", { id: "yourDevice001", data: { hover: false, action: false } })
-  }
+  // document.getElementById("action").onmouseenter = function () {
+  //   socket.emit("post", { id: "yourDevice001", data: { hover: true, action: false } })
+  // }
+
+  // document.getElementById("action").onmouseleave = function () {
+  //   socket.emit("post", { id: "yourDevice001", data: { hover: false, action: false } })
+  // }
 
 </script>
 
@@ -60,6 +80,7 @@
     padding: 5px;
     cursor: pointer;
     user-select: none;
+    margin-right: 10px;
   }
 
   .button:hover {
