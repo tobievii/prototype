@@ -529,6 +529,7 @@ app.get("/api/v3/plugins/definitions", (req:any, res:any)=>{
 
   for (var plugin of plugins) {
     if (plugin.workflow) {
+      console.log("loading workflow definitions for plugin: "+plugin.name)
       definitions.push(plugin.workflowDefinitions);
     }
   }
