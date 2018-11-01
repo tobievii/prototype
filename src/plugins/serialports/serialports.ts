@@ -6,6 +6,8 @@ import { Plugin } from "../plugin";
 
 var _ = require("lodash");
 
+var sp: SerialPorts;
+
 // var usbDetect = require('usb-detection');
 // usbDetect.startMonitoring();
 
@@ -14,6 +16,7 @@ export const name = "serialports";
 export const workflowDefinitions = [
   "var serialports = { ",
   "write: (comName:string, data:string, cb:Function)=>{},",
+  "blah: (comName:string, data:string, cb:Function)=>{},",
   "list: ()",
   "}"
 ];
@@ -24,7 +27,12 @@ export const workflow = {
 };
 
 export function writeToPort(comName: string, data: string, cb: Function) {
+  console.log("writeToPort")
   sp.write(comName, data, cb);
+  
+  
+  
+  
 }
 
 export function listPorts() {
@@ -128,8 +136,10 @@ export class SerialPorts extends events.EventEmitter {
   }
 
   write(comName: string, data: string, cb: Function) {
-    for (let device of this.listofConnectedPorts) {
+
+    for (var device of this.listofConnectedPorts) {
       if (device.device.comName == comName) {
+        console.log("found device")
         device.write(data);
         cb(undefined, "success");
         return;
@@ -216,14 +226,14 @@ export class SerialJSONDevice extends events.EventEmitter {
   }
 
   write(data: any) {
-    //console.log("writing to port")
-    //console.log(data);
+    console.log("writing to port")
+    console.log(data);
     this.port.write(data + "\n");
     //return "Hello, " + this.comName;
   }
 }
 
-var sp: SerialPorts;
+
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
   console.log("initializing serialports");
