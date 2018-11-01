@@ -1,3 +1,7 @@
+/*
+    This example works in conjunction with /examples/html/buttonSerial
+*/
+
 int lastButton = 0;
 
 void setup() {
