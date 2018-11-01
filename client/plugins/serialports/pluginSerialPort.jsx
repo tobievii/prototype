@@ -2,8 +2,26 @@ import React, { Component } from "react";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHdd, faPlug, faLessThanEqual } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHdd,
+  faPlug,
+  faLessThanEqual,
+  faServer,
+  faUser,
+  faTrashAlt,
+  faCheckCircle,
+  faTimesCircle
+} from "@fortawesome/free-solid-svg-icons";
 
+library.add(faHdd);
+library.add(faPlug);
+library.add(faLessThanEqual);
+
+library.add(faServer);
+library.add(faUser);
+library.add(faTrashAlt);
+library.add(faCheckCircle);
+library.add(faTimesCircle);
 
 export const name = "SerialPorts";
 
@@ -24,10 +42,15 @@ export class SettingsPanel extends React.Component {
   updateInterval = {};
 
   getaccount = () => {
-    fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
-      if (user) { this.setState({ user: user }); }
-    }).catch(err => console.error(err.toString()))
-  }
+    fetch("/api/v3/account", { method: "GET" })
+      .then(res => res.json())
+      .then(user => {
+        if (user) {
+          this.setState({ user: user });
+        }
+      })
+      .catch(err => console.error(err.toString()));
+  };
 
   componentDidMount() {
     this.getaccount();
@@ -39,7 +62,7 @@ export class SettingsPanel extends React.Component {
   }
 
   onMouseOver = serialport => {
-    return event => { };
+    return event => {};
   };
 
   getSerialports = () => {
@@ -50,9 +73,9 @@ export class SettingsPanel extends React.Component {
       });
   };
 
-  setserialportaccount = (serialport) => {
+  setserialportaccount = serialport => {
     return event => {
-      console.log(serialport)
+      console.log(serialport);
 
       fetch("/api/v3/serialports/setserialportaccount", {
         method: "POST",
@@ -65,11 +88,39 @@ export class SettingsPanel extends React.Component {
         .then(response => response.json())
         .then(data => {
           //console.log(data);
-          //this.getaccount(); 
+          //this.getaccount();
 
-          if (this.props.update) { this.props.update(); }
+          if (this.props.update) {
+            this.props.update();
+          }
+        })
+        .catch(err => console.error(err.toString()));
+    };
+  };
 
-        }).catch(err => console.error(err.toString()));
+
+  connecttoggle = serialport => {
+    return event => {
+
+      if (serialport.connect) {
+        serialport.connect = false;
+      } else {
+        serialport.connect = true;
+      }
+
+      fetch("/api/v3/serialports/connect", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(serialport)
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.getSerialports();
+        })
+        .catch(err => console.error(err.toString()));
     }
   }
 
@@ -85,7 +136,7 @@ export class SettingsPanel extends React.Component {
             ID
           </div>
 
-          <div className="col-1" style={{ textAlign: "right"}}>
+          <div className="col-1" style={{ textAlign: "right" }}>
             CONFIG
           </div>
         </div>
@@ -107,7 +158,7 @@ export class SettingsPanel extends React.Component {
             >
               <div className="col-11" style={{ padding: 10 }}>
                 <div
-                  title={ serialport.connected ? "Connected" : serialport.error }
+                  title={serialport.connected ? "Connected" : serialport.error}
                   style={{
                     float: "left",
                     paddingRight: 10,
@@ -115,16 +166,18 @@ export class SettingsPanel extends React.Component {
                     opacity: 0.9,
                     cursor: serialport.default ? "" : "pointer",
                     color: "rgb(0, 222, 125)"
-                  }}><FontAwesomeIcon icon={"check-circle"} />
+                  }}
+                >
+                  <FontAwesomeIcon icon={"check-circle"} />
                 </div>
-                {serialport.pnpId}<br />
-                {serialport.comName}
+                <pre style={{ color: "#fff" }}>
+                  {JSON.stringify(serialport, null, 2)}
+                </pre>
               </div>
 
-
               <div className="col-1" style={cellstyle}>
-
-                <div onClick={this.setserialportaccount(serialport)}
+                <div
+                  onClick={this.setserialportaccount(serialport)}
                   title="link to this account"
                   style={{
                     float: "right",
@@ -135,16 +188,25 @@ export class SettingsPanel extends React.Component {
                   <FontAwesomeIcon icon="user" />
                 </div>
 
+                <div
+                  onClick={this.connecttoggle(serialport)}
+                  title="connect toggle"
+                  style={{
+                    float: "right",
+                    opacity: false ? 1.0 : 0.25,
+                    cursor: "pointer",
+                    marginRight: 10
+                  }}
+                >
+                  <FontAwesomeIcon icon="plug" />
+                </div>
+
+
               </div>
-
-
-
             </div>
           );
         })}
       </div>
     );
   }
-
-
 }
