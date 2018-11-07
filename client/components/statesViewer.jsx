@@ -207,7 +207,7 @@ export class DeviceList extends Component {
       return ( 
           <div>
              { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} />)  }
-             <div style={{marginLeft:-16}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+             <div style={{marginLeft:-9}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
           </div>
         )
     }
@@ -296,7 +296,7 @@ export class StatesViewer extends Component {
 
         <div className="row">
           <div className="d-none d-md-block col-md-6" >
-            <form id="search" style={{ paddingBottom: 10, textAlign: "left", marginLeft:-15 }}>
+            <form id="search" style={{ paddingBottom: 10, textAlign: "left", marginLeft:-8 }}>
               <input name="query" onChange={this.search} placeholder="filter" style={{ paddingLeft:15}} />
             </form>
           </div>

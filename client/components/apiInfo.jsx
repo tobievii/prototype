@@ -76,7 +76,7 @@ export class ApiInfo extends Component {
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "'+this.props.apikey+'|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="" style={{ paddingTop: 0, margin: "0 30px" }} >
+      <div className="" style={{ paddingTop: 0, margin: "0 37px" }} >
 
         <div className="row"> 
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) } >APIKEY</div>
