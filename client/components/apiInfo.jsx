@@ -19,9 +19,9 @@ export class ApiInfo extends Component {
 
   getMenuClasses = function (num ) {
     if (num == this.state.apiMenu) {
-      return "col-2 menuTab borderTopSpot"
+      return "menuTab borderTopSpot"
     } else {
-      return "col-2 menuTab menuSelectable"
+      return "menuTab menuSelectable"
     }
   }
 
@@ -76,7 +76,7 @@ export class ApiInfo extends Component {
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "'+this.props.apikey+'|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="container">
+      <div className="" style={{ paddingTop: 0, margin: "0 30px" }} >
 
         <div className="row"> 
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) } >APIKEY</div>

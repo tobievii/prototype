@@ -59,8 +59,15 @@ export class SettingsView extends React.Component {
 
   genPage = () => {
     if (this.state.activeMenu !== undefined) {
-      var SettingsPanel = plugins[this.state.activeMenu].SettingsPanel
-      return <SettingsPanel />
+
+      if (plugins[this.state.activeMenu]) {
+        var SettingsPanel = plugins[this.state.activeMenu].SettingsPanel
+        return <SettingsPanel />
+      } else {
+        //default to 0 
+        this.setState({activeMenu:0})
+      }
+
     } else {
       return <div>none</div>
     }
