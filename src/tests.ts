@@ -4,8 +4,14 @@ import { describe, it } from "mocha";
 import * as trex from "./utils";
 
 
-var testAcccount = { email: "admin@localhost.com", password: "admin", apikey: "xxxxxxxxxxx" };
-var testServer = "http://localhost";
+var testAccount = { 
+  email: "admin@localhost.com", 
+  password: "admin", 
+  apikey: "glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9" ,
+  server: "http://localhost",
+  port : 8080
+};
+
 
 import * as http from "http";
 
@@ -16,7 +22,7 @@ describe("API", function() {
     it("/api/v3/version", function(done: any) {
       const options = {
         hostname: "localhost",
-        port: 80,
+        port: testAccount.port,
         path: "/api/v3/version",
         method: "GET",
         headers: {
@@ -54,10 +60,11 @@ describe("API", function() {
 
       trex.restJSON(
         {
-          apikey: testAcccount.apikey,
+          apikey: testAccount.apikey,
           method: "POST",
-          path: testServer + "/api/v3/data/post",
-          body: testDevice
+          path: testAccount.server + "/api/v3/data/post",
+          body: testDevice,
+          port: testAccount.port
         },
         (err: Error, result: any) => {
           if (err) {
@@ -84,10 +91,11 @@ describe("API", function() {
       var testDevice: any = { id: "testDeviceDEV" };
       trex.restJSON(
         {
-          apikey: testAcccount.apikey,
+          apikey: testAccount.apikey,
           method: "POST",
-          path: testServer + "/api/v3/view",
-          body: testDevice
+          path: testAccount.server + "/api/v3/view",
+          body: testDevice,
+          port: testAccount.port
         },
         (err: Error, result: any) => {
           if (err) {
@@ -109,10 +117,11 @@ describe("API", function() {
       var testDevice: any = { id: "testDeviceDEV" };
       trex.restJSON(
         {
-          apikey: testAcccount.apikey,
+          apikey: testAccount.apikey,
           method: "POST",
-          path: testServer + "/api/v3/packets",
-          body: testDevice
+          path: testAccount.server + "/api/v3/packets",
+          body: testDevice,
+          port: testAccount.port
         },
         (err: Error, result: any) => {
           if (err) {
@@ -133,12 +142,12 @@ describe("API", function() {
       const postData = JSON.stringify({ id: "testDeviceDEV" });
       const options = {
         hostname: "localhost",
-        port: 80,
+        port: testAccount.port,
         path: "/api/v3/state",
         method: "POST",
         headers: {
           Authorization:
-            "Basic " + Buffer.from("api:key-"+testAcccount.apikey).toString("base64"),
+            "Basic " + Buffer.from("api:key-"+testAccount.apikey).toString("base64"),
           "Content-Type": "application/json",
           "Content-Length": Buffer.byteLength(postData)
         }
@@ -173,12 +182,12 @@ describe("API", function() {
       const postData = JSON.stringify({ id: "testDeviceDEV" });
       const options = {
         hostname: "localhost",
-        port: 80,
+        port: testAccount.port,
         path: "/api/v3/states",
         method: "GET",
         headers: {
           Authorization:
-            "Basic " + Buffer.from("api:key-"+testAcccount.apikey).toString("base64"),
+            "Basic " + Buffer.from("api:key-"+testAccount.apikey).toString("base64"),
           "Content-Type": "application/json"
         }
       };
