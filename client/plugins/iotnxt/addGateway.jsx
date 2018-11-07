@@ -64,7 +64,7 @@ export class AddGatewayPanel extends React.Component {
     }
 
     render() {
-        var formLabelStyle = { textAlign: "right", padding: "5px 3px 0 0" }
+        var formLabelStyle = { textAlign: "right", padding: "15px 3px 0 0" }
         var formInputStyle = { padding: 4 }
         var formRowStyle = {marginRight:20}
         return (

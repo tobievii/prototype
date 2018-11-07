@@ -282,26 +282,6 @@ td.react-bootstrap-table-editing-cell {
 }
 
 
-input {
-  color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.05);
-  
-  max-width: 100%;
-  
-  padding: 3px;
-
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 2px;  
-}
-
-input:focus {
-  border: 1px solid rgba(174, 231, 241, 0.35);
-  border-radius: 2px;
-  outline: none;
-}
-
-
-
 
 
 
@@ -593,3 +573,26 @@ input:checked + .slider:before {
 .paginationActive {
   border-top: 1px solid rgb(243, 53, 58);
 }
+
+
+
+
+input {
+  color: rgba(255,255,255,0.5);
+  background: rgba(16, 18, 24, 0.6);
+  
+  max-width: 100%;
+  
+  padding: 8px 15px 8px 15px ;
+
+  border: 1px solid rgba(19, 41, 49, 0);
+  
+}
+
+input:focus {
+  color: rgba(255,255,255,1.0);
+  border: 1px solid rgba(255, 39, 32, 0.5);
+  outline: none;
+}
+
+
