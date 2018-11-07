@@ -89,7 +89,7 @@ class StatesViewerItem extends Component {
     if (ratio > 1) { ratio = 1 }
         
     return { marginBottom: 2, padding: "7px 0px 7px 0px", 
-      backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5),"+this.blendrgba({r:3, g:4, b:5, a:0.5}, {r:125, g:255, b:175, a: 0.75}, (ratio/2) - 0.5)+")",
+      backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5),"+this.blendrgba({r:3, g:4, b:5, a:0.5}, {r:125, g:255, b:175, a: 0.75}, (ratio/1.5) - 0.35)+")",
       borderRight: "5px solid "+this.blendrgba( {r:60, g:19, b:25, a:0}, {r:125, g:255, b:175, a: 1.0}, ratio) }    
   }
 
@@ -143,12 +143,16 @@ export class Pagination extends Component {
   }
 
   render() {
-
-    return (<div>
-      {
-        this.props.pages.map( (button, i) =>  <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div> )
-      }
-    </div>)
+    if (this.props.pages.length > 1) {
+      return (<div>
+        {
+          this.props.pages.map( (button, i) =>  <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div> )
+        }
+      </div>)
+    } else {
+      return ( <div></div>)
+    }
+    
     
   }
 }
@@ -182,9 +186,11 @@ export class DeviceList extends Component {
 
     if (this.props.devices.length == 0) {
       return (
-        <div className="row commanderBgPanel" style={{opacity:0.5}}>
-          <div className="col-12">
-            <center>No devices to display.</center>
+        <div className="row " style={{opacity:0.5}}>
+          <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
+              <div className="commanderBgPanel" style={{ margin: 0}}>
+                <center>No devices to display.</center>
+              </div>            
           </div>          
         </div>
       )
@@ -207,7 +213,7 @@ export class DeviceList extends Component {
       return ( 
           <div>
              { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} />)  }
-             <div style={{marginLeft:-16}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+             <div style={{marginLeft:-9}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
           </div>
         )
     }
@@ -296,14 +302,14 @@ export class StatesViewer extends Component {
 
         <div className="row">
           <div className="d-none d-md-block col-md-6" >
-            <form id="search" style={{ paddingBottom: 10, textAlign: "left", marginLeft:-15 }}>
-              <input name="query" onChange={this.search} placeholder="filter" style={{ paddingLeft:15}} />
+            <form id="search" style={{ textAlign: "left", marginLeft:-8, marginBottom: 10 }}>
+              <input name="query" onChange={this.search} placeholder="filter"  />
             </form>
           </div>
 
           <div className="d-none d-md-block col-md-6" style={{ textAlign: "right" }} >
             <span className="headerClickable" onClick={this.sort("timestamp")}> 
-              { this.sortButtons() } sort
+              { this.sortButtons() }
             </span>
           </div>
         </div>
