@@ -11,7 +11,7 @@ library.add(faTimes)
 export class NavBar extends Component {
   render() {
     return (
-      <div className="container">
+      <div className="" style={{ margin: "0 20px" }} >
         <div className="row " style={{ paddingBottom: 10 }}>
           <div className="col-md-12">
             <a href="/">

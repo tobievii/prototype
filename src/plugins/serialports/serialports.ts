@@ -6,6 +6,8 @@ import { Plugin } from "../plugin";
 
 var _ = require("lodash");
 
+var sp: SerialPorts;
+
 // var usbDetect = require('usb-detection');
 // usbDetect.startMonitoring();
 
@@ -13,7 +15,8 @@ export const name = "serialports";
 
 export const workflowDefinitions = [
   "var serialports = { ",
-  "write: (comName:string, data:string, cb:Function)=>{}",
+  "write: (comName:string, data:string, cb:Function)=>{},",
+  "blah: (comName:string, data:string, cb:Function)=>{},",
   "list: ()",
   "}"
 ];
@@ -24,7 +27,12 @@ export const workflow = {
 };
 
 export function writeToPort(comName: string, data: string, cb: Function) {
+  console.log("writeToPort")
   sp.write(comName, data, cb);
+  
+  
+  
+  
 }
 
 export function listPorts() {
@@ -48,12 +56,12 @@ export class SerialPorts extends events.EventEmitter {
     this.list((allports: any) => {
       this.listOfPluggedInDevices = [];
       for (var port in allports) {
-        if (allports[port].pnpId) {
+        if (allports[port].comName) {
           this.listOfPluggedInDevices.push(allports[port]);
         }
         /*
         for (var knownDevice in knownDeviceList) {
-          if (allports[port].pnpId == knownDeviceList[knownDevice].pnpId) {
+          if (allports[port].comName == knownDeviceList[knownDevice].comName) {
             //console.log("Found port");
             //console.log(allports[port])
             var thisDev = allports[port];
@@ -128,8 +136,10 @@ export class SerialPorts extends events.EventEmitter {
   }
 
   write(comName: string, data: string, cb: Function) {
-    for (let device of this.listofConnectedPorts) {
+
+    for (var device of this.listofConnectedPorts) {
       if (device.device.comName == comName) {
+        console.log("found device")
         device.write(data);
         cb(undefined, "success");
         return;
@@ -194,7 +204,7 @@ export class SerialJSONDevice extends events.EventEmitter {
         /*
         comName:{ serialport.comName}<br /> 
         manufacturer: { serialport.manufacturer}<br />
-        pnpId: { serialport.pnpId}<br />
+        comName: { serialport.comName}<br />
         productId: { serialport.productId}<br />
         vendorId: { serialport.vendorId}<br />
         */
@@ -216,14 +226,14 @@ export class SerialJSONDevice extends events.EventEmitter {
   }
 
   write(data: any) {
-    //console.log("writing to port")
-    //console.log(data);
+    console.log("writing to port")
+    console.log(data);
     this.port.write(data + "\n");
     //return "Hello, " + this.comName;
   }
 }
 
-var sp: SerialPorts;
+
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
   console.log("initializing serialports");
@@ -239,7 +249,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   sp.on("data", data => {
     var packet = {
-      id: data.device.pnpId,
+      id: data.device.comName.split("/").join(""),
       data: data,
       meta: { method: "serialport" }
     };
@@ -301,7 +311,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     }
 
     var packet = {
-      id: data.device.pnpId,
+      id: data.device.comName.split("/").join(""),
       data: {
         connected: false,
         err: error
@@ -344,11 +354,57 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       res.json(result);
     });
   });
+
+  app.post("/api/v3/serialports/connect", (req:any, res:any)=>{
+    console.log(req.body)
+    if (typeof req.body.connect == "undefined") {
+      req.body.connect = true;
+    } 
+    setSerialportConnect(db, req.body, req.user, req.body.connect, (err:Error, result:any) => {
+      if (err) res.json(err);
+      res.json(result);
+    })
+
+  })
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function setSerialportConnect(db: any, device: any, user: any, connect:boolean, cb: any) {
+  updateserialportdevice(db, {comName: device.comName, connect:connect}, cb)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function setserialportaccount(db: any, device: any, user: any, cb: any) {
   db.plugins_serialports.update(
-    { pnpId: device.pnpId },
+    { comName: device.comName },
     { $set: { apikey: user.apikey } },
     (err: Error, resultUpd: any) => {
       if (err) cb(err, undefined);
@@ -359,9 +415,14 @@ function setserialportaccount(db: any, device: any, user: any, cb: any) {
   );
 }
 
+
+
+
+
+
 function updateserialportdevice(db: any, device: any, cb: any) {
   db.plugins_serialports.findOne(
-    { pnpId: device.pnpId },
+    { comName: device.comName },
     (err: any, devicedb: any) => {
       var newdevice: any = {};
 
@@ -372,7 +433,7 @@ function updateserialportdevice(db: any, device: any, cb: any) {
       }
 
       db.plugins_serialports.update(
-        { pnpId: newdevice.pnpId },
+        { comName: newdevice.comName },
         newdevice,
         { upsert: true },
         (err: any, res: any) => {
@@ -383,6 +444,14 @@ function updateserialportdevice(db: any, device: any, cb: any) {
   );
 }
 
+
+
+
+
+
+
+
+
 function getserialportconfig(db: any, device: any, cb: any) {
-  db.plugins_serialports.findOne({ pnpId: device.pnpId }, cb);
+  db.plugins_serialports.findOne({ comName: device.comName }, cb);
 }

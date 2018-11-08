@@ -12,11 +12,10 @@ var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 
 export function handlePacket(db:any, packet: any, cb: any) {
 
-  console.log("plugin:"+name + " handlePacket()");
+  
   
   iotnxtUpdateDevice(db,packet,(err:Error, result:any)=>{
-    console.log("======")
-    console.log(result)
+    
     if (err) console.log(err);
     if (result) {
       cb(packet);

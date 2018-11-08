@@ -160,6 +160,7 @@ export function restJSON(query:any, cb:any) {
     var protocolObject:any;
 
     var port;
+
     if (protocol == "http:") {
         protocolObject = http;
         port = 80;
@@ -167,6 +168,8 @@ export function restJSON(query:any, cb:any) {
         protocolObject = https;
         port = 443;
     }
+
+    if (query.port) { port = query.port}
 
     if (myURL.port != "") { port = myURL.port}
    
