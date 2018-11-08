@@ -335,7 +335,7 @@ callback(packet); `
           <div>
             <MonacoEditor
               width="100%"
-              height="1500"
+              height="900"
               language="javascript"
               theme="vs-dark"
               value={this.state.code}
@@ -369,7 +369,7 @@ callback(packet); `
 
 
 export class RenderObject extends Component {
-  state = {};
+  state = { timeago: "" };
   render() {
     var payload = {};
 
@@ -433,9 +433,11 @@ export class DeviceView extends Component {
   updateTime = () => {
     
     if (this.props.view) {
+      if (this.props.view.timestamp) {
+        var timeago = moment(this.props.view.timestamp).fromNow()
+        this.setState({timeago})
+      }
       
-      var timeago = moment(this.props.view.timestamp).fromNow()
-      this.setState({timeago})
     }
     
   }
@@ -577,24 +579,13 @@ export class DeviceView extends Component {
         >
           <div className="col-xs-12 col-md-12 col-lg-4 col-xl-3">
             <h4 className="spot">LATEST STATE</h4>
-            <SyntaxHighlighter
-              language="javascript"
-              style={tomorrowNightBright}
-            >
-              {JSON.stringify(latestState, null, 2)}
-            </SyntaxHighlighter>
+            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
 
-            <h4 className="spot">PACKET HISTORY</h4>
-            <p>
-              Up to a maximum of the 5 latest packets. For historical views
-              please use commander/BI.
-            </p>
-            <SyntaxHighlighter
-              language="javascript"
-              style={tomorrowNightBright}
-            >
-              {JSON.stringify(packets.slice(0, 5), null, 2)}
-            </SyntaxHighlighter>
+            <h4 className="spot">LATEST PACKETS</h4>
+          
+            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(packets, null, 2)}</SyntaxHighlighter></div>
+
+            
           </div>
      
 

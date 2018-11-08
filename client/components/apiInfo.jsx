@@ -105,7 +105,7 @@ export class ApiInfo extends Component {
               Username: <span className="spot">api</span><br />
               Password: <span className="spot">key-{this.props.apikey}</span>
             </p>
-            <p>In tools like <a href="https://www.getpostman.com/">POSTMAN</a> this will generate a base64 encoded header automatically. Dependig on what tools you use you might have to generate the "Authorization" header yourself.</p>
+            <p>In tools like <a href="https://www.getpostman.com/">POSTMAN</a> this will generate a base64 encoded header automatically. Depending on what tools you use you might have to generate the "Authorization" header yourself.</p>
           </div>
       
           <div className="col-md-12 commanderBgPanel" >

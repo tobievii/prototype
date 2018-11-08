@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 
-import * as $ from "jquery";
 import * as _ from "lodash";
 
 import { NavBar } from "./components/navBar.jsx";
@@ -11,7 +10,6 @@ import { StatesViewer } from "./components/statesViewer.jsx";
 import { ParamsView } from "./components/paramsView.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
 
-import * as utils from "./utils.react.ts";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -35,67 +33,47 @@ class App extends Component {
   };
 
   // API METHODS
+
   getVersion(cb) {
-    $.ajax({
-      url: "/api/v3/version",
-      type: "get",
-      dataType: "json",
-      contentType: "application/json",
-      success: cb
-    });
+    fetch("/api/v3/version", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(version => {
+      cb(version);
+    }).catch(err => console.error(err.toString()));
   }
+
   getAccount(cb) {
-    $.ajax({
-      url: "/api/v3/account",
-      type: "get",
-      dataType: "json",
-      contentType: "application/json",
-      success: cb
-    });
+    fetch("/api/v3/account", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(account => {
+      cb(account);
+    }).catch(err => console.error(err.toString()));
   }
 
   getStates(cb) {
-    $.ajax({
-      url: "/api/v3/states",
-      type: "get",
-      dataType: "json",
-      contentType: "application/json",
-      success: cb
-    });
+    fetch("/api/v3/states", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(states => {
+      cb(states);
+    }).catch(err => console.error(err.toString()));
   }
 
   getState(id, cb) {
-    $.ajax({
-      url: "/api/v3/state",
-      type: "post",
-      dataType: "json",
-      contentType: "application/json",
-      data: JSON.stringify({ id: id }),
-      success: cb
-    });
+    fetch("/api/v3/state", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id })
+    }).then(response => response.json()).then(state => { cb(state); })
+      .catch(err => console.error(err.toString()));
   }
 
   getView(id, cb) {
-    $.ajax({
-      url: "/api/v3/view",
-      type: "post",
-      dataType: "json",
-      contentType: "application/json",
-      data: JSON.stringify({ id: id }),
-      success: cb
-    });
+    fetch("/api/v3/view", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id })
+    }).then(response => response.json()).then(view => { cb(view); })
+      .catch(err => console.error(err.toString()));
   }
 
   postData(data, cb) {
-    console.log("App.jsx postData(apikey, data,cb)");
-    $.ajax({
-      url: "/api/v3/data/post",
-      type: "post",
-      dataType: "json",
-      contentType: "application/json",
-      data: JSON.stringify(data),
-      success: cb
-    });
+    fetch("/api/v3/data/post", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    }).then(response => response.json()).then(view => { cb(view); })
+      .catch(err => console.error(err.toString()));
   }
 
   onSaveHandlerView = () => {
@@ -123,14 +101,13 @@ class App extends Component {
 
     this.getVersion(version => {
       this.setState({ version: version.version.toUpperCase() });
-      //console.log(version);
+      console.log(version);
     });
 
     this.getAccount(account => {
       this.setState({ email: account.email });
       this.setState({ apikey: account.apikey });
       this.setState({ user: account });
-      console.log("set user");
 
       if (window.location.pathname.split("/")[1] == "view") {
         socket.emit(
@@ -215,27 +192,24 @@ class App extends Component {
         this.setState({ state });
       });
 
+      ///////
       // this gets the history from the packets database for a specific device.
-      var urlToCall = "/api/v3/packets";
-      var typeOfCall = "post";
-      $.ajax({
-        url: urlToCall,
-        type: typeOfCall,
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify({ id: window.location.pathname.split("/")[2] }),
-        success: packets => {
-          utils.log(typeOfCall + " " + urlToCall + " incoming packet");
-          //utils.log(packets);
 
-          if (!this.state.socketDataIn) {
+      fetch("/api/v3/packets", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: window.location.pathname.split("/")[2], limit: 1 })
+      }).then(response => response.json()).then(packets => {
+
+        if (!this.state.socketDataIn) {
+          if (packets.length > 0) {
             var socketDataIn = packets.reverse()[0].payload;
             this.setState({ socketDataIn });
           }
-
-          this.setState({ packets });
         }
-      });
+        this.setState({ packets });
+      }).catch(err => console.error(err.toString()));
+
+
     }
 
     ///////////////
