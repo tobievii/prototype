@@ -400,8 +400,8 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
       state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
 
-        console.log("!!")
-        console.log(apikey);
+        
+        
 
         if (options) {
           if (options.socketio == true) {
