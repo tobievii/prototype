@@ -34,18 +34,6 @@ var mongojs = require('mongojs')
 
 const { VM } = require('vm2');
 
-/*
-discordBot.login("NDk0MDU2MDIzOTkzMjIxMTIx.Dot-Iw.3rWS_--N_JHFP49szNLefW94yRU");
-
-setInterval(()=>{
-      discordBot.sendStatusUpdate("494073723268235264", "process started");
-},1000)
-*/
-
-
-
-// local
-
 var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 
@@ -400,8 +388,8 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
       state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
 
-        console.log("!!")
-        console.log(apikey);
+        
+        
 
         if (options) {
           if (options.socketio == true) {

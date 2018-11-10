@@ -3,10 +3,11 @@ import * as geoip from 'geoip-lite' // https://www.npmjs.com/package/geoip-lite
 import * as utils from './utils';
 import * as _ from 'lodash';
 
+var dbglobal:any;
 
 export function midware(db: any) {
-  return function (req: any, res: any, next: any) {
-    
+  dbglobal = db;
+  return function (req: any, res: any, next: any) {  
     
     
     if (req.headers.authorization) {
@@ -298,4 +299,21 @@ export function difference(object:any, base:any) {
     }
     
 	return changes(object, base);
+}
+
+
+
+export function validApiKey(db:any,testkey:string,cb:any) {
+  console.log("check validApi")
+  db.users.findOne({apikey:testkey}, (err:Error, user:any)=>{
+    if (user) {
+      cb(undefined,{testkey:testkey, valid: true, user: user})
+    } else {
+      cb({testkey:testkey, valid: false}, undefined)
+    }
+  })
+}
+
+export function checkApiKey(testkey:string, cb:any) {
+  validApiKey(dbglobal, testkey, cb)
 }
