@@ -138,7 +138,7 @@ export class mqttConnection extends EventEmitter {
                 //     //packetLength: packetLength
                 // }   
 
-                console.log(parsed)
+                //console.log(parsed)
 
                 this.emit("publish", parsed)
             }

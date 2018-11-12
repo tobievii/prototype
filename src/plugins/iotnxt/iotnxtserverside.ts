@@ -350,6 +350,7 @@ export function findDeviceGateway(db: any, apikey:string, devid:string, cb: any)
     } else {
       //check account setting
       db.users.findOne({ apikey: apikey },(err: Error, user: any) => {
+          if (user == null) { return; }
           if (user.plugins_iotnxt_gatewaydefault) {
             //account has gateway set
             cb(deviceState, user.plugins_iotnxt_gatewaydefault);
@@ -439,10 +440,10 @@ function iotnxtUpdateDevice(db:any, packet: any, cb: any) {
 
         var diff = difference(deviceTree, deviceTrees[gatewayIdent])
         if (_.isEmpty(diff)) { 
-          console.log("no need to register new endpoints");
+          //console.log("no need to register new endpoints");
           iotnxtUpdateDevicePublish(gateway,packet, cb);
         } else {
-          console.log("need to register new endpoints");
+          //console.log("need to register new endpoints");
           if (iotnxtqueues[gatewayIdent]) {
             iotnxtqueues[gatewayIdent].registerEndpoints(deviceTree, (err:Error,result:any) => {
               if (err) console.log(err);

@@ -327,7 +327,7 @@ export class IotnxtQueue extends events.EventEmitter {
     packet.fromUtc = fromUtc.toISOString();
     packet.sourceMessageID = getGUID();
 
-    console.log(packet);
+    //console.log(packet);
 
     var textBuffer = Buffer.from(JSON.stringify(packet));
 
@@ -344,7 +344,7 @@ export class IotnxtQueue extends events.EventEmitter {
     try {
 
         var routingkey = this.secret.RoutingKeyBase + ".NFY"
-        console.log(routingkey)
+        //console.log(routingkey)
         this.mqttRed.publish(routingkey, JSON.stringify(wrappedMessage), { qos: 0 }, function (err:Error) {
 
             if (err) { 

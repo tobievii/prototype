@@ -14,8 +14,6 @@ export function midware(db: any) {
       
       var auth = Buffer.from(req.headers.authorization.split(" ")[1], 'base64').toString()
       
-      console.log(auth)
-
       if (auth.split(":")[0] == "api") {
         var apiAuth = auth.split(":")[1];
         var apikey = apiAuth.split("-")[1]

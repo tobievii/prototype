@@ -561,8 +561,6 @@ export function processPacketWorkflow(db:any, apikey:string, deviceId:string, pa
       if (state.workflowCode) {
         // WORKFLOW EXISTS ON THIS DEVICE
         
-        console.log("test tcp")
-
         var sandbox:any = {
           http : require("http"),
           https : require("https"),
