@@ -17,9 +17,12 @@ export class SettingsPanel extends React.Component {
   render() {   
     return (
       <div style={blockstyle}>
-      <h4>ACCOUNT</h4>
+        <h4>ACCOUNT</h4>
+        <a href="/signout"><button className="btn-spot" style={{ float: "right"}} > SIGN OUT</button></a>
         email: {this.state.account.email}<br />
-        level: {this.state.account.level}
+        level: {this.state.account.level}<br />
+        
+        <div style={{clear:"both"}} />
       </div>
     )
   }

@@ -80,9 +80,15 @@ export function cookieSetFromUser(user:any, req:any, res:any, next:any) {
 
 export function signInFromWeb(db: any) {
   return function(req: any, res: any, next: any) {
+
+    
+
     if (req.body) {
+      console.log(req.body)
       if (req.body.email) {
+        
         if (validateEmail(req.body.email) && req.body.pass) {
+          
           db.users.findOne(
             { email: req.body.email.toLowerCase(), password: req.body.pass },
             (err: Error, user: any | undefined) => {
@@ -99,6 +105,8 @@ export function signInFromWeb(db: any) {
         } else {
           res.json({ error: "not valid email and/or password" });
         }
+      } else {
+        res.json({ error: "email address can not be empty"})
       }
     } else {
       res.json({ error: "could not parse json" });

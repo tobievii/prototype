@@ -4,6 +4,10 @@ import "bootstrap/dist/css/bootstrap.css";
 import * as _ from "lodash";
 
 import { NavBar } from "./components/navBar.jsx";
+
+import { Account } from "./components/account.jsx"
+
+
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
@@ -108,6 +112,7 @@ class App extends Component {
       this.setState({ email: account.email });
       this.setState({ apikey: account.apikey });
       this.setState({ user: account });
+      this.setState({ account });
 
       if (window.location.pathname.split("/")[1] == "view") {
         socket.emit(
@@ -228,10 +233,14 @@ class App extends Component {
   };
 
   render() {
+
+
     if (window.location.pathname === "/") {
       return (
         <div className="App">
-          <NavBar version={this.state.version} email={this.state.email} />
+          <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
+
+          <Account account={this.state.account} />
 
           <div className="container">
             <div className="row " style={{ paddingTop: 30, fontSize: 20 }}>
@@ -243,11 +252,10 @@ class App extends Component {
           </div>
           {this.mainView()}
 
-          <br />
-          <br />
+          
+          
           <ApiInfo apikey={this.state.apikey} />
-          <br />
-          <br />
+          
         </div>
       );
     }
@@ -261,7 +269,7 @@ class App extends Component {
         if (window.location.pathname.split("/")[3] == "params") {
           return (
             <div className="App">
-              <NavBar version={this.state.version} email={this.state.email} />
+              <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
               <br />
               <br />
               <ParamsView
@@ -276,7 +284,7 @@ class App extends Component {
       } else {
         return (
           <div className="App">
-            <NavBar version={this.state.version} email={this.state.email} />
+            <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
             <br />
             <br />
             <DeviceView
@@ -302,7 +310,7 @@ class App extends Component {
         if (window.location.pathname.split("/")[1] === "settings") {
           return (
             <div className="App">
-              <NavBar version={this.state.version} email={this.state.email} />
+              <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
               <br />
               <br />
               <SettingsView />
@@ -317,7 +325,7 @@ class App extends Component {
         );
       }
     } else {
-      return <div>...</div>;
+      return <div></div>;
     }
   }
 }
