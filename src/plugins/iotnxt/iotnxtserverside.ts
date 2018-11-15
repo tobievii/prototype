@@ -47,6 +47,11 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
     getgateways(db, (err: Error, gateways: any) => {
       if (err) res.json({err:err.toString()});
+
+      for (var g in gateways) {
+        delete gateways[g].Secret
+      }
+
       res.json(gateways);
     });
   });

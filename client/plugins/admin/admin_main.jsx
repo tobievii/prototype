@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 
-export const name = "Account"
+import { Registration } from "./registration.jsx"
+
+export const name = "Admin"
 
 export class SettingsPanel extends React.Component {
   state = {
@@ -23,12 +25,12 @@ export class SettingsPanel extends React.Component {
     return (
       <div>
         <div className="adminBlocks" >
-          <h4>ACCOUNT</h4>
-          <a href="/signout"><button className="btn-spot" style={{ float: "right" }} > SIGN OUT</button></a>
-          email: {this.state.account.email}<br />
+          <h4>ADMIN</h4>
           level: {this.state.account.level}<br />
           <div style={{ clear: "both" }} />
         </div>
+
+        <Registration level={this.state.level} />
         
       </div>
     )

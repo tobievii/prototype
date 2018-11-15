@@ -199,6 +199,29 @@ export function defaultAdminAccount(db:any) {
   //
 }
 
+
+
+export function registerExistingAccount(db:any, user:any, cb:any) {
+  console.log("registerExistingAccount")
+  if (validateEmail(user.email)) {
+    db.users.find({email:user.email}, (err:Error, usersEmailExists:any) => {
+
+      if (usersEmailExists.length == 0) {
+        db.users.update({ uuid: user.uuid }, user, { upsert: true },cb);  
+      } else {
+        cb("that email is taken", undefined)
+      }
+      
+
+    })
+    
+  } else {
+    cb("not valid email", undefined);
+  }
+  
+}
+
+
 // V3 API: ACCOUNT CREATE
 export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: any, accRequest:any|undefined) {
   var event = new Date();

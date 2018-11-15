@@ -4,10 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import * as _ from "lodash";
 
 import { NavBar } from "./components/navBar.jsx";
-
 import { Account } from "./components/account.jsx"
-
-
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
@@ -15,15 +12,24 @@ import { ParamsView } from "./components/paramsView.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
 
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCodeBranch } from "@fortawesome/free-solid-svg-icons";
-import { faTable } from "@fortawesome/free-solid-svg-icons";
-library.add(faCodeBranch);
-library.add(faTable);
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+//import { faStroopwafel, faCodeBranch, faTable } from '@fortawesome/free-solid-svg-icons'
+import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons"
+
+// library.add(faStroopwafel)
+// library.add(faCodeBranch);
+// library.add(faTable);
+library.add(faDiscord)
 
 import socketio from "socket.io-client";
 const socket = socketio();
+
+
+/////////////// PUBLIC MARKETING
+
+import { Landing } from "./public/landing.jsx"
+
 
 /*------------------------------------------------------------------
     React App
@@ -33,7 +39,9 @@ class App extends Component {
   state = {
     states: [],
     view: {},
-    viewType: "table"
+    viewType: "table",
+    loggedIn: false
+
   };
 
   // API METHODS
@@ -46,6 +54,7 @@ class App extends Component {
 
   getAccount(cb) {
     fetch("/api/v3/account", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(account => {
+      if (account.level > 0) { this.setState({ loggedIn: true }) }
       cb(account);
     }).catch(err => console.error(err.toString()));
   }
@@ -232,9 +241,16 @@ class App extends Component {
     }
   };
 
-  render() {
 
+  notLogged = () => {
+    return (<div className="App">
+      <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
+      <Account account={this.state.account} />
+      <Landing />
+    </div>)
+  }
 
+  logged = () => {
     if (window.location.pathname === "/") {
       return (
         <div className="App">
@@ -252,10 +268,10 @@ class App extends Component {
           </div>
           {this.mainView()}
 
-          
-          
+
+
           <ApiInfo apikey={this.state.apikey} />
-          
+
         </div>
       );
     }
@@ -327,6 +343,19 @@ class App extends Component {
     } else {
       return <div></div>;
     }
+  }
+
+  render() {
+
+
+
+    if (this.state.loggedIn == false) {
+      return this.notLogged()
+    } else {
+      return this.logged()
+    }
+
+
   }
 }
 

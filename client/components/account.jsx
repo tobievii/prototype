@@ -10,7 +10,7 @@ library.add(faDice)
 
 export class Account extends Component {
   state = {
-    menu: 1,
+    menu: 0,
     form: {
       email: "",
       passwordSignin : "",
@@ -75,6 +75,12 @@ export class Account extends Component {
     }
 }
 
+
+validateEmail = (email) => {
+  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
 signIn = () => {
   this.setState({ serverError: ""})
 
@@ -103,6 +109,30 @@ signIn = () => {
 
 register = () => {
   console.log("register")
+
+  fetch("/api/v3/admin/register", {
+    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: this.state.form.email,
+      pass: this.state.form.passwordSignup
+    })
+  }).then(response => response.json()).then(data => { 
+    console.log(data);
+
+    if (data.result) {
+      location.reload();
+    }
+    // console.log(data);
+    // if (data.signedin) {
+    //   location.reload();
+    // } 
+
+    if (data.error) {
+       this.setState( { serverError : data.error })
+    }
+
+  }).catch(err => console.error(err.toString()));
+
 }
 
 
@@ -123,7 +153,7 @@ register = () => {
         <div className="bgpanel" style={this.getMenuPageStyle(1)} >
           <div className="row" style={{ marginTop: 2, marginBottom: 5 }}>
             <div className="col-3" style={{ textAlign: "right", paddingTop: 10 }} > email: </div>
-            <div className="col-9" > <input placeholder="email" style={{ width: "100%" }} onChange={this.changeInput("email")} value={this.state.form.email} autoFocus /> </div>
+            <div className="col-9" > <input type="email" placeholder="email" style={{ width: "100%" }} spellCheck="false" onChange={this.changeInput("email")} value={this.state.form.email} autoFocus /> </div>
           </div>
 
           <div className="row" style={{ marginBottom: 15 }}>
@@ -144,7 +174,7 @@ register = () => {
             </div>
 
             <div className="col-5">              
-              <button className="btn-spot" style={{  float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Sign In</button>
+              <button className="btn-spot" style={{  float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Sign In </button>
             </div>
 
           </div>
@@ -156,8 +186,10 @@ register = () => {
             <div className="col-3" style={{ textAlign: "right", paddingTop: 10 }} > email: </div>
             <div className="col-9" > 
               <input placeholder="email" 
+                      type="email"
                       style={{ width: "100%" }} 
                       onChange={this.changeInput("email")} 
+                      spellCheck="false"
                       value={this.state.form.email} /> 
               </div>
           </div>
@@ -182,9 +214,12 @@ register = () => {
           </div>
 
           <div className="row">
-            <div className="col-3"></div>
-            <div className="col-6">
-              <button className="btn-spot" style={{ float: "left" }} ><FontAwesomeIcon icon="user-plus" /> Register</button>
+            <div className="col-7" style={{textAlign:"right"}} >
+              <span className="serverError" style={{fontSize:"11px"}} >{ this.state.serverError }</span>
+            </div>
+
+            <div className="col-5">
+              <button className="btn-spot" style={{ float: "right" }} onClick={this.register} ><FontAwesomeIcon icon="user-plus" /> Register</button>
             </div>
           </div>
         </div>
@@ -212,3 +247,6 @@ register = () => {
     
   }
 }
+
+
+
