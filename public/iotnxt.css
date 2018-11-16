@@ -712,3 +712,33 @@ input:focus {
   
   filter: drop-shadow(0px 0px 10px rgba(255,255,255,0.35));
 }
+
+.notificationBlock {
+  border: 1px solid rgba(255, 57, 67,0.35);
+  box-sizing: border-box;
+  background: rgba(255, 57, 67, 0.15);
+  margin: 20px;
+  padding: 10px;
+  font-weight: normal;
+  font-size: 12px;
+  border-radius: 1px;
+  color: rgba(255,57,67,1)
+}
+
+.notificationBlock button {
+  background: rgba(97, 97, 97, 0.15);
+  border: 1px solid rgba(92, 92, 92, 0.35);
+  border-radius: 1px;
+  margin-left: 10px;
+  color: rgb(255, 213, 216);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notificationBlock button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1px;
+  margin-left: 10px;
+  color: rgb(255, 255, 255)
+}

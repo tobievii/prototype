@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import * as _ from "lodash";
 
 import { NavBar } from "./components/navBar.jsx";
-import { Account } from "./components/account.jsx"
+import { Account } from "./public/account.jsx"
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
@@ -29,6 +29,7 @@ const socket = socketio();
 /////////////// PUBLIC MARKETING
 
 import { Landing } from "./public/landing.jsx"
+import { Verify } from "./components/verify.jsx";
 
 
 /*------------------------------------------------------------------
@@ -39,9 +40,7 @@ class App extends Component {
   state = {
     states: [],
     view: {},
-    viewType: "table",
-    loggedIn: false
-
+    viewType: "table"
   };
 
   // API METHODS
@@ -256,7 +255,7 @@ class App extends Component {
         <div className="App">
           <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
 
-          <Account account={this.state.account} />
+          <Verify account={this.state.account} />
 
           <div className="container">
             <div className="row " style={{ paddingTop: 30, fontSize: 20 }}>
@@ -347,12 +346,17 @@ class App extends Component {
 
   render() {
 
-
-
-    if (this.state.loggedIn == false) {
-      return this.notLogged()
+    if (this.state.account == undefined) {
+      return null;
     } else {
-      return this.logged()
+      console.log(this.state.loggedIn)
+      if (this.state.loggedIn == true) {
+        return this.logged()
+      } else {
+        console.log(this.state)
+        return this.notLogged()  
+      }
+    
     }
 
 

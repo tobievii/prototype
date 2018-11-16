@@ -301,10 +301,6 @@ export function accountDelete(db:any, user:account, cb:any ) {
 
 
 
-
-
-
-
 export function validateEmail(email:string) {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
@@ -317,6 +313,7 @@ export function validateEmail(email:string) {
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
+
 export function difference(object:any, base:any) {
 
 	function changes(object:any, base:any) {
