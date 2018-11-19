@@ -142,7 +142,7 @@ export function connectport(db: any, portOptions: any, eventHub: any, cb: any) {
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     client.on("data", (data: any) => {
-      console.log(data);
+      //console.log(data);
       eventHub.emit("device", {
         //apikey: config.apikey,
         apikey: portOptions.apikey,

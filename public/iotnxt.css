@@ -127,6 +127,7 @@ input[type="color"]:focus,
   border-radius: 0;
 }
 
+.medium-checkbox { width:15px; height: 15px; }
 .big-checkbox {width: 20px; height: 20px; padding-top:10px;}
 
 
@@ -349,6 +350,8 @@ td.react-bootstrap-table-editing-cell {
   -moz-box-shadow: 0px -11px 62px -20px rgba(0,0,0,0.25);
   box-shadow: 0px -11px 62px -20px rgba(0,0,0,0.25);
   margin-right:5px;
+  transition: all 0.2s;
+  user-select: none;
 }
 
 .menuTab:hover {
@@ -357,9 +360,8 @@ td.react-bootstrap-table-editing-cell {
 }
 
 .menuSelectable {
-  background-image: linear-gradient(rgba(16, 18, 24, 0.5), rgba(16, 18, 24, 0.5) );   
-  margin-top:5px;
-  
+  background-image: linear-gradient(rgb(16, 18, 24), rgb(0, 0, 0) );   
+
 }
 
 .tabMenuInactive {
@@ -368,6 +370,7 @@ td.react-bootstrap-table-editing-cell {
 
 .borderTopSpot {
   border-top: 1px solid rgb(243, 53, 58);
+  background-image: linear-gradient(rgba(243, 53, 58, 0.1), rgba(0, 0, 0, 0) );   
 }
 
 
@@ -615,4 +618,127 @@ input:focus {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(255, 85, 85); 
+}
+
+
+
+
+
+
+
+
+.btn-spot {
+  color: #eee;
+  background-color: rgb(255, 36, 36);
+  border: 1px solid rgba(255, 137, 141,0.35);
+  padding: 10px 13px 6px 13px;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0px 0px 20px 0px rgba(253, 74, 68,0.25);
+  transition: all 0.25s;
+  font-weight: bold;
+  text-transform: uppercase;
+
+}
+
+.btn-spot:hover {
+  color: #fff;
+  background-color: rgb(243, 53, 58);
+  box-shadow: 0px 0px 20px 0px rgba(253, 74, 68,0.85);
+  
+}
+
+.bgpanel {
+  background: rgb(5, 20, 34);
+  color: rgba(255, 246, 235, 0.959);
+  padding: 20px;
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+  box-shadow: 0px 25px 39px 1px rgba(0,0,0,0.35);
+  border-radius: 1px;
+  border: 1px solid rgba(199, 177, 149, 0.15);
+  border-top: none;
+  border-right: 1px solid rgba(97, 115, 129, 0.151);
+  margin-right: 5px;
+}
+
+
+
+
+
+.smallIconClickable {
+  cursor: pointer;
+  color: rgba(255, 255, 255,0.5);
+  transition: all 0.25s;
+}
+
+.smallIconClickable:hover {
+  color: rgb(255, 255, 255,0.9); 
+}
+
+.serverError {
+  color: rgb(243, 53, 58);
+}
+
+
+.adminBlocks {
+  border: 1px solid rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.2);
+  margin: 0px 0px 10px 0px;
+  padding: 20px;
+}
+
+.adminBlocksSub {
+  border: 1px solid rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.2);
+  margin: 0px 0px 10px 0px;
+  padding: 20px;
+  
+}
+
+
+.footerButton {
+  color: rgba(255,255,255,0.5);
+  transition: all 0.2s;
+  
+
+}
+
+.footerButton:hover{
+  color: rgba(255,255,255,1);
+  
+  filter: drop-shadow(0px 0px 10px rgba(255,255,255,0.35));
+}
+
+.notificationBlock {
+  border: 1px solid rgba(255, 57, 67,0.35);
+  box-sizing: border-box;
+  background: rgba(255, 57, 67, 0.15);
+  margin: 20px;
+  padding: 10px;
+  font-weight: normal;
+  font-size: 12px;
+  border-radius: 1px;
+  color: rgba(255,57,67,1)
+}
+
+.notificationBlock button {
+  background: rgba(97, 97, 97, 0.15);
+  border: 1px solid rgba(92, 92, 92, 0.35);
+  border-radius: 1px;
+  margin-left: 10px;
+  color: rgb(255, 213, 216);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notificationBlock button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1px;
+  margin-left: 10px;
+  color: rgb(255, 255, 255)
 }

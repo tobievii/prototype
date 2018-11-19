@@ -97,11 +97,11 @@ app.get('/', (req: any, res: any) => {
 
   if (req.user) {
     if (req.user.level > 0) {
-      fs.readFile('../client/react.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err: Error, data: any) => {
         res.end(data.toString())
       })
     } else {
-      fs.readFile('../public/landing.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err: Error, data: any) => {
         res.end(data.toString())
       })
     }
@@ -129,21 +129,21 @@ app.get('/signout', (req: any, res: any) => {
 app.post('/signin', accounts.signInFromWeb(db));
 
 app.get('/settings', (req: any, res: any) => {
-  fs.readFile('../client/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 });
 
 app.get('/view/:id', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../client/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get('/view/:id/:mode', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../client/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 })
@@ -152,7 +152,7 @@ app.get('/view/:id/:mode', (req: express.Request | any, res: express.Response | 
 
 app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
   trex.log("fbp:");
-  fs.readFile('../client/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 })
@@ -549,8 +549,6 @@ export function processPacketWorkflow(db:any, apikey:string, deviceId:string, pa
       if (state.workflowCode) {
         // WORKFLOW EXISTS ON THIS DEVICE
         
-        console.log("test tcp")
-
         var sandbox:any = {
           http : require("http"),
           https : require("https"),

@@ -41,6 +41,7 @@
     "mocha": "^5.2.0",
     "mongojs": "^2.6.0",
     "mqtt": "^2.18.8",
+    "nodemailer": "^4.6.8",
     "serialport": "^7.0.2",
     "socket.io": "^2.1.1",
     "source-map-support": "^0.5.9",

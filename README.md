@@ -1,5 +1,8 @@
 # Prototype
 
+Live: https://prototype.iotnxt.io
+Discord: https://discord.gg/rTQmvbT
+
 IoT framework for general purpose remote monitoring/control.   
 Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://webpack.js.org/),[react](https://reactjs.org/), [mongoDB](https://www.mongodb.com/), [express](https://expressjs.com/) and [socket.io](https://socket.io/).
 

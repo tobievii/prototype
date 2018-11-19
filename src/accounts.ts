@@ -14,8 +14,6 @@ export function midware(db: any) {
       
       var auth = Buffer.from(req.headers.authorization.split(" ")[1], 'base64').toString()
       
-      console.log(auth)
-
       if (auth.split(":")[0] == "api") {
         var apiAuth = auth.split(":")[1];
         var apikey = apiAuth.split("-")[1]
@@ -82,9 +80,15 @@ export function cookieSetFromUser(user:any, req:any, res:any, next:any) {
 
 export function signInFromWeb(db: any) {
   return function(req: any, res: any, next: any) {
+
+    
+
     if (req.body) {
+      console.log(req.body)
       if (req.body.email) {
+        
         if (validateEmail(req.body.email) && req.body.pass) {
+          
           db.users.findOne(
             { email: req.body.email.toLowerCase(), password: req.body.pass },
             (err: Error, user: any | undefined) => {
@@ -101,6 +105,8 @@ export function signInFromWeb(db: any) {
         } else {
           res.json({ error: "not valid email and/or password" });
         }
+      } else {
+        res.json({ error: "email address can not be empty"})
       }
     } else {
       res.json({ error: "could not parse json" });
@@ -193,6 +199,29 @@ export function defaultAdminAccount(db:any) {
   //
 }
 
+
+
+export function registerExistingAccount(db:any, user:any, cb:any) {
+  console.log("registerExistingAccount")
+  if (validateEmail(user.email)) {
+    db.users.find({email:user.email}, (err:Error, usersEmailExists:any) => {
+
+      if (usersEmailExists.length == 0) {
+        db.users.update({ uuid: user.uuid }, user, { upsert: true },cb);  
+      } else {
+        cb("that email is taken", undefined)
+      }
+      
+
+    })
+    
+  } else {
+    cb("not valid email", undefined);
+  }
+  
+}
+
+
 // V3 API: ACCOUNT CREATE
 export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: any, accRequest:any|undefined) {
   var event = new Date();
@@ -272,10 +301,6 @@ export function accountDelete(db:any, user:account, cb:any ) {
 
 
 
-
-
-
-
 export function validateEmail(email:string) {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
@@ -288,6 +313,7 @@ export function validateEmail(email:string) {
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
+
 export function difference(object:any, base:any) {
 
 	function changes(object:any, base:any) {

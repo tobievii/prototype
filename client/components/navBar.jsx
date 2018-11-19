@@ -9,6 +9,22 @@ library.add(faCog)
 library.add(faTimes)
 
 export class NavBar extends Component {
+  showSettings = () => {
+    if (this.props.account) {
+      if (this.props.account.level > 0) {
+        return (<a href="/settings" className="navLink"><FontAwesomeIcon icon="cog" /></a>)
+      }       
+    }
+  }
+
+  showLogout = () => {
+    if (this.props.account) {
+      if (this.props.account.level > 0) {
+        return (<a href="/signout" className="navLink" title="logout" ><FontAwesomeIcon icon="times" /></a>)
+      }       
+    }
+  }
+
   render() {
     return (
       <div className="" style={{ margin: "0 20px" }} >
@@ -28,15 +44,15 @@ export class NavBar extends Component {
                   className="font-weight-bold spot"
                   style={{ paddingLeft: 5, float: "left" }}
                 >
-                  PR0T0TYP3 <span style={{ color: "#fff", fontSize: 15 }}>DASHBOARD <span id="version" />{this.props.version}</span>
+                   PR0T0TYP3 <span style={{ color: "#fff", fontSize: 15 }}>DASHBOARD <span id="version" />{this.props.version}</span> 
                 </div>
               </div>
             </a>
 
             <div style={{ padding: "20px 10px 10px 10px", float: "right" }}>
               <span style={{fontSize: 14}}>{this.props.email}</span>&nbsp;
-              <a href="/settings" className="navLink"><FontAwesomeIcon icon="cog" /></a>&nbsp;
-              <a href="/signout" className="navLink"><FontAwesomeIcon icon="times" /></a>
+
+              { this.showSettings() }              
             </div>
           </div>
         </div>
