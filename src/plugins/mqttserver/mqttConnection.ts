@@ -2,6 +2,7 @@
 
 // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718037
 // https://docs.solace.com/MQTT-311-Prtl-Conformance-Spec/MQTT%20Control%20Packet%20format.htm#_Toc430864887
+
 import { EventEmitter } from "events";
 import * as net from "net"
 import * as accounts from "../../accounts"
@@ -87,7 +88,7 @@ export class mqttConnection extends EventEmitter {
                 var passwordOffset = usernameOffset+usernameLength+2
                 connect.password = data.slice(passwordOffset, passwordOffset+passwordLength).toString()
 
-                //console.log(connect);
+                console.log(connect);
 
                 //CHECK APIKEY
                 var apikey = connect.password.split("-")
@@ -95,12 +96,16 @@ export class mqttConnection extends EventEmitter {
                     apikey = apikey[1]
                     accounts.checkApiKey(apikey, (err:Error, result:any)=>{
                         
+                        console.log("CHECK API KEY...")
+
                         if (err) { 
+                            console.log("NOT VALID")
                             console.log(err); 
                             socket.destroy();
                             return;
                         }
                         
+                        console.log("VALID!")
                         this.apikey = apikey;
                         this.emit("connect", connect)                
                         socket.write(" \u0002\u0000\u0000");
@@ -160,10 +165,31 @@ export class mqttConnection extends EventEmitter {
                 console.log("SUBSCRIBE")
 
 
+                var parse:any = {} 
+                parse.packetType = data.slice(0,1).toString('hex')[0]
+                parse.totalLength = data.length;
+                parse.remainingLength = getRemainingLength(data) //data.readUInt8(1)
+                
+                
+                var offset = parse.remainingLength.bytenum;
+                offset  += 2;
+                var topicLength = Buffer.from(data.slice(offset,offset+1).toString('hex'), "hex")[0];
+
+                console.log(topicLength)
+
+                offset += 3;
+                parse.topic = data.slice(offset,-1).toString() 
+                // offset += topicLength;
+                // parse.payload = data.slice(offset).toString()
+                // return parse;
+
+
+                console.log(parse);
 
                 this.emit("subscribe", {
-                    subscribe: data.toString().split("\u0000")[1].slice(1)
+                     subscribe: parse.topic
                 })
+
                 return;
             }
 
