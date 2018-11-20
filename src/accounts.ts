@@ -84,7 +84,7 @@ export function signInFromWeb(db: any) {
     
 
     if (req.body) {
-      console.log(req.body)
+      
       if (req.body.email) {
         
         if (validateEmail(req.body.email) && req.body.pass) {
