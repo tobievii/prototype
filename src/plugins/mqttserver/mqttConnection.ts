@@ -2,6 +2,7 @@
 
 // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Toc398718037
 // https://docs.solace.com/MQTT-311-Prtl-Conformance-Spec/MQTT%20Control%20Packet%20format.htm#_Toc430864887
+
 import { EventEmitter } from "events";
 import * as net from "net"
 import * as accounts from "../../accounts"
@@ -87,7 +88,7 @@ export class mqttConnection extends EventEmitter {
                 var passwordOffset = usernameOffset+usernameLength+2
                 connect.password = data.slice(passwordOffset, passwordOffset+passwordLength).toString()
 
-                //console.log(connect);
+                console.log(connect);
 
                 //CHECK APIKEY
                 var apikey = connect.password.split("-")
@@ -95,12 +96,16 @@ export class mqttConnection extends EventEmitter {
                     apikey = apikey[1]
                     accounts.checkApiKey(apikey, (err:Error, result:any)=>{
                         
+                        console.log("CHECK API KEY...")
+
                         if (err) { 
+                            console.log("NOT VALID")
                             console.log(err); 
                             socket.destroy();
                             return;
                         }
                         
+                        console.log("VALID!")
                         this.apikey = apikey;
                         this.emit("connect", connect)                
                         socket.write(" \u0002\u0000\u0000");
@@ -158,12 +163,66 @@ export class mqttConnection extends EventEmitter {
             
             if (mqttPacketType == 8) {
                 console.log("SUBSCRIBE")
+                var parse:any = {} 
 
+                //console.log(parseInt(data.slice(0,1).toString("hex"), 16).toString(2)) // 10000010               
+                //console.log( bufferToBinary(data, 0) ) // 1000 0010   - always
+
+                //parse.packetIdentifier = getPacketIdentifier(data.slice(1,5)).total
+                parse.packetIdentifier = data.slice(2,4)                
+
+                // console.log("------")
+                // console.log( bufferToBinary(data, 0) )       // MQTT CONTROL PACKET TYPE 8
+                // console.log( bufferToBinary(data, 1) )       // REMAINING LENGTH
+                // console.log( bufferToBinary(data, 2) )       // PACKET IDENTIFIER MSB
+                // console.log( bufferToBinary(data, 3) )       // PACKET IDENTIFIER LSB
+                // console.log( bufferToBinary(data, 4) ) //
+                // console.log( bufferToBinary(data, 5) ) //
+                // console.log( bufferToBinary(data, 6) )
+                // console.log( bufferToBinary(data, 7) )
+                // console.log( bufferToBinary(data, 8) )
+                // console.log("------")
+
+                console.log()
+                parse.topicLength = data.readUInt16BE(4);
+                parse.topic = data.slice(6,-1).toString()
+                parse.qos = parseInt(bufferToBinary(data, data.length-1).slice(-2),2);
+                parse.remainingLength = getRemainingLength(data)
+
+                // parse.packetType = data.slice(0,1).toString('hex')[0]
+                // parse.totalLength = data.length;
+                 //data.readUInt8(1)
+                
+                
+                // var offset = parse.remainingLength.bytenum;
+                // offset  += 2;
+                // var topicLength = Buffer.from(data.slice(offset,offset+1).toString('hex'), "hex")[0];
+
+                // console.log(topicLength)
+
+                // offset += 3;
+                // parse.topic = data.slice(offset,-1).toString() 
+                // offset += topicLength;
+                // parse.payload = data.slice(offset).toString()
+                // return parse;
+
+
+
+                console.log("suback.")
+                var suback = Buffer.concat([ 
+                    Buffer.from([parseInt("10010000",2)]),  
+                    Buffer.from([3]),
+                    parse.packetIdentifier,
+                    Buffer.from([parse.qos])                
+                ])
+                console.log(suback);
+                socket.write(suback);
 
 
                 this.emit("subscribe", {
-                    subscribe: data.toString().split("\u0000")[1].slice(1)
+                     subscribe: parse.topic
                 })
+
                 return;
             }
 
@@ -225,6 +284,37 @@ function getRemainingLength(data:any) {
     return { total, bytenum }
   }
 
+
+
+
+  function getPacketIdentifier(data:any) {
+
+    var remainingdata = true;
+    var total = 0;
+    var bytenum = 0;
+    if (data[1] <= 127) {
+        console.log(data[1].toString(16))
+        total += data[1]
+        bytenum = 1;
+    } else {
+        console.log(data[1].toString(16))
+        bytenum = 2;
+        total += data[1] - 128
+        console.log(data[2].toString(16))
+        if (data[2] <= 127) {
+          
+            total += data[2] * 128
+        } else {
+            bytenum = 3;
+            total += (data[2]-128) * 128
+            total += data[3] * (128*128)
+        }
+    }
+  
+    return { total, bytenum }
+  }
+
+
 function checkBit(data:Buffer,bitnum:number) {
     //bitnum from right
     try {
@@ -266,4 +356,14 @@ function buildMqttPublishPacket(topic:any, data:any) {
     ])
   
     return pubbuf;
+  }
+
+
+  function bufferToBinary(bufferIn:Buffer, byteNu:number) {
+      var binarystring = parseInt(bufferIn.slice(byteNu,byteNu+1).toString("hex"), 16).toString(2)
+      while (binarystring.length < 8 ) {
+          binarystring = "0" + binarystring;
+      }
+    
+      return binarystring
   }

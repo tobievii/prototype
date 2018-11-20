@@ -12,8 +12,11 @@ export function postState(
 ) {
 
   if (!user) { 
-      //console.log("user undefined")
-      cb("user undefined", undefined)
+    
+    //console.log(meta)
+    //console.log(request)
+    //console.log("user undefined")
+    //cb("user undefined", undefined)
     return; 
   }
 

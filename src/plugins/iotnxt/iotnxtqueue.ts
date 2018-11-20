@@ -161,7 +161,7 @@ export class IotnxtQueue extends events.EventEmitter {
               ReplyKey: replyKey.toUpperCase()
           }
 
-          console.log(wrappedMessage)
+          //console.log(wrappedMessage)
 
           mqttGreen.publish("MESSAGEAUTHREQUEST", JSON.stringify(wrappedMessage), { qos: 1 }, function (err: any) {
               if (err) { console.error("publisherror:" + err) }
@@ -188,6 +188,7 @@ export class IotnxtQueue extends events.EventEmitter {
           this.secret = secret;
           cb(undefined, secret);
         } else {
+          console.log(secret)
           if (secret.ErrorMsg) {
             cb(secret.ErrorMsg.split('\n')[0], undefined);
           } else {
