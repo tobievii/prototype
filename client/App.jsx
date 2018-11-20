@@ -10,7 +10,7 @@ import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { ParamsView } from "./components/paramsView.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
-
+import { Dashboard } from "./components/dashboard/dashboard.jsx";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -228,17 +228,7 @@ class App extends Component {
     ///////////////
   } // end constructor
 
-  mainView = () => {
-    if (this.state.viewType) {
-      if (this.state.viewType == "table") {
-        return <StatesViewer states={this.state.states} />;
-      }
-      // if (this.state.viewType == "fbp" ) {
-      //   return (  <FBP states={this.state.states} /> )
-      // }
-    } else {
-    }
-  };
+
 
 
   notLogged = () => {
@@ -265,15 +255,18 @@ class App extends Component {
               </div>
             </div>
           </div>
-          {this.mainView()}
 
+          <StatesViewer states={this.state.states} />
 
+          <Dashboard />
 
           <ApiInfo apikey={this.state.apikey} />
 
         </div>
       );
     }
+
+
 
     /*------------------------------------------------------     
         url: /view                                            
