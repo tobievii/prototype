@@ -57,6 +57,9 @@ app.use('/view', express.static('../client/dist'))
 
 eventHub.on("device", (data: any) => {
   //console.log("----")
+
+
+
   handleDeviceUpdate(data.apikey, data.packet, {socketio:true} , (e: Error, r: any) => { });
 })
 eventHub.on("plugin", (data: any) => {
@@ -73,11 +76,11 @@ app.use(accounts.midware(db)); // rouan's cookie/user manager
 
 
 db.on('connect', function () {
+  
   for (var p in plugins) {
-    if (plugins[p].init) {
-      plugins[p].init(app, db, eventHub);
-    }
+    if (plugins[p].init) { plugins[p].init(app, db, eventHub); }
   }
+
 })
 
 //####################################################################
@@ -354,6 +357,8 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
 
+
+
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
             plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
@@ -383,7 +388,7 @@ function handleState(req: any, res: any, next: any) {
 function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any) {
 
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
-    if (err) { console.log(err); cb(err, undefined); }
+    if (err) { console.log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
       state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
