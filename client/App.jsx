@@ -258,7 +258,7 @@ class App extends Component {
 
           <StatesViewer states={this.state.states} />
 
-          <Dashboard />
+          
 
           <ApiInfo apikey={this.state.apikey} />
 
@@ -295,6 +295,7 @@ class App extends Component {
             <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
             <br />
             <br />
+            <Dashboard />
             <DeviceView
               state={this.state.state}
               view={this.state.view}
