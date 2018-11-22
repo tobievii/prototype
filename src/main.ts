@@ -216,16 +216,15 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
 // run once to update old packet data to have correct timestamp
 app.get("/admin/processpackets", (req:any, res:any)=>{
   if (req.user.level < 100) { res.end("no permission"); return; }
-  db.packets.find({}, (err:Error, packets:any)=>{
+  db.packets.find({"_created_on" : { "$exists" : false }}).limit(1000, (err:Error, packets:any)=>{
+    res.write("packets:\t"+packets.length);
     for (var packet of packets) {
       if (packet["_created_on"] == undefined) {
         packet["_created_on"] = new Date(packet.meta.created.jsonTime);
         db.packets.update({"_id" : packet["_id"]}, packet)
-        res.write(".");
-        console.log(".")
       }      
     }
-    res.end("done.")
+    res.end("\ndone.")
   })
 })
 
