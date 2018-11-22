@@ -235,7 +235,7 @@ app.post("/api/v3/activity", (req:any, res:any) => {
 
   db.packets.aggregate([
     { $match :
-        { _created_on :{ $gt: new Date("2018-01-01T00:00:00.000Z")}, apikey:"glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9", devid:"yourDevice001"}
+        { _created_on :{ $gt: new Date("2018-01-01T00:00:00.000Z")}, apikey:req.user.apikey, devid:req.body.deviceid}
     },
     { $group : {
         _id : { date: { $dateToString: { format: "%Y-%m-%d", date: "$_created_on" } }},
