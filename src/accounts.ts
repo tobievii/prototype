@@ -47,7 +47,7 @@ export function midware(db: any) {
           db.users.findOne({ uuid: req.cookies.uuid }, (err: any, user: any) => {
             if (user) {
               user._last_seen = new Date();
-              db.users.update({"_id":user["_id"]}, user);
+              //db.users.update({"_id":user["_id"]}, user);
               req.user = user;
               next();
             } else {

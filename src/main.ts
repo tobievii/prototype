@@ -171,8 +171,10 @@ app.get('/api/v3/version', (req: any, res: any) => {
 })
 
 app.get('/api/v3/account', (req: any, res: any) => {
-  delete req.user.password;
-  res.json(req.user);
+  var cleanUser = _.clone(req.user);
+
+  delete cleanUser.password;
+  res.json(cleanUser);
 })
 
 // This is to update the workflow on a device.
