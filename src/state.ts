@@ -26,6 +26,7 @@ export function postState(
     request.timestamp = event.toJSON();
 
     var packet = {
+      "_created_on" : new Date(),
       apikey: user.apikey,
       devid: request.id,
       payload: request,

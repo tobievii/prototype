@@ -47,8 +47,7 @@ callback(packet); `
   };
 
   saveWorkflow = () => {
-    console.log("saving workflow");
-    console.log(this.state.code);
+
 
     fetch("/api/v3/workflow", {
       method: "POST",
@@ -77,7 +76,7 @@ callback(packet); `
         if (e.ctrlKey) {
           e.preventDefault();
 
-          console.log("SAVE");
+          
           this.saveWorkflow();
         }
       }
@@ -95,16 +94,11 @@ callback(packet); `
     })
       .then(response => response.json())
       .then(packets => {
-        console.log("LAST PACKET:")
-        console.log(packets);
         if (packets.length > 0) {
           this.setState({lastPacket:packets[0]})
         } else {
           this.setState({lastPacket:{}})
         }
-        // console.log("lastState loaded..")
-        // this.setState({ lastState: data });
-        // cb(undefined, data);
       })
       .catch(err => console.error(err.toString()));
   };
@@ -120,7 +114,6 @@ callback(packet); `
     })
       .then(response => response.json())
       .then(data => {
-        console.log("lastState loaded..")
         this.setState({ lastState: data });
         cb(undefined, data);
       })
@@ -142,9 +135,7 @@ callback(packet); `
         for (var s in data) {
           statesObj[data[s].devid] = data[s];
         }
-        this.setState({ lastStates: data, lastStatesObj: statesObj });
-        console.log("lastStates loaded..")
-        
+        this.setState({ lastStates: data, lastStatesObj: statesObj });        
         this.loadPluginDefinitions((e,pluginDefinitions)=>{
           cb(undefined, { lastStates: data, lastStatesObj: statesObj, pluginDefinitions });
         })
@@ -163,8 +154,6 @@ callback(packet); `
       }
     }).then(response => response.json()).then(data => {
       this.setState({ pluginDefinitions : data });
-      console.log("plugin definitions loaded..")
-      console.log(data);
       cb(undefined,data);      
     }).catch( (err) => {
       //console.error(err.toString())
@@ -185,7 +174,6 @@ callback(packet); `
   }
 
   editorDidMount = (editor, monaco) => {
-    console.log("editorDidMount", editor);
     editor.focus();
 
     //fetch('/themes/Monokai.json')
@@ -199,7 +187,6 @@ callback(packet); `
     
     this.loadStates((err, resp) => {
       // extra libraries
-      console.log("editor state loaded")
 
       var definitions = [
         "declare var packet = " + JSON.stringify(this.state.lastPacket),
@@ -216,7 +203,6 @@ callback(packet); `
         "}"
       ]
 
-      console.log("----------")
       definitions = definitions.concat(resp.pluginDefinitions.definitions);
       
 
@@ -227,7 +213,6 @@ callback(packet); `
     });
 
     window.addEventListener("resize", () => {
-      console.log("resize!");
       editor.layout();
     });
   };
@@ -252,7 +237,6 @@ callback(packet); `
         //console.log("got state! got code");
 
         if (this.state.loaded == 0) {
-          console.log(this.props.state.workflowCode);
           var code = this.props.state.workflowCode;
           this.setState({ loaded: 1 });
           this.setState({ code });

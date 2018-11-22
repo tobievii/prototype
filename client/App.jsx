@@ -295,7 +295,13 @@ class App extends Component {
             <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
             <br />
             <br />
-            <Dashboard />
+            <Dashboard 
+                deviceid={window.location.pathname.split("/")[2]}
+                state={this.state.state}
+                view={this.state.view}
+                packets={this.state.packets}
+                socketDataIn={this.state.socketDataIn}
+            />
             <DeviceView
               state={this.state.state}
               view={this.state.view}
@@ -343,11 +349,11 @@ class App extends Component {
     if (this.state.account == undefined) {
       return null;
     } else {
-      console.log(this.state.loggedIn)
+      
       if (this.state.loggedIn == true) {
         return this.logged()
       } else {
-        console.log(this.state)
+        
         return this.notLogged()  
       }
     

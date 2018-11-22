@@ -19,10 +19,6 @@ export class Dashboard extends React.Component {
     
   }
 
-  
-
-  
-
   render() {
     // layout is an array of objects, see the demo for more complete usage
     var layout = [
@@ -31,11 +27,13 @@ export class Dashboard extends React.Component {
     ];
     return (
       <div>
-
+        
+        
         
       <GridLayout className="layout" layout={layout} cols={40} rowHeight={30} width={"4000"}>
-        <div className="dashboardBlock" key="c" ><Calendar /></div>
-        <div className="dashboardBlock" key="d" ><Line /></div>
+        <div className="dashboardBlock" key="c" >
+          <Calendar deviceid={this.props.deviceid} /></div>
+        {/* <div className="dashboardBlock" key="d" ><Line /></div> */}
       </GridLayout>
       </div>
     )

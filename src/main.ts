@@ -40,6 +40,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
+import { userInfo } from 'os';
 
 app.use(compression());
 app.use(cookieParser());
@@ -211,6 +212,60 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
     res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
   }
 });
+
+// run once to update old packet data to have correct timestamp
+app.get("/admin/processpackets", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
+  db.packets.find({}, (err:Error, packets:any)=>{
+    for (var packet of packets) {
+      if (packet["_created_on"] == undefined) {
+        packet["_created_on"] = new Date(packet.meta.created.jsonTime);
+        db.packets.update({"_id" : packet["_id"]}, packet)
+        res.write(".");
+        console.log(".")
+      }      
+    }
+    res.end("done.")
+  })
+})
+
+app.post("/api/v3/activity", (req:any, res:any) => {
+  console.log("activity")
+  console.log(req.body)  
+
+  db.packets.aggregate([
+    { $match :
+        { _created_on :{ $gt: new Date("2018-01-01T00:00:00.000Z")}, apikey:"glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9", devid:"yourDevice001"}
+    },
+    { $group : {
+        _id : { date: { $dateToString: { format: "%Y-%m-%d", date: "$_created_on" } }},
+        value: { $sum: 1 }
+    }},
+    { $sort: { _id: 1 } }
+    ], (err:Error, results:any)=>{
+      
+
+      for (var result of results) {
+        
+        var temp = {
+          day : result["_id"].date,
+          value : result.value
+        }
+
+        delete result.value
+        delete result["_id"]
+
+        result.day = temp.day
+        result.value = temp.value
+        
+      }
+
+      console.log(results);
+      res.json(results);
+    })
+
+  
+})
 
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
