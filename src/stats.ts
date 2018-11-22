@@ -36,7 +36,8 @@ export function init(app: any, db: any) {
       users24h : await usersActiveLastDays(1),
       users1w : await usersActiveLastDays(7),
       users1m : await usersActiveLastDays(30),
-      states24h: await statesActiveLastDays(1)
+      states24h: await statesActiveLastDays(1),
+      packets24h : await packetsActiveLastDays(1)
     }
     res.json(stats)
   })
@@ -45,7 +46,7 @@ export function init(app: any, db: any) {
   function usersActiveLastDays(days:number):Promise<number> {
     return new Promise<number> (resolve => {
       var time = (24*60*60 * 1000) * days;
-      db.users.find({"_last_seen":{$gt:new Date(Date.now() - time)}}).count( (err:Error, usersCount:any)=>{
+      db.users.find({ level : { $gt: 0 }, "_last_seen":{$gt:new Date(Date.now() - time)}}).count( (err:Error, usersCount:any)=>{
         resolve(usersCount)
       })
     })
@@ -60,6 +61,17 @@ export function init(app: any, db: any) {
       })
     })
   }
+
+    //   packets last 24hr
+    function packetsActiveLastDays(days:number):Promise<number> {
+      return new Promise<number> (resolve => {
+        var time = (24*60*60 * 1000) * days;
+        db.packets.find({"_created_on":{$gt:new Date(Date.now() - time)}}).count( (err:Error, packetsCount:any)=>{
+          resolve(packetsCount)
+        })
+      })
+    }
+
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 

@@ -20,7 +20,7 @@ export default class Stats extends React.Component {
   render() {
     return (
       <div className="panel">
-        In the last 24 hours {this.state.stats.users24h} active users and {this.state.stats.states24h} devices
+        In the last 24 hours {this.state.stats.users24h} active users, {this.state.stats.states24h} devices and {this.state.stats.packets24h} packets of data.
         {/* ( {this.state.stats.users1w} this week,  {this.state.stats.users1m} this month ) */}
       </div>
     )

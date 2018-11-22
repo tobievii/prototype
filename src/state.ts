@@ -25,7 +25,7 @@ export function postState(
     var event = new Date();
     request.timestamp = event.toJSON();
 
-    var packet = {
+    var packet:any = {
       "_last_seen" : new Date(),
       apikey: user.apikey,
       devid: request.id,
@@ -63,10 +63,11 @@ export function postState(
         var packetToUpsert: any = {};
         if (findResult) {
           delete findResult["_id"];
-
           packetToUpsert = _.merge(findResult, packet);
+          packetToUpsert["_last_seen"] = new Date();
         } else {
-          packetToUpsert = packet;
+          packetToUpsert = _.clone(packet);
+          packetToUpsert["_last_seen"] = new Date();
           packetToUpsert["_created_on"] = new Date();
         }
 
@@ -76,6 +77,9 @@ export function postState(
           packetToUpsert,
           { upsert: true },
           (errUp: Error, resUp: any) => {
+            
+            delete packet["_last_seen"]
+            packet["_created_on"] = new Date();
             db.packets.save(packet, (errSave: Error, resSave: any) => {            
               cb(resSave);
             });
