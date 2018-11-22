@@ -42,6 +42,8 @@ var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import { userInfo } from 'os';
 
+import * as stats from "./stats"
+
 app.use(compression());
 app.use(cookieParser());
 app.use(express.static('../public'))
@@ -115,7 +117,7 @@ app.get('/', (req: any, res: any) => {
 
 })
 
-
+stats.init(app,db);
 
 app.get('/admin/accounts', (req: any, res: any) => {
   fs.readFile('../public/admin_accounts.html', (err: Error, data: any) => {
@@ -189,6 +191,7 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
 })
 
 
+
 app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -213,58 +216,73 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   }
 });
 
-// run once to update old packet data to have correct timestamp
-app.get("/admin/processpackets", (req:any, res:any)=>{
+// run to update old packet data to have correct timestamp
+// app.get("/admin/processpackets", (req:any, res:any)=>{
+//   if (req.user.level < 100) { res.end("no permission"); return; }
+//   db.packets.find({"_created_on" : { "$exists" : false }}).limit(10000, (err:Error, packets:any)=>{
+//     res.write("packets:\t"+packets.length);
+//     for (var packet of packets) {
+//       if (packet["_created_on"] == undefined) {
+//         packet["_created_on"] = new Date(packet.meta.created.jsonTime);
+//         db.packets.update({"_id" : packet["_id"]}, packet)
+//       }      
+//     }
+//     res.end("\ndone.")
+//   })
+// })
+
+// run to update old packet data to have correct timestamp
+app.get("/admin/processusers", (req:any, res:any)=>{
   if (req.user.level < 100) { res.end("no permission"); return; }
-  db.packets.find({"_created_on" : { "$exists" : false }}).limit(1000, (err:Error, packets:any)=>{
-    res.write("packets:\t"+packets.length);
-    for (var packet of packets) {
-      if (packet["_created_on"] == undefined) {
-        packet["_created_on"] = new Date(packet.meta.created.jsonTime);
-        db.packets.update({"_id" : packet["_id"]}, packet)
+
+  db.users.find({"_created_on" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+    res.write("users:\t"+users.length);
+    for (var user of users) {
+      if (user["_created_on"] == undefined) {
+        user["_created_on"] = new Date(user.created.jsonTime);
+        db.users.update({"_id" : user["_id"]}, user)
       }      
     }
     res.end("\ndone.")
-  })
+  }) 
 })
 
-app.post("/api/v3/activity", (req:any, res:any) => {
-  console.log("activity")
-  console.log(req.body)  
+app.get("/admin/processusersseen", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
 
-  db.packets.aggregate([
-    { $match :
-        { _created_on :{ $gt: new Date("2018-01-01T00:00:00.000Z")}, apikey:req.user.apikey, devid:req.body.deviceid}
-    },
-    { $group : {
-        _id : { date: { $dateToString: { format: "%Y-%m-%d", date: "$_created_on" } }},
-        value: { $sum: 1 }
-    }},
-    { $sort: { _id: 1 } }
-    ], (err:Error, results:any)=>{
+  db.users.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+    res.write("users:\t"+users.length);
+    for (var user of users) {
+      if (user["_last_seen"] == undefined) {
+        user["_last_seen"] = new Date(user.created.jsonTime);
+        db.users.update({"_id" : user["_id"]}, user)
+      }      
+    }
+    res.end("\ndone.")
+  }) 
+})
+
+app.get("/admin/processstates", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
+
+  db.states.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, states:any)=>{
+    res.write("states:\t"+states.length);
+    for (var state of states) {
       
+      if (state["_last_seen"] == undefined) {
+        state["_last_seen"] = new Date(state.meta.created.jsonTime);  
+      } 
+      if (state["_created_on"] == undefined) {
+        state["_created_on"] = new Date(state.meta.created.jsonTime);  
+      } 
 
-      for (var result of results) {
-        
-        var temp = {
-          day : result["_id"].date,
-          value : result.value
-        }
-
-        delete result.value
-        delete result["_id"]
-
-        result.day = temp.day
-        result.value = temp.value
-        
-      }
-
-      console.log(results);
-      res.json(results);
-    })
-
-  
+      db.states.update({"_id" : state["_id"]}, state)     
+    }
+    res.end("\ndone.")
+  }) 
 })
+
+
 
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
 

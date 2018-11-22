@@ -46,6 +46,8 @@ export function midware(db: any) {
         } else {
           db.users.findOne({ uuid: req.cookies.uuid }, (err: any, user: any) => {
             if (user) {
+              user._last_seen = new Date();
+              db.users.update({"_id":user["_id"]}, user);
               req.user = user;
               next();
             } else {
@@ -169,19 +171,7 @@ export function accountVerifyCheck(db: any) {
   }
 }
 
-export interface account {
-  email : string,
-  apikey: string,
-  password: string,
-  level : number,
-  created : any,
-  uuid : string,
-  lastSeen : any,
-  ip : string,
-  ipLoc : any,
-  userAgent : any,
-  emailverified : boolean
-}
+
 
 
 export function defaultAdminAccount(db:any) {
@@ -228,8 +218,9 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
   var geoIPLoc = geoip.lookup(ip);
  
 
-  var user:account = {
+  var user:any = {
     uuid: utils.generate(128),
+    "_created_on": new Date(),
     created: {
       unix: event.getTime(),
       jsonTime: event.toJSON()
@@ -284,13 +275,13 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
 }
 
 
-export function accountClear(db:any, account:account, cb:any) {
+export function accountClear(db:any, account:any, cb:any) {
   if (account) {
     db.users.remove(account, cb);
   }
 }
 
-export function accountDelete(db:any, user:account, cb:any ) {
+export function accountDelete(db:any, user:any, cb:any ) {
   console.log("USER!")
   console.log(user);
   db.users.remove(user, (err:Error, result:any) => {

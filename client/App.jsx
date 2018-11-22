@@ -12,6 +12,9 @@ import { ParamsView } from "./components/paramsView.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
 import { Dashboard } from "./components/dashboard/dashboard.jsx";
 
+import Stats from "./components/stats.jsx"
+import Footer from "./public/footer.jsx"
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 //import { faStroopwafel, faCodeBranch, faTable } from '@fortawesome/free-solid-svg-icons'
@@ -261,7 +264,8 @@ class App extends Component {
           
 
           <ApiInfo apikey={this.state.apikey} />
-
+          <Stats />
+          <Footer />
         </div>
       );
     }
