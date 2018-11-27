@@ -9,6 +9,17 @@ import "../prototype.scss"
 export default class Stats extends React.Component {
   state = { stats: {} }
 
+  userNameList = () => {
+    try {
+      return (<div>
+        {
+          this.state.stats.users24hList.map( (user, i) =>  <span key={i} title={ user }>{ user.split("@")[0] } </span> )
+        }
+      </div>)
+    } catch (err) {}
+  }
+
+
   componentDidMount = () => {
     fetch("/api/v3/stats", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
@@ -22,6 +33,8 @@ export default class Stats extends React.Component {
       <div className="panel">
         In the last 24 hours {this.state.stats.users24h} active users, {this.state.stats.states24h} devices and {this.state.stats.packets24h} packets of data.
         {/* ( {this.state.stats.users1w} this week,  {this.state.stats.users1m} this month ) */}
+        {/* { JSON.stringify(this.state.stats.users24hList)} */}
+        { this.userNameList() }
       </div>
     )
   }

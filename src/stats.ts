@@ -34,6 +34,7 @@ export function init(app: any, db: any) {
   app.get("/api/v3/stats", async (req:any, res:any)=>{
     var stats = {
       users24h : await usersActiveLastDays(1),
+      users24hList : await usersActiveLastDaysNames(1),
       users1w : await usersActiveLastDays(7),
       users1m : await usersActiveLastDays(30),
       states24h: await statesActiveLastDays(1),
@@ -41,6 +42,20 @@ export function init(app: any, db: any) {
     }
     res.json(stats)
   })
+
+//   users last 24hr
+function usersActiveLastDaysNames(days:number):Promise<any> {
+  return new Promise<any> (resolve => {
+    var time = (24*60*60 * 1000) * days;
+    db.users.find({ level : { $gt: 0 }, "_last_seen":{$gt:new Date(Date.now() - time)}}, (err:Error, userList:any)=>{
+      var nameList:any = []
+      for (var user of userList) {
+        nameList.push(user.email);
+      }
+      resolve(nameList)
+    })
+  })
+}
 
   //   users last 24hr
   function usersActiveLastDays(days:number):Promise<number> {
