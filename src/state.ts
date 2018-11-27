@@ -81,7 +81,16 @@ export function postState(
             delete packet["_last_seen"]
             packet["_created_on"] = new Date();
             db.packets.save(packet, (errSave: Error, resSave: any) => {            
-              cb(resSave);
+
+              // update user account activity timestamp
+              db.users.findOne({apikey : user.apikey}, (e:Error, user:any)=>{
+                user["_last_seen"] = new Date();
+                db.users.update({apikey : user.apikey}, user, (e2:Error, r2:any)=>{
+                  cb(resSave);
+                })
+              })
+
+              
             });
           }
         );

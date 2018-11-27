@@ -334,3 +334,4 @@ export function validApiKey(db:any,testkey:string,cb:any) {
 export function checkApiKey(testkey:string, cb:any) {
   validApiKey(dbglobal, testkey, cb)
 }
+
