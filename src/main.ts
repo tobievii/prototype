@@ -72,9 +72,11 @@ eventHub.on("plugin", (data: any) => {
 //app.use(express.json())
 app.use(safeParser);
 
+//creates default admin account on first run.
 accounts.defaultAdminAccount(db);
 
-app.use(accounts.midware(db)); // rouan's cookie/user manager
+//handle accounts/cookies.
+app.use(accounts.midware(db)); 
 
 
 
@@ -84,6 +86,23 @@ db.on('connect', function () {
     if (plugins[p].init) { plugins[p].init(app, db, eventHub); }
   }
 
+})
+
+//####################################################################
+// USERS LAST SEEN / ACTIVE
+app.use( (req:any, res:any, next:any)=>{
+  if (req.user) {
+    console.log("user active:\t"+req.user.email+"\t"+req.url)
+    db.users.findOne({apikey : req.user.apikey}, (e:Error, user:any)=>{
+      user["_last_seen"] = new Date();
+      db.users.update({apikey : req.user.apikey}, user, (e2:Error, r2:any)=>{
+        next();
+      })
+    })
+  } else {
+    next();
+  }
+  
 })
 
 //####################################################################
