@@ -19,6 +19,14 @@ export class Dashboard extends React.Component {
     
   }
 
+  onDragOver = () => {
+    console.log("dragOver")
+  }
+
+  onDrop = () => {
+    console.log("drop")
+  }
+
   render() {
     // layout is an array of objects, see the demo for more complete usage
     var layout = [
@@ -26,15 +34,16 @@ export class Dashboard extends React.Component {
       {i: 'd', x: 0, y: 4, w: 8, h: 8}
     ];
     return (
-      <div>
-        
-        
-        
-      <GridLayout className="layout" layout={layout} cols={40} rowHeight={30} width={"4000"}>
-        <div className="dashboardBlock" key="c" >
-          <Calendar deviceid={this.props.deviceid} /></div>
-        {/* <div className="dashboardBlock" key="d" ><Line /></div> */}
-      </GridLayout>
+      <div
+        onDragOver = { (e) => this.onDragOver(e)}
+        onDrop={(e)=>this.onDrop(e, "complete")}
+        style={{background:"rgba(0,255,0,0.1)"}}
+      >
+        <GridLayout className="layout" layout={layout} cols={40} rowHeight={30} width={"4000"} >
+          <div className="dashboardBlock" key="c" >
+            <Calendar deviceid={this.props.deviceid} /></div>
+          {/* <div className="dashboardBlock" key="d" ><Line /></div> */}
+        </GridLayout>
       </div>
     )
   }

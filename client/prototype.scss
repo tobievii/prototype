@@ -10,3 +10,29 @@ $panelBg: rgba(3, 4, 5, 0.5);
   font-size: 15px;
   margin: 20px;
 }
+
+
+.dataView {
+  background: $panelBg;
+  margin: 3px;
+  padding-left: 15px;
+  border: 1px #333 solid;
+  cursor: pointer;
+  min-height: 15px;
+}
+
+.dataView:hover {
+  background: lighten($panelBg, 20%)
+}
+
+.dataViewName {
+  background: 1px solid rgba(255,0,0,0.1);
+  width: 30%;
+  float: left;
+}
+
+.dataViewValue {
+  border: 1px solid blue;
+  width: 70%;
+  float: left;
+}

@@ -1,8 +1,8 @@
-var socket = require("socket.io-client")("https://prototype.iotnxt.io");
+var socket = require("socket.io-client")("http://localhost:8080");
 
 socket.on("connect", function(data) {
 	console.log("connected.");
-	socket.emit("join", "p5gy91l2alrpvl433pxi6y86stk6gnme"); // your api key
+	socket.emit("join", "glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9"); // your api key
 
 	socket.on("post", data => {
 		console.log(data);
@@ -32,4 +32,4 @@ var car = {
 
 setInterval( ()=>{
   socket.emit("post", car )
-},500)
+},2500)

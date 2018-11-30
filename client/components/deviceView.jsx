@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
+import { DataView } from "./dataView.jsx"
+
 import moment from 'moment'
 
 library.add(faHdd);
@@ -351,48 +353,6 @@ callback(packet); `
 
 
 
-
-export class RenderObject extends Component {
-  state = { timeago: "" };
-  render() {
-    var payload = {};
-
-    if (this.props.payload) {
-      payload = this.props.payload;
-      return (
-        <p>
-          {Object.keys(payload).map(name => (
-            <RenderObjectChild key={name} name={name} details={payload[name]} />
-          ))}
-        </p>
-      );
-    } else {
-      return <p>empty</p>;
-    }
-  }
-}
-
-class RenderObjectChild extends Component {
-  render() {
-    // details is all the githubdata coming from the details prop above
-    var { name, details } = this.props;
-
-    if (typeof details == "object") {
-      return (
-        <div>
-          {name} :<RenderObject payload={details} />
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          {name} : {JSON.stringify(details)}
-        </div>
-      );
-    }
-  }
-}
-
 export class DeviceView extends Component {
   state = {
     devid: "loading",
@@ -562,12 +522,15 @@ export class DeviceView extends Component {
           }}
         >
           <div className="col-xs-12 col-md-12 col-lg-4 col-xl-3">
+            <h4 className="spot">DEVICE DATA</h4>
+            <DataView data={latestState} />
+
             <h4 className="spot">LATEST STATE</h4>
             <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
 
             <h4 className="spot">LATEST PACKETS</h4>
           
-            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(packets, null, 2)}</SyntaxHighlighter></div>
+            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(packets.slice(0,5), null, 2)}</SyntaxHighlighter></div>
 
             
           </div>
