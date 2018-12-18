@@ -73,7 +73,7 @@ export class IotnxtQueue extends events.EventEmitter {
           this.emit('error', err);          
         }
         if (secret) {
-          this.connectRedQ((err:Error,result:any)=>{
+          this.connectRedQ((err:Error,result:any)=>{            
             if (err) console.log(err);
             if (result) {
               this.register((err:Error, result:any)=>{

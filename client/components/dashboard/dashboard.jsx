@@ -13,17 +13,21 @@ import {Line} from "./nivo_line.jsx"
 
 // https://github.com/STRML/react-grid-layout
 
+
+
 export class Dashboard extends React.Component {
 
-  state = {
-    
-  }
+  state = {}
 
-  onDragOver = () => {
+  onDragOver = (e) => {
+    let event = e
+    event.stopPropagation();
+    event.preventDefault();
     console.log("dragOver")
   }
 
-  onDrop = () => {
+  onDrop = (e, f) => {
+    console.log(e);
     console.log("drop")
   }
 

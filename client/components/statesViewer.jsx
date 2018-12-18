@@ -93,6 +93,13 @@ class StatesViewerItem extends Component {
       borderRight: "5px solid "+this.blendrgba( {r:60, g:19, b:25, a:0}, {r:125, g:255, b:175, a: 1.0}, ratio) }    
   }
 
+  descIfExists = () => {
+    if (this.props.item.desc) {
+      return <span style={{ color: "rgba(125,255,175,0.5)"}}>{this.props.item.desc}</span>
+    } else {
+      return <span></span>
+    }
+  }
 
   render() {
 
@@ -107,7 +114,7 @@ class StatesViewerItem extends Component {
 
           style={ this.calcStyle() }>
 
-            <div className="col-8" style={{ overflow: "hidden" }}>{this.props.id} <br />
+            <div className="col-8" style={{ overflow: "hidden" }}>{this.props.id} {this.descIfExists() }<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
             
@@ -115,6 +122,7 @@ class StatesViewerItem extends Component {
               <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
               <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
             </div>
+
 
         </div>
       </a>
@@ -212,7 +220,8 @@ export class DeviceList extends Component {
 
       return ( 
           <div>
-             { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} />)  }
+             { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} item={item} />)  }
+
              <div style={{marginLeft:-9}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
           </div>
         )
