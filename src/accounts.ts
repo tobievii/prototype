@@ -1,6 +1,6 @@
 import * as geoip from 'geoip-lite' // https://www.npmjs.com/package/geoip-lite
 
-import * as utils from './utils';
+import { generate, generateDifficult, log } from './utils';
 import * as _ from 'lodash';
 
 var dbglobal:any;
@@ -126,7 +126,7 @@ export function accountVerify(db: any) {
           if (user.email) { user.emailold = user.email } //save old
           user.email = req.body.email;
           user.emailverified = false;
-          user.secretemailverificationcode = utils.generate(128);
+          user.secretemailverificationcode = generate(128);
 
           db.users.update({ uuid: user.uuid }, user, (errUpd: Error, resUpd: any) => {
             var gotourl = '/verify/' + user.uuid + '/' + user.secretemailverificationcode;
@@ -189,6 +189,12 @@ export function defaultAdminAccount(db:any) {
   //
 }
 
+export function createDefaultAdminAccount(db:any) {
+  log("creating default admin account")
+
+  accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err:Error,user:any)=>{
+  }, {password:"admin", level:99})
+}
 
 
 export function registerExistingAccount(db:any, user:any, cb:any) {
@@ -219,7 +225,7 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
  
 
   var user:any = {
-    uuid: utils.generate(128),
+    uuid: generate(128),
     "_created_on": new Date(),
     created: {
       unix: event.getTime(),
@@ -234,8 +240,8 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     userAgent: userAgent,
     emailverified: false,
     email: email.toLowerCase(),
-    apikey: utils.generate(32),
-    password: utils.generateDifficult(16),
+    apikey: generate(32),
+    password: generateDifficult(16),
     level: 0
   };
 

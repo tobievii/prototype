@@ -30,6 +30,8 @@ import * as accounts from './accounts'
 
 import * as events from "events";
 
+import * as utilsLib from "./utils"
+
 var mongojs = require('mongojs')
 
 const { VM } = require('vm2');
@@ -43,6 +45,7 @@ import { plugins } from "./plugins/config"
 import { userInfo } from 'os';
 
 import * as stats from "./stats"
+import { utils } from 'mocha';
 
 app.use(compression());
 app.use(cookieParser());
@@ -72,8 +75,9 @@ eventHub.on("plugin", (data: any) => {
 //app.use(express.json())
 app.use(safeParser);
 
-//creates default admin account on first run.
-accounts.defaultAdminAccount(db);
+//FIRST RUN
+// OLD: accounts.defaultAdminAccount(db);
+utilsLib.checkFirstRun(db);
 
 //handle accounts/cookies.
 app.use(accounts.midware(db)); 

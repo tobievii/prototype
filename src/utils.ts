@@ -5,6 +5,7 @@ import * as dns from 'dns';
 import * as url from 'url';
 import * as _ from 'lodash';
 
+import * as accounts from "./accounts"
 
 // Tests to see if we are online.
 export function online(): Promise<any> {
@@ -216,11 +217,6 @@ export function restJSON(query:any, cb:any) {
 
 }
 
-
-
-
-
-
 //generate random strings
 export function generate(count: number) {
     var _sym = 'abcdefghijklmnopqrstuvwxyz1234567890'
@@ -241,4 +237,30 @@ export function generate(count: number) {
       str += "" + tmp;
     }
     return str;
+  }
+
+  export function createDBIndexes(db:any) {
+      // creates optimized indexes
+      // meant to be run on first start or when upgrading from an older version
+      log("creating db indexes")
+      
+  }
+
+  export function checkFirstRun(db: any) {
+      // checks if this is the first run
+      log("check first run")
+
+      db.users.find({}).count( (errUsers:Error, usersCount:number) => {
+        if (errUsers) console.log("ERR CANT ACCESS DB.USERS");
+        
+        if (usersCount == 0) {
+            log("performing first run tasks");  
+            accounts.createDefaultAdminAccount(db);
+            createDBIndexes(db);
+
+        } else {
+          log("not first run");
+        }
+      })
+
   }
