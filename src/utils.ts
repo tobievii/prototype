@@ -40,7 +40,7 @@ export function ipaddress(cb: any) {
                     //console.log(interfaces[key][x].address)
                     if (interfaces[key][x].address != "127.0.0.1") {
                         found = 1;
-                        cb(undefined, interfaces[key][x].address )
+                        cb(undefined, interfaces[key][x].address)
                     }
                 }
             }
@@ -57,14 +57,14 @@ export function ipaddress(cb: any) {
 
 
 //gets our public ip address
-export function getExternIp(cb:any) {
+export function getExternIp(cb: any) {
     //console.log("Getting publicIP..")
     var http = require('http');
     var ip = ""
-    http.get('http://bot.whatismyipaddress.com', function(res:any){
+    http.get('http://bot.whatismyipaddress.com', function (res: any) {
         res.setEncoding('utf8');
 
-        res.on('data', function(chunk:string){
+        res.on('data', function (chunk: string) {
             ip += chunk;
         });
 
@@ -72,7 +72,7 @@ export function getExternIp(cb:any) {
             var sendip = ip;
             cb(undefined, sendip);
         })
-    }).on('error', function (err:Error) {
+    }).on('error', function (err: Error) {
         cb(err, undefined);
     });
 }
@@ -100,13 +100,13 @@ export function getGUID() {
 
 /* ------------------------------------------------------------------------- */
 
-export function log(a:any) {
-    
+export function log(a: any) {
+
     var now = new Date();
     if (typeof a == "object") {
         console.log(now.toISOString() + "\t" + JSON.stringify(a))
     } else {
-        console.log(now.toISOString() + "\t" + a )
+        console.log(now.toISOString() + "\t" + a)
     }
 }
 
@@ -116,49 +116,49 @@ export function log(a:any) {
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
-export function difference(object:any, base:any) {
+export function difference(object: any, base: any) {
 
-	function changes(object:any, base:any) {
-		return _.transform(object, function(result:any, value:any, key:any) {
-			if (!_.isEqual(value, base[key])) {
-				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
-			}
-		});
+    function changes(object: any, base: any) {
+        return _.transform(object, function (result: any, value: any, key: any) {
+            if (!_.isEqual(value, base[key])) {
+                result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+            }
+        });
     }
-    
-	return changes(object, base);
+
+    return changes(object, base);
 }
 
 
-export function recursiveFlat(inObj:any) {
-    var res :any = {};
-  
+export function recursiveFlat(inObj: any) {
+    var res: any = {};
+
     (function recurse(obj, current) {
-      for(var key in obj) {
-        var value = obj[key];
-        var newKey :any = (current ? current + "." + key : key);  // joined key with dot
-        if(value && typeof value === "object") {
-          recurse(value, newKey);  // it's a nested object, so do it again
-        } else {
-          res[newKey] = value;  // it's not an object, so set the property
+        for (var key in obj) {
+            var value = obj[key];
+            var newKey: any = (current ? current + "." + key : key);  // joined key with dot
+            if (value && typeof value === "object") {
+                recurse(value, newKey);  // it's a nested object, so do it again
+            } else {
+                res[newKey] = value;  // it's not an object, so set the property
+            }
         }
-      }
     })(inObj);
-  
+
     return res;
-  }
+}
 
 
 
-export function restJSON(query:any, cb:any) {
+export function restJSON(query: any, cb: any) {
 
     // apikey:string, method: string, path:string,body:Object,
-    
+
     const myURL = new url.URL(query.path);
 
     var protocol = myURL.protocol;
 
-    var protocolObject:any;
+    var protocolObject: any;
 
     var port;
 
@@ -170,13 +170,13 @@ export function restJSON(query:any, cb:any) {
         port = 443;
     }
 
-    if (query.port) { port = query.port}
+    if (query.port) { port = query.port }
 
-    if (myURL.port != "") { port = myURL.port}
-   
+    if (myURL.port != "") { port = myURL.port }
+
     var packet = query.body;
     const postData = JSON.stringify(packet);
-    const options:any = {
+    const options: any = {
         hostname: myURL.hostname,
         port: port,
         path: myURL.pathname,
@@ -188,31 +188,31 @@ export function restJSON(query:any, cb:any) {
     };
 
     if (query.apikey) {
-        options.headers.Authorization = "Basic " + Buffer.from("api:key-"+query.apikey).toString("base64");
+        options.headers.Authorization = "Basic " + Buffer.from("api:key-" + query.apikey).toString("base64");
     }
 
     var response = "";
-    const req = protocolObject.request(options, (res:any) => {
+    const req = protocolObject.request(options, (res: any) => {
         // HANDLE RESPONSE:
         // console.log(`STATUS: ${res.statusCode}`);
         // console.log(`HEADERS: ${JSON.stringify(res.headers)}`);        
         res.setEncoding('utf8');
-        res.on('data', (chunk:any) => { response+= chunk;  });
-        res.on('end', () => { 
+        res.on('data', (chunk: any) => { response += chunk; });
+        res.on('end', () => {
 
             var responseJson = JSON.parse(response);
 
             if (responseJson) {
                 cb(undefined, responseJson);
             }
-            
+
         });
     });
 
-    req.on('error', (e:Error) => { console.error(`problem with request: ${e.message}`); });
+    req.on('error', (e: Error) => { console.error(`problem with request: ${e.message}`); });
     req.write(postData);
     req.end();
-    
+
 
 
 }
@@ -222,45 +222,56 @@ export function generate(count: number) {
     var _sym = 'abcdefghijklmnopqrstuvwxyz1234567890'
     var str = '';
     for (var i = 0; i < count; i++) {
-      var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
-      str += "" + tmp;
+        var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
+        str += "" + tmp;
     }
     return str;
-  }
+}
 
 
-  export function generateDifficult(count: number) {
+export function generateDifficult(count: number) {
     var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
     var str = '';
     for (var i = 0; i < count; i++) {
-      var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
-      str += "" + tmp;
+        var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
+        str += "" + tmp;
     }
     return str;
-  }
+}
 
-  export function createDBIndexes(db:any) {
-      // creates optimized indexes
-      // meant to be run on first start or when upgrading from an older version
-      log("creating db indexes")
-      
-  }
+export function createDBIndexes(db: any) {
+    // creates optimized indexes
+    // meant to be run on first start or when upgrading from an older version
+    log("creating db indexes")
+    
+    db.states.createIndex({ apikey: 1 })
+    db.states.createIndex({ apikey: 1, devid: 1 })
+    db.states.createIndex({ "_last_seen": 1 })
+    
+    db.packets.createIndex({ "_created_on": 1 })
+    db.packets.createIndex({ apikey: 1 })
+    db.packets.createIndex({ apikey: 1, devid:1, "created_on":1 })
 
-  export function checkFirstRun(db: any) {
-      // checks if this is the first run
-      log("check first run")
+    db.users.createIndex({ uuid: 1 })
+    db.users.createIndex({ apikey: 1 })
+    db.users.createIndex({ "_last_seen": 1 })
+}
 
-      db.users.find({}).count( (errUsers:Error, usersCount:number) => {
+export function checkFirstRun(db: any) {
+    // checks if this is the first run
+    log("check first run")
+
+    db.users.find({}).count((errUsers: Error, usersCount: number) => {
         if (errUsers) console.log("ERR CANT ACCESS DB.USERS");
-        
+
         if (usersCount == 0) {
-            log("performing first run tasks");  
+            log("performing first run tasks");
             accounts.createDefaultAdminAccount(db);
             createDBIndexes(db);
 
         } else {
-          log("not first run");
+            log("not first run");
         }
-      })
+    })
 
-  }
+}

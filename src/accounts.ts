@@ -182,8 +182,7 @@ export function defaultAdminAccount(db:any) {
     if (usersCount == 0) {
       console.log("==== ADMIN ACCCOUNT ===")
       console.log(usersCount);
-      accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err:Error,user:any)=>{
-      }, {password:"admin", level:99})
+      createDefaultAdminAccount(db)
     }
   })
   //
