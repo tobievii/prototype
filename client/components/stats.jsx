@@ -13,7 +13,8 @@ export default class Stats extends React.Component {
     try {
       return (<div>
         {
-          this.state.stats.users24hList.map( (user, i) =>  <span key={i} title={ user }>{ user.split("@")[0] } </span> )
+          //this.state.stats.users24hList.map( (user, i) =>  <span key={i} title={ user.email }>{ user.email.split("@")[0] } </span> )
+          this.state.stats.users24hList.map( (user, i) =>  <a key={i} title={ user.email } href={ "/u/"+user.username }>{ user.username } </a> )
         }
       </div>)
     } catch (err) {}

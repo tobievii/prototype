@@ -79,6 +79,8 @@ app.use(safeParser);
 // OLD: accounts.defaultAdminAccount(db);
 utilsLib.checkFirstRun(db);
 
+utilsLib.createUsernamesForOldAccounts(db);
+
 //handle accounts/cookies.
 app.use(accounts.midware(db)); 
 
@@ -156,6 +158,12 @@ app.get('/signout', (req: any, res: any) => {
 });
 
 app.post('/signin', accounts.signInFromWeb(db));
+
+app.get("/u/:username", (req:any, res:any)=>{
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
 
 app.get('/settings', (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {

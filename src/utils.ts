@@ -275,3 +275,14 @@ export function checkFirstRun(db: any) {
     })
 
 }
+
+
+
+export function createUsernamesForOldAccounts(db:any) {
+    db.users.find({"username" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+        for (var user of users) {
+            user["username"] = generate(32).toLowerCase()
+            db.users.update({"_id" : user["_id"]}, user)                
+        }
+      }) 
+}

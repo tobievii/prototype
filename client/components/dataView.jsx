@@ -3,7 +3,6 @@ import React, { Component } from "react";
 import "../prototype.scss"
 
 
-
 export class RenderObject extends Component {
 
   renderObject = (data) => {
@@ -71,15 +70,13 @@ export class DataView extends React.Component {
 
   }
 
-  renderObject = (data) => {
+  renderObject = (data) => {    
     try {
       return (
         <div>
           {Object.keys(data).map((name,i) => {
             return (
-              <div key={i} className="dataView" draggable 
-                onDragStart={(e)=>this.onDragStart(e, name, i, data[name])}  
-                   >
+              <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name])}  >
                 <div className="dataViewName">{name}:</div> 
                 <div className="dataViewValue" >{this.renderData(data[name])}</div>
                 <div style={{clear:"both"}}/>

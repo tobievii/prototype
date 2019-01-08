@@ -83,6 +83,7 @@ export class ApiInfo extends Component {
           <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2) }>HTTP REST</div>
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3) }>SOCKET.IO</div>
           <div className={this.getMenuClasses(4)} onClick={this.onClickMenuTab(4) } >MQTT</div>
+          <div className={this.getMenuClasses(5)} onClick={this.onClickMenuTab(5) } >PYTHON</div>
         </div>
 
 
@@ -204,6 +205,20 @@ export class ApiInfo extends Component {
         <div className="row" style={this.getMenuPageStyle(4)}>
           <div className="col-md-12 commanderBgPanel" >
             <h4 className="spot">MQTT</h4>
+            <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
+
+            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
+              { "var mqtt = require('mqtt');\nvar config = { apikey: \""+this.props.apikey+"\" };\nvar client  = mqtt.connect('mqtt://"+window.location.host+"', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
+            </SyntaxHighlighter>
+          </div>
+        </div>
+
+
+
+
+        <div className="row" style={this.getMenuPageStyle(5)}>
+          <div className="col-md-12 commanderBgPanel" >
+            <h4 className="spot">Python</h4>
             <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
 
             <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>

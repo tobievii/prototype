@@ -237,6 +237,7 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     ip: ip,
     ipLoc: geoIPLoc,
     userAgent: userAgent,
+    username : generate(32).toLowerCase(),
     emailverified: false,
     email: email.toLowerCase(),
     apikey: generate(32),

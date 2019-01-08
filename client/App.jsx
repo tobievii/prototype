@@ -34,7 +34,7 @@ const socket = socketio();
 import { Landing } from "./public/landing.jsx"
 import { Verify } from "./components/verify.jsx";
 
-
+import { UserPage } from "./components/userpage.jsx"
 /*------------------------------------------------------------------
     React App
 */
@@ -349,6 +349,18 @@ class App extends Component {
   }
 
   render() {
+
+    if (window.location.pathname.split("/")[1] == "u") {
+      return ( 
+        <div className="App">
+          <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
+          <UserPage data={this.state} username={window.location.pathname.split("/")[2]}/>           
+          <Stats />
+          <Footer />
+        </div>
+      )
+    }
+
 
     if (this.state.account == undefined) {
       return null;

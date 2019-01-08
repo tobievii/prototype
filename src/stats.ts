@@ -50,7 +50,9 @@ function usersActiveLastDaysNames(days:number):Promise<any> {
     db.users.find({ level : { $gt: 0 }, "_last_seen":{$gt:new Date(Date.now() - time)}}, (err:Error, userList:any)=>{
       var nameList:any = []
       for (var user of userList) {
-        nameList.push(user.email);
+
+
+        nameList.push({ email: user.email, username: user.username});
       }
       resolve(nameList)
     })
