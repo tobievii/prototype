@@ -15,7 +15,8 @@ class StatesViewerItem extends Component {
   state = {
     timeago: "",
     timestamp: "",
-    millisago : 0
+    millisago : 0,
+    deleted : false
   };
 
   intvalM = undefined;
@@ -101,32 +102,60 @@ class StatesViewerItem extends Component {
     }
   }
 
+  clickDelete = (id) => {
+    return (event) => {
+      fetch("/api/v3/state/delete", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+      }).then(response => response.json()).then(serverresponse => { 
+        console.log(serverresponse);
+        this.setState({deleted : true})
+      }).catch(err => console.error(err.toString()));
+    }    
+  }
+
+  goToDevice = (id) => {
+    return (e) => {
+      window.location = '/view/'+ id ;
+    }
+  }
+
   render() {
 
-    var dataPreview = JSON.stringify(this.props.data)
-    var maxlength = 120;
-    if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
+    if (this.state.deleted == true) {
+      return ( <div style={{display:"none"}}></div>);
+    } else {
+      var dataPreview = JSON.stringify(this.props.data)
+      var maxlength = 120;
+      if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
+  
+      return (
+        
+          <div className="row statesViewerItem" 
+            key={this.props._id} 
+            style={ this.calcStyle() }>
+  
+              
+                <div className="col-7" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
+                  <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
+                </div>
+                
+                <div className="col-4" style={{textAlign:"right"}} >
+                  <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
+                  <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
+                </div>
+              
+  
+              <div className="col-1" style={{textAlign:"right"}}>
+                <div onClick={ this.clickDelete(this.props.id) } >DELETE X</div>
+              </div>
+  
+          </div>
+        
+      );
+    }
 
-    return (
-      <a  href={"/view/" + this.props.id}>
-        <div className="row statesViewerItem" 
-          key={this.props._id} 
 
-          style={ this.calcStyle() }>
-
-            <div className="col-8" style={{ overflow: "hidden" }}>{this.props.id} {this.descIfExists() }<br />
-              <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
-            </div>
-            
-            <div className="col-4" style={{textAlign:"right"}}>
-              <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
-              <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
-            </div>
-
-
-        </div>
-      </a>
-    );
   }
 }
 
