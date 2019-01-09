@@ -53,6 +53,9 @@ cd prototype
 # install node_modules for server side
 npm install
 
+# if you're installing on Windows, you'll need to install webpack dependencies
+npm install webpack-dev-server
+
 # build automatically on server file changes for development
 npm run buildwatch
 
@@ -80,8 +83,6 @@ Go to [http://localhost:8080/](http://localhost:8080/) and log in with the defau
 To get started we recommend using the HTTP REST api at first. After you've logged into your account using the web interface you will find your api key and pregenerated HTTP Authorization headers at the bottom of the screen:
 
 ![webapi example](https://i.imgur.com/n86DoeL.png)
-
-
 
 GET [http://localhost:8080/api/v3/version](http://localhost:8080/api/v3/version)
 
