@@ -76,7 +76,7 @@ export class ApiInfo extends Component {
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "'+this.props.apikey+'|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="" style={{ paddingTop: 0, margin: "0 37px" }} >
+      <div className="" style={{ paddingTop: 0, margin: "0 37px", marginTop: "50px" }} >
 
         <div className="row"> 
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) } >APIKEY</div>
@@ -213,21 +213,20 @@ export class ApiInfo extends Component {
           </div>
         </div>
 
-
-
-
         <div className="row" style={this.getMenuPageStyle(5)}>
           <div className="col-md-12 commanderBgPanel" >
             <h4 className="spot">Python</h4>
-            <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
+            <p>This code is for python users </p>
 
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
-              { "var mqtt = require('mqtt');\nvar config = { apikey: \""+this.props.apikey+"\" };\nvar client  = mqtt.connect('mqtt://"+window.location.host+"', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
+            <SyntaxHighlighter language="python" style={tomorrowNightBright}>
+              { 'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'} 
+            </SyntaxHighlighter>
+
+            <SyntaxHighlighter language="python" style={tomorrowNightBright}>
+              { 'import json\nimport urllib.request\n\t"data" = {\n\t\t"id": "python3device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib.request.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib.request.urlopen(req, json.dumps(data).encode("utf8"))'} 
             </SyntaxHighlighter>
           </div>
         </div>
-
-
       </div>
     );
   }
