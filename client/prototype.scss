@@ -1,14 +1,15 @@
-$panelBg: rgb(3, 4, 5);
+$panelBg: rgba(3, 4, 5, 0.5);
 
 .panel {
   background: $panelBg;
   color: rgba(255, 246, 235, 0.959);
   padding: 20px;
-  border: 1px solid rgba(60, 19, 25, 0);
+  // border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
   font-size: 15px;
-  margin: 20px;
+  margin: 22px;
+  margin-top: 5px;
 }
 
 
@@ -50,4 +51,8 @@ $panelBg: rgb(3, 4, 5);
 .avatarProfile img {
   width: 100%;
   height: 100%;
+}
+
+.statesViewerDeviceLink {
+  cursor: pointer;
 }

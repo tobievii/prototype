@@ -2,19 +2,25 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell } from '@fortawesome/free-solid-svg-icons'
 
 
 library.add(faCog)
 library.add(faTimes)
+library.add(faBell);
 
 export class NavBar extends Component {
+
   showSettings = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
         return (<a href="/settings" className="navLink"><FontAwesomeIcon icon="cog" /></a>)
       }       
     }
+  }
+
+  showNotifications = () => {
+    return (<a href="/notifications" className="navLink"><FontAwesomeIcon icon="bell" /></a>)
   }
 
   showLogout = () => {
@@ -27,7 +33,7 @@ export class NavBar extends Component {
 
   render() {
     return (
-      <div className="" style={{ margin: "0 20px" }} >
+      <div className="" style={{ margin: "0 5px" }} >
         <div className="row " style={{ paddingBottom: 10 }}>
           <div className="col-md-12">
             <a href="/">
@@ -50,8 +56,10 @@ export class NavBar extends Component {
             </a>
 
             <div style={{ padding: "20px 10px 10px 10px", float: "right" }}>
-              <span style={{fontSize: 14}}>{this.props.email}</span>&nbsp;
+              
+              <span style={{fontSize: 14}}>{this.props.email} ({this.props.account.username})</span>&nbsp;
 
+              { this.showNotifications() }&nbsp;
               { this.showSettings() }              
             </div>
           </div>
