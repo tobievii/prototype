@@ -136,7 +136,7 @@ class StatesViewerItem extends Component {
             style={ this.calcStyle() }>
   
               
-                <div className="col-7" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
+                <div className="col-7 statesViewerDeviceLink" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
                   <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
                 </div>
                 
