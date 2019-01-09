@@ -236,7 +236,7 @@ class App extends Component {
 
   notLogged = () => {
     return (<div className="App">
-      <NavBar account={this.state.account} version={this.state.version} email={this.state.email} />
+      <NavBar version={this.state.version} email={this.state.email} />
       <Account account={this.state.account} />
       <Landing />
     </div>)
