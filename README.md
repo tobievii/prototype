@@ -337,3 +337,35 @@ The serialports plugin enables autodetection of arduino or similar serialport de
 
 **26 Oct 2018 Fri at 19:41 SAST**  
 Rouan van der Ende - Initial public release v5.0.30
+
+# Developers
+
+## Keep your forked repository up-to-date
+
+```sh
+# Add the remote and call it 'upstream'.
+
+git remote add upstream https://github.com/IoT-prototype/prototype.git
+
+# Fetch all the branches of that remote into remote-tracking branches
+
+git fetch upstream
+
+# Merge upstream changes in to your downstream repository.
+
+git merge upstream/master
+
+# Create a new branch of where you want to work. or use the exsisting Dev branch.
+
+git checkout -b 'branch_name' # Without the single quotes
+
+# Perform your work locally using standard local repo workflow.
+
+# Then push your changes in to your Downstream remote repository.
+
+git push origin branch_name
+
+# Repeat above steps whenever you need to update your repository with the work that has occurred upstream since the last merge was performed.
+
+# Source:
+https://medium.com/sweetmeat/how-to-keep-a-downstream-git-repository-current-with-upstream-repository-changes-10b76fad6d97
