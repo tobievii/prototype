@@ -55,7 +55,13 @@ export class RenderObject extends Component {
 
 export class DataView extends React.Component {
 
-  renderData = (data) => {
+  state = {
+    dragging : false
+  }
+
+  dragging = false;
+
+  renderData = (data, level, path) => {
     
     if (data == null) {}
     if (typeof data == "string") {
@@ -64,21 +70,24 @@ export class DataView extends React.Component {
     if (typeof data == "number") {
       return <span>{data}</span>
     }
+    if (typeof data == "boolean") {
+      return <span>{data.toString()}</span>
+    }
     if (typeof data == "object") {
-      return <div>{ this.renderObject(data)}</div>
+      return <div>{ this.renderObject(data, level+1, path)}</div>
     }
 
   }
 
-  renderObject = (data) => {    
+  renderObject = (data,level, path) => {    
     try {
       return (
         <div>
           {Object.keys(data).map((name,i) => {
             return (
-              <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name])}  >
+              <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name],level, path+"."+name)}  >
                 <div className="dataViewName">{name}:</div> 
-                <div className="dataViewValue" >{this.renderData(data[name])}</div>
+                <div className="dataViewValue" >{this.renderData(data[name],level,path+"."+name)}</div>
                 <div style={{clear:"both"}}/>
               </div>)
           })}                  
@@ -87,15 +96,31 @@ export class DataView extends React.Component {
     } catch(err) {}
   }
 
-  onDragStart = (e, name, i, data) => {
-    console.log( { e, name, i, data } )
+  onDragStart = (e, name, i, data, level, path) => {
+
+    
+
+    if (this.dragging == false) {
+      console.log( { e, name, i, data, level, path } )
+      this.dragging = true;
+      
+      e.datapath = path;
+
+      setTimeout( ()=>{
+        this.dragging = false;
+      },500)
+
+    } else {
+      //console.log("already dragging")
+    }
+    
   }
 
   render() {
 
       return (
         <div>
-          { this.renderObject(this.props.data)}
+          { this.renderObject(this.props.data, 0, "root")}
         </div>
       );
     } 

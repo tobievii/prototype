@@ -17,7 +17,7 @@ $panelBg: rgba(3, 4, 5, 0.5);
   background: $panelBg;
   margin: 3px;
   padding-left: 15px;
-  border: 1px #f00 solid;
+  //border: 1px #f00 solid;
   cursor: pointer;
   min-height: 15px;
 }
@@ -27,15 +27,15 @@ $panelBg: rgba(3, 4, 5, 0.5);
 }
 
 .dataViewName {
-  background: 1px solid rgb(255,0,0);
-  width: 30%;
+  //background: 1px solid rgb(255,0,0);
+
   float: left;
 }
 
 .dataViewValue {
   
-  border: 1px solid blue;
-  width: 70%;
+  //border: 1px solid blue;
+
   float: left;
 }
 

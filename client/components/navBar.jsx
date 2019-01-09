@@ -32,6 +32,12 @@ export class NavBar extends Component {
   }
 
   render() {
+    var username = ""
+    if (this.props.account) {
+      if (this.props.account.username) {
+        username = this.props.account.username;
+      }
+    }
     return (
       <div className="" style={{ margin: "0 5px" }} >
         <div className="row " style={{ paddingBottom: 10 }}>
@@ -57,7 +63,7 @@ export class NavBar extends Component {
 
             <div style={{ padding: "20px 10px 10px 10px", float: "right" }}>
               
-              <span style={{fontSize: 14}}>{this.props.email} ({this.props.account.username})</span>&nbsp;
+              <span style={{fontSize: 14}}>{this.props.email} ({username})</span>&nbsp;
 
               { this.showNotifications() }&nbsp;
               { this.showSettings() }              
