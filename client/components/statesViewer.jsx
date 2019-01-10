@@ -5,7 +5,6 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
 
-
 library.add(faSort)
 library.add(faSortNumericDown);
 library.add(faSortAlphaDown);
@@ -16,15 +15,16 @@ class StatesViewerItem extends Component {
     timeago: "",
     timestamp: "",
     millisago : 0,
-    deleted : false
+    deleted : false,
+    publicButton: <i class="fas fa-eye-slash icon"></i>,
+    deleteButton: <i class="fas fa-trash-alt icon"></i>,
+    shareButton: <i class="fas fa-share-alt icon"></i>,
+    publicButtonState: "PUBLIC",
+    deleteButtonClick: 0
   };
 
   intvalM = undefined;
   intvalT = undefined;
-
-  
-
-
 
   componentWillUnmount = () => {
 
@@ -104,19 +104,61 @@ class StatesViewerItem extends Component {
 
   clickDelete = (id) => {
     return (event) => {
-      fetch("/api/v3/state/delete", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id })
-      }).then(response => response.json()).then(serverresponse => { 
-        console.log(serverresponse);
-        this.setState({deleted : true})
-      }).catch(err => console.error(err.toString()));
+      if(this.state.deleteButtonClick == 0){
+        this.setState({ deleteButton: "ARE YOU SURE?" });
+        this.setState({ deleteButtonClick: 1});
+        this.setState({ publicButton: "YES"});
+        this.setState({ shareButton: "NO"});
+        return;
+      }
+
+      if(this.state.deleteButtonClick == 1){
+        fetch("/api/v3/state/delete", {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ id: id })
+        }).then(response => response.json()).then(serverresponse => { 
+          console.log(serverresponse);
+          this.setState({deleted : true})
+        }).catch(err => console.error(err.toString()));
+     }
     }    
   }
 
   goToDevice = (id) => {
     return (e) => {
       window.location = '/view/'+ id ;
+    }
+  }
+
+  changeStatus = (id) => {
+    return(event) => {
+      if(this.state.publicButtonState == "PUBLIC" && this.state.deleteButtonClick == 0){
+        this.setState({ publicButton: <i class="far fa-eye icon"></i>});
+        this.setState({ publicButtonState: "PRIVATE" });
+      }
+
+      if(this.state.publicButtonState == "PRIVATE" && this.state.deleteButtonClick == 0){
+        this.setState({ publicButton: <i class="fas fa-eye-slash icon"></i>});
+        this.setState({ publicButtonState: "PUBLIC" });
+      }
+
+      if(this.state.deleteButtonClick == 1){
+        fetch("/api/v3/state/delete", {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ id: id })
+        }).then(response => response.json()).then(serverresponse => { 
+          console.log(serverresponse);
+          this.setState({deleted : true})
+        }).catch(err => console.error(err.toString()));
+      }
+    }
+  }
+
+  clickShare = () => {
+    return () => {
+      if(this.state.deleteButtonClick == 1){
+        window.location.reload();
+      }
     }
   }
 
@@ -131,28 +173,32 @@ class StatesViewerItem extends Component {
   
       return (
         
-          <div className="row statesViewerItem" 
-            key={this.props._id} 
-            style={ this.calcStyle() }>
- 
-              <div className='col-1'>
+       <div className="row statesViewerItem"
+        key={this.props._id} 
+        style={ this.calcStyle() }>
+
+         <div className='col-1'>
    <form> 
    <input type='checkbox'  id='react-radio-button-group-1' name='' value='One'  style={{margin:20}}  />
      </form>
      </div>
-                <div className="col-6 statesViewerDeviceLink" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
-                  <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
-                </div>
-                
-                <div className="col-4" style={{textAlign:"right"}} >
-                  <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
-                  <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
-                </div>
-              
-  
-              <div className="col-1" style={{textAlign:"right"}}>
-                <div onClick={ this.clickDelete(this.props.id) } >DELETE X</div>
-              </div>
+          
+            <div className="col-8 linkPointer" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
+              <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
+            </div>
+            
+            <div className="col-2" style={{textAlign:"right"}} >
+              <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
+              <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
+            </div>
+
+          <div className="col-2 icons" style={{textAlign:"center"}}>
+            <div className="linkPointer">
+              <span className="trash" onClick={ this.clickDelete(this.props.id) }>{ this.state.deleteButton}</span>
+              <span className="visibility" onClick={ this.changeStatus(this.props.id) }>{this.state.publicButton}</span>
+              <span className="share" onClick={this.clickShare() }>{ this.state.shareButton }</span>
+            </div>
+          </div>
   
           </div>
         

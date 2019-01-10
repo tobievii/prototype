@@ -78,3 +78,36 @@ input[type="checkbox"]:checked {
 .statesViewerDeviceLink {
   cursor: pointer;
 }
+
+.widgetLabel {
+  background: #2B2F37;
+  padding: 3px;
+}
+
+.widgetContents {
+  padding: 5px;
+}
+
+.linkPointer{
+  cursor: pointer;
+}
+
+.trash{
+  color: #f00;
+  padding: 0.8rem;
+}
+
+.share{
+  color: orange;
+  padding: 0.8rem;
+}
+
+.visibility{
+  padding: 0.8rem;
+  color: green;
+}
+
+.icon{
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}

@@ -22,9 +22,9 @@ export class Account extends Component {
   // find out if the server allows registration
   getServerRegistrationOptions = () => {
     fetch("/api/v3/admin/registration", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } })
-    .then(response => response.json()).then(registration => {
-      this.setState({registration:registration.result})
-    }).catch(err => console.error(err.toString()));
+      .then(response => response.json()).then(registration => {
+        this.setState({ registration: registration.result })
+      }).catch(err => console.error(err.toString()));
   }
 
   componentDidMount = () => {
@@ -88,6 +88,12 @@ export class Account extends Component {
   validateEmail = (email) => {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
+  }
+
+  signInKey = (e) => {
+    if (e.key == "Enter") {
+      this.signIn();
+    }
   }
 
   signIn = () => {
@@ -154,18 +160,18 @@ export class Account extends Component {
     } else {
       return null;
     }
-    
+
   }
 
 
   levelZero = () => {
     return (
-      <div className="" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }} >
+      <div className="" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }}>
 
 
         <div className="row" >
           <div className="col-md-12 "  >
-            { this.drawRegisterButton() }
+            {this.drawRegisterButton()}
             <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1)} style={{ width: "150", float: "right" }}>LOGIN</div>
 
           </div>
@@ -174,7 +180,7 @@ export class Account extends Component {
         <div className="bgpanel" style={this.getMenuPageStyle(1)} >
           <div className="row" style={{ marginTop: 2, marginBottom: 5 }}>
             <div className="col-3" style={{ textAlign: "right", paddingTop: 10 }} > email: </div>
-            <div className="col-9" > <input type="email" placeholder="email" style={{ width: "100%" }} spellCheck="false" onChange={this.changeInput("email")} value={this.state.form.email} autoFocus /> </div>
+            <div className="col-9" > <input type="email" placeholder="email" style={{ width: "100%" }} spellCheck="false" onKeyPress={this.signInKey} onChange={this.changeInput("email")} value={this.state.form.email} autoFocus /> </div>
           </div>
 
           <div className="row" style={{ marginBottom: 15 }}>
@@ -184,6 +190,7 @@ export class Account extends Component {
                 style={{ width: "100%" }}
                 value={this.state.form.passwordSignin}
                 onChange={this.changeInput("passwordSignin")}
+                onKeyPress={this.signInKey}
               />
             </div>
           </div>
@@ -268,6 +275,5 @@ export class Account extends Component {
 
   }
 }
-
 
 
