@@ -183,7 +183,7 @@ class StatesViewerItem extends Component {
      </form>
      </div>
           
-            <div className="col-8 linkPointer" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
+            <div className="col-7 linkPointer" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
             
