@@ -11,6 +11,28 @@ $panelBg: rgba(3, 4, 5, 0.5);
   margin: 22px;
   margin-top: 5px;
 }
+input[type="checkbox"] {
+  /* remove standard background appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* create custom checkbox appearance */
+ 
+  width: 15px;
+  height: 15px;
+  padding: 3px;
+  /* background-color only for content */
+  background-clip: content-box;
+  border: 1px solid white;
+  background-color: #e7e6e7;
+  
+}
+
+/* appearance for checked checkbox */
+input[type="checkbox"]:checked {
+  background-color: red;
+  border: 1px solid red;
+}
 
 
 .dataView {

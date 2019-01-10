@@ -173,10 +173,16 @@ class StatesViewerItem extends Component {
   
       return (
         
-        <div className="row statesViewerItem" 
+       <div className="row statesViewerItem"
         key={this.props._id} 
         style={ this.calcStyle() }>
 
+         <div className='col-1'>
+   <form> 
+   <input type='checkbox'  id='react-radio-button-group-1' name='' value='One'  style={{margin:20}}  />
+     </form>
+     </div>
+          
             <div className="col-8 linkPointer" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
