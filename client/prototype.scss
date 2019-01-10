@@ -11,13 +11,13 @@ $panelBg: rgba(3, 4, 5, 0.5);
   margin: 22px;
   margin-top: 5px;
 }
-input[type="radio"] {
+input[type="checkbox"] {
   /* remove standard background appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  /* create custom radiobutton appearance */
-  display: inline-block;
+  /* create custom checkbox appearance */
+ 
   width: 15px;
   height: 15px;
   padding: 3px;
@@ -25,11 +25,11 @@ input[type="radio"] {
   background-clip: content-box;
   border: 1px solid white;
   background-color: #e7e6e7;
-  border-radius: 50%;
+  
 }
 
-/* appearance for checked radiobutton */
-input[type="radio"]:checked {
+/* appearance for checked checkbox */
+input[type="checkbox"]:checked {
   background-color: red;
   border: 1px solid red;
 }

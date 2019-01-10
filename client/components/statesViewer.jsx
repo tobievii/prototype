@@ -137,7 +137,7 @@ class StatesViewerItem extends Component {
  
               <div className='col-1'>
    <form> 
-   <input type='radio'  id='react-radio-button-group-1' name='dev' value='One'  style={{margin:20 }}  />
+   <input type='checkbox'  id='react-radio-button-group-1' name='' value='One'  style={{margin:20}}  />
      </form>
      </div>
                 <div className="col-6 statesViewerDeviceLink" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
