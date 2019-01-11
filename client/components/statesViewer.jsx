@@ -4,6 +4,11 @@ import moment from 'moment'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
+import * as _ from "lodash"
+
+import * as p from "../prototype.ts"
+
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -14,13 +19,14 @@ class StatesViewerItem extends Component {
   state = {
     timeago: "",
     timestamp: "",
-    millisago : 0,
-    deleted : false,
-    publicButton: <i class="fas fa-eye-slash icon"></i>,
-    deleteButton: <i class="fas fa-trash-alt icon"></i>,
-    shareButton: <i class="fas fa-share-alt icon"></i>,
+    millisago: 0,
+    deleted: false,
+    publicButton: <i className="fas fa-eye-slash icon"></i>,
+    deleteButton: <i className="fas fa-trash-alt icon"></i>,
+    shareButton: <i className="fas fa-share-alt icon"></i>,
     publicButtonState: "PUBLIC",
-    deleteButtonClick: 0
+    deleteButtonClick: 0,
+    selected: undefined
   };
 
   intvalM = undefined;
@@ -51,29 +57,29 @@ class StatesViewerItem extends Component {
 
     this.intvalT = setInterval(() => {
       this.updateTime();
-    }, 1000/60)
+    }, 1000 / 60)
 
-    this.intvalM = setInterval(()=>{
+    this.intvalM = setInterval(() => {
       this.updateMillis();
-    },1000/60);
+    }, 1000 / 60);
   }
 
-  blendrgba(x,y,ratio) {
+  blendrgba(x, y, ratio) {
 
     if (ratio <= 0) {
-      return "rgba("+Math.round(x.r)+","+Math.round(x.g)+","+Math.round(x.b)+","+x.a+")"
+      return "rgba(" + Math.round(x.r) + "," + Math.round(x.g) + "," + Math.round(x.b) + "," + x.a + ")"
     } else if (ratio >= 1) {
-      return "rgba("+Math.round(y.r)+","+Math.round(y.g)+","+Math.round(y.b)+","+y.a+")"
+      return "rgba(" + Math.round(y.r) + "," + Math.round(y.g) + "," + Math.round(y.b) + "," + y.a + ")"
     } else {
       var blended = {
-        r : (x.r*(1-ratio)) + (y.r*ratio),
-        g : (x.g*(1-ratio)) + (y.g*ratio),
-        b : (x.b*(1-ratio)) + (y.b*ratio),
-        a : (x.a*(1-ratio)) + (y.a*ratio),
+        r: (x.r * (1 - ratio)) + (y.r * ratio),
+        g: (x.g * (1 - ratio)) + (y.g * ratio),
+        b: (x.b * (1 - ratio)) + (y.b * ratio),
+        a: (x.a * (1 - ratio)) + (y.a * ratio),
       }
-      return "rgba("+Math.round(blended.r)+","+Math.round(blended.g)+","+Math.round(blended.b)+","+blended.a+")"
+      return "rgba(" + Math.round(blended.r) + "," + Math.round(blended.g) + "," + Math.round(blended.b) + "," + blended.a + ")"
     }
-    
+
     //return "rgba(255,255,255,1)"
   }
 
@@ -81,22 +87,35 @@ class StatesViewerItem extends Component {
   calcStyle = () => {
     var timefade = 3000;
 
-    var lastChange = new Date(this.props.timestamp);     
-    var millisago = Date.now() - lastChange.getTime();    
-    var ratio = (timefade-millisago)/timefade;
+    var lastChange = new Date(this.props.timestamp);
+    var millisago = Date.now() - lastChange.getTime();
+    var ratio = (timefade - millisago) / timefade;
 
     //var ratio = (timefade-this.state.millisago)/timefade;
     if (ratio < 0) { ratio = 0 }
     if (ratio > 1) { ratio = 1 }
-        
-    return { marginBottom: 2, padding: "7px 0px 7px 0px", 
-      backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5),"+this.blendrgba({r:3, g:4, b:5, a:0.5}, {r:125, g:255, b:175, a: 0.75}, (ratio/1.5) - 0.35)+")",
-      borderRight: "5px solid "+this.blendrgba( {r:60, g:19, b:25, a:0}, {r:125, g:255, b:175, a: 1.0}, ratio) }    
+
+    if (this.props.item.selected) {
+      return {
+        marginBottom: 2, padding: "7px 0px 7px 0px",
+        backgroundImage: "linear-gradient(to right, rgba(3, 25, 5, 0.5)," + this.blendrgba({ r: 3, g: 25, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
+        borderRight: "5px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio),
+        borderLeft: "2px solid #0f0"
+      }
+    } else {
+      return {
+        marginBottom: 2, padding: "7px 0px 7px 0px",
+        backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
+        borderRight: "5px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
+      }
+    }
+
+
   }
 
   descIfExists = () => {
     if (this.props.item.desc) {
-      return <span style={{ color: "rgba(125,255,175,0.5)"}}>{this.props.item.desc}</span>
+      return <span style={{ color: "rgba(125,255,175,0.5)" }}>{this.props.item.desc}</span>
     } else {
       return <span></span>
     }
@@ -104,51 +123,51 @@ class StatesViewerItem extends Component {
 
   clickDelete = (id) => {
     return (event) => {
-      if(this.state.deleteButtonClick == 0){
+      if (this.state.deleteButtonClick == 0) {
         this.setState({ deleteButton: "ARE YOU SURE?" });
-        this.setState({ deleteButtonClick: 1});
-        this.setState({ publicButton: "YES"});
-        this.setState({ shareButton: "NO"});
+        this.setState({ deleteButtonClick: 1 });
+        this.setState({ publicButton: "YES" });
+        this.setState({ shareButton: "NO" });
         return;
       }
 
-      if(this.state.deleteButtonClick == 1){
+      if (this.state.deleteButtonClick == 1) {
         fetch("/api/v3/state/delete", {
           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
           body: JSON.stringify({ id: id })
-        }).then(response => response.json()).then(serverresponse => { 
+        }).then(response => response.json()).then(serverresponse => {
           console.log(serverresponse);
-          this.setState({deleted : true})
+          this.setState({ deleted: true })
         }).catch(err => console.error(err.toString()));
-     }
-    }    
+      }
+    }
   }
 
   goToDevice = (id) => {
     return (e) => {
-      window.location = '/view/'+ id ;
+      window.location = '/view/' + id;
     }
   }
 
   changeStatus = (id) => {
-    return(event) => {
-      if(this.state.publicButtonState == "PUBLIC" && this.state.deleteButtonClick == 0){
-        this.setState({ publicButton: <i class="far fa-eye icon"></i>});
+    return (event) => {
+      if (this.state.publicButtonState == "PUBLIC" && this.state.deleteButtonClick == 0) {
+        this.setState({ publicButton: <i className="far fa-eye icon"></i> });
         this.setState({ publicButtonState: "PRIVATE" });
       }
 
-      if(this.state.publicButtonState == "PRIVATE" && this.state.deleteButtonClick == 0){
-        this.setState({ publicButton: <i class="fas fa-eye-slash icon"></i>});
+      if (this.state.publicButtonState == "PRIVATE" && this.state.deleteButtonClick == 0) {
+        this.setState({ publicButton: <i className="fas fa-eye-slash icon"></i> });
         this.setState({ publicButtonState: "PUBLIC" });
       }
 
-      if(this.state.deleteButtonClick == 1){
+      if (this.state.deleteButtonClick == 1) {
         fetch("/api/v3/state/delete", {
           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
           body: JSON.stringify({ id: id })
-        }).then(response => response.json()).then(serverresponse => { 
+        }).then(response => response.json()).then(serverresponse => {
           console.log(serverresponse);
-          this.setState({deleted : true})
+          this.setState({ deleted: true })
         }).catch(err => console.error(err.toString()));
       }
     }
@@ -156,52 +175,68 @@ class StatesViewerItem extends Component {
 
   clickShare = () => {
     return () => {
-      if(this.state.deleteButtonClick == 1){
+      if (this.state.deleteButtonClick == 1) {
         window.location.reload();
       }
     }
   }
 
+  selectBoxClickHandler = (action) => {
+    return (e) => {
+      this.props.actionCall(action)
+    }
+  }
+
+  selectbox = () => {
+    if (this.props.item.selected) {
+      return (
+        <i className="fas fa-check-square" onClick={this.selectBoxClickHandler("deselect")} ></i>
+      )
+    } else {
+      return (
+        <i className="far fa-square" onClick={this.selectBoxClickHandler("select")} ></i>
+      )
+    }
+
+  }
+
   render() {
 
     if (this.state.deleted == true) {
-      return ( <div style={{display:"none"}}></div>);
+      return (<div style={{ display: "none" }}></div>);
     } else {
       var dataPreview = JSON.stringify(this.props.data)
       var maxlength = 120;
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
-  
-      return (
-        
-       <div className="row statesViewerItem"
-        key={this.props._id} 
-        style={ this.calcStyle() }>
 
-         <div className='col-1'>
-   <form> 
-   <input type='checkbox'  id='react-radio-button-group-1' name='' value='One'  style={{margin:20}}  />
-     </form>
-     </div>
-          
-            <div className="col-7 linkPointer" style={{ overflow: "hidden" }} onClick={this.goToDevice(this.props.id)} >{this.props.id} {this.descIfExists() }<br />
+      return (
+
+        <div class="container-fluid" style={{ marginBottom: 2}}>
+          <div class="row statesViewerItem" style={this.calcStyle()}>
+            <div class="col" style={{flex: "0 0 50px", padding: 15 }}>
+              {this.selectbox()} 
+            </div>
+            
+            <div class="col" style={{  overflow: "hidden"}}>
+              <Link to={"/view/" + this.props.id} >{this.props.id}</Link> {this.descIfExists()}<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
             
-            <div className="col-2" style={{textAlign:"right"}} >
-              <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
-              <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
+            <div class="col" style={{flex: "0 0 230px" }}>
+              <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
+              <span className="faded" style={{ fontSize: 12 }}>{this.props.timestamp}</span>
             </div>
 
-          <div className="col-2 icons" style={{textAlign:"center"}}>
-            <div className="linkPointer">
-              <span className="trash" onClick={ this.clickDelete(this.props.id) }>{ this.state.deleteButton}</span>
-              <span className="visibility" onClick={ this.changeStatus(this.props.id) }>{this.state.publicButton}</span>
-              <span className="share" onClick={this.clickShare() }>{ this.state.shareButton }</span>
+            <div class="col" style={{flex: "0 0 120px", textAlign:"right"}}>
+              <span className="trash" onClick={this.clickDelete(this.props.id)}>{this.state.deleteButton}</span>
+              <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
+              <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span>
             </div>
           </div>
-  
-          </div>
+        </div>
+
         
+
       );
     }
 
@@ -215,7 +250,7 @@ export class Pagination extends Component {
 
   onClick = (button) => {
     return evt => {
-      
+
       this.props.onPageChange(button)
     }
   }
@@ -226,21 +261,21 @@ export class Pagination extends Component {
     } else {
       return "pagination"
     }
-    
+
   }
 
   render() {
     if (this.props.pages.length > 1) {
       return (<div>
         {
-          this.props.pages.map( (button, i) =>  <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div> )
+          this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
       </div>)
     } else {
-      return ( <div></div>)
+      return (<div></div>)
     }
-    
-    
+
+
   }
 }
 
@@ -253,32 +288,43 @@ export class DeviceList extends Component {
 
   onPageChange = (data) => {
     console.log(data);
-    this.setState( { activePage: data.text })
+    this.setState({ activePage: data.text })
+  }
+
+  handleActionCall = (a) => {
+    return (e) => {
+      this.props.actionCall({ a, e })
+    }
   }
 
   render() {
+
+    if (this.props.devices == undefined) {
+      return null
+    }
+
     var pagesNum = Math.ceil(this.props.devices.length / this.props.max);
 
-    
+
     //if (pagesNum < this.state.activePage) { this.setState({activePage : 1 })}
-    
-    
-    
+
+
+
 
     var pages = [];
-    for (var a = 1; a <= pagesNum; a++) { 
-      pages.push({text:a, active: (this.state.activePage == a) }); 
+    for (var a = 1; a <= pagesNum; a++) {
+      pages.push({ text: a, active: (this.state.activePage == a) });
     }
 
 
     if (this.props.devices.length == 0) {
       return (
-        <div className="row " style={{opacity:0.5}}>
+        <div className="row " style={{ opacity: 0.5 }}>
           <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
-              <div className="commanderBgPanel" style={{ margin: 0}}>
-                <center>No devices to display.</center>
-              </div>            
-          </div>          
+            <div className="commanderBgPanel" style={{ margin: 0 }}>
+              <center>No devices to display.</center>
+            </div>
+          </div>
         </div>
       )
     } else {
@@ -286,33 +332,80 @@ export class DeviceList extends Component {
       var devicelist = _.clone(this.props.devices);
 
       if (this.props.max) {
-        var start = this.props.max * (this.state.activePage-1)
+        var start = this.props.max * (this.state.activePage - 1)
         var end = this.props.max * this.state.activePage
-        devicelist = devicelist.slice(start,end);
+        devicelist = devicelist.slice(start, end);
       }
 
       if (devicelist.length == 0) {
         if (this.state.activePage != 1) {
-          this.setState({activePage : 1})
-        }        
+          this.setState({ activePage: 1 })
+        }
       }
 
-      return ( 
-          <div>
-             { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} item={item} />)  }
-
-             <div style={{marginLeft:-9}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
-          </div>
-        )
+      return (
+        <div>
+          {devicelist.map(item => <StatesViewerItem actionCall={this.handleActionCall(item.id)} key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} item={item} />)}
+          <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+        </div>
+      )
     }
   }
 }
 
 export class StatesViewer extends Component {
-  state = { search: "", sort: "" };
+  state = {
+    search: "",
+    sort: "",
+    devicesServer: [],
+    devicesView: []
+  };
+
+  constructor(props) {
+    super(props)
+    if (props.username) {
+
+      p.getStates((states) => {
+        for (var s in states) {
+          states[s].selected = false
+        }
+        this.setState({ devicesServer: states })
+        this.setState({ devicesView: states })
+      })
+
+    }
+  }
 
   search = evt => {
-    this.setState({ search: evt.target.value })
+    this.setState({ search: evt.target.value }, () => {
+      var newDeviceList = []
+      //filter
+
+      for (var device of this.state.devicesServer) {
+        if (this.state.search.length > 0) {
+          if (device.id.includes(this.state.search)) {
+            newDeviceList.push(device)
+          }
+        } else {
+          newDeviceList.push(device)
+        }
+      }
+      //end filter
+      this.setState({ devicesView: newDeviceList })
+    })
+
+
+    console.log("search" + evt.target.value)
+
+    // var newDeviceList = _.clone(this.state.devicesView)
+    // for (var dev in newDeviceList) {
+    //   newDeviceList[dev].selected = true;
+    // }
+
+
+
+
+
   }
 
   sort = property => {
@@ -320,17 +413,17 @@ export class StatesViewer extends Component {
       console.log(property);
 
       if (this.state.sort == "") {
-        this.setState({sort:"timedesc"});
+        this.setState({ sort: "timedesc" });
         return;
       }
 
       if (this.state.sort == "timedesc") {
-        this.setState({sort:"namedesc"});
+        this.setState({ sort: "namedesc" });
         return;
       }
-      
+
       if (this.state.sort == "namedesc") {
-        this.setState({sort:""});
+        this.setState({ sort: "" });
         return;
       }
 
@@ -338,91 +431,120 @@ export class StatesViewer extends Component {
   }
 
   sortButtons = () => {
-    if (this.state.sort == "") { return <FontAwesomeIcon icon="sort-amount-down" /> } 
-    if (this.state.sort == "timedesc") { return <FontAwesomeIcon icon="sort-numeric-down" /> }    
-    if (this.state.sort == "namedesc") { return <FontAwesomeIcon icon="sort-alpha-down" /> }    
+    if (this.state.sort == "") { return <FontAwesomeIcon icon="sort-amount-down" /> }
+    if (this.state.sort == "timedesc") { return <FontAwesomeIcon icon="sort-numeric-down" /> }
+    if (this.state.sort == "namedesc") { return <FontAwesomeIcon icon="sort-alpha-down" /> }
+  }
+
+  selectAll = () => {
+    console.log("select all")
+    var newDeviceList = _.clone(this.state.devicesView)
+    for (var dev in newDeviceList) {
+      newDeviceList[dev].selected = true;
+    }
+    this.setState({ devicesView: newDeviceList })
+  }
+
+  handleActionCall = (clickdata) => {
+    console.log(clickdata)
+
+    var newDeviceList = _.clone(this.state.devicesView)
+    for (var dev in newDeviceList) {
+      if (newDeviceList[dev].id == clickdata.a) {
+
+        if (clickdata.e == "deselect") {
+          newDeviceList[dev].selected = false;
+        }
+        if (clickdata.e == "select") {
+          newDeviceList[dev].selected = true;
+        }
+
+      }
+    }
+
+    this.setState({ devicesView: newDeviceList })
+
   }
 
   render() {
-    var deviceStates = []
+    // var deviceStates = []
 
-    
+    // if (this.props.states == undefined) {
+    //   // loading probably
+    // } else {
+    //   for (var device of this.props.states) {
+    //     if (this.state.search.length > 0) {
+    //       if (device.id.includes(this.state.search)) {
+    //         deviceStates.push(device)
+    //       }
+    //     } else {
+    //       deviceStates.push(device)
+    //     }
+    //   }
+    // }
 
-      for (var device of this.props.states) {
-        if (this.state.search.length > 0) {
-          if (device.id.includes(this.state.search)) {
-            deviceStates.push(device)
-          }
-        } else {
-          deviceStates.push(device)
-        }
-      } 
 
-    
 
-      if (this.state.sort == "timedesc") {
-        deviceStates.sort( (a,b) => {          
-          if (new Date(a.timestamp) > new Date(b.timestamp)) {
-            return 1 } else {
-              return -1
-            }
-          
-        }).reverse();
-      }
-      if (this.state.sort == "namedesc") {
-        deviceStates.sort( (a,b) => {
-          if (a.id >= b.id ) {
-            return 1 } else { return -1 }
-        })
-      }
 
-      if (this.state.sort == "") {
-        deviceStates.reverse();
-      }
 
-    
-    
+    // if (this.state.sort == "timedesc") {
+    //   deviceStates.sort((a, b) => {
+    //     if (new Date(a.timestamp) > new Date(b.timestamp)) {
+    //       return 1
+    //     } else {
+    //       return -1
+    //     }
+
+    //   }).reverse();
+    // }
+    // if (this.state.sort == "namedesc") {
+    //   deviceStates.sort((a, b) => {
+    //     if (a.id >= b.id) {
+    //       return 1
+    //     } else { return -1 }
+    //   })
+    // }
+
+    // if (this.state.sort == "") {
+    //   deviceStates.reverse();
+    // }
+
+
+
 
     return (
       <div className="" style={{ paddingTop: 25, margin: 30 }} >
 
-        
+
 
         <div className="row">
           <div className="d-none d-md-block col-md-6" >
-            <form id="search" style={{ textAlign: "left", marginLeft:-8, marginBottom: 10 }}>
-              <input name="query" onChange={this.search} placeholder="filter"  />
+            <form id="search" style={{ textAlign: "left", marginLeft: -8, marginBottom: 10 }}>
+              <input name="query" onChange={this.search} placeholder="filter" />
             </form>
           </div>
 
           <div className="d-none d-md-block col-md-6" style={{ textAlign: "right" }} >
-            <span className="headerClickable" onClick={this.sort("timestamp")}> 
-              { this.sortButtons() }
+            <span className="headerClickable" onClick={this.sort("timestamp")}>
+              {this.sortButtons()}
             </span>
           </div>
         </div>
 
-        <DeviceList devices={deviceStates} max={15} />
+        <div className="row">
+          <div className="d-none d-md-block col-md-6" >
+            <div style={{ padding: 7 }}>
+              <i className="far fa-check-square" title="select all" onClick={this.selectAll} ></i>
+            </div>
+          </div>
+        </div>
+
+        <DeviceList devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
 
 
       </div>
 
     )
-    // } else {
-    //   return (
-    //     <div className="container" style={{ paddingTop: 25 }} >
-    //       <div className="row">            
-    //         <div className="col-sm-12"> 
-    //           <form id="search" style={{ paddingBottom: 10 , textAlign: "right" }}>
-    //             Search <input name="query" onChange={this.search}/>
-    //           </form> 
-    //         </div>
-    //         <div className="col-sm-12" style={{ textAlign: "center"}}> 
-    //           <div>No devices yet.</div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   )
-    // }
+
   }
 }

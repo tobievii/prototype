@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 
 import "../prototype.scss"
-
-
-
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
 export default class Stats extends React.Component {
@@ -14,7 +12,9 @@ export default class Stats extends React.Component {
       return (<div>
         {
           //this.state.stats.users24hList.map( (user, i) =>  <span key={i} title={ user.email }>{ user.email.split("@")[0] } </span> )
-          this.state.stats.users24hList.map( (user, i) =>  <a key={i} title={ user.email } href={ "/u/"+user.username }>{ user.username } </a> )
+          this.state.stats.users24hList.map( (user, i) => { 
+            return <Link key={i} to={ "/u/"+user.username }>{ user.username } </Link> 
+          } )
         }
       </div>)
     } catch (err) {}

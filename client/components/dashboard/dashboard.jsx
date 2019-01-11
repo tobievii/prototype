@@ -2,10 +2,7 @@ import React, { Component } from "react";
 
 import GridLayout from 'react-grid-layout';
 
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css"
 
-import "./index.scss"
 
 
 import { Calendar } from "./nivo_calendar.jsx"
@@ -13,7 +10,7 @@ import { Line } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
 
-// https://github.com/STRML/react-grid-layout
+
 
 import { Widget } from "./widget.jsx"
 
