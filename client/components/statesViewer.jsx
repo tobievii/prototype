@@ -550,7 +550,7 @@ export class StatesViewer extends Component {
 
         <div className="row">
           <div className="" >
-            <form id="search" style={{ textAlign: "lef", marginLeft: 18, marginBottom: 10 }}>
+            <form id="search" style={{ textAlign: "left", marginLeft: 18, marginBottom: 10 }}>
               <input name="query" onChange={this.search} placeholder="filter" />
             </form>
           </div>
