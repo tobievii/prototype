@@ -128,7 +128,11 @@ class App extends Component {
 
     userView = ({match}) => {
         return (
-            <UserPage username={match.params.username} />
+            <div>
+                <UserPage username={match.params.username} />
+                <StatesViewer username={match.params.username} />
+            </div>
+            
         )
     }
 

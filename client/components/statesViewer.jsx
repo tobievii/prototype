@@ -15,6 +15,10 @@ library.add(faSortNumericDown);
 library.add(faSortAlphaDown);
 library.add(faSortAmountDown);
 
+
+import socketio from "socket.io-client";
+
+
 class StatesViewerItem extends Component {
   state = {
     timeago: "",
@@ -211,23 +215,23 @@ class StatesViewerItem extends Component {
 
       return (
 
-        <div class="container-fluid" style={{ marginBottom: 2}}>
-          <div class="row statesViewerItem" style={this.calcStyle()}>
-            <div class="col" style={{flex: "0 0 50px", padding: 15 }}>
+        <div className="container-fluid" style={{ marginBottom: 2}}>
+          <div className="row statesViewerItem" style={this.calcStyle()}>
+            <div className="col" style={{flex: "0 0 50px", padding: 15 }}>
               {this.selectbox()} 
             </div>
             
-            <div class="col" style={{  overflow: "hidden"}}>
+            <div className="col" style={{  overflow: "hidden"}}>
               <Link to={"/view/" + this.props.id} >{this.props.id}</Link> {this.descIfExists()}<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
             
-            <div class="col" style={{flex: "0 0 230px" }}>
+            <div className="col" style={{flex: "0 0 230px" }}>
               <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
               <span className="faded" style={{ fontSize: 12 }}>{this.props.timestamp}</span>
             </div>
 
-            <div class="col" style={{flex: "0 0 120px", textAlign:"right"}}>
+            <div className="col" style={{flex: "0 0 120px", textAlign:"right"}}>
               <span className="trash" onClick={this.clickDelete(this.props.id)}>{this.state.deleteButton}</span>
               <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
               <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span>
@@ -364,16 +368,27 @@ export class StatesViewer extends Component {
   constructor(props) {
     super(props)
     if (props.username) {
-
-      p.getStates((states) => {
+      p.statesByUsername(props.username, (states) => {
+        console.log(states)
         for (var s in states) {
           states[s].selected = false
         }
         this.setState({ devicesServer: states })
         this.setState({ devicesView: states })
       })
-
     }
+
+    //CONNECT TO DATAFEED
+    // Not working yet
+    p.getAccount(account => {
+      console.log("attempting to connect")
+      const socket = socketio();
+      socket.on("connect", a => { 
+        console.log("StatesViewer socket connected"); 
+        socket.emit("connectStates", { apikey: account.apikey, username: props.username} );
+      });
+    })  
+    
   }
 
   search = evt => {

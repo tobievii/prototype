@@ -27,6 +27,16 @@ export function getState(id, cb) {
     .catch(err => console.error(err.toString()));
 }
 
+
+export function statesByUsername(username, cb) {
+  fetch("/api/v3/states", {
+    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ username : username })
+  }).then(response => response.json()).then(states => { cb(states); })
+    .catch(err => console.error(err.toString()));
+}
+
+
 export function getView(id, cb) {
   fetch("/api/v3/view", {
     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },

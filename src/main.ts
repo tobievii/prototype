@@ -368,6 +368,40 @@ app.get('/api/v3/states', (req: any, res: any) => {
   })
 })
 
+app.post("/api/v3/states", (req:any, res:any) => {
+
+  if (req.body) {
+
+    // find state by username
+    // todo filter by permission/level
+    if (req.body.username) {
+      console.log("state by username!")
+      console.log(req.body);
+
+      db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
+        console.log(user)
+        if (e) { res.json({error: "db error"})}
+        if (user) {
+          
+          db.states.find({ apikey: user.apikey }, (er:Error, states: any[]) => {
+            var cleanStates:any = []
+            for (var a in states) {
+              var cleanState = _.clone(states[a].payload)
+              //clean sensitive data from query:
+              //delete cleanState["apikey"]
+              cleanStates.push(cleanState);
+            }
+            res.json(cleanStates)
+          })
+        }
+      })
+
+    }
+    
+  }
+
+})
+
 app.get("/api/v3/states/full", (req: any, res: any) => {
   db.states.find({ apikey: req.user.apikey }, (err: Error, states: any[]) => {
     res.json(states);
@@ -781,6 +815,10 @@ io.on('connection', function (socket: any) {
     socket.join(path);
   });
 
+  socket.on('connectStates', (options:any)=>{
+    console.log("connectState");
+    console.log(options)
+  })
 
   socket.on('post', (data: any) => {
     //trex.log("socket posted");
