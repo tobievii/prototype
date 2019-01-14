@@ -83,6 +83,7 @@ app.use(safeParser);
 utilsLib.checkFirstRun(db);
 
 utilsLib.createUsernamesForOldAccounts(db);
+utilsLib.createDeviceKeysForOldAccounts(db);
 
 //handle accounts/cookies.
 app.use(accounts.midware(db)); 
@@ -375,8 +376,6 @@ app.post("/api/v3/states", (req:any, res:any) => {
     // find state by username
     // todo filter by permission/level
     if (req.body.username) {
-      console.log("state by username!")
-      console.log(req.body);
 
       db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
         console.log(user)
@@ -387,8 +386,6 @@ app.post("/api/v3/states", (req:any, res:any) => {
             var cleanStates:any = []
             for (var a in states) {
               var cleanState = _.clone(states[a].payload)
-              //clean sensitive data from query:
-              //delete cleanState["apikey"]
               cleanStates.push(cleanState);
             }
             res.json(cleanStates)

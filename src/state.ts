@@ -29,6 +29,7 @@ export function postState(
       "_last_seen" : new Date(),
       apikey: user.apikey,
       devid: request.id,
+      key : utils.generateDifficult(128),
       payload: request,
       meta: {
         user: {

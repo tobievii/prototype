@@ -286,3 +286,13 @@ export function createUsernamesForOldAccounts(db:any) {
         }
       }) 
 }
+
+
+export function createDeviceKeysForOldAccounts(db:any) {
+    db.states.find({"key" : { "$exists" : false }}).limit(10000, (err:Error, states:any)=>{
+        for (var state of states) {
+            state["key"] = generateDifficult(128)
+            db.states.update({"_id" : state["_id"]}, state)                
+        }
+      }) 
+}
