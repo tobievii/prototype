@@ -25,9 +25,9 @@ class StatesViewerItem extends Component {
     timestamp: "",
     millisago: 0,
     deleted: false,
-    publicButton: <i className="fas fa-eye-slash icon"></i>,
-    deleteButton: <i className="fas fa-trash-alt icon"></i>,
-    shareButton: <i className="fas fa-share-alt icon"></i>,
+    publicButton: <i className="fas fa-eye-slash icon" style={{color: "grey", padding: "5px"}}></i>,
+    deleteButton: <i className="fas fa-trash-alt icon" style={{color: "grey", padding: "5px"}}></i>,
+    shareButton: <i className="fas fa-share-alt icon" style={{color: "grey", padding: "5px"}}></i>,
     publicButtonState: "PUBLIC",
     deleteButtonClick: 0,
     selected: undefined

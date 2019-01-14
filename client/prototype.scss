@@ -752,19 +752,19 @@ input[type="checkbox"]:checked {
   cursor: pointer;
 }
 
-.trash{
-  color: #f00;
+.trash i:hover{
+  color: #f00 !important;
   padding: 5px;
 }
 
-.share{
-  color: orange;
+.share i:hover{
+  color: orange !important;
   padding: 5px;
 }
 
-.visibility{
-  padding: 5px;
-  color: green;
+.visibility i:hover{
+  color: green !important;
+  padding: 5px ;
 }
 
 .icon{
