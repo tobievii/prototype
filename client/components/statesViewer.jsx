@@ -362,7 +362,9 @@ export class StatesViewer extends Component {
     search: "",
     sort: "",
     devicesServer: [],
-    devicesView: []
+    devicesView: [],
+    checkboxstate: "Select All",
+    boxtick: "far fa-check-square"
   };
 
   constructor(props) {
@@ -451,13 +453,27 @@ export class StatesViewer extends Component {
     if (this.state.sort == "namedesc") { return <FontAwesomeIcon icon="sort-alpha-down" /> }
   }
 
-  selectAll = () => {
+ selectAll = () => {
+    if(this.state.checkboxstate=="Select All"){
     console.log("select all")
     var newDeviceList = _.clone(this.state.devicesView)
     for (var dev in newDeviceList) {
       newDeviceList[dev].selected = true;
     }
     this.setState({ devicesView: newDeviceList })
+    this.setState({checkboxstate: "Unselect All"})
+     this.setState({boxtick: "far fa-square"})
+  }
+    if(this.state.checkboxstate=="Unselect All"){
+        console.log("Unselect All")
+    var newDeviceList = _.clone(this.state.devicesView)
+    for (var dev in newDeviceList) {
+      newDeviceList[dev].selected = false;
+    }
+    this.setState({ devicesView: newDeviceList })
+    this.setState({checkboxstate: "Select All"})
+    this.setState({boxtick: "far fa-check-square"})
+    }
   }
 
   handleActionCall = (clickdata) => {
@@ -528,18 +544,18 @@ export class StatesViewer extends Component {
 
 
     return (
-      <div className="" style={{ paddingTop: 25, margin: 30 }} >
+     <div className="" style={{ paddingTop: 25, margin: 30  }} >
 
 
 
         <div className="row">
-          <div className="d-none d-md-block col-md-6" >
-            <form id="search" style={{ textAlign: "left", marginLeft: -8, marginBottom: 10 }}>
+          <div className="" >
+            <form id="search" style={{ textAlign: "lef", marginLeft: 18, marginBottom: 10 }}>
               <input name="query" onChange={this.search} placeholder="filter" />
             </form>
           </div>
 
-          <div className="d-none d-md-block col-md-6" style={{ textAlign: "right" }} >
+          <div className="" style={{ textAlign: "right", marginLeft:1400}} >
             <span className="headerClickable" onClick={this.sort("timestamp")}>
               {this.sortButtons()}
             </span>
@@ -547,9 +563,12 @@ export class StatesViewer extends Component {
         </div>
 
         <div className="row">
-          <div className="d-none d-md-block col-md-6" >
-            <div style={{ padding: 7 }}>
-              <i className="far fa-check-square" title="select all" onClick={this.selectAll} ></i>
+          <div className=" " >
+            <div style={{ padding: 18 }}>
+  
+    
+  
+          <i className={this.state.boxtick} title="select all" onClick={this.selectAll} ><b> {this.state.checkboxstate}</b></i>
             </div>
           </div>
         </div>
