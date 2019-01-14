@@ -47,13 +47,16 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 
-app.use(compression());
+
 app.use(cookieParser());
+
+app.use(compression({level:9}));
 app.use(express.static('../public'))
+
 app.use(express.static('../client'))
 app.use(express.static('../client/dist'))
-
 app.use('/view', express.static('../client/dist'))
+
 
 
 

@@ -2,10 +2,7 @@ import React, { Component } from "react";
 
 import GridLayout from 'react-grid-layout';
 
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css"
 
-import "./index.scss"
 
 
 import { Calendar } from "./nivo_calendar.jsx"
@@ -13,9 +10,9 @@ import { Line } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
 
-// https://github.com/STRML/react-grid-layout
 
 
+import { Widget } from "./widget.jsx"
 
 export class Dashboard extends React.Component {
 
@@ -26,8 +23,8 @@ export class Dashboard extends React.Component {
       rowHeight: 30
     },
     layout: [
-      { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar" },
-      { i: '1', x: 0, y: 4, w: 8, h: 8, type: "Line" }
+      { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
+      { i: '1', x: 0, y: 4, w: 8, h: 8, type: "Line" , dataname : "line" }
     ],
   }
 
@@ -50,7 +47,7 @@ export class Dashboard extends React.Component {
     console.log(location)
 
     var layout = _.clone(this.state.layout)
-    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 1, type: "Blank", datapath: e.datapath })
+    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
 
 
     this.setState({ layout: layout })
@@ -58,7 +55,7 @@ export class Dashboard extends React.Component {
 
   generateDashboard = () => {
     return (
-      <GridLayout className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} verticalCompact={false} >
+      <GridLayout className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} compactType={null} >
         {
           this.state.layout.map((data, i) => {
             if (data.type == "Calendar") {
@@ -80,8 +77,11 @@ export class Dashboard extends React.Component {
             if (data.type == "Blank") {
               return (
                 <div className="dashboardBlock" key={data.i} >
-                  {data.datapath}
+                  <Widget label={data.dataname} >
+                    { this.objectByString(this.props.view, data.datapath.slice(5) ).toString() }
+                  </Widget>
                 </div>
+                
               )
             }
 
@@ -92,6 +92,7 @@ export class Dashboard extends React.Component {
   }
 
   render() {
+    
     // layout is an array of objects, see the demo for more complete usage
     // var layout = [
     //   {i: 'c', x: 0, y: 0, w: 8, h: 4},
@@ -112,6 +113,21 @@ export class Dashboard extends React.Component {
       str += "" + tmp;
     }
     return str;
+  }
+
+  objectByString = (o,s) =>{
+    s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+    s = s.replace(/^\./, '');           // strip a leading dot
+    var a = s.split('.');
+    for (var i = 0, n = a.length; i < n; ++i) {
+        var k = a[i];
+        if (k in o) {
+            o = o[k];
+        } else {
+            return;
+        }
+    }
+    return o;
   }
 }
 

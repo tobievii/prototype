@@ -104,6 +104,7 @@ export class DataView extends React.Component {
       console.log( { e, name, i, data, level, path } )
       this.dragging = true;
       
+      e.dataname = name;
       e.datapath = path;
 
       setTimeout( ()=>{
