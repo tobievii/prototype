@@ -29,7 +29,6 @@ export function postState(
       "_last_seen" : new Date(),
       apikey: user.apikey,
       devid: request.id,
-      key : utils.generateDifficult(128),
       payload: request,
       meta: {
         user: {
@@ -62,16 +61,21 @@ export function postState(
     db.states.findOne({ apikey: user.apikey, devid: request.id },
       (findErr: Error, findResult: any) => {
         var packetToUpsert: any = {};
+        var info:any = {}
         if (findResult) {
           delete findResult["_id"];
           packetToUpsert = _.merge(findResult, packet);
-          packetToUpsert["_last_seen"] = new Date();
+          packetToUpsert["_last_seen"] = new Date();     
+          info.newdevice = false
         } else {
           packetToUpsert = _.clone(packet);
           packetToUpsert["_last_seen"] = new Date();
           packetToUpsert["_created_on"] = new Date();
+          packetToUpsert["key"] = utils.generateDifficult(128);
+          info.newdevice = true
         }
 
+        packet["key"] = packetToUpsert.key
 
         db.states.update(
           { apikey: user.apikey, devid: request.id },
@@ -87,7 +91,7 @@ export function postState(
               db.users.findOne({apikey : user.apikey}, (e:Error, user:any)=>{
                 user["_last_seen"] = new Date();
                 db.users.update({apikey : user.apikey}, user, (e2:Error, r2:any)=>{
-                  cb(resSave);
+                  cb(resSave, info);
                 })
               })
 

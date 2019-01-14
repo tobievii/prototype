@@ -43,8 +43,8 @@ class StatesViewerItem extends Component {
   }
 
   updateTime = () => {
-    if (this.props.timestamp) {
-      var timeago = moment(this.props.timestamp).fromNow()
+    if (this.props.device["_last_seen"]) {
+      var timeago = moment(this.props.device["_last_seen"]).fromNow()
       this.setState({ timeago })
     }
   }
@@ -91,7 +91,7 @@ class StatesViewerItem extends Component {
   calcStyle = () => {
     var timefade = 3000;
 
-    var lastChange = new Date(this.props.timestamp);
+    var lastChange = new Date(this.props.device["_last_seen"]);
     var millisago = Date.now() - lastChange.getTime();
     var ratio = (timefade - millisago) / timefade;
 
@@ -99,7 +99,7 @@ class StatesViewerItem extends Component {
     if (ratio < 0) { ratio = 0 }
     if (ratio > 1) { ratio = 1 }
 
-    if (this.props.item.selected) {
+    if (this.props.device.selected) {
       return {
         marginBottom: 2, padding: "7px 0px 7px 0px",
         backgroundImage: "linear-gradient(to right, rgba(3, 25, 5, 0.5)," + this.blendrgba({ r: 3, g: 25, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
@@ -118,7 +118,7 @@ class StatesViewerItem extends Component {
   }
 
   descIfExists = () => {
-    if (this.props.item.desc) {
+    if (this.props.device.desc) {
       return <span style={{ color: "rgba(125,255,175,0.5)" }}>{this.props.item.desc}</span>
     } else {
       return <span></span>
@@ -192,7 +192,7 @@ class StatesViewerItem extends Component {
   }
 
   selectbox = () => {
-    if (this.props.item.selected) {
+    if (this.props.device.selected) {
       return (
         <i className="fas fa-check-square" onClick={this.selectBoxClickHandler("deselect")} ></i>
       )
@@ -209,12 +209,11 @@ class StatesViewerItem extends Component {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
     } else {
-      var dataPreview = JSON.stringify(this.props.data)
+      var dataPreview = JSON.stringify(this.props.device.payload.data)
       var maxlength = 120;
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
 
       return (
-
         <div className="container-fluid" style={{ marginBottom: 2}}>
           <div className="row statesViewerItem" style={this.calcStyle()}>
             <div className="col" style={{flex: "0 0 50px", padding: 15 }}>
@@ -222,13 +221,13 @@ class StatesViewerItem extends Component {
             </div>
             
             <div className="col" style={{  overflow: "hidden"}}>
-              <Link to={"/view/" + this.props.id} >{this.props.id}</Link> {this.descIfExists()}<br />
+              <Link to={"/view/" + this.props.device.devid} >{this.props.device.devid}</Link> {this.descIfExists()}<br />
               <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
             </div>
             
             <div className="col" style={{flex: "0 0 230px" }}>
               <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
-              <span className="faded" style={{ fontSize: 12 }}>{this.props.timestamp}</span>
+              <span className="faded" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
             </div>
 
             <div className="col" style={{flex: "0 0 120px", textAlign:"right"}}>
@@ -238,9 +237,6 @@ class StatesViewerItem extends Component {
             </div>
           </div>
         </div>
-
-        
-
       );
     }
 
@@ -349,7 +345,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(item => <StatesViewerItem actionCall={this.handleActionCall(item.id)} key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} item={item} />)}
+          {devicelist.map(device => <StatesViewerItem actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -366,30 +362,93 @@ export class StatesViewer extends Component {
     checkboxstate: "Select All",
     boxtick: "far fa-check-square"
   };
+  
+  socket = undefined;
 
   constructor(props) {
     super(props)
-    if (props.username) {
-      p.statesByUsername(props.username, (states) => {
-        console.log(states)
-        for (var s in states) {
-          states[s].selected = false
-        }
-        this.setState({ devicesServer: states })
-        this.setState({ devicesView: states })
+
+    this.socket = socketio();
+    this.socket.on("connect", a => { 
+      console.log("!! socket")
+
+      this.loadList();
+    });  
+
+    
+  }
+
+
+  loadList = () => {
+    console.log("reloading list")
+    
+    p.statesByUsername(this.props.username, (states) => {
+      console.log(states)
+      for (var s in states) {
+        states[s].selected = false
+      }
+      this.setState({ devicesServer: states }, ()=>{
+        this.setState({ devicesView: states }, ()=>{
+          this.socketConnectDevices();
+        })
       })
+    })    
+
+
+  }
+
+  componentWillUnmount = () => { this.socket.disconnect(); }
+
+  socketConnectDevices = () => {
+    //connect to devices socket feeds
+    console.log("connect to feeds")
+    
+    this.socket.emit("join", this.props.username)
+    this.socket.on("info", (info) => {
+      console.log(info);
+      if (info.newdevice) {
+        this.loadList();
+      }
+    })
+
+    for (var device in this.state.devicesServer) {
+      this.socket.emit("join", this.state.devicesServer[device].key );
     }
 
-    //CONNECT TO DATAFEED
-    // Not working yet
-    p.getAccount(account => {
-      console.log("attempting to connect")
-      const socket = socketio();
-      socket.on("connect", a => { 
-        console.log("StatesViewer socket connected"); 
-        socket.emit("connectStates", { apikey: account.apikey, username: props.username} );
-      });
-    })  
+    this.socket.on("post", (packet)=>{
+      console.log(packet)
+      this.handleDevicePacket(packet)
+    })
+    // p.getAccount(account => {
+    //   const socket = socketio();
+    //   socket.on("connect", a => { 
+    //     socket.emit("connectStates", { apikey: account.apikey, username: props.username} );
+    //   });
+    // })  
+
+  }
+
+  handleDevicePacket = (packet) => {
+    var devices = _.clone(this.state.devicesServer)
+    var found = 0;
+    for (var dev in devices) {
+      if (devices[dev].devid == packet.id) {
+        found = 1;
+        devices[dev]["_last_seen"] = packet.timestamp;
+      }
+    }
+
+
+
+    if (found == 0) {    
+      // new device?
+      this.loadList() 
+    } else {
+      // update
+      this.setState({devicesServer : devices})
+      this.setState({devicesView : devices})
+    }
+
     
   }
 
@@ -400,7 +459,7 @@ export class StatesViewer extends Component {
 
       for (var device of this.state.devicesServer) {
         if (this.state.search.length > 0) {
-          if (device.id.includes(this.state.search)) {
+          if (device.devid.includes(this.state.search)) {
             newDeviceList.push(device)
           }
         } else {
@@ -481,7 +540,7 @@ export class StatesViewer extends Component {
 
     var newDeviceList = _.clone(this.state.devicesView)
     for (var dev in newDeviceList) {
-      if (newDeviceList[dev].id == clickdata.a) {
+      if (newDeviceList[dev].devid == clickdata.a) {
 
         if (clickdata.e == "deselect") {
           newDeviceList[dev].selected = false;
@@ -545,8 +604,6 @@ export class StatesViewer extends Component {
 
     return (
      <div className="" style={{ paddingTop: 25, margin: 30  }} >
-
-
 
         <div className="row">
           <div className="" >

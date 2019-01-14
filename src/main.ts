@@ -369,34 +369,30 @@ app.get('/api/v3/states', (req: any, res: any) => {
   })
 })
 
+// new in 5.0.34:
 app.post("/api/v3/states", (req:any, res:any) => {
-
   if (req.body) {
-
     // find state by username
     // todo filter by permission/level
     if (req.body.username) {
-
       db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
-        console.log(user)
+        
         if (e) { res.json({error: "db error"})}
         if (user) {
           
           db.states.find({ apikey: user.apikey }, (er:Error, states: any[]) => {
             var cleanStates:any = []
             for (var a in states) {
-              var cleanState = _.clone(states[a].payload)
+              var cleanState = _.clone(states[a])
+              delete cleanState["apikey"]
               cleanStates.push(cleanState);
             }
             res.json(cleanStates)
           })
         }
       })
-
-    }
-    
+    } 
   }
-
 })
 
 app.get("/api/v3/states/full", (req: any, res: any) => {
@@ -492,10 +488,15 @@ function handleState(req: any, res: any, next: any) {
     }
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, req.user, newpacket, meta, (packet: any) => {
+      state.postState(db, req.user, newpacket, meta, (packet: any, info:any) => {
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
-
+        io.to(packet.key).emit('post', packet.payload)
+        
+        if (info.newdevice) {
+          io.to(req.user.username).emit("info", info)
+        }
+        
 
 
         for (var p in plugins) {
@@ -799,7 +800,8 @@ var io = require('socket.io')(server);
 
 io.on('connection', function (socket: any) {
   //trex.log(socket);
-  //trex.log(socket.id)
+
+  //utilsLib.log(socket.id)
   //trex.log(socket.handshake)
   //trex.log('socket connected...');
   setTimeout(function () {
@@ -807,15 +809,12 @@ io.on('connection', function (socket: any) {
   }, 5000)
 
   socket.on('join', function (path: string) {
+    console.log(socket.id + " joins " + path)
+    //console.log(socket)
     //AUTH
     //trex.log("SOCKET.IO JOIN "+path)
     socket.join(path);
   });
-
-  socket.on('connectStates', (options:any)=>{
-    console.log("connectState");
-    console.log(options)
-  })
 
   socket.on('post', (data: any) => {
     //trex.log("socket posted");
