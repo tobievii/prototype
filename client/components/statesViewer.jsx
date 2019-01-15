@@ -30,6 +30,7 @@ class StatesViewerItem extends Component {
     shareButton: <i className="fas fa-share-alt icon" style={{color: "grey", padding: "5px"}}></i>,
     publicButtonState: "PUBLIC",
     deleteButtonClick: 0,
+    selectBoxClicked: 0,
     selected: undefined
   };
 
@@ -197,6 +198,11 @@ class StatesViewerItem extends Component {
         <i className="fas fa-check-square" onClick={this.selectBoxClickHandler("deselect")} ></i>
       )
     } else {
+
+      if(this.state.selectBoxClicked === 0){
+        this.setState({ selectBoxClicked: 100 });
+      }
+
       return (
         <i className="far fa-square" onClick={this.selectBoxClickHandler("select")} ></i>
       )
@@ -360,7 +366,10 @@ export class StatesViewer extends Component {
     devicesServer: [],
     devicesView: [],
     checkboxstate: "Select All",
-    boxtick: "far fa-check-square"
+    boxtick: "far fa-check-square",
+    publicButton: "",
+    deleteButton: "",
+    shareButton: "",
   };
   
   socket = undefined;
@@ -370,12 +379,12 @@ export class StatesViewer extends Component {
 
     this.socket = socketio();
     this.socket.on("connect", a => { 
-      console.log("!! socket")
+      console.log("!! socket");
+      console.log(this.state.devicesView);
 
       this.loadList();
     });  
 
-    
   }
 
 
@@ -392,12 +401,20 @@ export class StatesViewer extends Component {
           this.socketConnectDevices();
         })
       })
+
+      if(states.length === 0){
+        this.setState({ checkboxstate: ""})
+        this.setState({ boxtick:  ""})
+      }else{
+        this.setState({ checkboxstate: "Select All"})
+        this.setState({ boxtick:  "far fa-check-square"})
+      }
     })    
-
-
   }
 
-  componentWillUnmount = () => { this.socket.disconnect(); }
+  componentWillUnmount = () => { 
+    this.socket.disconnect(); 
+  }
 
   socketConnectDevices = () => {
     //connect to devices socket feeds
@@ -512,28 +529,55 @@ export class StatesViewer extends Component {
     if (this.state.sort == "namedesc") { return <FontAwesomeIcon icon="sort-alpha-down" /> }
   }
 
- selectAll = () => {
+  selectAll = () => {
     if(this.state.checkboxstate=="Select All"){
-    console.log("select all")
-    var newDeviceList = _.clone(this.state.devicesView)
-    for (var dev in newDeviceList) {
-      newDeviceList[dev].selected = true;
+      console.log("select all")
+      var newDeviceList = _.clone(this.state.devicesView)
+      for (var dev in newDeviceList) {
+        newDeviceList[dev].selected = true;
+      }
+      console.log(this.state.devicesView)
+      this.setState({ devicesView: newDeviceList })
+      this.setState({checkboxstate: "Unselect All"})
+      this.setState({boxtick: "far fa-square"})
+      this.setState({ deleteButton: <i className="fas fa-trash-alt icon" style={{color: "grey", padding: "5px",left: "90px"}}></i>})
+      this.setState({ publicButton: <i className="fas fa-eye-slash icon" style={{color: "grey", padding: "5px"}}></i>})
+      this.setState({ shareButton:  <i className="fas fa-share-alt icon" style={{color: "grey", padding: "5px"}}></i>}) 
     }
-    this.setState({ devicesView: newDeviceList })
-    this.setState({checkboxstate: "Unselect All"})
-     this.setState({boxtick: "far fa-square"})
-  }
+
     if(this.state.checkboxstate=="Unselect All"){
         console.log("Unselect All")
-    var newDeviceList = _.clone(this.state.devicesView)
-    for (var dev in newDeviceList) {
-      newDeviceList[dev].selected = false;
-    }
-    this.setState({ devicesView: newDeviceList })
-    this.setState({checkboxstate: "Select All"})
-    this.setState({boxtick: "far fa-check-square"})
+      var newDeviceList = _.clone(this.state.devicesView)
+      for (var dev in newDeviceList) {
+        newDeviceList[dev].selected = false;
+      }
+      this.setState({ devicesView: newDeviceList })
+      this.setState({checkboxstate: "Select All"})
+      this.setState({boxtick: "far fa-check-square"})
+      this.setState({ deleteButton: ""})
+      this.setState({ publicButton: ""})
+      this.setState({ shareButton:  ""})
+      
     }
   }
+
+  deleteAll = () => {
+      var newDeviceList = _.clone(this.state.devicesView)
+
+      for (var dev in newDeviceList) {
+        fetch("/api/v3/state/delete", {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ id: newDeviceList[dev].devid })
+        }).then(response => response.json()).then(serverresponse => {
+          console.log(serverresponse);
+        }).catch(err => console.error(err.toString()));
+      }
+
+      this.setState({ deleteButton: ""})
+      this.setState({ publicButton: ""})
+      this.setState({ shareButton:  ""})
+      this.loadList();
+    }
 
   handleActionCall = (clickdata) => {
     console.log(clickdata)
@@ -553,7 +597,6 @@ export class StatesViewer extends Component {
     }
 
     this.setState({ devicesView: newDeviceList })
-
   }
 
   render() {
@@ -572,9 +615,6 @@ export class StatesViewer extends Component {
     //     }
     //   }
     // }
-
-
-
 
 
     // if (this.state.sort == "timedesc") {
@@ -622,10 +662,10 @@ export class StatesViewer extends Component {
         <div className="row">
           <div className=" " >
             <div style={{ padding: 18 }}>
-  
-    
-  
-          <i className={this.state.boxtick} title="select all" onClick={this.selectAll} ><b> {this.state.checkboxstate}</b></i>
+              <i className={this.state.boxtick} title="select all" onClick={this.selectAll} ><b> {this.state.checkboxstate}</b></i>
+              <span className="trash" style={{ paddingLeft: 30 }} onClick={ ()=> this.deleteAll() }>{this.state.deleteButton}</span>
+              <span className="visibility">{this.state.publicButton}</span>
+              <span className="share">{this.state.shareButton}</span>
             </div>
           </div>
         </div>
