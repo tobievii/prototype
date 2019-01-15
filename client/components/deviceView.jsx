@@ -22,6 +22,10 @@ import MonacoEditor from "react-monaco-editor";
 
 import * as p from "../prototype.ts"
 
+import socketio from "socket.io-client";
+
+const socket = socketio();
+
 export class Editor extends React.Component {
 
   loadingState = 0;
@@ -329,8 +333,6 @@ callback(packet); `
   }
 }
 
-
-
 export class DeviceView extends Component {
   state = {
     devid: undefined,
@@ -350,9 +352,10 @@ export class DeviceView extends Component {
     super(props);
 
     this.state.devid = props.devid
-    
+    socket.on("post", data => {
+      console.log(data);
+    });
   }
-
 
   updateTime = () => {
     if (this.props.view) {
@@ -362,7 +365,6 @@ export class DeviceView extends Component {
       }
     }    
   }
-
 
   componentDidMount = () => {
     this.updateTime();
@@ -374,6 +376,11 @@ export class DeviceView extends Component {
       console.log(view)
       this.setState({view})
     })
+    setInterval( () => {
+      p.getView(this.props.devid, (view)=>{
+        this.setState({view})
+      })
+    },50)
 
     p.getState(this.props.devid, (state) => {
       console.log(state)
@@ -439,7 +446,6 @@ export class DeviceView extends Component {
       });
     }
   };
-
 
   render() {
     var devid = "loading";
