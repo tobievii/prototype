@@ -23,12 +23,10 @@ import { SettingsView } from "./components/settingsView.jsx";
 
 import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
-
 import * as p from "./prototype.ts"
 
-import socketio from "socket.io-client";
-
-const socket = socketio();
+//import socketio from "socket.io-client";
+//const socket = socketio();
 
 class App extends Component {
 
@@ -42,7 +40,7 @@ class App extends Component {
         p.getAccount(account => { 
             this.setState({ account });
             if (account.level > 0) { 
-                socket.emit("join", account.apikey);
+                //socket.emit("join", account.apikey);
                 this.setState({ loggedIn: true }) 
                 // if its a real user (level >0 ) then we get device data.
             }            
@@ -50,47 +48,47 @@ class App extends Component {
 
         p.getStates( (states) => { this.setState({ states }) })
 
-        socket.on("connect", a => { console.log("socket connected"); });
-        socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
+        //socket.on("connect", a => { console.log("socket connected"); });
+        //socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
     }
 
-    socketHandler = (socketDataIn) => {
-        if (this.state.states) {
-            var newArray = this.state.states.slice();
+    // socketHandler = (socketDataIn) => {
+    //     if (this.state.states) {
+    //         var newArray = this.state.states.slice();
   
-            var found = 0;
-            for (var s in newArray) {
-              if (newArray[s].id == socketDataIn.id) {
-                found = 1;
-                var mergedEntry = _.merge(newArray[s], socketDataIn);
-                newArray[s] = mergedEntry;
-                this.setState({ states: newArray });
-              }
-            }
+    //         var found = 0;
+    //         for (var s in newArray) {
+    //           if (newArray[s].id == socketDataIn.id) {
+    //             found = 1;
+    //             var mergedEntry = _.merge(newArray[s], socketDataIn);
+    //             newArray[s] = mergedEntry;
+    //             this.setState({ states: newArray });
+    //           }
+    //         }
   
-            if (found == 0) {
-              newArray.push(socketDataIn);
-              this.setState({ states: newArray });
-            }
+    //         if (found == 0) {
+    //           newArray.push(socketDataIn);
+    //           this.setState({ states: newArray });
+    //         }
   
-            ///////////
+    //         ///////////
   
-            if (this.state.view) {
-              var copyView = Object.assign({}, this.state.view); //creating copy of object
+    //         if (this.state.view) {
+    //           var copyView = Object.assign({}, this.state.view); //creating copy of object
   
-              var view = _.merge(copyView, socketDataIn);
+    //           var view = _.merge(copyView, socketDataIn);
   
-              this.setState({ view });
-            }
+    //           this.setState({ view });
+    //         }
   
-            if (this.state.packets) {
-              var newPackets = this.state.packets.slice().reverse();
-              var payload = socketDataIn; //{data: socketDataIn.data, timestamp: socketDataIn.timestamp}
-              newPackets.push(payload);
-              this.setState({ packets: newPackets.reverse() });
-            }
-          }
-    }
+    //         if (this.state.packets) {
+    //           var newPackets = this.state.packets.slice().reverse();
+    //           var payload = socketDataIn; //{data: socketDataIn.data, timestamp: socketDataIn.timestamp}
+    //           newPackets.push(payload);
+    //           this.setState({ packets: newPackets.reverse() });
+    //         }
+    //       }
+    // }
 
   
 
