@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import moment from 'moment'
 import Moment from 'react-moment';
-
+import { confirmAlert } from 'react-confirm-alert'; 
+import 'react-confirm-alert/src/react-confirm-alert.css' 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
@@ -124,48 +125,65 @@ class StatesViewerItem extends Component {
     }
   }
 
-  clickDelete = (id) => {
+  clickDeleteConfirmation = (id) => {
     return (event) => {
-      if (this.state.deleteButtonClick == 0) {
-        this.setState({ deleteButton: "ARE YOU SURE?" });
-        this.setState({ deleteButtonClick: 1 });
-        this.setState({ publicButton: "YES" });
-        this.setState({ shareButton: "NO" });
-        return;
-      }
 
-      if (this.state.deleteButtonClick == 1) {
-        fetch("/api/v3/state/delete", {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({ id: id })
-        }).then(response => response.json()).then(serverresponse => {
-          this.setState({ deleted: true })
-        }).catch(err => console.error(err.toString()));
-      }
+      confirmAlert({
+        type: 'warning',
+        title: 'Are you sure?',
+        message: 'Deleting a device is irreversible',
+        buttons: [
+          {
+            label: 'Yes',
+            onClick: () => this.deleteEntry(id)
+          },
+          {
+            label: 'No',
+            onClick: () => { }
+          }
+        ]
+      })
+    }
+  };
+
+  deleteEntry = (id) => {
+    fetch("/api/v3/state/delete", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id })
+    }).then(response => response.json()).then(serverresponse => {
+      console.log(serverresponse);
+      this.setState({ deleted: true })
+    }).catch(err => console.error(err.toString()));
+  }
+
+  dialog() {
+    if (this.state.dialog) {
+      return (
+        <div className="container" style={{ color: "red" }}>
+        </div>
+      );
     }
   }
 
-
+  goToDevice = (id) => {
+    return (e) => {
+      window.location = '/view/' + id;
+    }
+  }
 
   changeStatus = (id) => {
     return (event) => {
-      if (this.state.publicButtonState == "PUBLIC" && this.state.deleteButtonClick == 0) {
-        this.setState({ publicButton: <i className="far fa-eye icon"></i> });
+      if (this.state.publicButtonState == "PUBLIC") {
+        this.setState({ publicButton: <i className="far fa-eye icon" style={{ color: "grey", padding: "5px" }}></i> });
         this.setState({ publicButtonState: "PRIVATE" });
       }
 
-      if (this.state.publicButtonState == "PRIVATE" && this.state.deleteButtonClick == 0) {
-        this.setState({ publicButton: <i className="fas fa-eye-slash icon"></i> });
+      if (this.state.publicButtonState == "PRIVATE") {
+        this.setState({ publicButton: <i className="fas fa-eye-slash icon" style={{ color: "grey", padding: "5px" }}></i> });
         this.setState({ publicButtonState: "PUBLIC" });
       }
 
       if (this.state.deleteButtonClick == 1) {
-        fetch("/api/v3/state/delete", {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({ id: id })
-        }).then(response => response.json()).then(serverresponse => {
-          this.setState({ deleted: true })
-        }).catch(err => console.error(err.toString()));
       }
     }
   }
@@ -227,7 +245,7 @@ class StatesViewerItem extends Component {
             </Link>
 
             <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
-              <span className="trash" onClick={this.clickDelete(this.props.id)}>{this.state.deleteButton}</span>
+              <span className="trash" onClick={this.clickDeleteConfirmation(this.props.id)}>{this.state.deleteButton}</span>
               <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
               <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span>
             </div>
