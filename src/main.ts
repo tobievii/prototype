@@ -50,7 +50,7 @@ import { utils } from 'mocha';
 
 app.use(cookieParser());
 
-app.use(compression({level:9}));
+//app.use(compression({level:1}));
 app.use(express.static('../public'))
 
 app.use(express.static('../client'))
@@ -489,6 +489,7 @@ function handleState(req: any, res: any, next: any) {
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info:any) => {
+        
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
@@ -531,15 +532,17 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
     if (err) { console.log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
-
-        
-        
-
+      state.postState(db, user, newpacket, packetIn.meta, (packet: any, info:any) => {
         if (options) {
           if (options.socketio == true) {
             io.to(apikey).emit('post', packet.payload);
             io.to(apikey + "|" + packetIn.id).emit('post', packet.payload);
+            io.to(packet.key).emit('post', packet.payload)
+
+            if (info.newdevice) {
+              io.to(user.username).emit("info", info)
+            }
+
           }
         }
         

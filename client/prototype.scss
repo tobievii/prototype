@@ -7,6 +7,7 @@
 }
 
 $panelBg: rgba(3, 4, 5, 0.5);
+$spot: #f3353a;
 
 body {
   font-family: "Share Tech Mono", monospace;
@@ -472,27 +473,7 @@ input:checked + .slider:before {
   opacity: 1;
 }
 
-.statesViewerItem {
-  color: #e1e1e1;
-  box-sizing: border-box;
-  background-image: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
-  border-left: 2px solid rgba(19, 41, 49, 0);
-  border-top: 1px solid rgba(19, 41, 49, 0);
-  border-bottom: 1px solid rgba(19, 41, 49, 0);
-  opacity: 1;
-  
-  box-sizing: border-box;
-}
 
-.statesViewerItem:hover {
-  color: #ffe6e7;
-  opacity: 1;
-  border-left: 2px solid #ff2720;
-  border-top: 1px solid rgba(255, 39, 32, 0.2);
-  border-bottom: 1px solid rgba(255, 39, 32, 0.2);
-  opacity: 1;
-  
-}
 
 .pagination {
   cursor: pointer;
@@ -524,7 +505,7 @@ input {
   color: rgba(255, 255, 255, 0.5);
   background: rgba(3, 4, 5, 0.5);
   max-width: 100%;
-  padding: 8px 15px 8px 15px;
+  padding: 5px 10px 5px 10px;
   border: 1px solid rgba(19, 41, 49, 0);
 }
 
@@ -735,9 +716,7 @@ input[type="checkbox"]:checked {
   height: 100%;
 }
 
-.statesViewerDeviceLink {
-  cursor: pointer;
-}
+
 
 .widgetLabel {
   background: #2B2F37;
@@ -770,4 +749,75 @@ input[type="checkbox"]:checked {
 .icon{
   margin-top: 1rem;
   font-size: 1.2rem;
+}
+
+
+/* statesViewer */
+
+.statesViewerDeviceLink {
+  cursor: pointer;
+}
+
+.statesViewerItem {
+  color: #e1e1e1;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0,0,0,0);
+  box-sizing: border-box;
+  opacity: 0.9;
+}
+
+.statesViewerItem:hover {
+  opacity: 1;
+  filter: drop-shadow(0px 0px 0px rgba(255, 255, 255, 0.35));
+
+}
+
+.statesViewerItemActivity {
+  border-right: 2px solid rgba( 125,255,175, 0.75);
+  background: linear-gradient(to right, rgba(3, 4, 5, 0.5), rgba( 125,255,175, 0.1) );
+}
+
+
+.statesViewerCheckBoxes {
+  padding-top: 16px;
+  padding-left: 6px;
+}
+
+.statesViewerCheckBoxDiv {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.statesViewerCheckBoxDiv:hover {
+  opacity: 0.5;
+  transition: opacity 0.02s ease-in-out;
+}
+
+/* BARS */
+
+.protoMenu {
+  background: rgba(3, 4, 5, 0.15);
+}
+
+/* BUTTONS */
+.protoButton {
+  background: rgba(3, 4, 5, 0.5);
+  color: rgba(255, 246, 235, 0.9);
+  padding: 6px 11px 6px 11px;
+  border: 1px solid rgba(60, 19, 25, 0);
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+}
+
+.protoButtonClickable:hover {
+  color: #f3353a;
+  background: rgba(20, 19, 25, 0.9);
+  border: 1px solid rgba(60, 19, 25, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
 }
