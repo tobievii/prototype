@@ -14,7 +14,7 @@ import * as _ from "lodash"
 
 import { Widget } from "./widget.jsx"
 
-export class Dashboard extends React.Component {
+export default class Dashboard extends React.Component {
 
   state = {
     grid: {
