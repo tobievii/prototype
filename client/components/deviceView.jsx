@@ -397,7 +397,7 @@ export class DeviceView extends Component {
     return "no idea";
   }
 
-  deleteDevice = () => {
+  deleteDevice = (id) => {
     // deletes a device's state and packet history
     if (this.state.trashClicked == 0) {
       var trashClicked = this.state.trashClicked;
@@ -409,16 +409,14 @@ export class DeviceView extends Component {
 
     if (this.state.trashClicked == 1) {
       console.log("clicked twice");
-      $.ajax({
-        url: "/api/v3/state/delete",
-        type: "post",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify(this.props.view),
-        success: result => {
-          window.location.href = window.location.origin;
-        }
-      });
+      fetch("/api/v3/state/delete", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+      }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse);
+        this.setState({ deleted: true })
+        
+      }).catch(err => console.error(err.toString()));
     }
   };
 
@@ -468,8 +466,6 @@ export class DeviceView extends Component {
       }
     }
 
-
-
     if (this.state.packets) {
       packets = this.state.packets;
     }
@@ -492,12 +488,10 @@ export class DeviceView extends Component {
 
 
           <div className="col-md-4">
-          
-          
             <div
               className="commanderBgPanel commanderBgPanelClickable"
               style={{ width: 175, float: "right" }}
-              onClick={this.deleteDevice}><FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}</div>
+              onClick={() => this.deleteDevice(this.props.devid)}><FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}</div>
 
             <div className="commanderBgPanel commanderBgPanelClickable" 
               style={{ width: 175, float: "right", marginRight: 10 }}

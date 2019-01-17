@@ -47,7 +47,6 @@ class StatesViewerItem extends Component {
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
-
   }
 
   componentDidUpdate = () => {
@@ -67,7 +66,6 @@ class StatesViewerItem extends Component {
     }
   }
 
-
   blendrgba(x, y, ratio) {
 
     if (ratio <= 0) {
@@ -86,7 +84,6 @@ class StatesViewerItem extends Component {
 
     //return "rgba(255,255,255,1)"
   }
-
 
   calcStyle = () => {
     var timefade = 3000;
@@ -113,8 +110,6 @@ class StatesViewerItem extends Component {
         borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
       }
     }
-
-
   }
 
   descIfExists = () => {
@@ -201,7 +196,9 @@ class StatesViewerItem extends Component {
   }
 
   selectbox = () => {
+    
     if (this.props.device.selected) {
+      
       return (
         <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
           <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
@@ -219,7 +216,6 @@ class StatesViewerItem extends Component {
         </div>
       )
     }
-
   }
 
   render() {
@@ -241,7 +237,6 @@ class StatesViewerItem extends Component {
 
             {this.selectbox()}
 
-
             <Link className="col" to={"/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
               <div>
                 <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
@@ -250,7 +245,7 @@ class StatesViewerItem extends Component {
             </Link>
 
             <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
-              <span className="trash" onClick={this.clickDeleteConfirmation(this.props.id)}>{this.state.deleteButton}</span>
+              <span className="trash" onClick={this.clickDeleteConfirmation(this.props.devID)}>{this.state.deleteButton}</span>
               <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
               <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span>
             </div>
@@ -264,12 +259,8 @@ class StatesViewerItem extends Component {
         </div>
       );
     }
-
-
   }
 }
-
-
 
 export class Pagination extends Component {
 
@@ -299,11 +290,8 @@ export class Pagination extends Component {
     } else {
       return (<div></div>)
     }
-
-
   }
 }
-
 
 export class DeviceList extends Component {
 
@@ -331,9 +319,6 @@ export class DeviceList extends Component {
 
 
     //if (pagesNum < this.state.activePage) { this.setState({activePage : 1 })}
-
-
-
 
     var pages = [];
     for (var a = 1; a <= pagesNum; a++) {
@@ -369,7 +354,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} />)}
+          {devicelist.map(device => <StatesViewerItem actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid}/>)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -388,6 +373,8 @@ export class StatesViewer extends Component {
     publicButton: "",
     deleteButton: "",
     shareButton: "",
+    selectedDevices: [],
+    selectAllState: null
   };
 
   socket = undefined;
@@ -406,16 +393,29 @@ export class StatesViewer extends Component {
       this.socket.on("info", (info) => {
         console.log(info);
         if (info.newdevice) {
-
+          p.statesByUsername(this.props.username, (states) => {
+            for (var s in states) {
+              states[s].selected = false
+            }
+            this.setState({ devicesServer: states }, () => {
+      
+              for (var device in this.state.devicesServer) {
+                this.socket.emit("join", this.state.devicesServer[device].key);
+              }
+      
+              this.setState({ devicesView: states }, () => {
+                //this.socketConnectDevices();
+                //this.sort();
+              })
+            })
+          })
         }
       })
 
       this.socket.on("post", (packet) => {
-        this.handleDevicePacket(packet)
+        this.handleDevicePacket(packet)  
       })
     });
-
-
 
     p.statesByUsername(this.props.username, (states) => {
       for (var s in states) {
@@ -450,8 +450,6 @@ export class StatesViewer extends Component {
     this.socket.disconnect(); 
   }
 
-
-
   handleDevicePacket = (packet) => {
     var devices = _.clone(this.state.devicesServer)
     var found = 0;
@@ -462,8 +460,6 @@ export class StatesViewer extends Component {
         devices[dev].payload = _.merge(devices[dev].payload, packet)        
       }
     }
-
-
 
     if (found == 0) {
       // new device?
@@ -479,6 +475,16 @@ export class StatesViewer extends Component {
 
 
   }
+
+  // updateDeviceList = () => {
+  //   var loadList = _.clone(this.state.devicesView);
+
+  //   this.setState({ devicesServer: loadList })
+  //   this.setState({ devicesView: loadList }, () => {
+  //     this.sort()
+  //   })    
+
+  // }
 
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
@@ -558,19 +564,22 @@ export class StatesViewer extends Component {
     if (value == true) {
       for (var dev in newDeviceList) {
         newDeviceList[dev].selected = true;
+        this.state.selectedDevices.push(newDeviceList[dev].devid);
       }
+      console.log(this.state.selectedDevices);
       this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+      this.setState({ selectAllState: true });
     }
     if (value == false) {
       
       for (var dev in newDeviceList) {
         newDeviceList[dev].selected = false;
+        this.state.selectedDevices.pop(newDeviceList[dev].devid);
       }
+      console.log(this.state.selectedDevices);
       this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+      this.setState({ selectAllState: false });
     }
-
-    
-
   }
 
   deleteAll = () => {
@@ -584,28 +593,47 @@ export class StatesViewer extends Component {
           console.log(serverresponse);
         }).catch(err => console.error(err.toString()));
       }
-
-      this.setState({ deleteButton: ""})
-      this.setState({ publicButton: ""})
-      this.setState({ shareButton:  ""})
-      this.loadList();
-    }
+  }
 
   handleActionCall = (clickdata) => {
     var newDeviceList = _.clone(this.state.devicesView)
     for (var dev in newDeviceList) {
       if (newDeviceList[dev].devid == clickdata.a) {
-        if (clickdata.e == "deselect") { newDeviceList[dev].selected = false; }
-        if (clickdata.e == "select") { newDeviceList[dev].selected = true; }
+        if (clickdata.e == "deselect") {
+          if(this.state.selectAllState === true){
+            this.setState({ selectAllState: false });
+          }
+          newDeviceList[dev].selected = false;
+          this.deleteSelectedDevice(clickdata.a);
+        }
+        if (clickdata.e == "select") { 
+          newDeviceList[dev].selected = true; 
+          this.addSelectedDevice(clickdata.a)
+        }
       }
     }
     this.setState({ devicesView: newDeviceList } , this.selectCountUpdate );
   }
 
+  addSelectedDevice = (device) => {
+    let selectedDevices = [...this.state.selectedDevices, device];
+    this.setState({ selectedDevices: selectedDevices })
+    //console.log(this.state.devicesView.length);
+    console.log(selectedDevices); 
+  }
+
+  deleteSelectedDevice = (deviceClicked) => {
+    let selectedDevices = this.state.selectedDevices.filter(device => {
+      return device !== deviceClicked;
+    });
+    this.setState({ selectedDevices: selectedDevices })
+    console.log(selectedDevices); 
+  }
+
   render() {
     return (
       <div className="" style={{ paddingTop: 25, margin: 30 }} >
-        <StatesViewerMenu search={this.search} selectAll={this.selectAll} sort={this.sort} selectCount={this.state.selectCount} />
+        <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.selectedDevices} sort={this.sort} selectCount={this.state.selectCount} deleteAll={this.deleteAll}/>
         <DeviceList devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
       </div>
     )

@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-
-
-
+import { confirmAlert } from 'react-confirm-alert';
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll : false, sort : "" }
+    state = { selectAll : false, sort : ""}
 
     selectBox = () => {
         if (this.state.selectAll) {
@@ -41,11 +39,54 @@ export class StatesViewerMenu extends Component {
         if (this.props.selectCount > 0) {
             return (
                 <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }}
-                onClick={this.clearState}> <i className="fas fa-trash" /> DELETE { this.props.selectCount} </div>
+                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE { this.props.selectCount} </div>
             )
         }
         
     }
+
+    clickDeleteConfirmation = () => {
+        confirmAlert({
+        title: 'Are you sure?',
+        message: 'Deleting a device is irreversible',
+        buttons: [
+            {
+            label: 'Yes',
+            onClick: () => this.deleteSelectedDevices()
+            },
+            {
+            label: 'No',
+            onClick: () => { }
+            }
+        ]
+        })
+    };
+
+    deleteSelectedDevices = () => {
+        //console.log(this.props.devices);
+        var newSelectedDeviceList = _.clone(this.props.devices)
+        console.log("hit");
+        for (var dev in newSelectedDeviceList) {
+            fetch("/api/v3/state/delete", {
+                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: newSelectedDeviceList[dev] })
+            }).then(response => response.json()).then(serverresponse => {
+                console.log(serverresponse);
+                window.location.reload();
+            }).catch(err => console.error(err.toString()));
+        }
+
+    }
+    
+    dialog() {
+        if (this.state.dialog) {
+          return (
+            <div className="container" style={{ color: "red" }}>
+            </div>
+          );
+        }
+      }
+    
 
     ///
 
