@@ -20,7 +20,20 @@ library.add(faEraser);
 
 import MonacoEditor from "react-monaco-editor";
 
-import * as p from "../prototype.ts"
+// export class MonacoEdi extends React.Component {
+//   render() {
+//     const requireConfig = {
+//       url: 'node_modules/monaco-editor/min/vs/loader.js',
+//       paths: {
+//         vs: 'node_modules/monaco-editor/min/vs'
+//       }
+//     };
+
+//     return (
+//       <MonacoEditor requireConfig={requireConfig} />
+//     );
+//   }
+// }
 
 export class Editor extends React.Component {
 
@@ -73,7 +86,6 @@ callback(packet); `
   };
 
   loadLastPacket = (devid, cb) => {
-    console.log("loadLastPacket")
     fetch("/api/v3/packets", {
       method: "POST",
       headers: {
@@ -86,9 +98,7 @@ callback(packet); `
       .then(packets => {
         if (packets.length > 0) {
           this.setState({lastPacket:packets[0]})
-          this.setState({packets:packets})
         } else {
-          this.setState({packets:[]})
           this.setState({lastPacket:{}})
         }
       })
@@ -331,9 +341,21 @@ callback(packet); `
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 export class DeviceView extends Component {
   state = {
-    devid: undefined,
+    devid: "loading",
     lastTimestamp: "no idea",
     packets: [],
     socketDataIn: {},
@@ -341,26 +363,27 @@ export class DeviceView extends Component {
     trashClicked: 0,
     trashButtonText: "DELETE DEVICE",
     clearStateClicked : 0,
-    eraseButtonText: "CLEAR STATE",
-    view : undefined,
-    state : undefined
+    eraseButtonText: "CLEAR STATE"
   };
 
   constructor(props) {
     super(props);
 
-    this.state.devid = props.devid
     
+
   }
 
 
   updateTime = () => {
+    
     if (this.props.view) {
       if (this.props.view.timestamp) {
         var timeago = moment(this.props.view.timestamp).fromNow()
         this.setState({timeago})
       }
-    }    
+      
+    }
+    
   }
 
 
@@ -369,17 +392,6 @@ export class DeviceView extends Component {
     setInterval( () => {
       this.updateTime();
     },500)
-
-    p.getView(this.props.devid, (view)=>{
-      console.log(view)
-      this.setState({view})
-    })
-
-    p.getState(this.props.devid, (state) => {
-      console.log(state)
-      this.setState({ state })
-    })
-
   }
 
   getName() {
@@ -452,11 +464,13 @@ export class DeviceView extends Component {
 
     let plugins;
 
-    if (this.state.view) {
-      latestState = this.state.view;
+    if (this.props.view) {
+      //var payload = this.props.view.payload
+      //payload.meta = { userAgent : this.props.view.meta.userAgent, method: this.props.view.meta.method }
+      latestState = this.props.view;
 
-      if (this.state.view.id) {
-        plugins = <DevicePluginPanel stateId={this.state.view.id} />;
+      if (this.props.view.id) {
+        plugins = <DevicePluginPanel stateId={this.props.view.id} />;
       } else {
         plugins = <p>plugins loading</p>;
       }
@@ -464,8 +478,9 @@ export class DeviceView extends Component {
 
 
 
-    if (this.state.packets) {
-      packets = this.state.packets;
+    if (this.props.packets) {
+      //console.log(this.props.packets)
+      packets = this.props.packets;
     }
 
     return (
@@ -514,6 +529,11 @@ export class DeviceView extends Component {
 
             <h4 className="spot">LATEST STATE</h4>
             <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
+
+            <h4 className="spot">LATEST PACKETS</h4>
+          
+            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(packets.slice(0,5), null, 2)}</SyntaxHighlighter></div>
+
             
           </div>
      

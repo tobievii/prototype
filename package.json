@@ -1,6 +1,6 @@
 {
   "name": "prototype",
-  "version": "5.0.30",
+  "version": "5.0.33",
   "description": "Typescrypt based IoT framework for general purpose remote monitoring/control.",
   "main": "src/main.js",
   "scripts": {
@@ -31,7 +31,6 @@
     "@types/lodash": "^4.14.116",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.11.3",
-    "@types/serialport": "^6.0.4",
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
     "discord.js": "^11.4.2",
@@ -42,7 +41,7 @@
     "mongojs": "^2.6.0",
     "mqtt": "^2.18.8",
     "nodemailer": "^4.6.8",
-    "serialport": "^7.0.2",
+    "request": "^2.88.0",
     "socket.io": "^2.1.1",
     "source-map-support": "^0.5.9",
     "typescript": "^3.1.3",

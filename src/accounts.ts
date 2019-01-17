@@ -1,6 +1,6 @@
 import * as geoip from 'geoip-lite' // https://www.npmjs.com/package/geoip-lite
 
-import * as utils from './utils';
+import { generate, generateDifficult, log } from './utils';
 import * as _ from 'lodash';
 
 var dbglobal:any;
@@ -11,7 +11,7 @@ export function midware(db: any) {
     
     
     if (req.headers.authorization) {
-      
+      console.log("req.headers.auth")
       var auth = Buffer.from(req.headers.authorization.split(" ")[1], 'base64').toString()
       
       if (auth.split(":")[0] == "api") {
@@ -46,6 +46,8 @@ export function midware(db: any) {
         } else {
           db.users.findOne({ uuid: req.cookies.uuid }, (err: any, user: any) => {
             if (user) {
+              user._last_seen = new Date();
+              //db.users.update({"_id":user["_id"]}, user);
               req.user = user;
               next();
             } else {
@@ -124,7 +126,7 @@ export function accountVerify(db: any) {
           if (user.email) { user.emailold = user.email } //save old
           user.email = req.body.email;
           user.emailverified = false;
-          user.secretemailverificationcode = utils.generate(128);
+          user.secretemailverificationcode = generate(128);
 
           db.users.update({ uuid: user.uuid }, user, (errUpd: Error, resUpd: any) => {
             var gotourl = '/verify/' + user.uuid + '/' + user.secretemailverificationcode;
@@ -169,19 +171,7 @@ export function accountVerifyCheck(db: any) {
   }
 }
 
-export interface account {
-  email : string,
-  apikey: string,
-  password: string,
-  level : number,
-  created : any,
-  uuid : string,
-  lastSeen : any,
-  ip : string,
-  ipLoc : any,
-  userAgent : any,
-  emailverified : boolean
-}
+
 
 
 export function defaultAdminAccount(db:any) {
@@ -192,13 +182,18 @@ export function defaultAdminAccount(db:any) {
     if (usersCount == 0) {
       console.log("==== ADMIN ACCCOUNT ===")
       console.log(usersCount);
-      accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err:Error,user:any)=>{
-      }, {password:"admin", level:99})
+      createDefaultAdminAccount(db)
     }
   })
   //
 }
 
+export function createDefaultAdminAccount(db:any) {
+  log("creating default admin account")
+
+  accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err:Error,user:any)=>{
+  }, {password:"admin", level:99})
+}
 
 
 export function registerExistingAccount(db:any, user:any, cb:any) {
@@ -228,8 +223,9 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
   var geoIPLoc = geoip.lookup(ip);
  
 
-  var user:account = {
-    uuid: utils.generate(128),
+  var user:any = {
+    uuid: generate(128),
+    "_created_on": new Date(),
     created: {
       unix: event.getTime(),
       jsonTime: event.toJSON()
@@ -241,10 +237,11 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     ip: ip,
     ipLoc: geoIPLoc,
     userAgent: userAgent,
+    username : generate(32).toLowerCase(),
     emailverified: false,
     email: email.toLowerCase(),
-    apikey: utils.generate(32),
-    password: utils.generateDifficult(16),
+    apikey: generate(32),
+    password: generateDifficult(16),
     level: 0
   };
 
@@ -284,13 +281,13 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
 }
 
 
-export function accountClear(db:any, account:account, cb:any) {
+export function accountClear(db:any, account:any, cb:any) {
   if (account) {
     db.users.remove(account, cb);
   }
 }
 
-export function accountDelete(db:any, user:account, cb:any ) {
+export function accountDelete(db:any, user:any, cb:any ) {
   console.log("USER!")
   console.log(user);
   db.users.remove(user, (err:Error, result:any) => {
@@ -343,3 +340,4 @@ export function validApiKey(db:any,testkey:string,cb:any) {
 export function checkApiKey(testkey:string, cb:any) {
   validApiKey(dbglobal, testkey, cb)
 }
+

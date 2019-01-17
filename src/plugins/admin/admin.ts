@@ -84,23 +84,31 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     }
 
   })
+ 
 
-
-  // public api to get information if server allows registration/requires email verification
-  // if level > 100 then adds the server private email config.
-  // if level < 100 then just sends through the public safe data.
   app.get("/api/v3/admin/registration", (req: any, res: any) => {
+    // public api to get information if server allows registration/requires email verification
+    // if level > 100 then adds the server private email config.
+    // if level < 100 then just sends through the public safe data.
+    
     if (req.user.level >= 100) {
       getRegistration(db, (err: Error, result: any) => {
         res.json({ err, result })
       })
     } else {
       getRegistration(db, (err: Error, secret: any) => {
-        var result = {
-          userEmailVerify: secret.userEmailVerify,
-          userRegistration: secret.userRegistration
+
+        if (secret) {
+          var result = {
+            userEmailVerify: secret.userEmailVerify,
+            userRegistration: secret.userRegistration
+          }
+          res.json({ err, result })
+        } else {
+          res.json({})
         }
-        res.json({ err, result })
+
+        
       })
     }
   });

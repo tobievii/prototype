@@ -17,6 +17,14 @@ module.exports = options => {
     plugins: [ new MonacoWebpackPlugin()],
     module: {
       rules: [
+        {
+          test: /\.scss$/,
+          use: [
+              "style-loader", // creates style nodes from JS strings
+              "css-loader", // translates CSS into CommonJS
+              "sass-loader" // compiles Sass to CSS, using Node Sass by default
+          ]
+      },
         { test: /\.tsx?$/, loader: "ts-loader" },
         {
           test: /.js$/,

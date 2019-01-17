@@ -10,7 +10,6 @@ export class DevicePluginPanel extends React.Component {
 
   getAccount = () => {
     fetch("/api/v3/account").then(res=>res.json()).then(user=>{
-      console.log(user)
       this.setState({user})
     })
   }
@@ -30,7 +29,7 @@ export class DevicePluginPanel extends React.Component {
             console.log(data.plugins_iotnxt_gateway);
             this.setState({ deviceGateway: data.plugins_iotnxt_gateway })
           } else {
-            console.log("device has no set gateway.. using account default")
+            
             this.setState({ deviceGateway: {} })
           }
         }).catch(err => console.error(this.props.url, err.toString()))

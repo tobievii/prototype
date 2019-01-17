@@ -25,7 +25,8 @@ export function postState(
     var event = new Date();
     request.timestamp = event.toJSON();
 
-    var packet = {
+    var packet:any = {
+      "_last_seen" : new Date(),
       apikey: user.apikey,
       devid: request.id,
       payload: request,
@@ -60,21 +61,41 @@ export function postState(
     db.states.findOne({ apikey: user.apikey, devid: request.id },
       (findErr: Error, findResult: any) => {
         var packetToUpsert: any = {};
+        var info:any = {}
         if (findResult) {
           delete findResult["_id"];
           packetToUpsert = _.merge(findResult, packet);
+          packetToUpsert["_last_seen"] = new Date();     
+          info.newdevice = false
         } else {
-          packetToUpsert = packet;
+          packetToUpsert = _.clone(packet);
+          packetToUpsert["_last_seen"] = new Date();
+          packetToUpsert["_created_on"] = new Date();
+          packetToUpsert["key"] = utils.generateDifficult(128);
+          info.newdevice = true
         }
 
+        packet["key"] = packetToUpsert.key
 
         db.states.update(
           { apikey: user.apikey, devid: request.id },
           packetToUpsert,
           { upsert: true },
           (errUp: Error, resUp: any) => {
+            
+            delete packet["_last_seen"]
+            packet["_created_on"] = new Date();
             db.packets.save(packet, (errSave: Error, resSave: any) => {            
-              cb(resSave);
+
+              // update user account activity timestamp
+              db.users.findOne({apikey : user.apikey}, (e:Error, user:any)=>{
+                user["_last_seen"] = new Date();
+                db.users.update({apikey : user.apikey}, user, (e2:Error, r2:any)=>{
+                  cb(resSave, info);
+                })
+              })
+
+              
             });
           }
         );

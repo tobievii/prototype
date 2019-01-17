@@ -30,6 +30,8 @@ import * as accounts from './accounts'
 
 import * as events from "events";
 
+import * as utilsLib from "./utils"
+
 var mongojs = require('mongojs')
 
 const { VM } = require('vm2');
@@ -40,14 +42,21 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
+import { userInfo } from 'os';
 
-app.use(compression());
+import * as stats from "./stats"
+import { utils } from 'mocha';
+
+
 app.use(cookieParser());
+
+//app.use(compression({level:1}));
 app.use(express.static('../public'))
+
 app.use(express.static('../client'))
 app.use(express.static('../client/dist'))
-
 app.use('/view', express.static('../client/dist'))
+
 
 
 
@@ -69,9 +78,15 @@ eventHub.on("plugin", (data: any) => {
 //app.use(express.json())
 app.use(safeParser);
 
-accounts.defaultAdminAccount(db);
+//FIRST RUN
+// OLD: accounts.defaultAdminAccount(db);
+utilsLib.checkFirstRun(db);
 
-app.use(accounts.midware(db)); // rouan's cookie/user manager
+utilsLib.createUsernamesForOldAccounts(db);
+utilsLib.createDeviceKeysForOldAccounts(db);
+
+//handle accounts/cookies.
+app.use(accounts.midware(db)); 
 
 
 
@@ -81,6 +96,23 @@ db.on('connect', function () {
     if (plugins[p].init) { plugins[p].init(app, db, eventHub); }
   }
 
+})
+
+//####################################################################
+// USERS LAST SEEN / ACTIVE
+app.use( (req:any, res:any, next:any)=>{
+  if (req.user) {
+    console.log("user active:\t"+req.user.email+"\t"+req.url)
+    db.users.findOne({apikey : req.user.apikey}, (e:Error, user:any)=>{
+      user["_last_seen"] = new Date();
+      db.users.update({apikey : req.user.apikey}, user, (e2:Error, r2:any)=>{
+        next();
+      })
+    })
+  } else {
+    next();
+  }
+  
 })
 
 //####################################################################
@@ -114,7 +146,7 @@ app.get('/', (req: any, res: any) => {
 
 })
 
-
+stats.init(app,db);
 
 app.get('/admin/accounts', (req: any, res: any) => {
   fs.readFile('../public/admin_accounts.html', (err: Error, data: any) => {
@@ -130,6 +162,12 @@ app.get('/signout', (req: any, res: any) => {
 });
 
 app.post('/signin', accounts.signInFromWeb(db));
+
+app.get("/u/:username", (req:any, res:any)=>{
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
 
 app.get('/settings', (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
@@ -168,8 +206,10 @@ app.get('/api/v3/version', (req: any, res: any) => {
 })
 
 app.get('/api/v3/account', (req: any, res: any) => {
-  delete req.user.password;
-  res.json(req.user);
+  var cleanUser = _.clone(req.user);
+
+  delete cleanUser.password;
+  res.json(cleanUser);
 })
 
 // This is to update the workflow on a device.
@@ -186,6 +226,7 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
     trex.log("WORKFLOW API ERROR")
   }
 })
+
 
 
 app.post("/api/v3/packets", (req: any, res: any, next: any) => {
@@ -211,6 +252,74 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
     res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
   }
 });
+
+// run to update old packet data to have correct timestamp
+// app.get("/admin/processpackets", (req:any, res:any)=>{
+//   if (req.user.level < 100) { res.end("no permission"); return; }
+//   db.packets.find({"_created_on" : { "$exists" : false }}).limit(10000, (err:Error, packets:any)=>{
+//     res.write("packets:\t"+packets.length);
+//     for (var packet of packets) {
+//       if (packet["_created_on"] == undefined) {
+//         packet["_created_on"] = new Date(packet.meta.created.jsonTime);
+//         db.packets.update({"_id" : packet["_id"]}, packet)
+//       }      
+//     }
+//     res.end("\ndone.")
+//   })
+// })
+
+// run to update old packet data to have correct timestamp
+app.get("/admin/processusers", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
+
+  db.users.find({"_created_on" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+    res.write("users:\t"+users.length);
+    for (var user of users) {
+      if (user["_created_on"] == undefined) {
+        user["_created_on"] = new Date(user.created.jsonTime);
+        db.users.update({"_id" : user["_id"]}, user)
+      }      
+    }
+    res.end("\ndone.")
+  }) 
+})
+
+app.get("/admin/processusersseen", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
+
+  db.users.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+    res.write("users:\t"+users.length);
+    for (var user of users) {
+      if (user["_last_seen"] == undefined) {
+        user["_last_seen"] = new Date(user.created.jsonTime);
+        db.users.update({"_id" : user["_id"]}, user)
+      }      
+    }
+    res.end("\ndone.")
+  }) 
+})
+
+app.get("/admin/processstates", (req:any, res:any)=>{
+  if (req.user.level < 100) { res.end("no permission"); return; }
+
+  db.states.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, states:any)=>{
+    res.write("states:\t"+states.length);
+    for (var state of states) {
+      
+      if (state["_last_seen"] == undefined) {
+        state["_last_seen"] = new Date(state.meta.created.jsonTime);  
+      } 
+      if (state["_created_on"] == undefined) {
+        state["_created_on"] = new Date(state.meta.created.jsonTime);  
+      } 
+
+      db.states.update({"_id" : state["_id"]}, state)     
+    }
+    res.end("\ndone.")
+  }) 
+})
+
+
 
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
@@ -258,6 +367,32 @@ app.get('/api/v3/states', (req: any, res: any) => {
     for (var a in states) { cleanStates.push(states[a].payload) }
     res.json(cleanStates);
   })
+})
+
+// new in 5.0.34:
+app.post("/api/v3/states", (req:any, res:any) => {
+  if (req.body) {
+    // find state by username
+    // todo filter by permission/level
+    if (req.body.username) {
+      db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
+        
+        if (e) { res.json({error: "db error"})}
+        if (user) {
+          
+          db.states.find({ apikey: user.apikey }, (er:Error, states: any[]) => {
+            var cleanStates:any = []
+            for (var a in states) {
+              var cleanState = _.clone(states[a])
+              delete cleanState["apikey"]
+              cleanStates.push(cleanState);
+            }
+            res.json(cleanStates)
+          })
+        }
+      })
+    } 
+  }
 })
 
 app.get("/api/v3/states/full", (req: any, res: any) => {
@@ -353,10 +488,16 @@ function handleState(req: any, res: any, next: any) {
     }
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, req.user, newpacket, meta, (packet: any) => {
+      state.postState(db, req.user, newpacket, meta, (packet: any, info:any) => {
+        
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
-
+        io.to(packet.key).emit('post', packet.payload)
+        
+        if (info.newdevice) {
+          io.to(req.user.username).emit("info", info)
+        }
+        
 
 
         for (var p in plugins) {
@@ -391,15 +532,17 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
     if (err) { console.log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, user, newpacket, packetIn.meta, (packet: any) => {
-
-        
-        
-
+      state.postState(db, user, newpacket, packetIn.meta, (packet: any, info:any) => {
         if (options) {
           if (options.socketio == true) {
             io.to(apikey).emit('post', packet.payload);
             io.to(apikey + "|" + packetIn.id).emit('post', packet.payload);
+            io.to(packet.key).emit('post', packet.payload)
+
+            if (info.newdevice) {
+              io.to(user.username).emit("info", info)
+            }
+
           }
         }
         
@@ -660,7 +803,8 @@ var io = require('socket.io')(server);
 
 io.on('connection', function (socket: any) {
   //trex.log(socket);
-  //trex.log(socket.id)
+
+  //utilsLib.log(socket.id)
   //trex.log(socket.handshake)
   //trex.log('socket connected...');
   setTimeout(function () {
@@ -668,11 +812,12 @@ io.on('connection', function (socket: any) {
   }, 5000)
 
   socket.on('join', function (path: string) {
+    console.log(socket.id + " joins " + path)
+    //console.log(socket)
     //AUTH
     //trex.log("SOCKET.IO JOIN "+path)
     socket.join(path);
   });
-
 
   socket.on('post', (data: any) => {
     //trex.log("socket posted");
