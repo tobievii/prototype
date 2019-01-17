@@ -266,7 +266,7 @@ callback(packet); `
               style={{
                 width: 160,
                 marginBottom: 20,
-                float: "left"
+                float: "left",
               }}
               onClick={this.saveWorkflow}
             >
@@ -308,7 +308,7 @@ callback(packet); `
             &nbsp;
           </div>
   
-          <div>
+          <div style={{backgroundColor:"black"}}>
             <MonacoEditor
               width="800"
               height="420"
@@ -318,6 +318,7 @@ callback(packet); `
               options={options}
               onChange={this.onChange}
               editorDidMount={this.editorDidMount}
+              
             />
           </div>
         </div>
@@ -501,22 +502,24 @@ export class DeviceView extends Component {
     }
 
     return (
-<div>
+<div style={{}}>
   
-<div><Dashboard /></div>
+<div><Dashboard view= {this.state.view}/></div>
      
-      <div className="commanderBgPanel" style={{ margin: 10 }}>
+  <div className="commanderBgPanel" style={{ margin: 10}}>
         <div
           className="row"
           style={{
             borderBottom: "1px solid rgba(255,255,255,0.1)",
-            marginBottom: 20,
-            paddingBottom: 10
+            marginBottom: 10,
+            paddingBottom: 1,
+           
           }}
         >
           <div className="col-md-8">
             
             <h3>{this.state.devid}</h3>
+           
             <span className="faded" >{this.state.timeago}</span>
           </div>
 
@@ -536,29 +539,32 @@ export class DeviceView extends Component {
           </div>
        
         </div>
-        <div>
-   <div className="row" > 
-   
+<div  >
+   <div className="row"  > 
+ 
        <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) }>EDITOR</div>
          
       
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3) }>PLUGINS</div></div>
-         </div>
+          </div>
         <div
           className="row"
           style={{
             borderBottom: "1px solid rgba(255,255,255,0.1)",
             marginBottom: 20,
-            paddingBottom: 10
+            paddingBottom: 10,
+            backgroundColor : "rgba(0, 3, 5, 0.5)",
+          
           }}
         >
         <div className="col-11" style={this.getMenuPageStyle(1)}>
        
           <div className="" >
+          <hr></hr>
             <h4 className="spot">DEVICE DATA</h4>
            <div style={{float : "left"}} > <DataView data={latestState} />
            <h4 className="spot">LATEST STATE</h4>
-            <div style={{maxHeight: 400, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0, height:300}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
+            <div style={{maxHeight: 450, overflowY: "scroll", marginBottom: 20, padding: 0, height:300}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
            </div>
 
 
@@ -574,7 +580,8 @@ export class DeviceView extends Component {
 
 
           <div className=" col-md-12 "  style={this.getMenuPageStyle(3)}>
-            <div><center>
+            <div><center >
+              <hr></hr>
               <h4 className="spot">PLUGINS</h4>
               <p>Plugin options unique to this device:</p>
               {plugins}

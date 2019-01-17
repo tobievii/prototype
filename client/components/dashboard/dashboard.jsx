@@ -45,6 +45,8 @@ export default class Dashboard extends React.Component {
     console.log("drop")
     console.log(e.datapath)
     console.log(location)
+      console.log(e.dataname)
+    console.log(this.generateDifficult(32))
 
     var layout = _.clone(this.state.layout)
     layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
