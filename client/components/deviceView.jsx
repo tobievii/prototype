@@ -21,7 +21,7 @@ library.add(faEraser);
 import MonacoEditor from "react-monaco-editor";
 
 import * as p from "../prototype.ts"
-import Dashboard from "./dashboard/dashboard.jsx"
+import { Dashboard } from "./dashboard/dashboard.jsx"
 export class Editor extends React.Component {
 
   loadingState = 0;
@@ -502,9 +502,9 @@ export class DeviceView extends Component {
     }
 
     return (
-<div style={{}}>
+<div>
   
-<div><Dashboard view= {this.state.view}/></div>
+
      
   <div className="commanderBgPanel" style={{ margin: 10}}>
         <div
@@ -539,6 +539,10 @@ export class DeviceView extends Component {
           </div>
        
         </div>
+        <div>
+        <div style={{backgroundColor:"transparent"}}><Dashboard view= {this.state.view}/></div>
+        </div>
+        <hr></hr>
 <div  >
    <div className="row"  > 
  
@@ -547,6 +551,7 @@ export class DeviceView extends Component {
       
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3) }>PLUGINS</div></div>
           </div>
+          
         <div
           className="row"
           style={{
@@ -572,7 +577,8 @@ export class DeviceView extends Component {
                       
 
           </div>
-          <div style={{float : "right" }}> <Editor deviceId={this.state.devid} state={this.props.state} /> </div>
+          <div style={{float : "right" }}>           <h4 className="spot">PROCESSING</h4>
+ <Editor deviceId={this.state.devid} state={this.props.state} /> </div>
           </div>
      
 
