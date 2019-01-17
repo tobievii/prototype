@@ -24,7 +24,7 @@ export class Dashboard extends React.Component {
     },
     layout: [
       { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
-      { i: '1', x: 0, y: 4, w: 8, h: 8, type: "Line" , dataname : "line" }
+      { i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" }
     ],
   }
 
@@ -42,9 +42,11 @@ export class Dashboard extends React.Component {
       y: Math.round(e.clientY/this.state.grid.rowHeight/2) - 1
     }
 
-    console.log("drop")
-    console.log(e.datapath)
-    console.log(location)
+    //console.log("drop")
+    //console.log(e.datapath)
+    //console.log(location)
+      //console.log(e.dataname)
+    //console.log(this.generateDifficult(32))
 
     var layout = _.clone(this.state.layout)
     layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })

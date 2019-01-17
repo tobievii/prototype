@@ -21,7 +21,7 @@ library.add(faEraser);
 import MonacoEditor from "react-monaco-editor";
 
 import * as p from "../prototype.ts"
-
+import { Dashboard } from "./dashboard/dashboard.jsx"
 export class Editor extends React.Component {
 
   loadingState = 0;
@@ -266,7 +266,7 @@ callback(packet); `
               style={{
                 width: 160,
                 marginBottom: 20,
-                float: "left"
+                float: "left",
               }}
               onClick={this.saveWorkflow}
             >
@@ -308,16 +308,17 @@ callback(packet); `
             &nbsp;
           </div>
   
-          <div>
+          <div style={{backgroundColor:"black"}}>
             <MonacoEditor
-              width="100%"
-              height="900"
+              width="800"
+              height="420"
               language="javascript"
               theme="vs-dark"
               value={this.state.code}
               options={options}
               onChange={this.onChange}
               editorDidMount={this.editorDidMount}
+              
             />
           </div>
         </div>
@@ -343,7 +344,8 @@ export class DeviceView extends Component {
     clearStateClicked : 0,
     eraseButtonText: "CLEAR STATE",
     view : undefined,
-    state : undefined
+    state : undefined,
+    apiMenu : 1
   };
 
   constructor(props) {
@@ -415,6 +417,37 @@ export class DeviceView extends Component {
     }
   };
 
+    getMenuClasses = function (num ) {
+    if (num == this.state.apiMenu) {
+      return "menuTab borderTopSpot"
+    } else {
+      return "menuTab menuSelectable"
+    }
+  }
+
+  getMenuPageStyle = function (num ) {
+    if (num == this.state.apiMenu) {
+      return { display: "" }
+    } else {
+      return { display: "none" }
+    }
+  }
+
+  onClickMenuTab = function (num) {
+    return (event) => {
+      /*
+      console.log(event);
+      event.currentTarget.className = "col-md-2 menuTab borderTopSpot";
+      console.log(num)
+      */
+     var apiMenu = num;
+   this.setState({ apiMenu });
+  this.forceUpdate();
+   
+    
+    }
+  }
+
   clearState = () => {
     //clears state, but retains history and workflow
 
@@ -469,18 +502,24 @@ export class DeviceView extends Component {
     }
 
     return (
-      <div className="commanderBgPanel" style={{ margin: 10 }}>
+<div>
+  
+
+     
+  <div className="commanderBgPanel" style={{ margin: 10}}>
         <div
           className="row"
           style={{
             borderBottom: "1px solid rgba(255,255,255,0.1)",
-            marginBottom: 20,
-            paddingBottom: 10
+            marginBottom: 10,
+            paddingBottom: 1,
+           
           }}
         >
           <div className="col-md-8">
             
             <h3>{this.state.devid}</h3>
+           
             <span className="faded" >{this.state.timeago}</span>
           </div>
 
@@ -490,7 +529,7 @@ export class DeviceView extends Component {
           
             <div
               className="commanderBgPanel commanderBgPanelClickable"
-              style={{ width: 175, float: "right" }}
+              style={{ width: 200, float: "right", height: 64 }}
               onClick={this.deleteDevice}><FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}</div>
 
             <div className="commanderBgPanel commanderBgPanelClickable" 
@@ -498,51 +537,68 @@ export class DeviceView extends Component {
               onClick={this.clearState}><FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}</div>
 
           </div>
+       
         </div>
-
+        <div>
+        <div style={{backgroundColor:"transparent"}}><Dashboard view= {this.state.view}/></div>
+        </div>
+        <hr></hr>
+<div  >
+   <div className="row"  > 
+ 
+       <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) }>EDITOR</div>
+         
+      
+          <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3) }>PLUGINS</div></div>
+          </div>
+          
         <div
           className="row"
           style={{
             borderBottom: "1px solid rgba(255,255,255,0.1)",
             marginBottom: 20,
-            paddingBottom: 10
+            paddingBottom: 10,
+            backgroundColor : "rgba(0, 3, 5, 0.5)",
+          
           }}
         >
-          <div className="col-xs-12 col-md-12 col-lg-4 col-xl-3">
+        <div className="col-11" style={this.getMenuPageStyle(1)}>
+       
+          <div className="" >
+          <hr></hr>
             <h4 className="spot">DEVICE DATA</h4>
-            <DataView data={latestState} />
+           <div style={{float : "left"}} > <DataView data={latestState} />
+           <h4 className="spot">LATEST STATE</h4>
+            <div style={{maxHeight: 450, overflowY: "scroll", marginBottom: 20, padding: 0, height:300}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
+           </div>
 
-            <h4 className="spot">LATEST STATE</h4>
-            <div style={{maxHeight: 500, overflowY: "scroll", fontSize: "85%", marginBottom: 20, padding: 0}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
+
             
+                      
+
+          </div>
+          <div style={{float : "right" }}>           <h4 className="spot">PROCESSING</h4>
+ <Editor deviceId={this.state.devid} state={this.props.state} /> </div>
           </div>
      
 
-          <div className="col-xs-12 col-md-12 col-lg-8 col-xl-6">
-            <div>
-              <h4 className="spot">PROCESSING</h4>
-                <Editor deviceId={this.state.devid} state={this.props.state} />              
-            </div>
-          </div>
 
-          <div className="col-xs-12 col-md-12 col-lg-8 col-xl-3">
-            <div>
+
+
+          <div className=" col-md-12 "  style={this.getMenuPageStyle(3)}>
+            <div><center >
+              <hr></hr>
               <h4 className="spot">PLUGINS</h4>
               <p>Plugin options unique to this device:</p>
               {plugins}
+              </center>
             </div>
           </div>
 
         </div>
-
-        <div className="row">
-
-         
-
-        </div>
+</div>
       </div>
+     
     );
   }
 }
-
-//
