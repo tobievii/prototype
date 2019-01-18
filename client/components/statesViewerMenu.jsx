@@ -19,8 +19,6 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    ////
-
     sortButtons = () => {
         if (this.state.sort == "") { return <i className="fas fa-sort-amount-down" title="latest created top"  onClick={this.sortClickHandler("timedesc")} ></i> }
         if (this.state.sort == "timedesc") { return <i className="fas fa-sort-numeric-down" title="last seen top" onClick={this.sortClickHandler("namedesc")} ></i> }
@@ -33,7 +31,6 @@ export class StatesViewerMenu extends Component {
             this.props.sort(action);
         }
     }
-    ////
 
     menuDeleteButton = () => {
         if (this.props.selectCount > 0) {
@@ -52,7 +49,7 @@ export class StatesViewerMenu extends Component {
         buttons: [
             {
             label: 'Yes',
-            onClick: () => this.deleteSelectedDevices()
+            onClick: () => this.props.deleteSelected()
             },
             {
             label: 'No',
@@ -62,22 +59,6 @@ export class StatesViewerMenu extends Component {
         })
     };
 
-    deleteSelectedDevices = () => {
-        //console.log(this.props.devices);
-        var newSelectedDeviceList = _.clone(this.props.devices)
-        console.log("hit");
-        for (var dev in newSelectedDeviceList) {
-            fetch("/api/v3/state/delete", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id: newSelectedDeviceList[dev] })
-            }).then(response => response.json()).then(serverresponse => {
-                console.log(serverresponse);
-                window.location.reload();
-            }).catch(err => console.error(err.toString()));
-        }
-
-    }
-    
     dialog() {
         if (this.state.dialog) {
           return (
@@ -85,10 +66,7 @@ export class StatesViewerMenu extends Component {
             </div>
           );
         }
-      }
-    
-
-    ///
+    }
 
     render() {
         return (

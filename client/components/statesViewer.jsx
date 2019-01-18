@@ -205,11 +205,6 @@ class StatesViewerItem extends Component {
         </div>
       )
     } else {
-
-      if(this.state.selectBoxClicked === 0){
-        this.setState({ selectBoxClicked: 100 });
-      }
-
       return (
         <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
           <i className="statesViewerCheckBoxes fas fa-check" ></i>
@@ -374,7 +369,7 @@ export class StatesViewer extends Component {
     deleteButton: "",
     shareButton: "",
     selectedDevices: [],
-    selectAllState: null
+    selectAllState: null,
   };
 
   socket = undefined;
@@ -388,7 +383,6 @@ export class StatesViewer extends Component {
     this.socket.on("connect", a => {
       console.log("socket connected")
       //this.loadList();
-
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
         console.log(info);
@@ -411,7 +405,7 @@ export class StatesViewer extends Component {
           })
         }
       })
-
+      
       this.socket.on("post", (packet) => {
         this.handleDevicePacket(packet)  
       })
@@ -472,8 +466,6 @@ export class StatesViewer extends Component {
         this.sort()
       })
     }
-
-
   }
 
   // updateDeviceList = () => {
@@ -502,7 +494,6 @@ export class StatesViewer extends Component {
       //end filter
       this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
     })
-
   }
 
   sort = (sorttype) => {
@@ -566,7 +557,6 @@ export class StatesViewer extends Component {
         newDeviceList[dev].selected = true;
         this.state.selectedDevices.push(newDeviceList[dev].devid);
       }
-      console.log(this.state.selectedDevices);
       this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
       this.setState({ selectAllState: true });
     }
@@ -576,27 +566,14 @@ export class StatesViewer extends Component {
         newDeviceList[dev].selected = false;
         this.state.selectedDevices.pop(newDeviceList[dev].devid);
       }
-      console.log(this.state.selectedDevices);
       this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
       this.setState({ selectAllState: false });
     }
   }
 
-  deleteAll = () => {
-      var newDeviceList = _.clone(this.state.devicesView)
-
-      for (var dev in newDeviceList) {
-        fetch("/api/v3/state/delete", {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({ id: newDeviceList[dev].devid })
-        }).then(response => response.json()).then(serverresponse => {
-          console.log(serverresponse);
-        }).catch(err => console.error(err.toString()));
-      }
-  }
-
   handleActionCall = (clickdata) => {
     var newDeviceList = _.clone(this.state.devicesView)
+    
     for (var dev in newDeviceList) {
       if (newDeviceList[dev].devid == clickdata.a) {
         if (clickdata.e == "deselect") {
@@ -604,38 +581,50 @@ export class StatesViewer extends Component {
             this.setState({ selectAllState: false });
           }
           newDeviceList[dev].selected = false;
-          this.deleteSelectedDevice(clickdata.a);
         }
         if (clickdata.e == "select") { 
           newDeviceList[dev].selected = true; 
-          this.addSelectedDevice(clickdata.a)
         }
       }
     }
+    
     this.setState({ devicesView: newDeviceList } , this.selectCountUpdate );
   }
 
-  addSelectedDevice = (device) => {
-    let selectedDevices = [...this.state.selectedDevices, device];
-    this.setState({ selectedDevices: selectedDevices })
-    //console.log(this.state.devicesView.length);
-    console.log(selectedDevices); 
-  }
+  deleteSelectedDevices = () => { 
+    var newSelectedDeviceList = _.clone(this.state.devicesView)
 
-  deleteSelectedDevice = (deviceClicked) => {
-    let selectedDevices = this.state.selectedDevices.filter(device => {
-      return device !== deviceClicked;
-    });
-    this.setState({ selectedDevices: selectedDevices })
-    console.log(selectedDevices); 
+    for (var dev in newSelectedDeviceList) {
+      if(newSelectedDeviceList[dev].selected === true){
+        fetch("/api/v3/state/delete", {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ id: newSelectedDeviceList[dev].devid })
+        }).then(response => response.json()).then(serverresponse => {
+            console.log(serverresponse);
+            console.log(newSelectedDeviceList) 
+            this.setState({ devicesServer: newSelectedDeviceList })
+            this.setState({ devicesView: newSelectedDeviceList }, () => {
+              this.sort()
+            })   
+        }).catch(err => console.error(err.toString()));
+        // selectedDevicesOnly = [...selectedDevicesOnly, newSelectedDeviceList[dev]]
+        // removeFromList = newSelectedDeviceList.filter(Devices => {
+        //   return selectedDevicesOnly[dev] !== Devices[dev]
+        // })
+      }   
+    }
   }
 
   render() {
-    return (
-      <div className="" style={{ paddingTop: 25, margin: 30 }} >
-        <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.selectedDevices} sort={this.sort} selectCount={this.state.selectCount} deleteAll={this.deleteAll}/>
-        <DeviceList devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
-      </div>
-    )
+    if (this.state.deleted == true) {
+      return (<div style={{ display: "none" }}></div>);
+    } else {
+      return (
+        <div className="" style={{ paddingTop: 25, margin: 30 }} >
+          <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+          <DeviceList devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
+        </div>
+      )
+    }
   }
 }

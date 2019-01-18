@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
 import * as $ from "jquery";
-
+import * as _ from "lodash"
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -347,14 +347,27 @@ export class DeviceView extends Component {
     view : undefined,
     state : undefined
   };
+  
 
   constructor(props) {
     super(props);
 
     this.state.devid = props.devid
-    socket.on("post", data => {
-      console.log(data);
+    console.log(this.state.state)
+    //this.socket.emit("join", this.props.username)
+    socket.on("connect", a => {
+      socket.on("post", (packet) => {
+          console.log(packet)  
+          console.log("Postttt")  
+          this.updateView(packet)
+      })
     });
+  }
+
+  updateView = (packets) => {
+    var view = _.clone(this.state.view);
+    view = _.merge(view, packets)
+    this.setState({ view: view })
   }
 
   updateTime = () => {
@@ -376,15 +389,11 @@ export class DeviceView extends Component {
       console.log(view)
       this.setState({view})
     })
-    setInterval( () => {
-      p.getView(this.props.devid, (view)=>{
-        this.setState({view})
-      })
-    },50)
 
     p.getState(this.props.devid, (state) => {
       console.log(state)
       this.setState({ state })
+      socket.emit("join", this.state.state.key)
     })
 
   }
@@ -404,6 +413,7 @@ export class DeviceView extends Component {
       this.setState({ trashClicked: 1 });
       this.setState({ trashButtonText: "ARE YOU SURE?" });
       console.log("clicked once");
+
       return;
     }
 
@@ -414,14 +424,14 @@ export class DeviceView extends Component {
         body: JSON.stringify({ id: id })
       }).then(response => response.json()).then(serverresponse => {
         console.log(serverresponse);
-        this.setState({ deleted: true })
-        
+        this.setState({ view: null })
       }).catch(err => console.error(err.toString()));
     }
   };
 
   clearState = () => {
     //clears state, but retains history and workflow
+    var idlocal = this.state.devid;
 
     if (this.state.clearStateClicked == 0) {
       this.setState({ clearStateClicked: 1 });
@@ -432,16 +442,13 @@ export class DeviceView extends Component {
 
     if (this.state.clearStateClicked == 1) {
       console.log("clicked twice");
-      $.ajax({
-        url: "/api/v3/state/clear",
-        type: "post",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify(this.props.view),
-        success: result => {
-          window.location.href = window.location.href;
-        }
-      });
+      fetch("/api/v3/state/clear", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: idlocal })
+      }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse);
+
+      }).catch(err => console.error(err.toString()));
     }
   };
 
