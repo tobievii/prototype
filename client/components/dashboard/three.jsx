@@ -6,6 +6,12 @@ import * as THREE from 'three';
 export class ThreeDWidget extends Component {
 
     componentDidMount() {
+        
+
+        setInterval( ()=>{
+            this.fitToDiv();
+        },100)
+
         const width = this.mount.offsetWidth
         const height = this.mount.offsetHeight
         console.log({width, height})
@@ -22,7 +28,10 @@ export class ThreeDWidget extends Component {
         //ADD RENDERER
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.renderer.setClearColor('#000000')
-        this.renderer.setSize(width, height)
+        
+        //this.renderer.setSize(width, height)
+        this.fitToDiv();
+
         this.mount.appendChild(this.renderer.domElement)
         //ADD CUBE
         const geometry = new THREE.BoxGeometry(1, 1, 1)
@@ -31,9 +40,23 @@ export class ThreeDWidget extends Component {
         this.scene.add(this.cube)
         this.start()
     }
+
+    fitToDiv () {
+        var detectedSize = { width: this.mount.offsetWidth, height: this.mount.offsetHeight}
+        
+        if (this.camera) {
+            this.camera.aspect = detectedSize.width/detectedSize.height
+            this.camera.updateProjectionMatrix();
+        }
+        
+        this.renderer.setSize(detectedSize.width, detectedSize.height)
+    }
+
     componentWillUnmount() {
         this.stop()
         this.mount.removeChild(this.renderer.domElement)
+
+
     }
     start = () => {
         if (!this.frameId) {
@@ -55,7 +78,9 @@ export class ThreeDWidget extends Component {
     render() {
         return (
             <div
-                style={{ width: "auto", height: '400px'}}
+                style={{ width: "100%", height: '100%', 
+                    //background: "#ff0"
+                }}
                 ref={(mount) => { this.mount = mount }}
             />
         )
