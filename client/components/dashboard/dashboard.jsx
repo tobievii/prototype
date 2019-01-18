@@ -10,9 +10,9 @@ import { Line } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
 
-
-
 import { Widget } from "./widget.jsx"
+
+import { ThreeDWidget } from "./three.jsx"
 
 export class Dashboard extends React.Component {
 
@@ -24,7 +24,8 @@ export class Dashboard extends React.Component {
     },
     layout: [
       { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
-      { i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" }
+      { i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" },
+      { i: 'asdf', x: 8, y: 4, w: 4, h: 4, type: "ThreeDWidget" , dataname : "3dplaceholder" }
     ],
   }
 
@@ -82,8 +83,17 @@ export class Dashboard extends React.Component {
                   <Widget label={data.dataname} >
                     { this.objectByString(this.props.view, data.datapath.slice(5) ).toString() }
                   </Widget>
-                </div>
-                
+                </div>                
+              )
+            }
+
+            if (data.type == "ThreeDWidget") {
+              return (
+                <div className="dashboardBlock" key={data.i} >
+                  <Widget label={data.dataname} >
+                    <ThreeDWidget />
+                  </Widget>
+                </div>                
               )
             }
 
