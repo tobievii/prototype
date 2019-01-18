@@ -35,8 +35,12 @@ export class StatesViewerMenu extends Component {
     menuDeleteButton = () => {
         if (this.props.selectCount > 0) {
             return (
-                <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }}
-                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE { this.props.selectCount} </div>
+                <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={ this.props.selectCount + " selected."}
+                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+            )
+        } else {
+            return (
+                <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed" }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
             )
         }
         
