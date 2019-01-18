@@ -1,10 +1,8 @@
 import React, { Component } from "react";
-
-
-
+import { confirmAlert } from 'react-confirm-alert';
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll : false, sort : "" }
+    state = { selectAll : false, sort : ""}
 
     selectBox = () => {
         if (this.state.selectAll) {
@@ -21,8 +19,6 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    ////
-
     sortButtons = () => {
         if (this.state.sort == "") { return <i className="fas fa-sort-amount-down" title="latest created top"  onClick={this.sortClickHandler("timedesc")} ></i> }
         if (this.state.sort == "timedesc") { return <i className="fas fa-sort-numeric-down" title="last seen top" onClick={this.sortClickHandler("namedesc")} ></i> }
@@ -35,19 +31,42 @@ export class StatesViewerMenu extends Component {
             this.props.sort(action);
         }
     }
-    ////
 
     menuDeleteButton = () => {
         if (this.props.selectCount > 0) {
             return (
                 <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }}
-                onClick={this.clearState}> <i className="fas fa-trash" /> DELETE { this.props.selectCount} </div>
+                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE { this.props.selectCount} </div>
             )
         }
         
     }
 
-    ///
+    clickDeleteConfirmation = () => {
+        confirmAlert({
+        title: 'Are you sure?',
+        message: 'Deleting a device is irreversible',
+        buttons: [
+            {
+            label: 'Yes',
+            onClick: () => this.props.deleteSelected()
+            },
+            {
+            label: 'No',
+            onClick: () => { }
+            }
+        ]
+        })
+    };
+
+    dialog() {
+        if (this.state.dialog) {
+          return (
+            <div className="container" style={{ color: "red" }}>
+            </div>
+          );
+        }
+    }
 
     render() {
         return (

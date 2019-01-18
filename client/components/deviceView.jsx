@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
 import * as $ from "jquery";
-
+import * as _ from "lodash"
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,7 +21,16 @@ library.add(faEraser);
 import MonacoEditor from "react-monaco-editor";
 
 import * as p from "../prototype.ts"
+
+
+import socketio from "socket.io-client";
+
+const socket = socketio();
+
+
+ 
 import { Dashboard } from "./dashboard/dashboard.jsx"
+  
 export class Editor extends React.Component {
 
   loadingState = 0;
@@ -330,8 +339,6 @@ callback(packet); `
   }
 }
 
-
-
 export class DeviceView extends Component {
   state = {
     devid: undefined,
@@ -347,14 +354,28 @@ export class DeviceView extends Component {
     state : undefined,
     apiMenu : 1
   };
+  
 
   constructor(props) {
     super(props);
 
     this.state.devid = props.devid
-    
+    console.log(this.state.state)
+    //this.socket.emit("join", this.props.username)
+    socket.on("connect", a => {
+      socket.on("post", (packet) => {
+          console.log(packet)  
+          console.log("Postttt")  
+          this.updateView(packet)
+      })
+    });
   }
 
+  updateView = (packets) => {
+    var view = _.clone(this.state.view);
+    view = _.merge(view, packets)
+    this.setState({ view: view })
+  }
 
   updateTime = () => {
     if (this.props.view) {
@@ -364,7 +385,6 @@ export class DeviceView extends Component {
       }
     }    
   }
-
 
   componentDidMount = () => {
     this.updateTime();
@@ -380,6 +400,7 @@ export class DeviceView extends Component {
     p.getState(this.props.devid, (state) => {
       console.log(state)
       this.setState({ state })
+      socket.emit("join", this.state.state.key)
     })
 
   }
@@ -392,28 +413,26 @@ export class DeviceView extends Component {
     return "no idea";
   }
 
-  deleteDevice = () => {
+  deleteDevice = (id) => {
     // deletes a device's state and packet history
     if (this.state.trashClicked == 0) {
       var trashClicked = this.state.trashClicked;
       this.setState({ trashClicked: 1 });
       this.setState({ trashButtonText: "ARE YOU SURE?" });
       console.log("clicked once");
+
       return;
     }
 
     if (this.state.trashClicked == 1) {
       console.log("clicked twice");
-      $.ajax({
-        url: "/api/v3/state/delete",
-        type: "post",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify(this.props.view),
-        success: result => {
-          window.location.href = window.location.origin;
-        }
-      });
+      fetch("/api/v3/state/delete", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+      }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse);
+        this.setState({ view: null })
+      }).catch(err => console.error(err.toString()));
     }
   };
 
@@ -450,6 +469,7 @@ export class DeviceView extends Component {
 
   clearState = () => {
     //clears state, but retains history and workflow
+    var idlocal = this.state.devid;
 
     if (this.state.clearStateClicked == 0) {
       this.setState({ clearStateClicked: 1 });
@@ -460,19 +480,15 @@ export class DeviceView extends Component {
 
     if (this.state.clearStateClicked == 1) {
       console.log("clicked twice");
-      $.ajax({
-        url: "/api/v3/state/clear",
-        type: "post",
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify(this.props.view),
-        success: result => {
-          window.location.href = window.location.href;
-        }
-      });
+      fetch("/api/v3/state/clear", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: idlocal })
+      }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse);
+
+      }).catch(err => console.error(err.toString()));
     }
   };
-
 
   render() {
     var devid = "loading";
@@ -494,8 +510,6 @@ export class DeviceView extends Component {
         plugins = <p>plugins loading</p>;
       }
     }
-
-
 
     if (this.state.packets) {
       packets = this.state.packets;
@@ -525,12 +539,12 @@ export class DeviceView extends Component {
 
 
           <div className="col-md-4">
-          
-          
             <div
               className="commanderBgPanel commanderBgPanelClickable"
+
               style={{ width: 200, float: "right", height: 64 }}
               onClick={this.deleteDevice}><FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}</div>
+
 
             <div className="commanderBgPanel commanderBgPanelClickable" 
               style={{ width: 175, float: "right", marginRight: 10 }}
