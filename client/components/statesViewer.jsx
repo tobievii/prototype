@@ -592,27 +592,23 @@ export class StatesViewer extends Component {
   }
 
   deleteSelectedDevices = () => { 
-    var newSelectedDeviceList = _.clone(this.state.devicesView)
+    var devicesToDelete= this.state.devicesServer.filter( (device) => { return device.selected == true; })
 
-    for (var dev in newSelectedDeviceList) {
-      if(newSelectedDeviceList[dev].selected === true){
+    for (var dev in devicesToDelete) {
+      if(devicesToDelete[dev].selected === true){
         fetch("/api/v3/state/delete", {
           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({ id: newSelectedDeviceList[dev].devid })
+          body: JSON.stringify({ id: devicesToDelete[dev].devid })
         }).then(response => response.json()).then(serverresponse => {
-            console.log(serverresponse);
-            console.log(newSelectedDeviceList) 
-            this.setState({ devicesServer: newSelectedDeviceList })
-            this.setState({ devicesView: newSelectedDeviceList }, () => {
-              this.sort()
-            })   
+            console.log(serverresponse)             
         }).catch(err => console.error(err.toString()));
-        // selectedDevicesOnly = [...selectedDevicesOnly, newSelectedDeviceList[dev]]
-        // removeFromList = newSelectedDeviceList.filter(Devices => {
-        //   return selectedDevicesOnly[dev] !== Devices[dev]
-        // })
       }   
     }
+
+    // -------------------------------
+    var devicesServerTemp = this.state.devicesServer.filter( (device) => { return device.selected == false; })
+    var devicesViewTemp = this.state.devicesView.filter( (device) => { return device.selected == false; })
+    this.setState({devicesView:devicesViewTemp, devicesServer:devicesServerTemp}, this.selectCountUpdate)
   }
 
   render() {
