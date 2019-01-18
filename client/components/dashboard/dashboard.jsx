@@ -2,6 +2,9 @@ import React, { Component } from "react";
 
 import GridLayout from 'react-grid-layout';
 
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css"
+import "./index.scss"
 
 
 
@@ -9,6 +12,8 @@ import { Calendar } from "./nivo_calendar.jsx"
 import { Line } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
+
+// https://github.com/STRML/react-grid-layout
 
 import { Widget } from "./widget.jsx"
 
@@ -43,11 +48,9 @@ export class Dashboard extends React.Component {
       y: Math.round(e.clientY/this.state.grid.rowHeight/2) - 1
     }
 
-    //console.log("drop")
-    //console.log(e.datapath)
-    //console.log(location)
-      //console.log(e.dataname)
-    //console.log(this.generateDifficult(32))
+    console.log("drop")
+    console.log(e.datapath)
+    console.log(location)
 
     var layout = _.clone(this.state.layout)
     layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
@@ -83,7 +86,7 @@ export class Dashboard extends React.Component {
                   <Widget label={data.dataname} >
                     { this.objectByString(this.props.view, data.datapath.slice(5) ).toString() }
                   </Widget>
-                </div>                
+                </div>
               )
             }
 

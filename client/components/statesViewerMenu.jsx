@@ -43,20 +43,37 @@ export class StatesViewerMenu extends Component {
     }
 
     clickDeleteConfirmation = () => {
+        // confirmAlert({
+        // title: 'Are you sure?',
+        // message: 'Deleting a device is irreversible',
+        // buttons: [
+        //     {
+        //     label: 'Yes',
+        //     onClick: () => this.props.deleteSelected()
+        //     },
+        //     {
+        //     label: 'No',
+        //     onClick: () => { }
+        //     }
+        // ]
+        // })
         confirmAlert({
-        title: 'Are you sure?',
-        message: 'Deleting a device is irreversible',
-        buttons: [
-            {
-            label: 'Yes',
-            onClick: () => this.props.deleteSelected()
-            },
-            {
-            label: 'No',
-            onClick: () => { }
+            customUI: ({ onClose }) => {
+              return (
+                <div className='protoPopup'>
+                  <h1>Are you sure?</h1>
+                  <p>Deleting a device is irreversible</p>
+                  <button onClick={onClose}>No</button>
+                  
+                  <button onClick={() => {
+                      //this.handleClickDelete()
+                      this.props.deleteSelected()
+                      onClose()
+                  }}>Yes, Delete it!</button>
+                </div>
+              )
             }
-        ]
-        })
+          })
     };
 
     dialog() {

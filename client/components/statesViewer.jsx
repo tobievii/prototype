@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import moment from 'moment'
 import Moment from 'react-moment';
-import { confirmAlert } from 'react-confirm-alert'; 
-import 'react-confirm-alert/src/react-confirm-alert.css' 
+
+import { confirmAlert } from './react-confirm-alert'; 
+import './react-confirm-alert/src/react-confirm-alert.css' 
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'

@@ -6,8 +6,9 @@ import * as THREE from 'three';
 export class ThreeDWidget extends Component {
 
     componentDidMount() {
-        const width = this.mount.clientWidth
-        const height = this.mount.clientHeight
+        const width = this.mount.offsetWidth
+        const height = this.mount.offsetHeight
+        console.log({width, height})
         //ADD SCENE
         this.scene = new THREE.Scene()
         //ADD CAMERA
@@ -54,7 +55,7 @@ export class ThreeDWidget extends Component {
     render() {
         return (
             <div
-                style={{ width: '400px', height: '400px' }}
+                style={{ width: "auto", height: '400px'}}
                 ref={(mount) => { this.mount = mount }}
             />
         )
