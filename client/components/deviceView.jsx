@@ -25,7 +25,6 @@ import * as p from "../prototype.ts"
 
 import socketio from "socket.io-client";
 
-const socket = socketio();
 
 
  
@@ -354,16 +353,20 @@ export class DeviceView extends Component {
     state : undefined,
     apiMenu : 1
   };
-  
+
+  socket;
 
   constructor(props) {
     super(props);
 
+    this.socket = socketio();
+
     this.state.devid = props.devid
     console.log(this.state.state)
     //this.socket.emit("join", this.props.username)
-    socket.on("connect", a => {
-      socket.on("post", (packet) => {
+    this.socket.on("connect", a => {
+      console.log("deviceView socket connected")
+      this.socket.on("post", (packet) => {
           console.log(packet)  
           console.log("Postttt")  
           this.updateView(packet)
@@ -400,9 +403,12 @@ export class DeviceView extends Component {
     p.getState(this.props.devid, (state) => {
       console.log(state)
       this.setState({ state })
-      socket.emit("join", this.state.state.key)
+      this.socket.emit("join", this.state.state.key)
     })
+  }
 
+  componentWillUnmount = () => {
+    this.socket.disconnect();
   }
 
   getName() {
