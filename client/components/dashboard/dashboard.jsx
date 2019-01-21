@@ -30,7 +30,7 @@ export class Dashboard extends React.Component {
     layout: [
       { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
       //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" },
-      { i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
+      //{ i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
     ],
   }
 
@@ -54,56 +54,59 @@ export class Dashboard extends React.Component {
 
     var layout = _.clone(this.state.layout)
     layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
-
-
     this.setState({ layout: layout })
   }
 
   generateDashboard = () => {
-    return (
-      <GridLayout className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} compactType={null} >
-        {
-          this.state.layout.map((data, i) => {
-            if (data.type == "Calendar") {
-              return (
-                <div className="dashboardBlock" key={data.i} >
-                  <Calendar deviceid={this.props.deviceid} />
-                </div>
-              )
-            }
 
-            if (data.type == "Line") {
-              return (
-                <div className="dashboardBlock" key={data.i} >
-                  <Line />
-                </div>
-              )
-            }
+    if (!this.props.state) {
+      return ( <div>loading..</div>)
+    } else {
+      return (
+        <GridLayout className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} compactType={null} >
+          {
+            this.state.layout.map((data, i) => {
+              if (data.type == "Calendar") {
+                return (
+                  <div className="dashboardBlock" key={data.i} >
+                    <Calendar state={this.props.state} />
+                  </div>
+                )
+              }
 
-            if (data.type == "Blank") {
-              return (
-                <div className="dashboardBlock" key={data.i} >
-                  <Widget label={data.dataname} >
-                    { this.objectByString(this.props.view, data.datapath.slice(5) ).toString() }
-                  </Widget>
-                </div>
-              )
-            }
+              if (data.type == "Line") {
+                return (
+                  <div className="dashboardBlock" key={data.i} >
+                    <Line />
+                  </div>
+                )
+              }
 
-            if (data.type == "ThreeDWidget") {
-              return (
-                <div className="dashboardBlock" key={data.i} >
-                  <Widget label={data.dataname} >
-                    <ThreeDWidget />
-                  </Widget>
-                </div>                
-              )
-            }
+              if (data.type == "Blank") {
+                return (
+                  <div className="dashboardBlock" key={data.i} >
+                    <Widget label={data.dataname} >
+                       { this.objectByString(this.props.state.payload, data.datapath.slice(5) ).toString() }
+                    </Widget>
+                  </div>
+                )
+              }
 
-          })
-        }
-      </GridLayout>
-    )
+              if (data.type == "ThreeDWidget") {
+                return (
+                  <div className="dashboardBlock" key={data.i} >
+                    <Widget label={data.dataname} >
+                      <ThreeDWidget />
+                    </Widget>
+                  </div>                
+                )
+              }
+
+            })
+          }
+        </GridLayout>
+      )
+    }
   }
 
   render() {

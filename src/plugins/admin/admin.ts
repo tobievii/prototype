@@ -140,7 +140,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     req.user.level = 1
 
     accounts.registerExistingAccount(db, req.user, (error: Error, result: any) => {
-      res.json({ error, result })
+      res.json({ error, result, account:req.user })
     })
 
   })

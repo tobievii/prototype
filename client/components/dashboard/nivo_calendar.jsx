@@ -10,9 +10,17 @@ export class Calendar extends React.Component {
   state = { activity : [] , from : "2018-01-01", to: "2018-11-22"  }
 
   componentDidMount = () => {
+    if (this.props.state) {
+      console.log("calendar:")
+      console.log(this.props.state)
+      this.fetchData();
+    }
+  }
+
+  fetchData = () => {
     fetch("/api/v3/activity", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ deviceid: this.props.deviceid })
+      body: JSON.stringify({ deviceid: this.props.state.devid })
     }).then(response => response.json()).then(activity => { 
 
       if (activity.length > 2) {
@@ -24,28 +32,7 @@ export class Calendar extends React.Component {
     }).catch(err => console.error(err.toString()));
   }
 
-
   render() {
-    /*
-    // example data:
-
-    var graphdata = [
-      {
-        "day": "2016-03-31",
-        "value": 293
-      },
-      {
-        "day": "2015-04-06",
-        "value": 229
-      },
-      {
-        "day": "2015-04-10",
-        "value": 312
-      }
-    ]
-    */
- 
-
     return (
         <ResponsiveCalendar
         data={this.state.activity}
@@ -73,7 +60,7 @@ export class Calendar extends React.Component {
         dayBorderWidth={2}
         dayBorderColor="rgba(247, 57, 67,0)"
         theme = {protoGraphTheme}
-        />      
+        />     
     )
   }
 }

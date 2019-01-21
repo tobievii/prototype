@@ -12,7 +12,8 @@ module.exports = options => {
       extensions: [".ts", ".tsx", ".js"]
     },
     watchOptions: {
-      poll: true
+      //poll: true,
+      ignored: ["node_modules", "build"]
     },
     plugins: [ new MonacoWebpackPlugin()],
     module: {
