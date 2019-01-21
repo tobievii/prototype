@@ -2,6 +2,9 @@ import React, { Component } from "react";
 
 import GridLayout from 'react-grid-layout';
 
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css"
+import "./index.scss"
 
 
 
@@ -10,9 +13,11 @@ import { Line } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
 
-
+// https://github.com/STRML/react-grid-layout
 
 import { Widget } from "./widget.jsx"
+
+import { ThreeDWidget } from "./three.jsx"
 
 export class Dashboard extends React.Component {
 
@@ -24,7 +29,8 @@ export class Dashboard extends React.Component {
     },
     layout: [
       { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
-      { i: '1', x: 0, y: 4, w: 8, h: 8, type: "Line" , dataname : "line" }
+      //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" },
+      { i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
     ],
   }
 
@@ -81,7 +87,16 @@ export class Dashboard extends React.Component {
                     { this.objectByString(this.props.view, data.datapath.slice(5) ).toString() }
                   </Widget>
                 </div>
-                
+              )
+            }
+
+            if (data.type == "ThreeDWidget") {
+              return (
+                <div className="dashboardBlock" key={data.i} >
+                  <Widget label={data.dataname} >
+                    <ThreeDWidget />
+                  </Widget>
+                </div>                
               )
             }
 

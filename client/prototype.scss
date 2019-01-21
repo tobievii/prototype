@@ -5,7 +5,6 @@
   src: local('Share Tech Mono'), local('ShareTechMono-Regular'), url(/fonts/ShareTechMono-Regular.ttf) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 $panelBg: rgba(3, 4, 5, 0.5);
 $spot: #f3353a;
 
@@ -797,6 +796,19 @@ input[type="checkbox"]:checked {
   transition: opacity 0.02s ease-in-out;
 }
 
+
+
+.stateSortButton {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s;
+}
+
+.stateSortButton:hover {
+  color: white;
+  filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35));
+}
+
 /* BARS */
 
 .protoMenu {
@@ -821,3 +833,23 @@ input[type="checkbox"]:checked {
   box-sizing: border-box;
   cursor: pointer;
 }
+
+// Popup window styling
+
+.protoPopup {
+  background: rgba(0,0,0,0.1)
+}
+
+.react-confirm-alert {
+  background: rgba(0,0,0,0.1);
+  background-color: rgba(0,0,0,0.1)
+}
+
+.react-confirm-alert-overlay {
+  background: rgba(0,0,0,0.1)
+}
+
+.react-confirm-alert-blur {
+  background: rgba(0,0,0,0.1)
+}
+

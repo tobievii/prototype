@@ -47,7 +47,8 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 
-
+app.disable('etag')
+app.disable('x-powered-by');
 app.use(cookieParser());
 
 //app.use(compression({level:1}));
@@ -442,7 +443,7 @@ function safeParser(req: any, res: any, next: any) {
         req.body = jsonin;
         next();
       } catch (err) {
-        res.json({ err: err.toString(), input: buf, url: req.url })
+        res.status(400).json({ "error:" : err.toString()+". Make sure you are sending valid JSON" })
         next();
       }
     } else { next(); }
@@ -469,15 +470,11 @@ function handleState(req: any, res: any, next: any) {
 
   if (req.body === undefined) { return; }
 
-  // if (!req.user) { res.json({error:"user not authenticated"}); return;}
-
-
-  /*
-  if (!req.user) { res.json({error:"user not authenticated"}); return;}
-  if (!req.body) { res.json({error:"invalid json"}); return; }*/
-
+  
   if ((req.user) && (req.user.level) > 0) {
     if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+    if (typeof req.body.id != "string") { res.status(400).json({"error": "parameter id must be of type string"}); return;}
+    if (!req.body.data) { res.status(400).json({"error":"data parameter missing"}); return;}
     if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
     if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
 
