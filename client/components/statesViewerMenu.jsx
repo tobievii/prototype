@@ -20,9 +20,9 @@ export class StatesViewerMenu extends Component {
     }
 
     sortButtons = () => {
-        if (this.state.sort == "") { return <i className="fas fa-sort-amount-down" title="latest created top"  onClick={this.sortClickHandler("timedesc")} ></i> }
-        if (this.state.sort == "timedesc") { return <i className="fas fa-sort-numeric-down" title="last seen top" onClick={this.sortClickHandler("namedesc")} ></i> }
-        if (this.state.sort == "namedesc") { return <i className="fas fa-sort-alpha-down" title="alphabetical" onClick={this.sortClickHandler("")} ></i> }
+        if (this.state.sort == "") { return <i className="stateSortButton fas fa-sort-amount-down" title="latest created top"  onClick={this.sortClickHandler("timedesc")} ></i> }
+        if (this.state.sort == "timedesc") { return <i className="stateSortButton fas fa-sort-numeric-down" title="last seen top" onClick={this.sortClickHandler("namedesc")} ></i> }
+        if (this.state.sort == "namedesc") { return <i className="stateSortButton fas fa-sort-alpha-down" title="alphabetical" onClick={this.sortClickHandler("")} ></i> }
     }
 
     sortClickHandler = ( action ) => {
@@ -108,8 +108,10 @@ export class StatesViewerMenu extends Component {
                         {/* { this.props.selectCount} */}
                     </div>
 
-                    <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
+                    <div className="col" style={{ flex: "0 0 120px" }}>
+                        <div style={{float:"right", marginTop: "7px", textAlign:"left", width: "20px"}}>
                         { this.sortButtons() }
+                        </div>
                     </div>
                 </div>
             </div>

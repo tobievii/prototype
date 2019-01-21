@@ -796,6 +796,19 @@ input[type="checkbox"]:checked {
   transition: opacity 0.02s ease-in-out;
 }
 
+
+
+.stateSortButton {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s;
+}
+
+.stateSortButton:hover {
+  color: white;
+  filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35));
+}
+
 /* BARS */
 
 .protoMenu {
