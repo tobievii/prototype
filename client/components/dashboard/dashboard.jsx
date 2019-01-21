@@ -30,7 +30,7 @@ export class Dashboard extends React.Component {
     layout: [
       { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
       //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line" , dataname : "line" },
-      { i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
+      //{ i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
     ],
   }
 
