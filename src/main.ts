@@ -372,13 +372,21 @@ app.get('/api/v3/states', (req: any, res: any) => {
 app.post("/api/v3/states", (req:any, res:any) => {
   if (req.body) {
     // find state by username
+    if (req.body.username != req.user.username) {
+      if (req.user.level < 100) {
+        res.json([])
+        return;
+      }
+    }
+    
     // todo filter by permission/level
     if (req.body.username) {
       db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
         
         if (e) { res.json({error: "db error"})}
         if (user) {
-          
+            
+
           db.states.find({ apikey: user.apikey }, (er:Error, states: any[]) => {
             var cleanStates:any = []
             for (var a in states) {
