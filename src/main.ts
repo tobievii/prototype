@@ -47,11 +47,9 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 
-app.disable('etag')
 app.disable('x-powered-by');
 app.use(cookieParser());
-
-//app.use(compression({level:1}));
+app.use(compression());
 app.use(express.static('../public'))
 
 app.use(express.static('../client'))
