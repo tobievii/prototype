@@ -37,7 +37,9 @@ export class NavBar extends Component {
       if (account.level > 0) {
         return (
           <div style={{ padding: "20px 10px 10px 10px", float: "right" }}>
-            <span style={{fontSize: 14}}>{account.email} ({account.username})</span>&nbsp;
+            <span style={{fontSize: 14}} title="email">{account.email}</span> &nbsp;
+            <span style={{fontSize: 14}} title="username">{account.username}</span> &nbsp;
+            <span style={{fontSize: 14}} title="level">{account.level}</span> &nbsp;
             { this.showNotifications() }&nbsp;
             { this.showSettings() }              
           </div>

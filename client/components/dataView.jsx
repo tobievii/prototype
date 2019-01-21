@@ -118,12 +118,24 @@ export class DataView extends React.Component {
   }
 
   render() {
-
-      return (
-        <div>
-          { this.renderObject(this.props.data, 0, "root")}
-        </div>
-      );
-    } 
+    if (this.props.data) {
+      if (this.props.data.payload) {
+        return (
+          <div>
+            { this.renderObject(this.props.data.payload, 0, "root")}
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            { this.renderObject(this.props.data, 0, "root")}
+          </div>
+        );
+      }
+    } else {
+      return (<div>loading..</div>)
+    }
+    
+  }
 
 }

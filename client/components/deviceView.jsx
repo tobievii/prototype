@@ -18,7 +18,6 @@ library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
 
-import MonacoEditor from "react-monaco-editor";
 
 import * as p from "../prototype.ts"
 
@@ -27,316 +26,10 @@ import socketio from "socket.io-client";
 
 
 
- 
+
 import { Dashboard } from "./dashboard/dashboard.jsx"
-  
-export class Editor extends React.Component {
+import { Editor } from "./editor.jsx"
 
-  loadingState = 0;
-
-  state = {
-    message: "",
-    messageOpacity: 0,
-    loaded: 0,
-    code: `// uncomment below to test "workflow" processing
-// packet.data.test = "hello world"
-callback(packet); `
-  };
-
-  saveWorkflow = () => {
-
-
-    fetch("/api/v3/workflow", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id: this.props.deviceId, code: this.state.code })
-    })
-      .then(response => response.json())
-      .then(serverresponse => {
-        this.setState({ message: serverresponse.result, messageOpacity: 1.0 });
-        setTimeout(() => {
-          this.setState({ messageOpacity: 0 });
-        }, 1000);
-      })
-      .catch(err => console.error(err.toString()));
-  };
-
-  componentDidMount = () => {
-    
-
-
-    document.addEventListener("keydown", e => {
-      if (e.key.toLowerCase() == "s") {
-        if (e.ctrlKey) {
-          e.preventDefault();
-
-          
-          this.saveWorkflow();
-        }
-      }
-    });
-  };
-
-  loadLastPacket = (devid, cb) => {
-    console.log("loadLastPacket")
-    fetch("/api/v3/packets", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id: devid, limit: 1 })
-    })
-      .then(response => response.json())
-      .then(packets => {
-        if (packets.length > 0) {
-          this.setState({lastPacket:packets[0]})
-          this.setState({packets:packets})
-        } else {
-          this.setState({packets:[]})
-          this.setState({lastPacket:{}})
-        }
-      })
-      .catch(err => console.error(err.toString()));
-  };
-
-  loadState = (devid, cb) => {
-    fetch("/api/v3/state", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id: devid })
-    })
-      .then(response => response.json())
-      .then(data => {
-        this.setState({ lastState: data });
-        cb(undefined, data);
-      })
-      .catch(err => console.error(err.toString()));
-  };
-
-  loadStates = cb => {
-    fetch("/api/v3/states/full", {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        //same as workflow
-        var statesObj = {};
-        for (var s in data) {
-          statesObj[data[s].devid] = data[s];
-        }
-        this.setState({ lastStates: data, lastStatesObj: statesObj });        
-        this.loadPluginDefinitions((e,pluginDefinitions)=>{
-          cb(undefined, { lastStates: data, lastStatesObj: statesObj, pluginDefinitions });
-        })
-        
-      })
-      .catch(err => console.error(err.toString()));
-  };
-
-
-  loadPluginDefinitions = cb => {
-    fetch("/api/v3/plugins/definitions",{
-      method: "GET", 
-      headers: {
-        Accept: "application/json",
-        "Content-Type":"application/json"
-      }
-    }).then(response => response.json()).then(data => {
-      this.setState({ pluginDefinitions : data });
-      cb(undefined,data);      
-    }).catch( (err) => {
-      //console.error(err.toString())
-      cb(undefined,[]);
-    });
-  }
-
-  awaitData = (data, cb) => {
-
-    var checker = setInterval(()=>{
-      if (data === undefined) {
-
-      } else {
-        clearInterval(checker);
-        cb(data);
-      }
-    },0)
-  }
-
-  editorDidMount = (editor, monaco) => {
-    editor.focus();
-
-    //fetch('/themes/Monokai.json')
-    fetch("/themes/prototyp3.json")
-      .then(data => data.json())
-      .then(data => {
-        monaco.editor.defineTheme("prototyp3", data);
-        monaco.editor.setTheme("prototyp3");
-      });
-
-    
-    this.loadStates((err, resp) => {
-      // extra libraries
-
-      var definitions = [
-        "declare var packet = " + JSON.stringify(this.state.lastPacket),
-        "const state = " + JSON.stringify(this.state.lastState),
-        "const states = " + JSON.stringify(resp.lastStates),
-        "const statesObj = " + JSON.stringify(resp.lastStatesObj),
-        "declare var iotnxt = { register : ()=>{}, somenewapicall: ()=>{} }",
-        "declare function callback(packet:any)",
-        "declare class Facts {",
-        "    /**",
-        "     * Returns the next fact",
-        "     */",
-        "    static next():string",
-        "}"
-      ]
-
-      definitions = definitions.concat(resp.pluginDefinitions.definitions);
-      
-
-      monaco.languages.typescript.javascriptDefaults.addExtraLib(
-        definitions.join("\n"),
-        "filename/facts.d.ts"
-      );
-    });
-
-    window.addEventListener("resize", () => {
-      editor.layout();
-    });
-  };
-
-  onChange = (code, e) => {
-    this.setState({ code: code });
-  };
-
-  loadOnFirstData = () => {
-
-    
-    if (this.props.deviceId) {
-      if (this.loadingState === 0 ) {
-        this.loadingState = 1
-        this.loadState(this.props.deviceId, ()=>{});
-        this.loadLastPacket(this.props.deviceId)
-      }
-    }
-
-    if (this.props.state) {
-      if (this.props.state.workflowCode) {
-        //console.log("got state! got code");
-
-        if (this.state.loaded == 0) {
-          var code = this.props.state.workflowCode;
-          this.setState({ loaded: 1 });
-          this.setState({ code });
-        } else {
-          //console.log("already loaded code!")
-        }
-      } else {
-        //console.log("got state! no workflow");
-      }
-    }
-  };
-
-  ///https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-adding-an-action-to-an-editor-instance
-
-  render() {
-    this.loadOnFirstData();
-
-    if ((this.state.lastState === undefined) || (this.state.lastPacket === undefined)) {
-      
-      return (
-        <div>Editor Loading</div>
-      )
-
-    } else {
-
-      const options = {
-        selectOnLineNumbers: false,
-        minimap: { enabled: false}
-      };
-      return (
-        <div>
-          <div>
-            <div
-              className="commanderBgPanel commanderBgPanelClickable"
-              style={{
-                width: 160,
-                marginBottom: 20,
-                float: "left",
-              }}
-              onClick={this.saveWorkflow}
-            >
-              <FontAwesomeIcon icon="hdd" /> SAVE CODE
-            </div>
-  
-            <div
-              style={{
-                transition: "all 0.25s ease-out",
-                opacity: this.state.messageOpacity,
-                width: 110,
-                marginTop: 20,
-                marginBottom: 20,
-                float: "left",
-                textAlign: "left",
-                paddingLeft: 20
-              }}
-            >
-              {this.state.message}
-            </div>
-  
-            <div style={{ clear: "both" }} />
-          </div>
-  
-          <div>
-            <span title="Check to your left under packet history">packet</span>
-            &nbsp;
-            <span title={JSON.stringify(this.state.lastState, null, 2)}>
-              state
-            </span>
-            &nbsp;
-            <span title={JSON.stringify(this.state.lastStates, null, 2)}>
-              states
-            </span>
-            &nbsp;
-            <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>
-              statesObj
-            </span>
-            &nbsp;
-          </div>
-  
-          <div style={{backgroundColor:"black"}}>
-            <MonacoEditor
-              width="800"
-              height="420"
-              language="javascript"
-              theme="vs-dark"
-              value={this.state.code}
-              options={options}
-              onChange={this.onChange}
-              editorDidMount={this.editorDidMount}
-              
-            />
-          </div>
-        </div>
-      );
-
-    }
-
-    
-  }
-}
 
 export class DeviceView extends Component {
   state = {
@@ -347,64 +40,61 @@ export class DeviceView extends Component {
     getPackets: false,
     trashClicked: 0,
     trashButtonText: "DELETE DEVICE",
-    clearStateClicked : 0,
+    clearStateClicked: 0,
     eraseButtonText: "CLEAR STATE",
-    view : undefined,
-    state : undefined,
-    apiMenu : 1
+    view: undefined,
+    apiMenu: 1
   };
 
   socket;
 
   constructor(props) {
     super(props);
-
     this.socket = socketio();
-
     this.state.devid = props.devid
-    console.log(this.state.state)
-    //this.socket.emit("join", this.props.username)
     this.socket.on("connect", a => {
-      console.log("deviceView socket connected")
       this.socket.on("post", (packet) => {
-          console.log(packet)  
-          console.log("Postttt")  
-          this.updateView(packet)
+        this.updateView(packet)
       })
     });
   }
 
-  updateView = (packets) => {
+  updateView = (packet) => {
     var view = _.clone(this.state.view);
-    view = _.merge(view, packets)
-    this.setState({ view: view })
+    view = _.merge(view, packet)
+    
+    // should be same as DB.states for this device.
+    var state = _.clone(this.state.state);
+    state.payload = _.merge(state.payload, packet);
+    state["_last_seen"] = packet.timestamp;
+    this.setState({ view, state })
   }
 
   updateTime = () => {
-    if (this.props.view) {
-      if (this.props.view.timestamp) {
-        var timeago = moment(this.props.view.timestamp).fromNow()
-        this.setState({timeago})
+    if (this.state.view) {
+      if (this.state.view.timestamp) {
+        var timeago = moment(this.state.view.timestamp).fromNow()
+        this.setState({ timeago })
       }
-    }    
+    }
   }
 
   componentDidMount = () => {
     this.updateTime();
-    setInterval( () => {
+    setInterval(() => {
       this.updateTime();
-    },500)
+    }, 500)
 
-    p.getView(this.props.devid, (view)=>{
-      console.log(view)
-      this.setState({view})
+    p.getView(this.props.devid, (view) => {
+      this.setState({ view })
     })
 
     p.getState(this.props.devid, (state) => {
-      console.log(state)
-      this.setState({ state })
-      this.socket.emit("join", this.state.state.key)
+      this.setState({ state }, ()=>{
+        this.socket.emit("join", state.key)
+      })      
     })
+
   }
 
   componentWillUnmount = () => {
@@ -442,7 +132,7 @@ export class DeviceView extends Component {
     }
   };
 
-    getMenuClasses = function (num ) {
+  getMenuClasses = function (num) {
     if (num == this.state.apiMenu) {
       return "menuTab borderTopSpot"
     } else {
@@ -450,7 +140,7 @@ export class DeviceView extends Component {
     }
   }
 
-  getMenuPageStyle = function (num ) {
+  getMenuPageStyle = function (num) {
     if (num == this.state.apiMenu) {
       return { display: "" }
     } else {
@@ -465,11 +155,11 @@ export class DeviceView extends Component {
       event.currentTarget.className = "col-md-2 menuTab borderTopSpot";
       console.log(num)
       */
-     var apiMenu = num;
-   this.setState({ apiMenu });
-  this.forceUpdate();
-   
-    
+      var apiMenu = num;
+      this.setState({ apiMenu });
+      this.forceUpdate();
+
+
     }
   }
 
@@ -495,6 +185,26 @@ export class DeviceView extends Component {
       }).catch(err => console.error(err.toString()));
     }
   };
+
+  drawState = () => {
+    if (this.state.state) {
+      return ( 
+        <div  style={{ maxWidth: "400px", overflow: "hidden", margin:0, padding:0 }}>
+
+          <SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(this.state.state.payload, null, 2)}</SyntaxHighlighter>
+
+          {/* <pre className="commanderBgPanel" style={{ fontSize: "10px", padding: 5, margin: 0}}>
+            {JSON.stringify(this.state.state, null, 2)}
+          </pre>           */}
+        </div>
+      )
+    } else {
+      return (
+        <div></div>
+      )
+    }
+    
+  }
 
   render() {
     var devid = "loading";
@@ -522,103 +232,72 @@ export class DeviceView extends Component {
     }
 
     return (
-<div>
-  
+      <div>
+        <div className="container-fluid protoMenu commanderBgPanel" style={{ margin: 10 }}>
+          <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
 
-     
-  <div className="commanderBgPanel" style={{ margin: 10}}>
-        <div
-          className="row"
-          style={{
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            marginBottom: 10,
-            paddingBottom: 1,
-           
-          }}
-        >
-          <div className="col-md-8">
-            
-            <h3>{this.state.devid}</h3>
-           
-            <span className="faded" >{this.state.timeago}</span>
-          </div>
+            <div className="col">
+                <h3>{this.state.devid}</h3>
+                <span className="faded" >{this.state.timeago}</span>
+            </div>
 
+            <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 180, float: "right", height: 64 }} onClick={this.deleteDevice}>
+                <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+              </div>
 
-          <div className="col-md-4">
-            <div
-              className="commanderBgPanel commanderBgPanelClickable"
-
-              style={{ width: 200, float: "right", height: 64 }}
-              onClick={this.deleteDevice}><FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}</div>
-
-
-            <div className="commanderBgPanel commanderBgPanelClickable" 
-              style={{ width: 175, float: "right", marginRight: 10 }}
-              onClick={this.clearState}><FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}</div>
-
-          </div>
-       
-        </div>
-        <div>
-        <div style={{backgroundColor:"transparent"}}><Dashboard view= {this.state.view}/></div>
-        </div>
-        <hr></hr>
-<div  >
-   <div className="row"  > 
- 
-       <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1) }>EDITOR</div>
-         
-      
-          <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3) }>PLUGINS</div></div>
-          </div>
-          
-        <div
-          className="row"
-          style={{
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
-            marginBottom: 20,
-            paddingBottom: 10,
-            backgroundColor : "rgba(0, 3, 5, 0.5)",
-          
-          }}
-        >
-        <div className="col-11" style={this.getMenuPageStyle(1)}>
-       
-          <div className="" >
-          <hr></hr>
-            <h4 className="spot">DEVICE DATA</h4>
-           <div style={{float : "left"}} > <DataView data={latestState} />
-           <h4 className="spot">LATEST STATE</h4>
-            <div style={{maxHeight: 450, overflowY: "scroll", marginBottom: 20, padding: 0, height:300}}><SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(latestState, null, 2)}</SyntaxHighlighter></div>
-           </div>
-
-
-            
-                      
-
-          </div>
-          <div style={{float : "right" }}>           <h4 className="spot">PROCESSING</h4>
- <Editor deviceId={this.state.devid} state={this.props.state} /> </div>
-          </div>
-     
-
-
-
-
-          <div className=" col-md-12 "  style={this.getMenuPageStyle(3)}>
-            <div><center >
-              <hr></hr>
-              <h4 className="spot">PLUGINS</h4>
-              <p>Plugin options unique to this device:</p>
-              {plugins}
-              </center>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 160, float: "right", marginRight: 10 }} onClick={this.clearState}>
+                <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
+              </div>
             </div>
           </div>
+          
+          
+          <div className="row" >            
+            <div className="col" style={{ flex: "0 0 400px" }} >
+              <div>
+                <div style={{marginBottom : 20 }}>
+                  <h4 className="spot">DEVICE DATA</h4>
+                  <DataView data={ this.state.state   } />
+                </div>
+                
+                <div>
+                  <h4 className="spot">LATEST STATE</h4>
+                  { this.drawState() }
+                </div>
 
+                <div>
+                  <h4 className="spot">PLUGINS</h4>
+                  {plugins}
+                </div>                
+              </div>              
+            </div>
+
+            <div className="col" >
+              <h4 className="spot">DASHBOARD</h4>
+              <div style={{ backgroundColor: "transparent" }}>
+                <Dashboard state={this.state.state} />
+              </div>
+
+              <h4 className="spot">PROCESSING</h4>
+              <div>
+                  <Editor state={this.state.state} /> 
+              </div>              
+            </div>
+
+
+          </div>
+
+
+
+
+
+           
+
+          
         </div>
-</div>
       </div>
-     
+
     );
   }
 }
