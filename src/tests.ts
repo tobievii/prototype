@@ -3,22 +3,56 @@
 import { describe, it } from "mocha";
 import * as trex from "./utils";
 
-
 var testAccount = { 
-  email: "admin@localhost.com", 
-  password: "admin", 
-  apikey: "glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9" ,
+  email: "", 
+  password: "newUser", 
+  apikey: "" ,
   server: "http://localhost",
   port : 8080
-};
-
+}
 
 import * as http from "http";
 
 describe("API", function() {
+
   describe("REST API", function() {
     var testvalue: any;
-    /*********************************************************/
+
+    /************************************   Register   ****************************************/
+
+    it("/api/v3/admin/register", function(done: any) {
+      var randomNumberEmail = Math.floor(Math.random()*(100)+1);
+      const Account: any = { email: "test"+randomNumberEmail+"@iotlocalhost.com", password: testAccount.password};
+
+      trex.restJSON(
+        {
+          path: "http://localhost:8080/api/v3/admin/register",
+          method: "POST",
+          body: Account,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          }
+        },
+        (err: Error, result: any, account:any) => {
+          if (err) {
+            done(err);
+          }
+          if (result) {
+            if (result.error) { done(new Error(result.error)); }
+            //if (result.data.someval == testvalue) { done(); }
+            else{
+              testAccount.email = result.account.email;
+              testAccount.apikey = result.account.apikey
+              done();
+            }
+          }
+        }
+      );
+    });
+
+    /************************************   Version   ****************************************/
+
     it("/api/v3/version", function(done: any) {
       const options = {
         hostname: "localhost",
@@ -50,7 +84,8 @@ describe("API", function() {
       });
       req.end();
     });
-    /*********************************************************/
+
+    /************************************   Post   ****************************************/
     it("/api/v3/data/post", function(done: any) {
       testvalue = "DEV" + Math.round(Math.random() * 1000);
       var testDevice: any = {
@@ -78,15 +113,14 @@ describe("API", function() {
                 done();  
               } else {
                 done(result);
-              }
-              
-            }
-            
+              } 
+            } 
           }
         }
       );
     });
-    /*********************************************************/
+
+    /************************************   VIEW   ****************************************/
     it("/api/v3/view", function(done: any) {
       var testDevice: any = { id: "testDeviceDEV" };
       trex.restJSON(
@@ -112,7 +146,7 @@ describe("API", function() {
         }
       );
     });
-    /*********************************************************/
+    /************************************   Packets   ****************************************/
     it("/api/v3/packets", function(done: any) {
       var testDevice: any = { id: "testDeviceDEV" };
       trex.restJSON(
@@ -137,7 +171,7 @@ describe("API", function() {
         }
       );
     });
-    /*********************************************************/
+    /************************************   STATE   ****************************************/
     it("/api/v3/state", function(done: any) {
       const postData = JSON.stringify({ id: "testDeviceDEV" });
       const options = {
@@ -177,7 +211,8 @@ describe("API", function() {
       req.write(postData);
       req.end();
     });
-    /*********************************************************/
+
+    /************************************   States   ****************************************/
     it("/api/v3/states", function(done: any) {
       const postData = JSON.stringify({ id: "testDeviceDEV" });
       const options = {
