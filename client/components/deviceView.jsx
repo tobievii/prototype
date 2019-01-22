@@ -9,7 +9,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
-
+import Modal from 'react-modal';
 import { DataView } from "./dataView.jsx"
 
 import moment from 'moment'
@@ -42,8 +42,10 @@ export class DeviceView extends Component {
     trashButtonText: "DELETE DEVICE",
     clearStateClicked: 0,
     eraseButtonText: "CLEAR STATE",
+    sharebuttonText: "SHARE DEVICE",
     view: undefined,
-    apiMenu: 1
+    apiMenu: 1,
+    isOpen:false
   };
 
   socket;
@@ -186,6 +188,13 @@ export class DeviceView extends Component {
     }
   };
 
+  toggleModal = () => {
+this.setState({isOpen:!this.state.isOpen})
+  }
+  componentWillMount(){
+    Modal.setAppElement('body');
+  }
+
   drawState = () => {
     if (this.state.state) {
       return ( 
@@ -242,13 +251,25 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 180, float: "right", height: 64 }} onClick={this.deleteDevice}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10 }} onClick={this.deleteDevice}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 160, float: "right", marginRight: 10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 122, float: "right", marginRight: 10,fontSize:10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
+
+                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
+                
+                <FontAwesomeIcon icon="" /><i class="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              </div>
+              <div >
+              <Modal isOpen={this.state.isOpen} onRequestClose={this.toggle}> <button onClick={this.toggleModal} >X
+                  </button><center style={{color:"black"}}>
+                Search For users to share  with<br></br>
+                  <div style={{color:"white"}}><input  type="text" name="search" placeholder=" By email" /></div></center>
+                  </Modal>
+                  </div>
             </div>
           </div>
           
@@ -258,7 +279,7 @@ export class DeviceView extends Component {
               <div>
                 <div style={{marginBottom : 20 }}>
                   <h4 className="spot">DEVICE DATA</h4>
-                  <DataView data={ this.state.state   } />
+                  <DataView data={ this.state.state  } />
                 </div>
                 
                 <div>
