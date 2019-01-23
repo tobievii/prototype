@@ -2,9 +2,8 @@ import React, { Component } from "react";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
-import * as $ from "jquery";
 import * as _ from "lodash"
-
+import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
@@ -29,7 +28,6 @@ import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
-
 
 export class DeviceView extends Component {
   state = {
@@ -81,6 +79,10 @@ export class DeviceView extends Component {
     }
   }
 
+  componentWillMount(){
+    Modal.setAppElement('body');
+  }
+
   componentDidMount = () => {
     this.updateTime();
     setInterval(() => {
@@ -96,6 +98,7 @@ export class DeviceView extends Component {
         this.socket.emit("join", state.key)
       })      
     })
+    
 
   }
 
@@ -114,25 +117,46 @@ export class DeviceView extends Component {
   deleteDevice = (id) => {
     // deletes a device's state and packet history
     if (this.state.trashClicked == 0) {
-      var trashClicked = this.state.trashClicked;
-      this.setState({ trashClicked: 1 });
-      this.setState({ trashButtonText: "ARE YOU SURE?" });
-      console.log("clicked once");
-
+      this.setState({ trashClicked: 1 })
+      confirmAlert({
+        customUI: ({ onClose }) => {
+          return (
+            <div className='protoPopup'>
+              <h1>Are you sure?</h1>
+              <p>Deleting a device is irreversible</p>
+              <button onClick={onClose}>No</button>
+              
+              <button onClick={() => {
+                  //this.handleClickDelete()
+                  this.deleteDevice(this.state.devid)
+              }}>Yes, Delete it!</button>
+            </div>
+          )
+        }
+      })
       return;
     }
 
-    if (this.state.trashClicked == 1) {
+    else{
       console.log("clicked twice");
       fetch("/api/v3/state/delete", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ id: id })
       }).then(response => response.json()).then(serverresponse => {
         console.log(serverresponse);
-        this.setState({ view: null })
+        window.location.href = "http://localhost:8080/"
       }).catch(err => console.error(err.toString()));
     }
   };
+
+  dialog() {
+    if (this.state.dialog) {
+      return (
+        <div className="container" style={{ color: "red" }}>
+        </div>
+      );
+    }
+}
 
   getMenuClasses = function (num) {
     if (num == this.state.apiMenu) {
@@ -189,10 +213,7 @@ export class DeviceView extends Component {
   };
 
   toggleModal = () => {
-this.setState({isOpen:!this.state.isOpen})
-  }
-  componentWillMount(){
-    Modal.setAppElement('body');
+    this.setState({isOpen:!this.state.isOpen})
   }
 
   drawState = () => {
@@ -251,7 +272,7 @@ this.setState({isOpen:!this.state.isOpen})
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10 }} onClick={this.deleteDevice}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
@@ -259,9 +280,9 @@ this.setState({isOpen:!this.state.isOpen})
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
+                <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
                 
-                <FontAwesomeIcon icon="" /><i class="fas fa-share-alt"></i> {this.state.sharebuttonText}
+                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
               <div >
               <Modal isOpen={this.state.isOpen} onRequestClose={this.toggle}> <button onClick={this.toggleModal} >X
@@ -305,17 +326,7 @@ this.setState({isOpen:!this.state.isOpen})
                   <Editor state={this.state.state} /> 
               </div>              
             </div>
-
-
           </div>
-
-
-
-
-
-           
-
-          
         </div>
       </div>
 

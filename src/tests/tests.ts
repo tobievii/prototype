@@ -1,7 +1,7 @@
 // https://mochajs.org/#getting-started
 
 import { describe, it } from "mocha";
-import * as trex from "./utils";
+import * as trex from "../utils";
 
 var testAccount = { 
   email: "", 
@@ -11,9 +11,13 @@ var testAccount = {
   port : 8080
 }
 
+var testDev = "testDeviceDEV";
+
 import * as http from "http";
 
 describe("API", function() {
+
+ 
 
   describe("REST API", function() {
     var testvalue: any;
@@ -89,7 +93,7 @@ describe("API", function() {
     it("/api/v3/data/post", function(done: any) {
       testvalue = "DEV" + Math.round(Math.random() * 1000);
       var testDevice: any = {
-        id: "testDeviceDEV",
+        id: testDev,
         data: { someval: testvalue }
       };
 
@@ -110,7 +114,7 @@ describe("API", function() {
               done(new Error(result.error))
             } else {
               if (result.result == "success") {
-                done();  
+                done();    
               } else {
                 done(result);
               } 
@@ -122,7 +126,7 @@ describe("API", function() {
 
     /************************************   VIEW   ****************************************/
     it("/api/v3/view", function(done: any) {
-      var testDevice: any = { id: "testDeviceDEV" };
+      var testDevice: any = { id: testDev };
       trex.restJSON(
         {
           apikey: testAccount.apikey,
@@ -140,6 +144,7 @@ describe("API", function() {
             if (result.error) { done(new Error(result.error)); }
 
             if (result.data.someval == testvalue) {
+              
               done();
             }
           }
@@ -148,7 +153,7 @@ describe("API", function() {
     });
     /************************************   Packets   ****************************************/
     it("/api/v3/packets", function(done: any) {
-      var testDevice: any = { id: "testDeviceDEV" };
+      var testDevice: any = { id: testDev };
       trex.restJSON(
         {
           apikey: testAccount.apikey,
@@ -165,6 +170,7 @@ describe("API", function() {
             if (result.error) { done(new Error(result.error)); }
             //if (result.data.someval == testvalue) { done(); }
             if (result[result.length - 1].data.someval == testvalue) {
+              
               done();
             }
           }
@@ -172,8 +178,9 @@ describe("API", function() {
       );
     });
     /************************************   STATE   ****************************************/
+
     it("/api/v3/state", function(done: any) {
-      const postData = JSON.stringify({ id: "testDeviceDEV" });
+      const postData = JSON.stringify({ id: testDev });
       const options = {
         hostname: "localhost",
         port: testAccount.port,
@@ -213,8 +220,9 @@ describe("API", function() {
     });
 
     /************************************   States   ****************************************/
+
     it("/api/v3/states", function(done: any) {
-      const postData = JSON.stringify({ id: "testDeviceDEV" });
+      const postData = JSON.stringify({ id: testDev });
       const options = {
         hostname: "localhost",
         port: testAccount.port,
@@ -235,12 +243,13 @@ describe("API", function() {
         });
         res.on("end", () => {
           var result = JSON.parse(response);
-
+         
           if (result.error) { done(new Error(result.error)); }
 
           for (var d in result) {
             if (result[d].id == "testDeviceDEV") {
               if (result[d].data.someval == testvalue) {
+                
                 done();
               }
             }
@@ -253,9 +262,50 @@ describe("API", function() {
       });
       req.end();
     });
-    /*********************************************************/
+
+    /************************************   Delete   ****************************************/
+
+    it("/api/v3/state/delete", function(done: any) {
+      const postData = JSON.stringify({ id: testDev });
+
+      const options = {
+        hostname: "localhost",
+        port: testAccount.port,
+        path: "/api/v3/state/delete",
+        method: "POST",
+        headers: {
+          Authorization:
+            "Basic " + Buffer.from("api:key-"+testAccount.apikey).toString("base64"),
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(postData)
+        }
+      };
+      // CREATE REQUEST OBJECT
+      const req = http.request(options, res => {
+        var response = "";
+        res.setEncoding("utf8");
+        res.on("data", chunk => {
+          response += chunk;
+        });
+        res.on("end", () => {
+          var result = JSON.parse(response);
+          
+          if (result.error) { 
+            done(new Error(result.error)); 
+          }else{
+            done();
+          }
+        });
+      });
+
+      req.on("error", e => {
+        console.error(`problem with request: ${e.message}`);
+      });
+      req.write(postData);
+      req.end();
+    });
+    
    
   });
 
-  /*######################################################################*/
 });
