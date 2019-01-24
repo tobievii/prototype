@@ -10,8 +10,8 @@ var testAccount = {
   server: "http://localhost",
   port : 8080
 }
-
 var testDev = "testDeviceDEV";
+// var socket = require("socket.io-client")("http://localhost:8080");
 
 import * as http from "http";
 
@@ -96,9 +96,9 @@ describe("API", function() {
         id: testDev,
         data: { someval: testvalue }
       };
-
+      
       trex.restJSON(
-        {
+        { 
           apikey: testAccount.apikey,
           method: "POST",
           path: testAccount.server + "/api/v3/data/post",

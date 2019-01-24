@@ -116,7 +116,7 @@ export class DeviceView extends Component {
 
   deleteDevice = (id) => {
     // deletes a device's state and packet history
-    if (this.state.trashClicked == 0) {
+    if (this.state.trashClicked >= 0) {
       this.setState({ trashClicked: 1 })
       confirmAlert({
         customUI: ({ onClose }) => {
@@ -128,24 +128,19 @@ export class DeviceView extends Component {
               
               <button onClick={() => {
                   //this.handleClickDelete()
-                  this.deleteDevice(this.state.devid)
+                  {fetch("/api/v3/state/delete", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: id })
+                  }).then(response => response.json()).then(serverresponse => {
+                    console.log(serverresponse);
+                    window.location.href = "/"
+                  }).catch(err => console.error(err.toString()));}
               }}>Yes, Delete it!</button>
             </div>
           )
         }
       })
       return;
-    }
-
-    else{
-      console.log("clicked twice");
-      fetch("/api/v3/state/delete", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ id: id })
-      }).then(response => response.json()).then(serverresponse => {
-        console.log(serverresponse);
-        window.location.href = "http://localhost:8080/"
-      }).catch(err => console.error(err.toString()));
     }
   };
 
@@ -193,22 +188,31 @@ export class DeviceView extends Component {
     //clears state, but retains history and workflow
     var idlocal = this.state.devid;
 
-    if (this.state.clearStateClicked == 0) {
+    if (this.state.clearStateClicked >= 0) {
       this.setState({ clearStateClicked: 1 });
-      this.setState({ eraseButtonText: "ARE YOU SURE?" });
-      console.log("clicked once");
+      confirmAlert({
+        customUI: ({ onClose }) => {
+          return (
+            <div className='protoPopup'>
+              <h1>Are you sure?</h1>
+              <p>Clearing A State is irreversible</p>
+              <button onClick={onClose}>No</button>
+              
+              <button onClick={() => {
+                  //this.handleClickDelete()
+                  {fetch("/api/v3/state/clear", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: idlocal })
+                  }).then(response => response.json()).then(serverresponse => {
+                    console.log(serverresponse);
+                    window.location.reload()
+                  }).catch(err => console.error(err.toString()));}
+              }}>Yes, Clear it!</button>
+            </div>
+          )
+        }
+      })
       return;
-    }
-
-    if (this.state.clearStateClicked == 1) {
-      console.log("clicked twice");
-      fetch("/api/v3/state/clear", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ id: idlocal })
-      }).then(response => response.json()).then(serverresponse => {
-        console.log(serverresponse);
-
-      }).catch(err => console.error(err.toString()));
     }
   };
 
