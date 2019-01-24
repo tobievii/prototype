@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Stats } from "./stats.jsx"
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -43,7 +45,12 @@ export class DeviceView extends Component {
     sharebuttonText: "SHARE DEVICE",
     view: undefined,
     apiMenu: 1,
-    isOpen:false
+    isOpen:false,
+    stats:{},
+    tempstat:[],
+    search:"",
+    isOpen:false,
+    userSearched: "Search For users above"
   };
 
   socket;
@@ -57,6 +64,35 @@ export class DeviceView extends Component {
         this.updateView(packet)
       })
     });
+  }
+search = evt => {
+    this.setState({ search: evt.target.value.toString()}, () => {
+    var temp = []; 
+    var newDeviceList = [];
+    this.state.stats.users24hList.map((person,i) =>{ 
+      temp=[...temp, person.email]
+             if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
+        newDeviceList.push(person.email);
+           }   else {
+          newDeviceList.push("|");
+                }
+    });
+      temp=newDeviceList.filter((users) =>{ return users !== "|"})
+                  this.setState({ z: temp })
+                     console.log(temp);
+   })
+}
+   userNameList = () => {
+    
+    try {
+      return (<div>
+        {
+this.state.z.map( (user, i) =>{
+     return <Link key={i} to={""} >  <div className="commanderBgPanel commanderBgPanelClickable">{ user }</div> <br></br>   </Link>
+          })
+        }
+      </div>)
+    } catch (err) {}
   }
 
   updateView = (packet) => {
@@ -81,6 +117,11 @@ export class DeviceView extends Component {
 
   componentWillMount(){
     Modal.setAppElement('body');
+      fetch("/api/v3/stats", {
+      method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
+    }).then(response => response.json()).then(stats => {      
+      this.setState({stats: stats})
+     }).catch(err => console.error(err.toString()));
   }
 
   componentDidMount = () => {
@@ -266,7 +307,7 @@ export class DeviceView extends Component {
     }
 
     return (
-      <div>
+     <div>
         <div className="container-fluid protoMenu commanderBgPanel" style={{ margin: 10 }}>
           <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
 
@@ -276,23 +317,26 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10 }} onClick={() => this.deleteDevice(this.state.devid)}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10,marginRight: 10,marginLeft: 3 }} onClick={this.deleteDevice}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 122, float: "right", marginRight: 10,fontSize:10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 122, float: "right",fontSize:10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-                <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
+                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
                 
-                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
-              <div >
-              <Modal isOpen={this.state.isOpen} onRequestClose={this.toggle}> <button onClick={this.toggleModal} >X
-                  </button><center style={{color:"black"}}>
+              <div>
+              <Modal style={{background:"black"}} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{color:"red"}}></i> 
+                 <center style={{color:"black"}}>
                 Search For users to share  with<br></br>
-                  <div style={{color:"white"}}><input  type="text" name="search" placeholder=" By email" /></div></center>
+                
+                  <div style={{color:"white"}}><i className="fas fa-search" style={{color:"black"}}></i> <input  type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
+                        <br></br>  
+                      {this.userNameList()};    
                   </Modal>
                   </div>
             </div>
@@ -333,7 +377,6 @@ export class DeviceView extends Component {
           </div>
         </div>
       </div>
-
     );
   }
 }
