@@ -846,10 +846,14 @@ input[type="checkbox"]:checked {
 }
 
 .react-confirm-alert-overlay {
-  background: rgba(0,0,0,0.1)
+  background: rgba(170, 132, 132, 0.1)
 }
 
 .react-confirm-alert-blur {
-  background: rgba(0,0,0,0.1)
+  background: rgba(124, 42, 42, 0.1)
 }
 
+.ReactModal__Overlay.ReactModal__Overlay--after-open{
+  
+  background : rgba(3, 4, 5, 0.5),
+}

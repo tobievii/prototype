@@ -31,6 +31,21 @@ import socketio from "socket.io-client";
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
 
+const customStyles = {
+  content : {
+ top                   : '50%',
+    left                  : '50%',
+    right                 : '50%',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+transform             : 'translate(-50%, -50%)',
+
+    background : "rgba(3, 4, 5, 0.9)",
+  
+  },
+ 
+};
+
 export class DeviceView extends Component {
   state = {
     devid: undefined,
@@ -329,15 +344,16 @@ this.state.z.map( (user, i) =>{
                 
               <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
-              <div>
-              <Modal style={{background:"black"}} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{color:"red"}}></i> 
-                 <center style={{color:"black"}}>
+              <div ><center>
+              <Modal style={customStyles}  isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{color:"red"}}></i> 
+                 <center style={{color:"white"}}>
                 Search For users to share  with<br></br>
                 
-                  <div style={{color:"white"}}><i className="fas fa-search" style={{color:"black"}}></i> <input  type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
+                  <div style={{color:"white"}}><i className="fas fa-search" style={{color:"white"}}></i> <input  type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
                         <br></br>  
-                      {this.userNameList()};    
+                      {this.userNameList()}   
                   </Modal>
+                  </center>
                   </div>
             </div>
           </div>
