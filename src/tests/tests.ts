@@ -3,6 +3,11 @@
 import { describe, it } from "mocha";
 import * as trex from "../utils";
 
+import { MqttProto } from "./mqttproto"
+
+
+
+
 var testAccount = { 
   email: "", 
   password: "newUser", 
@@ -305,6 +310,25 @@ describe("API", function() {
       req.end();
     });
     
+    //////////////////////////////////////////
+    it("mqtt connection", (done) => {
+
+      var timeout = setTimeout( ()=>{
+        done("error timeout")
+      }, 3000)
+
+      var mqttconnection = new MqttProto();
+
+      mqttconnection.on("connect", ()=>{
+        console.log("successfully connected to mqtt prototype")
+        clearTimeout(timeout)
+        done()
+      })
+
+
+
+    })
+    ///////////////////////////////////////////
    
   });
 

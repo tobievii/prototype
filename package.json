@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node ./build/main.js",
-    "test": "mocha ./build/tests.js",
+    "test": "mocha ./build/tests/tests.js",
     "tests": "node ./build/tests.js",
     "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
     "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
