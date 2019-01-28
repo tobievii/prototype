@@ -345,15 +345,30 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 });
 
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
-  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
-  if (req.body.id) {
-    db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-      res.json(state);
-    })
-  } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
-  }
+
+  if (req.body.username) { 
+    // mash to complete.
+    // search db for username
+    // db.users.find({username})
+    // db.states.findOne({apikey, id}m )
+   } else {
+
+    if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+
+    if (req.body.id) {
+      db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+        res.json(state);
+      })
+    } else {
+      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    }
+
+   }
+
+
+
+
 });
 
 
