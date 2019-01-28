@@ -41,7 +41,8 @@ const customStyles = {
 transform             : 'translate(-50%, -50%)',
 
     background : "rgba(3, 4, 5, 0.9)",
-  
+    maxHeight: 'calc(100vh - 210px)', 
+    overflowY: 'auto'
   },
  
 };
