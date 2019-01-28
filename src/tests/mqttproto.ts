@@ -1,38 +1,39 @@
 var mqtt = require('mqtt');
+var testValue = false;
+var client: any;
+var config: any;
 
 import { EventEmitter } from "events"
 
 export class MqttProto extends EventEmitter {
 
-    constructor () {
-        console.log("attempting to connect")
+    constructor (key: any) {
         super();
 
-        var config = { apikey: "4vpw5gtrw4p3mdunmxpbm3qp76n37q4g" };
-        var client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+config.apikey});
+        config = { apikey: key };
+        client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+config.apikey});
         
         client.on('connect', () => {
-            console.log("connected.");
             this.emit("connect", {})
         
-            client.subscribe(config.apikey, function (err) {
-                if (err) { console.log(err) }
-                console.log("subscribed.")
+            client.subscribe(config.apikey, (err: any) => {
+                if (err) { console.log(err); testValue = false; }
+                else{ testValue = true; }
             })
-        
-            setInterval(()=>{
-                client.publish(config.apikey, JSON.stringify({id:"mqttDevice1", data: { a: Math.random() }}) );
-            },1000)
         })
         
-        client.on('message', function (topic, message) {
-            console.log(message.toString())
-        })
-
+        client.on('message', function (topic: any, message: any) {
+            if(topic === config.apikey){
+                console.log(message.toString())
+            }
+        })  
     }
 
-   
-
+    postData(){
+        if(client.publish(config.apikey, JSON.stringify({id:"testDeviceDEV", data: { someval: "Dev2-" + Math.round(Math.random() * 1000) }}) )){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
-
-
