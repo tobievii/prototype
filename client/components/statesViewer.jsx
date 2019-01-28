@@ -161,10 +161,11 @@ export class StatesViewer extends Component {
                 this.socket.emit("join", this.state.devicesServer[device].key);
               }
       
-              this.setState({ devicesView: states }, () => {
+              if(this.state.search.length < 1){
+                this.setState({ devicesView: states }, () => {
                 //this.socketConnectDevices();
                 //this.sort();
-              })
+              })}
             })
           })
         }
@@ -225,10 +226,14 @@ export class StatesViewer extends Component {
       console.log("recieved data for device not on our list yet.")
     } else {
       // update
-      this.setState({ devicesServer: devices })
-      this.setState({ devicesView: devices }, () => {
-        this.sort()
-      })
+      if(this.state.search.length > 0){
+        this.setState({ devicesServer: devices })
+      }else{
+        this.setState({ devicesServer: devices })
+        this.setState({ devicesView: devices }, () => {
+          this.sort()
+        })
+      }
     }
   }
 
