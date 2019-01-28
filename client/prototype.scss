@@ -823,7 +823,7 @@ input[type="checkbox"]:checked {
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
-  font-size: 15px;
+  font-size: 15px;  
 }
 
 .protoButtonClickable:hover {
@@ -837,7 +837,9 @@ input[type="checkbox"]:checked {
 // Popup window styling
 
 .protoPopup {
-  background: rgba(0,0,0,0.1)
+  // background: rgba(0,0,0,0.1);
+  margin: 15px;
+
 }
 
 .react-confirm-alert {

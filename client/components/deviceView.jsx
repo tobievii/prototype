@@ -182,7 +182,7 @@ this.state.z.map( (user, i) =>{
               <p>Deleting a device is irreversible</p>
               <button onClick={onClose}>No</button>
               
-              <button onClick={() => {
+              <button style = {{ margin:"15px" }} onClick={() => {
                   //this.handleClickDelete()
                   {fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -254,7 +254,7 @@ this.state.z.map( (user, i) =>{
               <p>Clearing A State is irreversible</p>
               <button onClick={onClose}>No</button>
               
-              <button onClick={() => {
+              <button style = {{ margin:"15px" }} onClick={() => {
                   //this.handleClickDelete()
                   {fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },

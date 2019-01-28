@@ -69,7 +69,7 @@ export class StatesViewerMenu extends Component {
                   <p>Deleting a device is irreversible</p>
                   <button onClick={onClose}>No</button>
                   
-                  <button onClick={() => {
+                  <button style = {{ margin:"15px" }} onClick={() => {
                       //this.handleClickDelete()
                       this.props.deleteSelected()
                       onClose()
