@@ -332,15 +332,15 @@ this.state.z.map( (user, i) =>{
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 130, float: "right",fontSize:10,marginRight: 10,marginLeft: 3 }} onClick={this.deleteDevice}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right",fontSize:10,marginRight: 10,marginLeft: 3 }} onClick={this.deleteDevice}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 122, float: "right",fontSize:10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "30%", float: "right",fontSize:10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 125, float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
+                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "31%", float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
                 
               <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
@@ -360,7 +360,7 @@ this.state.z.map( (user, i) =>{
           
           
           <div className="row" >            
-            <div className="col" style={{ flex: "0 0 400px" }} >
+            <div className="col-9" style={{ flex: "0 0 400px" }} >
               <div>
                 <div style={{marginBottom : 20 }}>
                   <h4 className="spot">DEVICE DATA</h4>
@@ -379,14 +379,14 @@ this.state.z.map( (user, i) =>{
               </div>              
             </div>
 
-            <div className="col" >
-              <h4 className="spot">DASHBOARD</h4>
-              <div style={{ backgroundColor: "transparent" }}>
+            <div className="col"   >
+              <h4 style={{color:" #f3353a"}} >DASHBOARD</h4>
+              <div style={{ backgroundColor: "transparent" }} className="col-9" >
                 <Dashboard state={this.state.state} />
               </div>
 
-              <h4 className="spot">PROCESSING</h4>
-              <div>
+              <h4 style={{color:" #f3353a"}} >PROCESSING</h4>
+              <div className="col-9">
                   <Editor state={this.state.state} /> 
               </div>              
             </div>
