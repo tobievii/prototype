@@ -50,11 +50,13 @@ import { utils } from 'mocha';
 app.disable('x-powered-by');
 app.use(cookieParser());
 app.use(compression());
-app.use(express.static('../public'))
 
+app.use(express.static('../public'))
 app.use(express.static('../client'))
 app.use(express.static('../client/dist'))
+
 app.use('/view', express.static('../client/dist'))
+app.use('/u/:username/view', express.static('../client/dist'))
 
 
 
@@ -167,6 +169,13 @@ app.get("/u/:username", (req:any, res:any)=>{
     res.end(data.toString())
   })
 })
+
+app.get("/u/:username/view/:devid", (req:any, res:any)=>{
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
+
 
 app.get('/settings', (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
@@ -321,33 +330,90 @@ app.get("/admin/processstates", (req:any, res:any)=>{
 
 
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
-
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
-  if (req.body.id) {
-    db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
 
-      if (state == null) { res.json({ "error": "id not found" }); return; }
+  if (req.username) {
+    //
 
-      if (state) {
-        var viewState = state.payload;
-        viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
-        res.json(viewState);
-      } else {
-        res.json({ error: "state not found" })
+    if (req.body.username != req.user.username) {
+      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
+    } 
+
+    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+      if (user) {
+        ///
+          if (req.body.id) {
+            db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+        
+              if (state == null) { res.json({ "error": "id not found" }); return; }
+        
+              if (state) {
+                var viewState = state.payload;
+                viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
+                res.json(viewState);
+              } else {
+                res.json({ error: "state not found" })
+              }
+        
+        
+            })
+          } else {
+            res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          }
+        ///
       }
-
-
-    })
+    });
+    //
   } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    if (req.body.id) {
+      db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+  
+        if (state == null) { res.json({ "error": "id not found" }); return; }
+  
+        if (state) {
+          var viewState = state.payload;
+          viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
+          res.json(viewState);
+        } else {
+          res.json({ error: "state not found" })
+        }
+  
+  
+      })
+    } else {
+      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    }
   }
+
+
+
 });
 
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
 
   if (req.body.username) { 
+
+    if (req.body.username != req.user.username) {
+      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
+    } 
+    
+
+    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+      if (user) {
+        console.log(user)
+        /////
+          if (req.body.id) {
+            db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+              res.json(state);
+            })
+          } else {
+            res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          }
+        /////
+      }
+    })
     // mash to complete.
     // search db for username
     // db.users.find({username})

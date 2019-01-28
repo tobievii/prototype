@@ -211,7 +211,7 @@ export class StatesViewerItem extends Component {
   
               {this.selectbox()}
   
-              <Link className="col" to={"/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
+              <Link className="col" to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
                   <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>

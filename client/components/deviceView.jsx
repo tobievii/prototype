@@ -32,19 +32,19 @@ import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
 
 const customStyles = {
-  content : {
- top                   : '50%',
-    left                  : '50%',
-    right                 : '50%',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-transform             : 'translate(-50%, -50%)',
+  content: {
+    top: '50%',
+    left: '50%',
+    right: '50%',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
 
-    background : "rgba(3, 4, 5, 0.9)",
-    maxHeight: 'calc(100vh - 210px)', 
+    background: "rgba(3, 4, 5, 0.9)",
+    maxHeight: 'calc(100vh - 210px)',
     overflowY: 'auto'
   },
- 
+
 };
 
 export class DeviceView extends Component {
@@ -61,11 +61,11 @@ export class DeviceView extends Component {
     sharebuttonText: "SHARE DEVICE",
     view: undefined,
     apiMenu: 1,
-    isOpen:false,
-    stats:{},
-    tempstat:[],
-    search:"",
-    isOpen:false,
+    isOpen: false,
+    stats: {},
+    tempstat: [],
+    search: "",
+    isOpen: false,
     userSearched: "Search For users above"
   };
 
@@ -81,40 +81,40 @@ export class DeviceView extends Component {
       })
     });
   }
-search = evt => {
-    this.setState({ search: evt.target.value.toString()}, () => {
-    var temp = []; 
-    var newDeviceList = [];
-    this.state.stats.users24hList.map((person,i) =>{ 
-      temp=[...temp, person.email]
-             if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
-        newDeviceList.push(person.email);
-           }   else {
+  search = evt => {
+    this.setState({ search: evt.target.value.toString() }, () => {
+      var temp = [];
+      var newDeviceList = [];
+      this.state.stats.users24hList.map((person, i) => {
+        temp = [...temp, person.email]
+        if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
+          newDeviceList.push(person.email);
+        } else {
           newDeviceList.push("|");
-                }
-    });
-      temp=newDeviceList.filter((users) =>{ return users !== "|"})
-                  this.setState({ z: temp })
-                     console.log(temp);
-   })
-}
-   userNameList = () => {
-    
+        }
+      });
+      temp = newDeviceList.filter((users) => { return users !== "|" })
+      this.setState({ z: temp })
+      console.log(temp);
+    })
+  }
+  userNameList = () => {
+
     try {
       return (<div>
         {
-this.state.z.map( (user, i) =>{
-     return <Link key={i} to={""} >  <div className="commanderBgPanel commanderBgPanelClickable">{ user }</div> <br></br>   </Link>
+          this.state.z.map((user, i) => {
+            return <Link key={i} to={""} >  <div className="commanderBgPanel commanderBgPanelClickable">{user}</div> <br></br>   </Link>
           })
         }
       </div>)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   updateView = (packet) => {
     var view = _.clone(this.state.view);
     view = _.merge(view, packet)
-    
+
     // should be same as DB.states for this device.
     var state = _.clone(this.state.state);
     state.payload = _.merge(state.payload, packet);
@@ -131,13 +131,14 @@ this.state.z.map( (user, i) =>{
     }
   }
 
-  componentWillMount(){
+  componentWillMount() {
+    // should not get stats here? i think it should be /api/v3/users
     Modal.setAppElement('body');
-      fetch("/api/v3/stats", {
+    fetch("/api/v3/stats", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-    }).then(response => response.json()).then(stats => {      
-      this.setState({stats: stats})
-     }).catch(err => console.error(err.toString()));
+    }).then(response => response.json()).then(stats => {
+      this.setState({ stats: stats })
+    }).catch(err => console.error(err.toString()));
   }
 
   componentDidMount = () => {
@@ -146,16 +147,43 @@ this.state.z.map( (user, i) =>{
       this.updateTime();
     }, 500)
 
-    p.getView(this.props.devid, (view) => {
-      this.setState({ view })
-    })
 
-    p.getState(this.props.devid, (state) => {
+    fetch("/api/v3/view", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: this.props.devid, username: this.props.username })
+    }).then(response => response.json()).then(view => { 
+      if (view.error) {
+        console.log(view.error)
+      } else {
+        this.setState({ view })
+      }
+      
+    }).catch(err => console.error(err.toString()));
+
+    // p.getView(this.props.devid, (view) => {
+    //   console.log(view)
+    //   this.setState({ view })
+    // })
+
+    // p.getState(this.props.devid, (state) => {
+    //   this.setState({ state }, ()=>{
+    //     this.socket.emit("join", state.key)
+    //   })      
+    // })
+
+    fetch("/api/v3/state", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: this.props.devid, username: this.props.username })
+    }).then(response => response.json()).then(state => { 
       this.setState({ state }, ()=>{
-        this.socket.emit("join", state.key)
-      })      
-    })
-    
+        if (state.error) {
+          console.log(state.error)
+        } else {
+          this.socket.emit("join", state.key)
+        }
+        
+      })  
+    }).catch(err => console.error(err.toString()));
 
   }
 
@@ -182,16 +210,18 @@ this.state.z.map( (user, i) =>{
               <h1>Are you sure?</h1>
               <p>Deleting a device is irreversible</p>
               <button onClick={onClose}>No</button>
-              
-              <button style = {{ margin:"15px" }} onClick={() => {
-                  //this.handleClickDelete()
-                  {fetch("/api/v3/state/delete", {
+
+              <button style={{ margin: "15px" }} onClick={() => {
+                //this.handleClickDelete()
+                {
+                  fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: id })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.href = "/"
-                  }).catch(err => console.error(err.toString()));}
+                  }).catch(err => console.error(err.toString()));
+                }
               }}>Yes, Delete it!</button>
             </div>
           )
@@ -208,7 +238,7 @@ this.state.z.map( (user, i) =>{
         </div>
       );
     }
-}
+  }
 
   getMenuClasses = function (num) {
     if (num == this.state.apiMenu) {
@@ -254,16 +284,18 @@ this.state.z.map( (user, i) =>{
               <h1>Are you sure?</h1>
               <p>Clearing A State is irreversible</p>
               <button onClick={onClose}>No</button>
-              
-              <button style = {{ margin:"15px" }} onClick={() => {
-                  //this.handleClickDelete()
-                  {fetch("/api/v3/state/clear", {
+
+              <button style={{ margin: "15px" }} onClick={() => {
+                //this.handleClickDelete()
+                {
+                  fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: idlocal })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.reload()
-                  }).catch(err => console.error(err.toString()));}
+                  }).catch(err => console.error(err.toString()));
+                }
               }}>Yes, Clear it!</button>
             </div>
           )
@@ -274,13 +306,13 @@ this.state.z.map( (user, i) =>{
   };
 
   toggleModal = () => {
-    this.setState({isOpen:!this.state.isOpen})
+    this.setState({ isOpen: !this.state.isOpen })
   }
 
   drawState = () => {
     if (this.state.state) {
-      return ( 
-        <div  style={{ maxWidth: "400px", overflow: "hidden", margin:0, padding:0 }}>
+      return (
+        <div style={{ maxWidth: "400px", overflow: "hidden", margin: 0, padding: 0 }}>
 
           <SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(this.state.state.payload, null, 2)}</SyntaxHighlighter>
 
@@ -294,10 +326,11 @@ this.state.z.map( (user, i) =>{
         <div></div>
       )
     }
-    
+
   }
 
   render() {
+
     var devid = "loading";
     var lastTimestamp = "";
     var packets = [];
@@ -323,73 +356,73 @@ this.state.z.map( (user, i) =>{
     }
 
     return (
-     <div>
+      <div>
         <div className="container-fluid protoMenu commanderBgPanel" style={{ margin: 10 }}>
           <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
 
             <div className="col">
-                <h3>{this.state.devid}</h3>
-                <span className="faded" >{this.state.timeago}</span>
+              <h3>{this.state.devid}</h3>
+              <span className="faded" >{this.state.timeago}</span>
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right",fontSize:10,marginRight: 10,marginLeft: 3 }} onClick={this.deleteDevice}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={this.deleteDevice}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "30%", float: "right",fontSize:10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "30%", float: "right", fontSize: 10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-                          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "31%", float: "left", marginRight: 10,fontSize:10 }} onClick={this.toggleModal}>
-                
-              <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "31%", float: "left", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
+
+                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
               <div ><center>
-              <Modal style={customStyles}  isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{color:"red"}}></i> 
-                 <center style={{color:"white"}}>
-                Search For users to share  with<br></br>
-                
-                  <div style={{color:"white"}}><i className="fas fa-search" style={{color:"white"}}></i> <input  type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-                        <br></br>  
-                      {this.userNameList()}   
-                  </Modal>
-                  </center>
-                  </div>
+                <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
+                  <center style={{ color: "white" }}>
+                    Search For users to share  with<br></br>
+
+                    <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
+                  <br></br>
+                  {this.userNameList()}
+                </Modal>
+              </center>
+              </div>
             </div>
           </div>
-          
-          
-          <div className="row" >            
+
+
+          <div className="row" >
             <div className="col-9" style={{ flex: "0 0 400px" }} >
               <div>
-                <div style={{marginBottom : 20 }}>
+                <div style={{ marginBottom: 20 }}>
                   <h4 className="spot">DEVICE DATA</h4>
-                  <DataView data={ this.state.state  } />
+                  <DataView data={this.state.state} />
                 </div>
-                
+
                 <div>
                   <h4 className="spot">LATEST STATE</h4>
-                  { this.drawState() }
+                  {this.drawState()}
                 </div>
 
                 <div>
                   <h4 className="spot">PLUGINS</h4>
                   {plugins}
-                </div>                
-              </div>              
+                </div>
+              </div>
             </div>
 
             <div className="col"   >
-              <h4 style={{color:" #f3353a"}} >DASHBOARD</h4>
+              <h4 style={{ color: " #f3353a" }} >DASHBOARD</h4>
               <div style={{ backgroundColor: "transparent" }} className="col-9" >
                 <Dashboard state={this.state.state} />
               </div>
 
-              <h4 style={{color:" #f3353a"}} >PROCESSING</h4>
+              <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
               <div className="col-9">
-                  <Editor state={this.state.state} /> 
-              </div>              
+                <Editor state={this.state.state} />
+              </div>
             </div>
           </div>
         </div>

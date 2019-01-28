@@ -117,9 +117,8 @@ class App extends Component {
 
     deviceView = ({match}) => {
         return (
-            <div>
-                
-                <DeviceView devid={match.params.devid} />
+            <div>                
+                <DeviceView devid={match.params.devid} username={match.params.username} />
             </div>
         )
     }
@@ -149,7 +148,8 @@ class App extends Component {
                         <NavBar version={this.state.version} account={this.state.account} />
                         <Route exact path="/" component={this.home} />
                         <Route path="/view/:devid" component={this.deviceView} />                    
-                        <Route path="/u/:username" component={this.userView} />
+                        <Route exact path="/u/:username" component={this.userView} />
+                        <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                     </div>
                 </Router>

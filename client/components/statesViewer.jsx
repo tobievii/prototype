@@ -113,7 +113,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid}/>)}
+          {devicelist.map(device => <StatesViewerItem username={this.props.username} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid}/>)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -386,8 +386,9 @@ export class StatesViewer extends Component {
     } else {
       return (
         <div className="" style={{ paddingTop: 25, margin: 30 }} >
+          <span>username: {this.props.username}</span>
           <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
-          <DeviceList devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
+          <DeviceList username={this.props.username} devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
         </div>
       )
     }
