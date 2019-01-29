@@ -85,7 +85,7 @@ export class DeviceView extends Component {
     this.setState({ search: evt.target.value.toString() }, () => {
       var temp = [];
       var newDeviceList = [];
-      this.state.stats.users24hList.map((person, i) => {
+      this.state.stats.userList.map((person, i) => {
         temp = [...temp, person.email]
         if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
           newDeviceList.push(person.email);
@@ -94,7 +94,7 @@ export class DeviceView extends Component {
         }
       });
       temp = newDeviceList.filter((users) => { return users !== "|" })
-      this.setState({ z: temp })
+      this.setState({ userSearched: temp })
       console.log(temp);
     })
   }
@@ -103,8 +103,8 @@ export class DeviceView extends Component {
     try {
       return (<div>
         {
-          this.state.z.map((user, i) => {
-            return <Link key={i} to={""} >  <div className="commanderBgPanel commanderBgPanelClickable">{user}</div> <br></br>   </Link>
+          this.state.userSearched.map((user, i) => {
+            return <Link key={i} to >  <div className="commanderBgPanel commanderBgPanelClickable">{user}</div> <br></br>   </Link>
           })
         }
       </div>)
@@ -385,7 +385,12 @@ export class DeviceView extends Component {
 
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
                   <br></br>
+                  <div>
                   {this.userNameList()}
+                  </div>
+                  <center>
+                  {/* <button>Share Device</button> */}
+                  </center>
                 </Modal>
               </center>
               </div>

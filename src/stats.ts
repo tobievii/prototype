@@ -35,6 +35,7 @@ export function init(app: any, db: any) {
     var stats = {
       users24h : await usersActiveLastDays(1),
       users24hList : await usersActiveLastDaysNames(1),
+       userList : await usersNames(),
       users1w : await usersActiveLastDays(7),
       users1m : await usersActiveLastDays(30),
       states24h: await statesActiveLastDays(1),
@@ -43,6 +44,21 @@ export function init(app: any, db: any) {
     res.json(stats)
   })
 
+  //all users
+function usersNames():Promise<any> {
+  return new Promise<any> (resolve => {
+    
+    db.users.find({ level : { $gt: 0 }, }, (err:Error, userList:any)=>{
+      var nameList:any = []
+      for (var user of userList) {
+
+
+        nameList.push({ email: user.email, username: user.username});
+      }
+      resolve(nameList)
+    })
+  })
+}
 //   users last 24hr
 function usersActiveLastDaysNames(days:number):Promise<any> {
   return new Promise<any> (resolve => {
