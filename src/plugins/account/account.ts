@@ -31,7 +31,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     })
 
     app.get("/api/v3/user/:username", (req: any, res: any) => {
-        getuser(db, req.params.username, (user)=>{
+        getuser(db, req.params.username, (user: any)=>{
             res.json(user);
         })
     })

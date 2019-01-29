@@ -3,9 +3,6 @@
 import { describe, it } from "mocha";
 import * as trex from "../utils";
 
-import { MqttProto } from "./mqttproto"
-import { SocketProto } from "./socketproto"
-
 var testAccount = {
   email: "",
   password: "newUser",
@@ -14,10 +11,6 @@ var testAccount = {
   port: 8080,
   testDev: "testDeviceDEV"
 }
-var mqttconnection: any;
-var socketconnection: any;
-
-// var socket = require("socket.io-client")("http://localhost:8080");
 
 import * as http from "http";
 
@@ -28,7 +21,7 @@ describe("API", function () {
     /************************************   Register   ****************************************/
 
     it("/api/v3/admin/register", function (done: any) {
-      var randomNumberEmail = Math.floor(Math.random() * (1000) + 1);
+      var randomNumberEmail = generateDifficult(32);
       const Account: any = { email: "test" + randomNumberEmail + "@iotlocalhost.com", password: testAccount.password };
 
       trex.restJSON(
@@ -53,9 +46,7 @@ describe("API", function () {
             //if (result.data.someval == testvalue) { done(); }
             else {
               testAccount.email = result.account.email;
-              testAccount.apikey = result.account.apikey
-              mqttconnection = new MqttProto(result.account.apikey);
-              socketconnection = new SocketProto(testAccount.apikey);
+              testAccount.apikey = result.account.apikey;
               done();
             }
           }
@@ -99,25 +90,25 @@ describe("API", function () {
     });
 
     /************************************   MQTT   ****************************************/
-    it("/MQTT  connection/", (done) => {
-      testvalue = 0;
-      var timeout = setTimeout(() => {
-        done("error timeout")
-      }, 3000)
+    // it("/MQTT  connection/", (done) => {
+    //   testvalue = 0;
+    //   var timeout = setTimeout(() => {
+    //     done("error timeout")
+    //   }, 2000)
 
-      var mqttconnection = new MqttProto(testAccount.apikey)
+    //   var mqttconnection = new MqttProto(testAccount.apikey)
 
-      mqttconnection.on("connect", () => {
-        var test = mqttconnection.postData();
+    //   mqttconnection.on("connect", () => {
+    //     //var test = mqttconnection.postData();
 
-        if(test){
-          clearTimeout(timeout)
-          done()
-        }else{
-          done(new Error("Could Not post to device.")) 
-        } 
-      })
-    })
+    //     //if(test){
+    //       clearTimeout(timeout)
+    //       done()
+    //     // }else{
+    //     //   done(new Error("Could Not post to device.")) 
+    //     // } 
+    //   })
+    // })
 
     /************************************   SocketIo   ****************************************/
 
@@ -134,6 +125,7 @@ describe("API", function () {
     //     done()
     //   })
     // })
+    
 
     /************************************   Post   ****************************************/
     it("/api/v3/data/post", function (done: any) {
@@ -321,8 +313,6 @@ describe("API", function () {
       req.end();
     });
 
-
-
     /************************************   Delete   ****************************************/
 
     it("/api/v3/state/delete", function (done: any) {
@@ -364,9 +354,102 @@ describe("API", function () {
       req.write(postData);
       req.end();
     });
+  });
 
+  describe("MQTT+SOCKETS+REST API", function () {
 
+    /************************************   Register   ****************************************/
+    it("/api/v3/data/post + SOCKETS + MQTT", function (done: any) {
 
+      var mqtt = require('mqtt');
+      var client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+testAccount.apikey});
 
+      var randomnumber = Math.round(Math.random()*10000)
+      var socket = require("socket.io-client")("http://localhost:8080")
+
+      var counter = 0;
+
+      var mqttpacket: any;
+      var socketpacket: any;
+      var originalData: any;
+
+      function checkSuccess() {
+        if (counter == 2) {
+          comparePackets();
+        }// }else{
+        //   done(new Error("Error: not all gateways recieved packets"))
+        // }
+      }
+
+      function comparePackets(){
+        if(mqttpacket === socketpacket){
+          if(mqttpacket === originalData){
+            if(socketpacket === originalData){
+              done();
+            } 
+          }
+        } 
+      }
+
+      /*************************** Socket Connect *************************************/
+
+      socket.on("connect", () => {
+        socket.emit("join", testAccount.apikey ); 
+
+        /*************************** MQTT Connect *************************************/
+
+        client.on('connect', function () {
+          var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0} };
+          /*************************** Http POST *************************************/
+          trex.restJSON(
+            {
+              apikey: testAccount.apikey,
+              method: "POST",
+              path: testAccount.server + "/api/v3/data/post",
+              body: {id:"mqttsockettest", data:dataVar},
+              port: testAccount.port
+            },(err: Error, result: any) => {
+              if (err) { done(err); }
+            }
+          );
+
+          originalData =  JSON.stringify(dataVar);
+
+          client.subscribe(testAccount.apikey, function (err: any) {
+            if (err) { console.log(err) }
+            //console.log("subscribed.")
+          })
+
+          client.on('message', function (topic: any, message: any) {
+            //console.log(JSON.parse(message.toString()))
+            var t = JSON.parse(message.toString());
+
+            mqttpacket = JSON.stringify(t.payload.data);
+            counter++;
+            checkSuccess()
+          })
+      
+        })
+      });
+
+      socket.on("post", (data: any) => {
+        //console.log("SOCKET PACKET RECIEVED")
+        socketpacket = JSON.stringify(data.data);
+        counter++;
+        checkSuccess()
+        //if (data.data.random == randomnumber ) { done(); } else { done(new Error("error packet did not match") )}        
+      });
+      
+    });
   });
 });
+
+function generateDifficult(count: number) {
+  var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+  var str = '';
+  for (var i = 0; i < count; i++) {
+    var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
+    str += "" + tmp;
+  }
+  return str;
+}

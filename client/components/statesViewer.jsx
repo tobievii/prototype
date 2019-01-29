@@ -386,7 +386,7 @@ export class StatesViewer extends Component {
     } else {
       return (
         <div className="" style={{ paddingTop: 25, margin: 30 }} >
-          <span>username: {this.props.username}</span>
+          {/* <span>username: {this.props.username}</span> */}
           <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
           <DeviceList username={this.props.username} devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
         </div>
