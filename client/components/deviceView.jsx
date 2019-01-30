@@ -39,12 +39,15 @@ const customStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-
-    background: "rgba(3, 4, 5, 0.9)",
+    border: "none",
+    background: "rgba(3, 4, 5,0.6)",
     maxHeight: 'calc(100vh - 210px)',
-    overflowY: 'auto'
+    overflowY: 'auto',
   },
-
+//bacground of Pop up Modal on search
+  overlay:{
+    background: "rgba(27, 57, 77,0.9)",
+  }
 };
 
 export class DeviceView extends Component {
@@ -65,10 +68,10 @@ export class DeviceView extends Component {
     stats: {},
     tempstat: [],
     search: "",
-    isOpen: false,
-    userSearched: "Search For users above",
+       userSearched: "Search For users above",
     SelectedUsers:[],
-    DeviceSharedEmails:[]
+    DeviceSharedEmails:[],
+    EmailsharedDevice:[],
   };
 
   socket;
@@ -115,7 +118,6 @@ export class DeviceView extends Component {
       });
       temp = newDeviceList.filter((users) => { return users !== "|" })
       this.setState({ userSearched: temp })
-      console.log(temp);
     })
   }
 
@@ -125,7 +127,7 @@ export class DeviceView extends Component {
       return (<div>
         {
           this.state.SelectedUsers.map((user, i) => {
-        return  <p style={{float:"left",color:"rgb(127,255,0)",textOverflow:"ellipsis"}}> |{user.email}| </p>  
+        return  <p style={{float:"left",color:"rgb(127,255,0)",textOverflow:"ellipsis" , overflow: "hidden", margin: 0, padding: 0}}> |{user.email}| </p>  
           })
         }
       </div>)
@@ -134,10 +136,22 @@ export class DeviceView extends Component {
   userNameList = () => {
 
     try {
-      return (<div>
+      return (<div style={{height: "20%"}}>
         {
           this.state.userSearched.map((user, i) => {
-            return  <div className="commanderBgPanel commanderBgPanelClickable">{user.email} <input type="checkbox" style={{float:"right"}} onClick={(e) => this.handleActionCall(user)} /> </div>  
+            return  <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{float:"right"}} onClick={(e) => this.handleActionCall(user)} /> </div>  
+          })
+        }
+      </div>)
+    } catch (err) { }
+  }
+
+  emailsEmailedWith = () =>{
+       try {
+      return (<div>
+        {
+          this.state.EmailsharedDevice.map((user, i) => {
+        return  <div className="" style={{color:"rgb(127,255,0)"}}> |{user.email}|<input type="checkbox" style={{float:"right"}}/>  </div>  
           })
         }
       </div>)
@@ -281,6 +295,18 @@ export class DeviceView extends Component {
     }
   }
 
+ShareButton = () => {
+        if (this.state.SelectedUsers.length > 0) {
+            return (
+                <div className="protoButton" 
+                onClick={this.shareDevice} style={{float:"right"}}> <i className="fas fa-share-alt"  /> SHARE DEVICE</div>
+            )
+        } else {
+            return (
+                <div className="protoButton" style={{  opacity: 0.3, cursor: "not-allowed" ,float:"right"}} ><i className="fas fa-share-alt"  />  SHARE DEVICE</div>
+            )
+        }
+          }
   getMenuPageStyle = function (num) {
     if (num == this.state.apiMenu) {
       return { display: "" }
@@ -337,6 +363,10 @@ export class DeviceView extends Component {
     }
   };
 
+  shareDevice = () =>{
+   this.state.EmailsharedDevice=_.clone(this.state.SelectedUsers) //#region 
+    this.setState({ isOpen: !this.state.isOpen })
+  }
   toggleModal = () => {
     this.setState({ isOpen: !this.state.isOpen })
   }
@@ -417,9 +447,8 @@ export class DeviceView extends Component {
 
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
                   <br></br><div>
-                  <button className="protoButton protoButtonClickable" style={{float:"right"}}>Share Device</button></div><hr></hr>
-                   <div >{this. selectedNameList()}</div> <hr></hr><br></br>
-                  <div>
+                  { this.ShareButton()}</div><hr></hr>
+                   <div >{this. selectedNameList()}</div> <hr></hr><br></br>                <div >
                                      {this.userNameList()}
                   </div>
                   <center>
@@ -449,7 +478,9 @@ export class DeviceView extends Component {
                   <h4 className="spot">PLUGINS</h4>
                   {plugins}
                 </div>
-              </div>
+              </div><br></br><div> <h4 className="spot">DEVICE SHARELIST</h4>
+              <div  style={{float:"center",width:"100%"}} className="commanderBgPanel">{this.emailsEmailedWith()}<center><button className="commanderBgPanel commanderBgPanelClickable" style={{height:"20%"}}>BLOCK</button></center></div>
+                      </div>
             </div>
 
             <div className="col"   >
