@@ -306,7 +306,6 @@ export class DeviceView extends Component {
 
   clearState = () => {
     //clears state, but retains history and workflow
-    var idlocal = this.state.devid;
 
     if (this.state.clearStateClicked >= 0) {
       this.setState({ clearStateClicked: 1 });
@@ -323,7 +322,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: idlocal })
+                    body: JSON.stringify({ id: this.state.devid })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.reload()
@@ -399,7 +398,7 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={this.deleteDevice}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() =>this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 

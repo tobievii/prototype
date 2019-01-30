@@ -342,7 +342,7 @@ describe("API", function () {
 
           if (result.error) {
             done(new Error(result.error));
-          } else {
+          } else{
             done();
           }
         });
@@ -358,7 +358,7 @@ describe("API", function () {
 
   describe("MQTT+SOCKETS+REST API", function () {
 
-    /************************************   Register   ****************************************/
+    /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("/api/v3/data/post + SOCKETS + MQTT", function (done: any) {
 
       var mqtt = require('mqtt');
@@ -376,18 +376,23 @@ describe("API", function () {
       function checkSuccess() {
         if (counter == 2) {
           comparePackets();
-        }// }else{
-        //   done(new Error("Error: not all gateways recieved packets"))
-        // }
+        }
       }
 
       function comparePackets(){
         if(mqttpacket === socketpacket){
           if(mqttpacket === originalData){
             if(socketpacket === originalData){
+              socket.disconnect();
               done();
-            } 
-          }
+            }else{
+              done (new Error("Original Data sent and Socket packets recieved not the same!"))
+            }  
+          }else{
+            done (new Error("Original Data sent and Mqtt packets recieved not the same!"))
+          } 
+        }else{
+          done (new Error("Mqtt and Socket packets recieved not the same!"))
         } 
       }
 
@@ -417,11 +422,9 @@ describe("API", function () {
 
           client.subscribe(testAccount.apikey, function (err: any) {
             if (err) { console.log(err) }
-            //console.log("subscribed.")
           })
 
           client.on('message', function (topic: any, message: any) {
-            //console.log(JSON.parse(message.toString()))
             var t = JSON.parse(message.toString());
 
             mqttpacket = JSON.stringify(t.payload.data);
@@ -433,15 +436,104 @@ describe("API", function () {
       });
 
       socket.on("post", (data: any) => {
-        //console.log("SOCKET PACKET RECIEVED")
         socketpacket = JSON.stringify(data.data);
         counter++;
-        checkSuccess()
-        //if (data.data.random == randomnumber ) { done(); } else { done(new Error("error packet did not match") )}        
+        checkSuccess()        
       });
       
     });
-  });
+
+    /************************************   MQTT+SOCKETS+REST API   ****************************************/  
+    it("MQTT + /api/v3/data/post + SOCKETS", function (done: any) {
+      var mqtt = require('mqtt');
+      var client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+testAccount.apikey});
+
+      var socket = require("socket.io-client")("http://localhost:8080")
+
+      var randomnumber = Math.round(Math.random()*10000)
+      var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0} };
+
+      var counter = 0;
+
+      var restpacket: any;
+      var socketpacket: any;
+      var originalData: any;
+
+      function checkSuccess() {
+        if (counter == 2) {
+          comparePackets();
+        }
+      }
+
+      function comparePackets(){
+        if(restpacket === socketpacket){
+          if(restpacket === originalData){
+            if(socketpacket === originalData){
+              socket.disconnect();
+              done();
+            }else{
+              done (new Error("Original Data sent and Socket packets recieved not the same!"))
+            }  
+          }else{
+            done (new Error("Original Data sent and Mqtt packets recieved not the same!"))
+          } 
+        }else{
+          done (new Error("Mqtt and Socket packets recieved not the same!"))
+        } 
+      }
+
+      socket.on("connect", () => {
+        socket.emit("join", testAccount.apikey ); 
+        
+        /*************************** MQTT Connect *************************************/
+
+        client.on('connect', function () {
+
+          client.subscribe(testAccount.apikey, function (err: any) {
+            if (err) { 
+              console.log(err) 
+            }else{
+              client.publish(testAccount.apikey, JSON.stringify({id: testAccount.testDev, data: dataVar}) );
+              originalData =  JSON.stringify(dataVar);
+              var testDevice: any = { id: testAccount.testDev };
+
+              trex.restJSON(
+                {
+                  apikey: testAccount.apikey,
+                  method: "POST",
+                  path: testAccount.server + "/api/v3/view",
+                  body: testDevice,
+                  port: testAccount.port
+                },
+                (err: Error, result: any) => {
+                  if(err){
+                    console.log(err)
+                  }else{
+                    restpacket = JSON.stringify(result.data)
+                    counter++;
+                  } 
+                }
+              );
+            }   
+          })
+        })
+      });
+
+      socket.on("post", (data: any) => {
+        socketpacket = JSON.stringify(data.data);
+        counter++;
+        checkSuccess()       
+      });
+
+      
+    });
+
+    /************************************   MQTT+SOCKETS+REST API   ****************************************/  
+    it("SOCKETS  +  MQTT + /api/v3/data/post", function (done: any) {
+      done()
+    });
+
+  });  
 });
 
 function generateDifficult(count: number) {
