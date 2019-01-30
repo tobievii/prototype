@@ -53,7 +53,7 @@ function usersNames():Promise<any> {
       for (var user of userList) {
 
 
-        nameList.push({ email: user.email, username: user.username});
+        nameList.push({ email: user.email, username: user.username, selected:"deselected"});
       }
       resolve(nameList)
     })

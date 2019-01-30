@@ -66,7 +66,9 @@ export class DeviceView extends Component {
     tempstat: [],
     search: "",
     isOpen: false,
-    userSearched: "Search For users above"
+    userSearched: "Search For users above",
+    SelectedUsers:[],
+    DeviceSharedEmails:[]
   };
 
   socket;
@@ -81,6 +83,24 @@ export class DeviceView extends Component {
       })
     });
   }
+
+ handleActionCall = (clickdata) => {
+    var newEmailList = _.clone(this.state.userSearched)
+ var temp = [];
+     for (var dev in newEmailList) {
+       if (newEmailList[dev] == clickdata) {
+       if (clickdata.selected == "deselected") {
+          newEmailList[dev].selected ="selected";
+            }
+  else{
+     newEmailList[dev].selected ="deselected";
+           }
+  temp = newEmailList.filter((users) => { return users.selected !== "deselected" })
+  this.state.SelectedUsers=_.clone(temp)
+     }
+    }
+   }
+
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
       var temp = [];
@@ -88,7 +108,7 @@ export class DeviceView extends Component {
       this.state.stats.userList.map((person, i) => {
         temp = [...temp, person.email]
         if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
-          newDeviceList.push(person.email);
+          newDeviceList.push(person);
         } else {
           newDeviceList.push("|");
         }
@@ -98,13 +118,26 @@ export class DeviceView extends Component {
       console.log(temp);
     })
   }
+
+    selectedNameList = () => {
+
+    try {
+      return (<div>
+        {
+          this.state.SelectedUsers.map((user, i) => {
+        return  <p style={{float:"left",color:"rgb(127,255,0)",textOverflow:"ellipsis"}}> |{user.email}| </p>  
+          })
+        }
+      </div>)
+    } catch (err) { }
+  }
   userNameList = () => {
 
     try {
       return (<div>
         {
           this.state.userSearched.map((user, i) => {
-            return <Link key={i} to >  <div className="commanderBgPanel commanderBgPanelClickable">{user}</div> <br></br>   </Link>
+            return  <div className="commanderBgPanel commanderBgPanelClickable">{user.email} <input type="checkbox" style={{float:"right"}} onClick={(e) => this.handleActionCall(user)} /> </div>  
           })
         }
       </div>)
@@ -384,9 +417,11 @@ export class DeviceView extends Component {
                     Search For users to share  with<br></br>
 
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-                  <br></br>
+                  <br></br><div>
+                  <button className="protoButton protoButtonClickable" style={{float:"right"}}>Share Device</button></div><hr></hr>
+                   <div >{this. selectedNameList()}</div> <hr></hr><br></br>
                   <div>
-                  {this.userNameList()}
+                                     {this.userNameList()}
                   </div>
                   <center>
                   {/* <button>Share Device</button> */}
