@@ -1,6 +1,6 @@
 # Prototype
 
-test
+test2
 
 Live: https://prototype.iotnxt.io
 Discord: https://discord.gg/rTQmvbT
