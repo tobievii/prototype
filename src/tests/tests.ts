@@ -89,44 +89,6 @@ describe("API", function () {
       req.end();
     });
 
-    /************************************   MQTT   ****************************************/
-    // it("/MQTT  connection/", (done) => {
-    //   testvalue = 0;
-    //   var timeout = setTimeout(() => {
-    //     done("error timeout")
-    //   }, 2000)
-
-    //   var mqttconnection = new MqttProto(testAccount.apikey)
-
-    //   mqttconnection.on("connect", () => {
-    //     //var test = mqttconnection.postData();
-
-    //     //if(test){
-    //       clearTimeout(timeout)
-    //       done()
-    //     // }else{
-    //     //   done(new Error("Could Not post to device.")) 
-    //     // } 
-    //   })
-    // })
-
-    /************************************   SocketIo   ****************************************/
-
-    // it("Socket connection", (done) => {
-
-    //   var timeout = setTimeout(() => {
-    //     done("error timeout")
-    //   }, 2000)
-
-    //   socketconnection = new SocketProto(testAccount.apikey);
-    //   socketconnection.on("connect", () => {
-    //     console.log("successfully connected to socket prototype")
-    //     clearTimeout(timeout)
-    //     done()
-    //   })
-    // })
-    
-
     /************************************   Post   ****************************************/
     it("/api/v3/data/post", function (done: any) {
       testvalue = "DEV" + Math.round(Math.random() * 1000);
@@ -524,13 +486,106 @@ describe("API", function () {
         counter++;
         checkSuccess()       
       });
-
-      
     });
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/  
     it("SOCKETS  +  MQTT + /api/v3/data/post", function (done: any) {
-      done()
+      var mqtt = require('mqtt');
+      var client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+testAccount.apikey});
+
+      var socket = require("socket.io-client")("http://localhost:8080")
+
+      var randomnumber = Math.round(Math.random()*10000)
+      var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0} };
+
+      var counter = 0;
+
+      var restpacket: any;
+      var mqttpacket: any;
+      var socketpacket: any;
+      var originalData: any;
+
+      function checkSuccess() {
+        if (counter == 2) {
+          comparePackets();
+        }
+      }
+
+      // if(randomnumber){
+      //   console.log("hit")
+      // }
+
+      function comparePackets(){
+        if(restpacket === socketpacket){
+          if(restpacket === originalData){
+            if(socketpacket === originalData){
+              socket.disconnect();
+              done();
+            }else{
+              done (new Error("Original Data sent and Socket packets recieved not the same!"))
+            }  
+          }else{
+            done (new Error("Original Data sent and Rest packets recieved not the same!"))
+          } 
+        }else{
+          done (new Error("Rest and Socket packets recieved not the same!"))
+        } 
+      }
+
+      socket.on("connect", () => {
+        socket.emit("join", testAccount.apikey ); 
+        
+        /*************************** MQTT Connect *************************************/
+
+        client.on('connect', function () {
+
+          client.subscribe(testAccount.apikey, function (err: any) {
+            if (err) { 
+              console.log(err) 
+            }else{
+              //client.publish(testAccount.apikey, JSON.stringify({id: testAccount.testDev, data: dataVar}) );
+              socket.emit("post", {id: testAccount.apikey, data: dataVar } )
+
+              originalData =  JSON.stringify(dataVar);
+              // console.log(originalData+"---------------------original data sent")
+              var testDevice: any = { id: testAccount.testDev };
+
+              trex.restJSON(
+                {
+                  apikey: testAccount.apikey,
+                  method: "POST",
+                  path: testAccount.server + "/api/v3/view",
+                  body: testDevice,
+                  port: testAccount.port
+                },
+                (err: Error, result: any) => {
+                  if(err){
+                    console.log(err)
+                  }else{
+                    restpacket = JSON.stringify(result.data)
+                    // console.log(restpacket+"----------------------------rest")
+                    counter++;
+                  } 
+                }
+              );
+
+              client.on('message', function (topic: any, message: any) {
+                var t = JSON.parse(message.toString());
+    
+                mqttpacket = JSON.stringify(t.payload.data);
+                // console.log(mqttpacket+"--------------------------mqtt")
+              })
+            }   
+          })
+        })
+      });
+
+      socket.on("post", (data: any) => {
+        socketpacket = JSON.stringify(data.data);
+        // console.log(socketpacket+"--------------------------socket")
+        counter++;
+        checkSuccess()       
+      });
     });
 
   });  
