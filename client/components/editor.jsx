@@ -275,7 +275,7 @@ export class Editor extends React.Component {
                             <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>statesObj</span>                        
                         </div> */}
 
-                        <div style={{ backgroundColor: "black", width: "90%" }}>
+                        <div style={{ backgroundColor: "black",}}>
                             <MonacoEditor
                                 width="auto"
                                 height="900"
