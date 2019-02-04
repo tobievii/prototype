@@ -44,8 +44,8 @@ const customStyles = {
     maxHeight: 'calc(100vh - 210px)',
     overflowY: 'auto',
   },
-//bacground of Pop up Modal on search
-  overlay:{
+  //bacground of Pop up Modal on search
+  overlay: {
     background: "rgba(27, 57, 77,0.9)",
   }
 };
@@ -68,10 +68,10 @@ export class DeviceView extends Component {
     stats: {},
     tempstat: [],
     search: "",
-       userSearched: "Search For users above",
-    SelectedUsers:[],
-    DeviceSharedEmails:[],
-    EmailsharedDevice:[],
+    userSearched: "Search For users above",
+    SelectedUsers: [],
+    DeviceSharedEmails: [],
+    EmailsharedDevice: [],
   };
 
   socket;
@@ -87,22 +87,22 @@ export class DeviceView extends Component {
     });
   }
 
- handleActionCall = (clickdata) => {
+  handleActionCall = (clickdata) => {
     var newEmailList = _.clone(this.state.userSearched)
- var temp = [];
-     for (var dev in newEmailList) {
-       if (newEmailList[dev] == clickdata) {
-       if (clickdata.selected == "deselected") {
-          newEmailList[dev].selected ="selected";
-            }
-  else{
-     newEmailList[dev].selected ="deselected";
-           }
-  temp = newEmailList.filter((users) => { return users.selected !== "deselected" })
-  this.state.SelectedUsers=_.clone(temp)
-     }
+    var temp = [];
+    for (var dev in newEmailList) {
+      if (newEmailList[dev] == clickdata) {
+        if (clickdata.selected == "deselected") {
+          newEmailList[dev].selected = "selected";
+        }
+        else {
+          newEmailList[dev].selected = "deselected";
+        }
+        temp = newEmailList.filter((users) => { return users.selected !== "deselected" })
+        this.state.SelectedUsers = _.clone(temp)
+      }
     }
-   }
+  }
 
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
@@ -121,13 +121,13 @@ export class DeviceView extends Component {
     })
   }
 
-    selectedNameList = () => {
+  selectedNameList = () => {
 
     try {
       return (<div>
         {
           this.state.SelectedUsers.map((user, i) => {
-        return  <p style={{float:"left",color:"rgb(127,255,0)",textOverflow:"ellipsis" , overflow: "hidden", margin: 0, padding: 0}}> |{user.email}| </p>  
+            return <p style={{ float: "left", color: "rgb(127,255,0)", textOverflow: "ellipsis", overflow: "hidden", margin: 0, padding: 0 }}> |{user.email}| </p>
           })
         }
       </div>)
@@ -136,22 +136,22 @@ export class DeviceView extends Component {
   userNameList = () => {
 
     try {
-      return (<div style={{height: "20%"}}>
+      return (<div style={{ height: "20%" }}>
         {
           this.state.userSearched.map((user, i) => {
-            return  <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{float:"right"}} onClick={(e) => this.handleActionCall(user)} /> </div>  
+            return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
           })
         }
       </div>)
     } catch (err) { }
   }
 
-  emailsEmailedWith = () =>{
-       try {
+  emailsEmailedWith = () => {
+    try {
       return (<div>
         {
           this.state.EmailsharedDevice.map((user, i) => {
-        return  <div className="" style={{color:"rgb(127,255,0)"}}> |{user.email}|<input type="checkbox" style={{float:"right"}}/>  </div>  
+            return <div className="" style={{ color: "rgb(127,255,0)" }}> |{user.email}|<input type="checkbox" style={{ float: "right" }} />  </div>
           })
         }
       </div>)
@@ -198,13 +198,13 @@ export class DeviceView extends Component {
     fetch("/api/v3/view", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
-    }).then(response => response.json()).then(view => { 
+    }).then(response => response.json()).then(view => {
       if (view.error) {
         console.log(view.error)
       } else {
         this.setState({ view })
       }
-      
+
     }).catch(err => console.error(err.toString()));
 
     // p.getView(this.props.devid, (view) => {
@@ -221,15 +221,15 @@ export class DeviceView extends Component {
     fetch("/api/v3/state", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
-    }).then(response => response.json()).then(state => { 
-      this.setState({ state }, ()=>{
+    }).then(response => response.json()).then(state => {
+      this.setState({ state }, () => {
         if (state.error) {
           console.log(state.error)
         } else {
           this.socket.emit("join", state.key)
         }
-        
-      })  
+
+      })
     }).catch(err => console.error(err.toString()));
 
   }
@@ -295,18 +295,18 @@ export class DeviceView extends Component {
     }
   }
 
-ShareButton = () => {
-        if (this.state.SelectedUsers.length > 0) {
-            return (
-                <div className="protoButton" 
-                onClick={this.shareDevice} style={{float:"right"}}> <i className="fas fa-share-alt"  /> SHARE DEVICE</div>
-            )
-        } else {
-            return (
-                <div className="protoButton" style={{  opacity: 0.3, cursor: "not-allowed" ,float:"right"}} ><i className="fas fa-share-alt"  />  SHARE DEVICE</div>
-            )
-        }
-          }
+  ShareButton = () => {
+    if (this.state.SelectedUsers.length > 0) {
+      return (
+        <div className="protoButton"
+          onClick={this.shareDevice} style={{ float: "right" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
+      )
+    } else {
+      return (
+        <div className="protoButton" style={{ opacity: 0.3, cursor: "not-allowed", float: "right" }} ><i className="fas fa-share-alt" />  SHARE DEVICE</div>
+      )
+    }
+  }
   getMenuPageStyle = function (num) {
     if (num == this.state.apiMenu) {
       return { display: "" }
@@ -363,8 +363,8 @@ ShareButton = () => {
     }
   };
 
-  shareDevice = () =>{
-   this.state.EmailsharedDevice=_.clone(this.state.SelectedUsers) //#region 
+  shareDevice = () => {
+    this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
@@ -419,24 +419,24 @@ ShareButton = () => {
 
     return (
       <div>
-        <div className="container-fluid protoMenu commanderBgPanel" style={{ margin: 10 }}>
+        <div className="container-fluid  commanderBgPanel" >
           <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
 
-            <div className="col">
+            <div className="col-6">
               <h3>{this.state.devid}</h3>
               <span className="faded" >{this.state.timeago}</span>
             </div>
 
-            <div className="col" style={{ flex: "0 0 400px", padding: 0 }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "33%", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() =>this.deleteDevice(this.state.devid)}>
+            <div className="col-6" >
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "30%", float: "right", fontSize: 10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", float: "right", fontSize: 10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "31%", float: "left", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100xp", float: "right", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
@@ -447,53 +447,46 @@ ShareButton = () => {
 
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
                   <br></br><div>
-                  { this.ShareButton()}</div><hr></hr>
-                   <div >{this. selectedNameList()}</div> <hr></hr><br></br>                <div >
-                                     {this.userNameList()}
+                    {this.ShareButton()}</div><hr></hr>
+                  <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
+                    {this.userNameList()}
                   </div>
                   <center>
-                  {/* <button>Share Device</button> */}
+                    {/* <button>Share Device</button> */}
                   </center>
                 </Modal>
               </center>
               </div>
             </div>
           </div>
-
+          
+          <hr />
 
           <div className="row" >
-            <div className="col-9" style={{ flex: "0 0 400px" }} >
-              <div>
-                <div style={{ marginBottom: 20 }}>
-                  <h4 className="spot">DEVICE DATA</h4>
-                  <DataView data={this.state.state} />
-                </div>
+            <div className="col-12" >
+              <Dashboard state={this.state.state} />
+            </div>
+          </div>
 
-                <div>
-                  <h4 className="spot">LATEST STATE</h4>
-                  {this.drawState()}
-                </div>
+          <div className="row" >
+            <div className="col-3" >
+              <h4 className="spot">DEVICE DATA</h4>
+              <DataView data={this.state.state} />
 
-                <div>
-                  <h4 className="spot">PLUGINS</h4>
-                  {plugins}
-                </div>
-              </div><br></br><div> <h4 className="spot">DEVICE SHARELIST</h4>
-              <div  style={{float:"center",width:"100%"}} className="commanderBgPanel">{this.emailsEmailedWith()}<center><button className="commanderBgPanel commanderBgPanelClickable" style={{height:"20%"}}>BLOCK</button></center></div>
-                      </div>
             </div>
 
-            <div className="col"   >
-              <h4 style={{ color: " #f3353a" }} >DASHBOARD</h4>
-              <div style={{ backgroundColor: "transparent" }} className="col-9" >
-                <Dashboard state={this.state.state} />
-              </div>
-
+            <div className="col-6">
               <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
-              <div className="col-9">
+              
                 <Editor state={this.state.state} />
-              </div>
+              
             </div>
+
+            <div className="col-3">
+              <h4 className="spot">PLUGINS</h4>
+              {plugins}
+            </div>
+
           </div>
         </div>
       </div>
