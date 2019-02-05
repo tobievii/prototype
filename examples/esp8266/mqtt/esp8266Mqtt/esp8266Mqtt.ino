@@ -3,6 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+// test commit
+
 const char* ssid = "IOT.NXT.DEV";
 const char* password = "10TnxtD3v";
 const char* mqttServer = "172.16.3.28";
