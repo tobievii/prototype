@@ -2,6 +2,9 @@
 
 import { describe, it } from "mocha";
 import * as trex from "../utils";
+import { configure, shallow } from 'enzyme';
+import { expect } from 'chai';
+import { signInFromWeb } from '../accounts'
 
 var testAccount = {
   email: "",
@@ -366,14 +369,14 @@ describe("API", function () {
         /*************************** MQTT Connect *************************************/
 
         client.on('connect', function () {
-          var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0} };
+          var dataVar = { random : randomnumber, temp: {cold: Math.round(Math.random()*10000), hot: Math.round(Math.random()*10000)} };
           /*************************** Http POST *************************************/
           trex.restJSON(
             {
               apikey: testAccount.apikey,
               method: "POST",
               path: testAccount.server + "/api/v3/data/post",
-              body: {id:"mqttsockettest", data:dataVar},
+              body: {id:testAccount.testDev, data:dataVar},
               port: testAccount.port
             },(err: Error, result: any) => {
               if (err) { done(err); }
@@ -383,21 +386,23 @@ describe("API", function () {
           originalData =  JSON.stringify(dataVar);
 
           client.subscribe(testAccount.apikey, function (err: any) {
-            if (err) { console.log(err) }
+            if (err) { done(err) }
           })
 
           client.on('message', function (topic: any, message: any) {
+            //console.log(message+"-------mqtt")
             var t = JSON.parse(message.toString());
 
             mqttpacket = JSON.stringify(t.data);
+            //console.log(mqttpacket+"---------------mqtt1")
             counter++;
             checkSuccess()
           })
-      
         })
       });
 
       socket.on("post", (data: any) => {
+        //console.log(JSON.stringify(data)+"-------------------socket")
         socketpacket = JSON.stringify(data.data);
         counter++;
         checkSuccess()        
@@ -472,6 +477,7 @@ describe("API", function () {
                     console.log(err)
                   }else{
                     restpacket = JSON.stringify(result.data)
+                   // console.log(restpacket+"-----------Rest1")
                     counter++;
                   } 
                 }
@@ -488,12 +494,124 @@ describe("API", function () {
       });
     });
 
-    
+    /************************************   MQTT+SOCKETS+REST API   ****************************************/  
+    it("SOCKETS  +  MQTT + /api/v3/data/post", function (done: any) {
+      var mqtt = require('mqtt');
+      var client  = mqtt.connect('mqtt://localhost', {username:"api", password:"key-"+testAccount.apikey});
 
-  });  
+      var socket = require("socket.io-client")("http://localhost:8080")
+
+      var randomnumber = Math.round(Math.random()*10000)
+      var dataVar = { 
+        random : randomnumber, 
+        temp: {cold: 1, hot: 0} 
+      };
+
+      var counter = 0;
+
+      var restpacket: any;
+      var mqttpacket: any;
+      var socketpacket: any;
+      var originalData: any;
+
+      socket.on("connect", () => {
+        socket.emit("join", testAccount.apikey ); 
+        
+        /*************************** MQTT Connect *************************************/
+
+        client.on('connect', function () {
+
+          client.subscribe(testAccount.apikey, function (err: any) {
+            if (err) { 
+              console.log(err) 
+            }else{
+              //client.publish(testAccount.apikey, JSON.stringify({id: testAccount.testDev, data: dataVar}));
+              
+            }   
+          })
+
+          socket.emit("post", {id: testAccount.testDev, data: dataVar })
+          originalData = JSON.stringify(dataVar);
+          //console.log(originalData+"---------------------original data sent")
+
+          
+        })
+
+        client.on('message', function (topic: any, message: any){
+          var t = JSON.parse(message.toString());
+          mqttpacket = JSON.stringify(t.data);
+          //console.log(message+"--------------------------mqtt")
+          checkSuccess()
+        })
+
+      });
+
+      socket.on("post", (data: any) => {
+        var testDevice: any = { id: testAccount.testDev };
+          
+        trex.restJSON(
+          {
+            apikey: testAccount.apikey,
+            method: "POST",
+            path: testAccount.server + "/api/v3/view",
+            body: testDevice,
+            port: testAccount.port
+          },
+          (err: Error, result: any) => {
+            if(err){
+              console.log(err)
+            }else{
+              restpacket = JSON.stringify(result.data)
+              //console.log(JSON.stringify(result)+"----------------------------rest")
+              counter++;
+              checkSuccess();
+            } 
+          }
+        ); 
+        socketpacket = JSON.stringify(data.data);
+        //console.log(socketpacket+"--------------------------socket")
+        counter++;
+        checkSuccess()     
+      });
+
+      function checkSuccess() {
+        if (counter >= 2) {
+          comparePackets();
+        }
+      }
+
+      function comparePackets(){
+        if(restpacket === socketpacket){
+          if(restpacket === originalData){
+            if(socketpacket === originalData){
+              if(mqttpacket === originalData){
+                socket.disconnect();
+                done();
+              }else{
+                done (new Error("Original Data sent and MQTT packets recieved not the same!"))
+              }
+            }else{
+              done (new Error("Original Data sent and Socket packets recieved not the same!"))
+            }  
+          }else{
+            done (new Error("Original Data sent and Rest packets recieved not the same!"))
+          }
+        }else{
+           done (new Error("Rest and Socket packets recieved not the same!"))
+         } 
+      }
+    });
+  });
+
 });
 
-function generateDifficult(count: number) {
+describe("UI Test", function(){
+  it('Contains Login Button', function(done: any){
+    done();
+  });
+});
+
+function generateDifficult(count: number){
   var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
   var str = '';
   for (var i = 0; i < count; i++){
