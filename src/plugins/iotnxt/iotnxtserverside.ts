@@ -7,11 +7,12 @@ export var deviceTrees: any = {};
 export var iotnxtqueues: any = {};
 
 import { version } from "../../config";
+import { userInfo } from "os";
 
 var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 
 var enablePackets = false;
-
+  var person ="";
 export function handlePacket(db:any, packet: any, cb: any) {
 
   
@@ -36,7 +37,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // INITIALIZE ROUTES
 
   app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-    addgateway(db, req.body, (err: Error, result: any) => {
+    addgateway(db, req.body,req.user, (err: Error, result: any,) => {
+      person=req.user;
       if (err) res.json({err:err.toString()});
       connectgateway(db, req.body, eventHub, (errC:any, resultC:any)=>{})
       res.json(result);      
@@ -52,7 +54,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   });
 
   app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
-    getgateways(db, (err: Error, gateways: any) => {
+    getgateways(db,req.user, (err: Error, gateways: any) => {
       if (err) res.json({err:err.toString()});
 
       for (var g in gateways) {
@@ -113,7 +115,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
     console.log("CONNECTING QUEUES")
     // CONNECT ALL GATEWAYS AT INIT
-    getgateways(db, (err: Error, gateways: any) => {
+    getgateways(db,person, (err: Error, gateways: any) => {
       if (gateways) {
         for (var g in gateways) {        
           connectgateway(db, gateways[g], eventHub, (err:any, result:any)=>{ })
@@ -222,15 +224,22 @@ function connectgateway(db:any, gatewayToconnect:any, eventHub:any, cb:any) {
 }
 
 
-function addgateway(db: any, gateway: any, cb: any) {
+function addgateway(db: any, gateway: any,user:any, cb: any) {
+    db.plugins_iotnxt.aggregate( [
+  {
+    $addFields: { "userID": null}
+  }
+] )
   gateway.default = false; // defaults to not the default
   gateway.connected = false;
   gateway.unique = generateDifficult(64);
-  gateway.type = "gateway"
+  gateway.type = "gateway";
+gateway.userID=user._id
   db.plugins_iotnxt.save(gateway,(err: Error, result: any) => {cb(err, result);});
 }
 
-function getgateways(db: any, cb: any) {
+function getgateways(db: any, user:any,cb: any) {
+  if(user.level>=100){
   db.plugins_iotnxt.find({ type: "gateway" }, (err: Error, data: any) => {
     if (err) { console.error("iotnxt plugin cannot get gateways");
       cb(err, undefined);
@@ -242,6 +251,22 @@ function getgateways(db: any, cb: any) {
       cb(undefined, data);
     }
   });
+ }
+
+ if(user.level<100){
+  db.plugins_iotnxt.find({ type: "gateway",userID: user._id }, (err: Error, data: any) => {
+    if (err) { console.error("iotnxt plugin cannot get gateways");
+      cb(err, undefined);
+    }
+
+    if (data == null) {
+      cb(undefined, []);
+    } else {
+      cb(undefined, data);
+    }
+  });
+ }
+
 }
 
 function getserverdefaultgateway(db: any, cb: any) {
@@ -318,7 +343,7 @@ function updategateway(db:any, gateway:any, update:any, cb:any) {
 
 // Calculates the device object for iotnxt queue registration
 function calcDeviceTree(db: any, gateway: any, cb: any) {
-  getgateways(db, (err: Error, gateways: any) => {
+  getgateways(db,person, (err: Error, gateways: any) => {
     if (gateways) {
       var deviceTree: any = {};
       var results = 0;
