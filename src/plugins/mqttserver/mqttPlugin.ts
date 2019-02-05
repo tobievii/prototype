@@ -6,6 +6,8 @@ import { mqttConnection } from "./mqttConnection"
 
 import * as accounts from "../../accounts"
 
+import * as _ from "lodash"
+
 export var mqttConnections:any = [];
 
 export function handlePacket(db:any, packet:any, cb:any) {
@@ -14,7 +16,16 @@ export function handlePacket(db:any, packet:any, cb:any) {
     for (var c in mqttConnections) {
         //mqttConnections[c].publish("glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9", packet)
         if (mqttConnections[c].apikey == packet.apikey) {
-            mqttConnections[c].publish(packet.apikey, JSON.stringify(packet))
+            console.log("have mqtt connection to send to ")
+            var temp = _.clone(packet.payload);
+            delete temp["meta"]
+            delete temp.timestamp
+            if (temp.err != undefined) { 
+                if (temp.err == "") {
+                    delete temp.err
+                }
+            }
+            mqttConnections[c].publish(packet.apikey, JSON.stringify(temp))
         }    
     }
 }

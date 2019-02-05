@@ -7,6 +7,8 @@ import { EventEmitter } from "events";
 import * as net from "net"
 import * as accounts from "../../accounts"
 
+import { log } from "../../utils"
+
 export class mqttConnection extends EventEmitter {
     socket:net.Socket;
     apikey:string = "";
@@ -23,14 +25,18 @@ export class mqttConnection extends EventEmitter {
     }
 
     publish = (topic:string, data:any) => {
+        
 
         if (typeof data != "string" ) {
             data = JSON.stringify(data)
         }
 
         try {
+            console.log("MQTT publishing to client")
             this.socket.write(buildMqttPublishPacket(topic, data));
-        } catch (err) {}
+        } catch (err) {
+            console.log(err);
+        }
         
 
         //this.socket.write(Buffer.from("30550020676c7035786d316a7077687477646e73796b76356e76346868777270317879397b226964223a2274657374446576696365222c2264617461223a7b2261223a302e393232373733393235393631383039337d7d", "hex"))
@@ -40,16 +46,16 @@ export class mqttConnection extends EventEmitter {
         // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180831
         return (data:Buffer) => {         
 
-            console.log("\n---- mqtt packet ---- ")
+            //console.log("\n---- mqtt packet ---- ")
             var packetTypeHex = data.slice(0,1).toString('hex')[0]
             var mqttPacketType =  Buffer.from('0'+packetTypeHex, 'hex')[0];
             //console.log("mqttPacketType:"+mqttPacketType);
             var remainingLength = data.readUInt8(1)
-            console.log("remainLength:"+remainingLength)
-            console.log("total Length"+data.length)
+            // console.log("remainLength:"+remainingLength)
+            // console.log("total Length"+data.length)
 
-            console.log(data.toString("hex"));
-            console.log(data.toString())
+            // console.log(data.toString("hex"));
+            // console.log(data.toString())
 
             if (mqttPacketType == 1) {
 
@@ -96,7 +102,7 @@ export class mqttConnection extends EventEmitter {
                     apikey = apikey[1]
                     accounts.checkApiKey(apikey, (err:Error, result:any)=>{
                         
-                        console.log("CHECK API KEY...")
+                        
 
                         if (err) { 
                             console.log("NOT VALID")
@@ -105,13 +111,13 @@ export class mqttConnection extends EventEmitter {
                             return;
                         }
                         
-                        console.log("VALID!")
+                        
                         this.apikey = apikey;
                         this.emit("connect", connect)                
                         socket.write(" \u0002\u0000\u0000");
                     })
                 } else {
-                    console.log("invalid mqtt credentials")
+                    
                     socket.destroy();
                 }
 
@@ -123,7 +129,7 @@ export class mqttConnection extends EventEmitter {
             }
 
             if (mqttPacketType == 3) { 
-                console.log("PUBLISH") 
+                log("PUBLISH") 
                 var parsed = parseMqttPublish(data)
                 // //console.log(data.toString("hex"))
                 // console.log( data.slice(2,3).toString('hex'))
@@ -263,14 +269,14 @@ function getRemainingLength(data:any) {
     var total = 0;
     var bytenum = 0;
     if (data[1] <= 127) {
-        console.log(data[1].toString(16))
+        
         total += data[1]
         bytenum = 1;
     } else {
-        console.log(data[1].toString(16))
+        
         bytenum = 2;
         total += data[1] - 128
-        console.log(data[2].toString(16))
+        
         if (data[2] <= 127) {
           
             total += data[2] * 128
@@ -293,14 +299,14 @@ function getRemainingLength(data:any) {
     var total = 0;
     var bytenum = 0;
     if (data[1] <= 127) {
-        console.log(data[1].toString(16))
+        
         total += data[1]
         bytenum = 1;
     } else {
-        console.log(data[1].toString(16))
+        
         bytenum = 2;
         total += data[1] - 128
-        console.log(data[2].toString(16))
+        
         if (data[2] <= 127) {
           
             total += data[2] * 128
@@ -330,6 +336,12 @@ function checkBit(data:Buffer,bitnum:number) {
 
 
 function buildMqttPublishPacket(topic:any, data:any) {
+
+    console.log("----------")
+    console.log(topic);
+    console.log(data);
+    console.log("----------")
+
     var totalLength = topic.length + data.length + 2
     var remainingdataBuffer;
     
@@ -355,6 +367,8 @@ function buildMqttPublishPacket(topic:any, data:any) {
       Buffer.from(data)
     ])
   
+
+
     return pubbuf;
   }
 
