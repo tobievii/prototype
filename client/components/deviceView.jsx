@@ -73,7 +73,8 @@ export class DeviceView extends Component {
     DeviceSharedEmails: [],
     EmailsharedDevice: [],
    display:"",
-    EditorButton:"HIDE EDITOR"
+    EditorButton:"HIDE EDITOR",
+    DeviceDataSize:"col-3"
   };
 
   socket;
@@ -396,10 +397,12 @@ export class DeviceView extends Component {
 if(this.state.display == "none"){
      this.state.display=""
      this.state.EditorButton="HIDE EDITOR";
+     this.state.DeviceDataSize="col-3"
    }
     else{
      this.state.display="none";
      this.state.EditorButton="SHOW EDITOR";
+     this.state.DeviceDataSize="col-6"
    }
   }
 
@@ -452,6 +455,8 @@ if(this.state.display == "none"){
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
+               
+<div  onClick={this.ShowEditor} style={{width: "auto", float: "right", marginRight: 10, fontSize: 10}} className="commanderBgPanel commanderBgPanelClickable"  >{this.state.EditorButton}</div>
               <div ><center>
                 <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
                   <center style={{ color: "white" }}>
@@ -481,10 +486,9 @@ if(this.state.display == "none"){
               <Dashboard state={this.state.state} />
             </div>
           </div>
-          <center>
-<div  onClick={this.ShowEditor} style={{width:"10%",fontSize: "100%" }} className="commanderBgPanel commanderBgPanelClickable"  >{this.state.EditorButton}</div><br></br></center>
+         
           <div className="row"  >
-            <div className="col-3" >
+            <div className={this.state.DeviceDataSize}>
               <h4 className="spot">DEVICE DATA</h4>
               <DataView data={this.state.state} />
 
