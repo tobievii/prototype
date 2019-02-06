@@ -188,7 +188,7 @@ export class StatesViewer extends Component {
 
         this.setState({ devicesView: states }, () => {
           //this.socketConnectDevices();
-          //this.sort();
+          this.sort();
         })
       })
     })
@@ -231,7 +231,7 @@ export class StatesViewer extends Component {
       }else{
         this.setState({ devicesServer: devices })
         this.setState({ devicesView: devices }, () => {
-          this.sort()
+          // this.sort()
         })
       }
     }
