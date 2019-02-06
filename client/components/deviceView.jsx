@@ -72,8 +72,8 @@ export class DeviceView extends Component {
     SelectedUsers: [],
     DeviceSharedEmails: [],
     EmailsharedDevice: [],
-   display:"",
-    EditorButton:"HIDE EDITOR",
+    display:"",
+    EditorButton:" HIDE EDITOR",
     DeviceDataSize:"col-3"
   };
 
@@ -394,7 +394,7 @@ export class DeviceView extends Component {
   }
  ShowEditor = () =>{
  
-if(this.state.display == "none"){
+  if(this.state.display == "none"){
      this.state.display=""
      this.state.EditorButton="HIDE EDITOR";
      this.state.DeviceDataSize="col-3"
@@ -456,7 +456,9 @@ if(this.state.display == "none"){
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
                
-<div  onClick={this.ShowEditor} style={{width: "auto", float: "right", marginRight: 10, fontSize: 10}} className="commanderBgPanel commanderBgPanelClickable"  >{this.state.EditorButton}</div>
+              <div  onClick={this.ShowEditor} style={{width: "auto", float: "right", marginRight: 10, fontSize: 10}} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i class="fas fa-edit"></i> {this.state.EditorButton}
+              </div>
               <div ><center>
                 <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
                   <center style={{ color: "white" }}>
