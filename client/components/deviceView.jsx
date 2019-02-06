@@ -266,7 +266,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id })
+                    body: JSON.stringify({ id: id , username: this.props.username})
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.href = "/"
@@ -350,7 +350,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: this.state.devid })
+                    body: JSON.stringify({ id: this.state.devid, username: this.props.username})
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.reload()
