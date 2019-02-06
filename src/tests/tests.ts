@@ -2,9 +2,6 @@
 
 import { describe, it } from "mocha";
 import * as trex from "../utils";
-import { configure, shallow } from 'enzyme';
-import { expect } from 'chai';
-import { signInFromWeb } from '../accounts'
 
 var testAccount = {
   email: "",
