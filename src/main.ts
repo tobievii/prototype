@@ -392,7 +392,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
-
   if (req.body.username) { 
 
     if (req.body.username != req.user.username) {
@@ -664,23 +663,49 @@ app.get("/api/v3/state", (req: any, res: any) => {
 });
 
 app.post("/api/v3/state/delete", (req: any, res: any) => {
-  if ((req.user) && (req.user.level) > 0) {
-    if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+  if (req.body.username) { 
+    if (req.body.username != req.user.username) {
+      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
+    } 
 
-    var meta = {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      method: req.method
-    }
+    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+      if (user) {
+        var meta = {
+          ip: req.ip,
+          userAgent: req.get('User-Agent'),
+          method: req.method
+        }
 
-    if (req.body.id) {
-      db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
-        if (err) res.json(err);
-        if (removed) res.json(removed);
-      })
+        if (req.body.id) {
+          db.states.remove({ apikey: user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+            if (err) res.json(err);
+            if (removed) res.json(removed);
+          })
+        } else {
+          res.json({ result: "auth failed" });
+        }
+      }
+    })
+
+  }else{
+    if ((req.user) && (req.user.level) > 0) {
+      if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+
+      var meta = {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        method: req.method
+      }
+
+      if (req.body.id) {
+        db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+          if (err) res.json(err);
+          if (removed) res.json(removed);
+        })
+      }
+    } else {
+      res.json({ result: "auth failed" });
     }
-  } else {
-    res.json({ result: "auth failed" });
   }
 
 })

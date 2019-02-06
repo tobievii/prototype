@@ -82,7 +82,7 @@ export class DataView extends React.Component {
   renderObject = (data,level, path) => {    
     try {
       return (
-        <div>
+        <div style={{overflowY: 'hidden'}}>
           {Object.keys(data).map((name,i) => {
             return (
               <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name],level, path+"."+name)}  >

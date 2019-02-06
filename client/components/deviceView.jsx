@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 import Modal from 'react-modal';
-import { DataView } from "./dataView.jsx"
+import { DataView } from "./dataView.jsx";
 
 import moment from 'moment'
 
@@ -72,6 +72,9 @@ export class DeviceView extends Component {
     SelectedUsers: [],
     DeviceSharedEmails: [],
     EmailsharedDevice: [],
+    display:"",
+    EditorButton:" HIDE EDITOR",
+    DeviceDataSize:"col-3"
   };
 
   socket;
@@ -263,7 +266,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id })
+                    body: JSON.stringify({ id: id , username: this.props.username})
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.href = "/"
@@ -324,8 +327,7 @@ export class DeviceView extends Component {
       */
       var apiMenu = num;
       this.setState({ apiMenu });
-      this.forceUpdate();
-
+      
 
     }
   }
@@ -348,7 +350,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: this.state.devid })
+                    body: JSON.stringify({ id: this.state.devid, username: this.props.username})
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.reload()
@@ -390,6 +392,19 @@ export class DeviceView extends Component {
     }
 
   }
+ ShowEditor = () =>{
+ 
+  if(this.state.display == "none"){
+     this.state.display=""
+     this.state.EditorButton="HIDE EDITOR";
+     this.state.DeviceDataSize="col-3"
+   }
+    else{
+     this.state.display="none";
+     this.state.EditorButton="SHOW EDITOR";
+     this.state.DeviceDataSize="col-6"
+   }
+  }
 
   render() {
 
@@ -428,17 +443,21 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col-6" >
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", float: "right", fontSize: 10 }} onClick={this.clearState}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100xp", float: "right", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              </div>
+               
+              <div  onClick={this.ShowEditor} style={{width: "auto", float: "right", marginRight: 10, fontSize: 10}} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i class="fas fa-edit"></i> {this.state.EditorButton}
               </div>
               <div ><center>
                 <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
@@ -461,27 +480,29 @@ export class DeviceView extends Component {
           </div>
           
           <hr />
-
+ <div className="col-1"> 
+          
+          </div>
           <div className="row" >
             <div className="col-12" >
               <Dashboard state={this.state.state} />
             </div>
           </div>
-
-          <div className="row" >
-            <div className="col-3" >
+         
+          <div className="row"  >
+            <div className={this.state.DeviceDataSize}>
               <h4 className="spot">DEVICE DATA</h4>
               <DataView data={this.state.state} />
 
             </div>
 
-            <div className="col-6">
+            <div className="col-6"  style={{display:this.state.display }}  >
               <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
               
-                <Editor state={this.state.state} />
+                <Editor state={this.state.state}  />
               
             </div>
-
+            
             <div className="col-3">
               <h4 className="spot">PLUGINS</h4>
               {plugins}

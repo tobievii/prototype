@@ -108,7 +108,7 @@ export class StatesViewerMenu extends Component {
                         {/* { this.props.selectCount} */}
                     </div>
 
-                    <div className="col" style={{ flex: "0 0 120px" }}>
+                    <div className="col" style={{ flex: "0 0 120px" }}>  <i className="fas fa-map-marked-alt" style={{color:"grey",marginTop: "9px"}}></i>
                         <div style={{float:"right", marginTop: "7px", textAlign:"left", width: "20px"}}>
                         { this.sortButtons() }
                         </div>
