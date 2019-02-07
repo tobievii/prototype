@@ -155,7 +155,11 @@ app.get('/admin/accounts', (req: any, res: any) => {
   })
 })
 
-
+app.get("/recover", (req:any, res:any)=>{
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
 
 app.get('/signout', (req: any, res: any) => {
   res.clearCookie("uuid");
@@ -710,13 +714,13 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
-app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+  app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
     console.log("account registration")
     console.log(req.body)
 
 
     req.user.email = req.body.email
-    accounts.Forgotpassword(db, req.user, (error: Error, result: any) => {
+       accounts.Forgotpassword(db, req.user, (error: Error, result: any) => {
       res.json({ error, result, account:req.user })
     })
 
