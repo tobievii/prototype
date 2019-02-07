@@ -710,6 +710,19 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
+app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+    console.log("account registration")
+    console.log(req.body)
+
+
+    req.user.email = req.body.email
+    accounts.Forgotpassword(db, req.user, (error: Error, result: any) => {
+      res.json({ error, result, account:req.user })
+    })
+
+  })
+
+
 app.post("/api/v3/state/clear", (req: any, res: any) => {
 
   if (!req.user) { return; }

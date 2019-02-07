@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHdd, faUserCheck, faUserPlus, faDice } from '@fortawesome/free-solid-svg-icons'
-
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 library.add(faUserCheck)
 library.add(faUserPlus)
 library.add(faDice)
@@ -11,12 +11,17 @@ library.add(faDice)
 export class Account extends Component {
   state = {
     menu: 0,
+    url: "/",
     form: {
       email: "",
       passwordSignin: "",
       passwordSignup: ""
     },
-    serverError: ""
+    serverError: "",
+    resetButton: "",
+    forgotButton: "FORGOT PASSWORD",
+    loginButton: "LOGIN",
+    usedButton: null
   }
 
   // find out if the server allows registration
@@ -72,7 +77,6 @@ export class Account extends Component {
       if (this.state.menu == menu) { this.setState({ menu: 0 }) } else {
         this.setState({ menu });
       }
-
     }
   }
 
@@ -135,6 +139,7 @@ export class Account extends Component {
       console.log(data);
 
       if (data.result) {
+        <Link to={"/recover"}/>
         location.reload();
       }
       // console.log(data);
@@ -150,6 +155,27 @@ export class Account extends Component {
 
   }
 
+  ForgotPassword = () =>{
+    console.log("ForgotPassword");
+    fetch("/api/v3/ForgetPassword", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: this.state.form.email
+      })
+    }).then(response => response.json()).then(data => {
+      console.log(data);
+
+      if (data.result) {
+        this.setState({ resetButton: "RESET PASSWORD" })
+      }
+       if (data.error) {
+        console.log("zzzzzzzzzzzzzzzzzzzzzzzzzz")
+        this.setState({ serverError: data.error })
+      }
+
+    }).catch(err => console.error(err.toString()));
+  }
+
   drawRegisterButton = () => {
     if (this.state.registration) {
       if (this.state.registration.userRegistration) {
@@ -163,6 +189,31 @@ export class Account extends Component {
 
   }
 
+  showButton = () => {
+    if(this.state.resetButton == ""){
+      return (
+        <div>
+          <div className="col-7" style={{ textAlign: "right" }} >
+              <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
+          </div>
+                        <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
+
+                             <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 90,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
+        </div>             
+      )
+    }else{
+      return(
+        <div className="col-7" style={{ textAlign: "right" }} >
+          <div className="col-7" style={{ textAlign: "right" }} >
+              <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
+          </div>
+             <div><Link to={"/recover"} >
+            <button className="btn-spot" style={{ float: "right" }} onClick={()=> this.ForgotPassword()} > { this.state.resetButton } </button>
+          </Link></div> 
+            </div>
+      )
+    }
+  }
 
   levelZero = () => {
     return (
@@ -197,14 +248,19 @@ export class Account extends Component {
 
           <div className="row">
 
-            <div className="col-7" style={{ textAlign: "right" }} >
+            {/* <div className="col-7" style={{ textAlign: "right" }} >
               <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
             </div>
+
+            <button className="btn-spot" style={{ float: "right" }} onClick={()=> this.ForgotPassword()} ><FontAwesomeIcon icon="user-check" /> { this.showButton } </button>
+            
 
             <div className="col-5">
               <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
             </div>
 
+          </div> */}
+          { this.showButton() }
           </div>
         </div>
 
@@ -247,6 +303,7 @@ export class Account extends Component {
             </div>
 
             <div className="col-5">
+            
               <button className="btn-spot" style={{ float: "right" }} onClick={this.register} ><FontAwesomeIcon icon="user-plus" /> Register</button>
             </div>
           </div>

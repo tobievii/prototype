@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -12,7 +12,7 @@ import { Landing } from "./public/landing.jsx"
 
 
 import { UserPage } from "./components/userpage.jsx"
-
+import { Recovery } from "./public/recovery.jsx";
 // logged in content:
 import { Verify } from "./components/verify.jsx";
 import { ApiInfo } from "./components/apiInfo.jsx";
@@ -103,7 +103,7 @@ class App extends Component {
                         <Footer />
                     </div>
                 )
-            } else {
+                 } else {
                 return (
                     <div>
                     <Account account={this.state.account} />
@@ -133,6 +133,13 @@ class App extends Component {
         )
     }
 
+    recoverPassword = () =>{
+                return(
+           <div>
+           <Recovery />
+           </div>
+       )}
+
     settings = ({match}) => {
         return (
             <SettingsView />
@@ -147,6 +154,7 @@ class App extends Component {
                     <div>
                         <NavBar version={this.state.version} account={this.state.account} />
                         <Route exact path="/" component={this.home} />
+                        <Route path="/recover" component={this.recoverPassword} />
                         <Route path="/view/:devid" component={this.deviceView} />                    
                         <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />

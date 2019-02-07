@@ -206,16 +206,33 @@ export function registerExistingAccount(db:any, user:any, cb:any) {
       } else {
         cb("that email is taken", undefined)
       }
-      
-
     })
     
   } else {
     cb("not valid email", undefined);
   }
-  
 }
 
+export function Forgotpassword(db:any, user:any, cb:any) {
+  console.log("forgotpassword backend")
+ if(user.email.length !=0){
+    if (validateEmail(user.email)) {
+      db.users.find({email:user.email}, (err:Error, result:any) => {
+     if (result.length==0) {
+       cb("Email does not exist")
+      } else {
+      cb(null,result);
+      }
+     })
+  } 
+   else{
+    cb("not valid email", undefined)
+    }
+  }
+ else{
+   cb("email can not be empty", undefined)
+ }
+}
 
 // V3 API: ACCOUNT CREATE
 export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: any, accRequest:any|undefined) {
