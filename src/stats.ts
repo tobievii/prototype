@@ -1,6 +1,6 @@
 export function init(app: any, db: any) {
   console.log("initializing stats")
-
+//const person =this.props.username;
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   // returns array of days device had activity and counts the amount of packets for each day
   app.post("/api/v3/activity", (req:any, res:any) => {
@@ -22,7 +22,7 @@ export function init(app: any, db: any) {
           delete result.value
           delete result["_id"]
           result.day = temp.day
-          result.value = temp.value         
+          result.value = temp.value 
         }
 
         res.json(results);
