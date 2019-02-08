@@ -87,7 +87,7 @@ export class DataView extends React.Component {
             return (
               <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name],level, path+"."+name)}  >
                 <div className="dataViewName">{name}:</div> 
-                <div className="dataViewValue" >{this.renderData(data[name],level+"."+name)}</div>
+                <div className="dataViewValue" >{this.renderData(data[name],level,path+"."+name)}</div>
                 <div style={{clear:"both"}}/>
               </div>)
           })}                  
