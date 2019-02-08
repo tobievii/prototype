@@ -21,8 +21,9 @@ describe("API", function () {
     /************************************   Register   ****************************************/
 
     it("/api/v3/admin/register", function (done: any) {
-      var randomNumberEmail = generateDifficult(32);
-      const Account: any = { email: "test" + randomNumberEmail + "@iotlocalhost.com", password: testAccount.password };
+      var randomNumberEmail = generateDifficult(32); 
+      var emaillocal = "test" + randomNumberEmail + "@iotlocalhost.com";
+      const Account: any = { email: emaillocal.toLowerCase(), pass: testAccount.password };
 
       trex.restJSON(
         {
@@ -43,7 +44,6 @@ describe("API", function () {
             { 
               done(new Error(result.error)); 
             }
-            //if (result.data.someval == testvalue) { done(); }
             else {
               testAccount.email = result.account.email;
               testAccount.apikey = result.account.apikey;
@@ -53,6 +53,77 @@ describe("API", function () {
         }
       );
       
+    });
+
+    /************************************   Account   ****************************************/
+
+    it("/api/v3/account", function (done: any) {
+
+      const options = {
+        hostname: "localhost",
+        port: testAccount.port,
+        path: "/api/v3/account",
+        method: "GET",
+        headers: {
+          Authorization:
+          "Basic " + Buffer.from("api:key-" + testAccount.apikey).toString("base64"),
+          "Content-Type": "application/json"
+        }
+      };
+      // CREATE REQUEST OBJECT
+      const req = http.request(options, res => {
+        var response = "";
+        res.setEncoding("utf8");
+        res.on("data", chunk => {
+          response += chunk;
+        });
+        res.on("end", () => {
+          var result = JSON.parse(response);
+
+          if (result.error) {
+            done(new Error(result.error));
+          } else if(result.apikey == testAccount.apikey){
+            done();
+          }
+        });
+      });
+
+      req.on("error", e => {
+        console.error(`problem with request: ${e.message}`);
+      });
+      req.end();
+    });
+
+    /************************************   Sign In   ****************************************/
+
+    it("/signIn", function (done: any) {
+      const Account: any = { email: testAccount.email , pass: testAccount.password };
+
+      trex.restJSON(
+        {
+          path: "http://localhost:8080/signin",
+          method: "POST",
+          body: Account,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          }
+        },
+        (err: Error, result: any, account: any) => {
+          if (err) {
+            done(err);
+          }
+          if (result) {
+            if (result.error) 
+            { 
+              done(new Error(result.error)); 
+            }
+            else if(result.signedin == true){
+              done();
+            }
+          }
+        }
+      );
     });
 
     /************************************   Version   ****************************************/
@@ -603,9 +674,12 @@ describe("API", function () {
 });
 
 describe("UI Test", function(){
-  it('Contains Login Button', function(done: any){
-    done();
-  });
+  describe("Landing Page", function(){
+    it('Contains Login Button', function(done: any){
+      done();
+    });
+  })
+  
 });
 
 function generateDifficult(count: number){
