@@ -65,14 +65,14 @@ export class DataView extends React.Component {
     
     if (data == null) {}
     if (typeof data == "string") {
-      return <span>{data}</span>
+          return  <span  style={{color:"#FFA500",paddingLeft:"4em" }}>{data}</span>
     }
     if (typeof data == "number") {
-      return <span>{data}</span>
+      return <span   style={{color:"#7FFF00",paddingLeft:"4em"}}>{data}</span>
     }
     if (typeof data == "boolean") {
-      return <span>{data.toString()}</span>
-    }
+      return <span  style={{color:"#FF1493",paddingLeft:"4em"}}>{data.toString()}</span>
+}
     if (typeof data == "object") {
       return <div>{ this.renderObject(data, level+1, path)}</div>
     }
@@ -87,7 +87,7 @@ export class DataView extends React.Component {
             return (
               <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name],level, path+"."+name)}  >
                 <div className="dataViewName">{name}:</div> 
-                <div className="dataViewValue" >{this.renderData(data[name],level,path+"."+name)}</div>
+                <div className="dataViewValue" >{this.renderData(data[name],level+"."+name)}</div>
                 <div style={{clear:"both"}}/>
               </div>)
           })}                  
