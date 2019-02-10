@@ -44,8 +44,8 @@ export class Dashboard extends React.Component {
   onDrop = (e, f) => {
     //console.log({e,f});
     var location = {
-      x: Math.round(e.clientX/ (this.state.grid.width/this.state.grid.cols)),
-      y: Math.round(e.clientY/this.state.grid.rowHeight/2) - 1
+      x: Math.round(e.clientX / (this.state.grid.width / this.state.grid.cols)),
+      y: Math.round(e.clientY / this.state.grid.rowHeight / 2) - 1
     }
 
     console.log("drop")
@@ -60,8 +60,10 @@ export class Dashboard extends React.Component {
   generateDashboard = () => {
 
     if (!this.props.state) {
-      return ( <div>loading..</div>)
+      return (<div>loading..</div>)
     } else {
+
+
       return (
         <GridLayout className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} compactType={null} >
           {
@@ -86,7 +88,7 @@ export class Dashboard extends React.Component {
                 return (
                   <div className="dashboardBlock" key={data.i} >
                     <Widget label={data.dataname} >
-                       { this.objectByString(this.props.state.payload, data.datapath.slice(5) ).toString() }
+                      {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
                     </Widget>
                   </div>
                 )
@@ -98,9 +100,14 @@ export class Dashboard extends React.Component {
                     <Widget label={data.dataname} >
                       <ThreeDWidget />
                     </Widget>
-                  </div>                
+                  </div>
                 )
               }
+
+
+              return (
+                <div>default</div>
+              )
 
             })
           }
@@ -110,7 +117,7 @@ export class Dashboard extends React.Component {
   }
 
   render() {
-    
+
     // layout is an array of objects, see the demo for more complete usage
     // var layout = [
     //   {i: 'c', x: 0, y: 0, w: 8, h: 4},
@@ -133,17 +140,17 @@ export class Dashboard extends React.Component {
     return str;
   }
 
-  objectByString = (o,s) =>{
+  objectByString = (o, s) => {
     s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
     s = s.replace(/^\./, '');           // strip a leading dot
     var a = s.split('.');
     for (var i = 0, n = a.length; i < n; ++i) {
-        var k = a[i];
-        if (k in o) {
-            o = o[k];
-        } else {
-            return;
-        }
+      var k = a[i];
+      if (k in o) {
+        o = o[k];
+      } else {
+        return;
+      }
     }
     return o;
   }

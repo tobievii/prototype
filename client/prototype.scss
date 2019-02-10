@@ -7,6 +7,7 @@
 }
 $panelBg: rgba(3, 4, 5, 0.5);
 $spot: #f3353a;
+$borders: rgb(34, 39, 44);
 
 body {
   font-family: "Share Tech Mono", monospace;
@@ -677,11 +678,14 @@ input[type="checkbox"]:checked {
 
 .dataView {
   background: $panelBg;
-  margin: 3px;
-  padding-left: 15px;
+  margin: 0px;
+  padding: 7px 15px;
   //border: 1px #f00 solid;
   cursor: pointer;
   min-height: 15px;
+  //border: 1px $borders solid;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .dataView:hover {
@@ -689,16 +693,13 @@ input[type="checkbox"]:checked {
 }
 
 .dataViewName {
-  //background: 1px solid rgb(255,0,0);
 
-  float: left;
 }
 
 .dataViewValue {
   
-  //border: 1px solid blue;
+  
 
-  float: left;
 }
 
 .avatarProfile {

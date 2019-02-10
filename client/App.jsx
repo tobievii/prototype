@@ -25,6 +25,8 @@ import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
+import { Dashboard } from "./components/dashboard/dashboard.jsx"
+
 //import socketio from "socket.io-client";
 //const socket = socketio();
 
@@ -32,21 +34,21 @@ class App extends Component {
 
     state = {};
 
-    constructor (props) {
+    constructor(props) {
         super(props);
 
-        p.getVersion( (version) => { this.setState({ version: version.version.toUpperCase() }); })
-        
-        p.getAccount(account => { 
+        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
+
+        p.getAccount(account => {
             this.setState({ account });
-            if (account.level > 0) { 
+            if (account.level > 0) {
                 //socket.emit("join", account.apikey);
-                this.setState({ loggedIn: true }) 
+                this.setState({ loggedIn: true })
                 // if its a real user (level >0 ) then we get device data.
-            }            
+            }
         })
 
-        p.getStates( (states) => { this.setState({ states }) })
+        p.getStates((states) => { this.setState({ states }) })
 
         //socket.on("connect", a => { console.log("socket connected"); });
         //socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
@@ -55,7 +57,7 @@ class App extends Component {
     // socketHandler = (socketDataIn) => {
     //     if (this.state.states) {
     //         var newArray = this.state.states.slice();
-  
+
     //         var found = 0;
     //         for (var s in newArray) {
     //           if (newArray[s].id == socketDataIn.id) {
@@ -65,22 +67,22 @@ class App extends Component {
     //             this.setState({ states: newArray });
     //           }
     //         }
-  
+
     //         if (found == 0) {
     //           newArray.push(socketDataIn);
     //           this.setState({ states: newArray });
     //         }
-  
+
     //         ///////////
-  
+
     //         if (this.state.view) {
     //           var copyView = Object.assign({}, this.state.view); //creating copy of object
-  
+
     //           var view = _.merge(copyView, socketDataIn);
-  
+
     //           this.setState({ view });
     //         }
-  
+
     //         if (this.state.packets) {
     //           var newPackets = this.state.packets.slice().reverse();
     //           var payload = socketDataIn; //{data: socketDataIn.data, timestamp: socketDataIn.timestamp}
@@ -90,57 +92,60 @@ class App extends Component {
     //       }
     // }
 
-  
+
 
     home = ({ match }) => {
         if (this.state.account) {
-            if (this.state.account.level >0) {
+            if (this.state.account.level > 0) {
                 return (
                     <div>
+                        <Dashboard state={this.state.states} />
                         <StatesViewer username={this.state.account.username} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
                     </div>
                 )
-                 } else {
+            } else {
                 return (
                     <div>
-                    <Account account={this.state.account} />
-                    <Landing />
-                  </div>)
+                        <Account account={this.state.account} />
+                        <Landing />
+                    </div>)
             }
         } else {
             return null
-        }        
+        }
     }
 
-    deviceView = ({match}) => {
+    deviceView = ({ match }) => {
         return (
-            <div>                
+            <div>
                 <DeviceView devid={match.params.devid} username={match.params.username} />
             </div>
         )
     }
 
-    userView = ({match}) => {
+    userView = ({ match }) => {
         return (
             <div>
                 <UserPage username={match.params.username} />
+
                 <StatesViewer username={match.params.username} />
             </div>
-            
+
         )
     }
 
-    recoverPassword = () =>{
-                return(
-           <div>
-           <Recovery />
-           </div>
-       )}
+    recoverPassword = () => {
+        return (
+            <div>
+                <Recovery />
+            </div>
+        )
+    }
 
-    settings = ({match}) => {
+    settings = ({ match }) => {
         return (
             <SettingsView />
         )
@@ -149,13 +154,13 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                
+
                 <Router>
                     <div>
                         <NavBar version={this.state.version} account={this.state.account} />
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover" component={this.recoverPassword} />
-                        <Route path="/view/:devid" component={this.deviceView} />                    
+                        <Route path="/view/:devid" component={this.deviceView} />
                         <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />

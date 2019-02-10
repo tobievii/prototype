@@ -72,9 +72,9 @@ export class DeviceView extends Component {
     SelectedUsers: [],
     DeviceSharedEmails: [],
     EmailsharedDevice: [],
-    display:"",
-    EditorButton:" HIDE EDITOR",
-    DeviceDataSize:"col-3"
+    display: "",
+    EditorButton: " HIDE EDITOR",
+    DeviceDataSize: "col-3"
   };
 
   socket;
@@ -266,7 +266,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id , username: this.props.username})
+                    body: JSON.stringify({ id: id, username: this.props.username })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.href = "/"
@@ -327,7 +327,7 @@ export class DeviceView extends Component {
       */
       var apiMenu = num;
       this.setState({ apiMenu });
-      
+
 
     }
   }
@@ -350,7 +350,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/clear", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: this.state.devid, username: this.props.username})
+                    body: JSON.stringify({ id: this.state.devid, username: this.props.username })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);
                     window.location.reload()
@@ -392,18 +392,18 @@ export class DeviceView extends Component {
     }
 
   }
- ShowEditor = () =>{
- 
-  if(this.state.display == "none"){
-     this.state.display=""
-     this.state.EditorButton="HIDE EDITOR";
-     this.state.DeviceDataSize="col-3"
-   }
-    else{
-     this.state.display="none";
-     this.state.EditorButton="SHOW EDITOR";
-     this.state.DeviceDataSize="col-6"
-   }
+  ShowEditor = () => {
+
+    if (this.state.display == "none") {
+      this.state.display = ""
+      this.state.EditorButton = "HIDE EDITOR";
+      this.state.DeviceDataSize = "col-3"
+    }
+    else {
+      this.state.display = "none";
+      this.state.EditorButton = "SHOW EDITOR";
+      this.state.DeviceDataSize = "col-6"
+    }
   }
 
   render() {
@@ -455,9 +455,9 @@ export class DeviceView extends Component {
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
-               
-              <div  onClick={this.ShowEditor} style={{width: "auto", float: "right", marginRight: 10, fontSize: 10}} className="commanderBgPanel commanderBgPanelClickable"  >
-                <i class="fas fa-edit"></i> {this.state.EditorButton}
+
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
               <div ><center>
                 <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
@@ -478,17 +478,17 @@ export class DeviceView extends Component {
               </div>
             </div>
           </div>
-          
+
           <hr />
- <div className="col-1"> 
-          
-          </div>
+
+
+
           <div className="row" >
             <div className="col-12" >
               <Dashboard state={this.state.state} />
             </div>
           </div>
-         
+
           <div className="row"  >
             <div className={this.state.DeviceDataSize}>
               <h4 className="spot">DEVICE DATA</h4>
@@ -496,13 +496,13 @@ export class DeviceView extends Component {
 
             </div>
 
-            <div className="col-6"  style={{display:this.state.display }}  >
+            <div className="col-6" style={{ display: this.state.display }}  >
               <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
-              
-                <Editor state={this.state.state}  />
-              
+
+              <Editor state={this.state.state} />
+
             </div>
-            
+
             <div className="col-3">
               <h4 className="spot">PLUGINS</h4>
               {plugins}

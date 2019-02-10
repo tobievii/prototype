@@ -70,7 +70,7 @@ eventHub.on("device", (data: any) => {
 
 
 
-  handleDeviceUpdate(data.apikey, data.packet, {socketio:true} , (e: Error, r: any) => { });
+  handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
@@ -87,12 +87,12 @@ utilsLib.createUsernamesForOldAccounts(db);
 utilsLib.createDeviceKeysForOldAccounts(db);
 
 //handle accounts/cookies.
-app.use(accounts.midware(db)); 
+app.use(accounts.midware(db));
 
 
 
 db.on('connect', function () {
-  
+
   for (var p in plugins) {
     if (plugins[p].init) { plugins[p].init(app, db, eventHub); }
   }
@@ -101,19 +101,19 @@ db.on('connect', function () {
 
 //####################################################################
 // USERS LAST SEEN / ACTIVE
-app.use( (req:any, res:any, next:any)=>{
+app.use((req: any, res: any, next: any) => {
   if (req.user) {
-    console.log("user active:\t"+req.user.email+"\t"+req.url)
-    db.users.findOne({apikey : req.user.apikey}, (e:Error, user:any)=>{
+    console.log("user active:\t" + req.user.email + "\t" + req.url)
+    db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
       user["_last_seen"] = new Date();
-      db.users.update({apikey : req.user.apikey}, user, (e2:Error, r2:any)=>{
+      db.users.update({ apikey: req.user.apikey }, user, (e2: Error, r2: any) => {
         next();
       })
     })
   } else {
     next();
   }
-  
+
 })
 
 //####################################################################
@@ -147,7 +147,7 @@ app.get('/', (req: any, res: any) => {
 
 })
 
-stats.init(app,db);
+stats.init(app, db);
 
 app.get('/admin/accounts', (req: any, res: any) => {
   fs.readFile('../public/admin_accounts.html', (err: Error, data: any) => {
@@ -155,7 +155,7 @@ app.get('/admin/accounts', (req: any, res: any) => {
   })
 })
 
-app.get("/recover", (req:any, res:any)=>{
+app.get("/recover", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
@@ -168,13 +168,13 @@ app.get('/signout', (req: any, res: any) => {
 
 app.post('/signin', accounts.signInFromWeb(db));
 
-app.get("/u/:username", (req:any, res:any)=>{
+app.get("/u/:username", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get("/u/:username/view/:devid", (req:any, res:any)=>{
+app.get("/u/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
@@ -281,54 +281,54 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
 // })
 
 // run to update old packet data to have correct timestamp
-app.get("/admin/processusers", (req:any, res:any)=>{
+app.get("/admin/processusers", (req: any, res: any) => {
   if (req.user.level < 100) { res.end("no permission"); return; }
 
-  db.users.find({"_created_on" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
-    res.write("users:\t"+users.length);
+  db.users.find({ "_created_on": { "$exists": false } }).limit(10000, (err: Error, users: any) => {
+    res.write("users:\t" + users.length);
     for (var user of users) {
       if (user["_created_on"] == undefined) {
         user["_created_on"] = new Date(user.created.jsonTime);
-        db.users.update({"_id" : user["_id"]}, user)
-      }      
+        db.users.update({ "_id": user["_id"] }, user)
+      }
     }
     res.end("\ndone.")
-  }) 
+  })
 })
 
-app.get("/admin/processusersseen", (req:any, res:any)=>{
+app.get("/admin/processusersseen", (req: any, res: any) => {
   if (req.user.level < 100) { res.end("no permission"); return; }
 
-  db.users.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
-    res.write("users:\t"+users.length);
+  db.users.find({ "_last_seen": { "$exists": false } }).limit(10000, (err: Error, users: any) => {
+    res.write("users:\t" + users.length);
     for (var user of users) {
       if (user["_last_seen"] == undefined) {
         user["_last_seen"] = new Date(user.created.jsonTime);
-        db.users.update({"_id" : user["_id"]}, user)
-      }      
+        db.users.update({ "_id": user["_id"] }, user)
+      }
     }
     res.end("\ndone.")
-  }) 
+  })
 })
 
-app.get("/admin/processstates", (req:any, res:any)=>{
+app.get("/admin/processstates", (req: any, res: any) => {
   if (req.user.level < 100) { res.end("no permission"); return; }
 
-  db.states.find({"_last_seen" : { "$exists" : false }}).limit(10000, (err:Error, states:any)=>{
-    res.write("states:\t"+states.length);
+  db.states.find({ "_last_seen": { "$exists": false } }).limit(10000, (err: Error, states: any) => {
+    res.write("states:\t" + states.length);
     for (var state of states) {
-      
-      if (state["_last_seen"] == undefined) {
-        state["_last_seen"] = new Date(state.meta.created.jsonTime);  
-      } 
-      if (state["_created_on"] == undefined) {
-        state["_created_on"] = new Date(state.meta.created.jsonTime);  
-      } 
 
-      db.states.update({"_id" : state["_id"]}, state)     
+      if (state["_last_seen"] == undefined) {
+        state["_last_seen"] = new Date(state.meta.created.jsonTime);
+      }
+      if (state["_created_on"] == undefined) {
+        state["_created_on"] = new Date(state.meta.created.jsonTime);
+      }
+
+      db.states.update({ "_id": state["_id"] }, state)
     }
     res.end("\ndone.")
-  }) 
+  })
 })
 
 
@@ -341,30 +341,30 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     //
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
-    } 
+      if (req.user.level < 100) { res.json({ error: "must be level 100" }); return; }
+    }
 
-    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+    db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         ///
-          if (req.body.id) {
-            db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-        
-              if (state == null) { res.json({ "error": "id not found" }); return; }
-        
-              if (state) {
-                var viewState = state.payload;
-                viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
-                res.json(viewState);
-              } else {
-                res.json({ error: "state not found" })
-              }
-        
-        
-            })
-          } else {
-            res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
-          }
+        if (req.body.id) {
+          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+
+            if (state == null) { res.json({ "error": "id not found" }); return; }
+
+            if (state) {
+              var viewState = state.payload;
+              viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
+              res.json(viewState);
+            } else {
+              res.json({ error: "state not found" })
+            }
+
+
+          })
+        } else {
+          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+        }
         ///
       }
     });
@@ -372,9 +372,9 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
   } else {
     if (req.body.id) {
       db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-  
+
         if (state == null) { res.json({ "error": "id not found" }); return; }
-  
+
         if (state) {
           var viewState = state.payload;
           viewState.meta = { userAgent: state.meta.userAgent, method: state.meta.method }
@@ -382,8 +382,8 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
         } else {
           res.json({ error: "state not found" })
         }
-  
-  
+
+
       })
     } else {
       res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -396,24 +396,24 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
-  if (req.body.username) { 
+  if (req.body.username) {
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
-    } 
-    
+      if (req.user.level < 100) { res.json({ error: "must be level 100" }); return; }
+    }
 
-    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+
+    db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         console.log(user)
         /////
-          if (req.body.id) {
-            db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-              res.json(state);
-            })
-          } else {
-            res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
-          }
+        if (req.body.id) {
+          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+            res.json(state);
+          })
+        } else {
+          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+        }
         /////
       }
     })
@@ -421,7 +421,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
     // search db for username
     // db.users.find({username})
     // db.states.findOne({apikey, id}m )
-   } else {
+  } else {
 
     if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -433,7 +433,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
       res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
     }
 
-   }
+  }
 
 
 
@@ -453,7 +453,7 @@ app.get('/api/v3/states', (req: any, res: any) => {
 })
 
 // new in 5.0.34:
-app.post("/api/v3/states", (req:any, res:any) => {
+app.post("/api/v3/states", (req: any, res: any) => {
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
@@ -462,17 +462,17 @@ app.post("/api/v3/states", (req:any, res:any) => {
         return;
       }
     }
-    
+
     // todo filter by permission/level
     if (req.body.username) {
-      db.users.findOne({username:req.body.username}, (e:Error, user:any)=>{
-        
-        if (e) { res.json({error: "db error"})}
-        if (user) {
-            
+      db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
 
-          db.states.find({ apikey: user.apikey }, (er:Error, states: any[]) => {
-            var cleanStates:any = []
+        if (e) { res.json({ error: "db error" }) }
+        if (user) {
+
+
+          db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
+            var cleanStates: any = []
             for (var a in states) {
               var cleanState = _.clone(states[a])
               delete cleanState["apikey"]
@@ -482,7 +482,7 @@ app.post("/api/v3/states", (req:any, res:any) => {
           })
         }
       })
-    } 
+    }
   }
 })
 
@@ -533,7 +533,7 @@ function safeParser(req: any, res: any, next: any) {
         req.body = jsonin;
         next();
       } catch (err) {
-        res.status(400).json({ "error:" : err.toString()+". Make sure you are sending valid JSON" })
+        res.status(400).json({ "error:": err.toString() + ". Make sure you are sending valid JSON" })
         next();
       }
     } else { next(); }
@@ -560,11 +560,11 @@ function handleState(req: any, res: any, next: any) {
 
   if (req.body === undefined) { return; }
 
-  
+
   if ((req.user) && (req.user.level) > 0) {
     if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
-    if (typeof req.body.id != "string") { res.status(400).json({"error": "parameter id must be of type string"}); return;}
-    if (!req.body.data) { res.status(400).json({"error":"data parameter missing"}); return;}
+    if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
+    if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
     if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
     if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
 
@@ -575,16 +575,16 @@ function handleState(req: any, res: any, next: any) {
     }
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, req.user, newpacket, meta, (packet: any, info:any) => {
-        
+      state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
+
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
-        
+
         if (info.newdevice) {
           io.to(req.user.username).emit("info", info)
         }
-        
+
 
 
         for (var p in plugins) {
@@ -613,13 +613,14 @@ function handleState(req: any, res: any, next: any) {
 */
 
 
-function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any) {
+
+function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
 
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { console.log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, user, newpacket, packetIn.meta, (packet: any, info:any) => {
+      state.postState(db, user, newpacket, packetIn.meta, (packet: any, info: any) => {
         if (options) {
           if (options.socketio == true) {
             io.to(apikey).emit('post', packet.payload);
@@ -632,7 +633,7 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options:any, cb: any)
 
           }
         }
-        
+
         //console.log(apikey + "|" + packetIn.id)
 
 
@@ -667,12 +668,12 @@ app.get("/api/v3/state", (req: any, res: any) => {
 });
 
 app.post("/api/v3/state/delete", (req: any, res: any) => {
-  if (req.body.username) { 
+  if (req.body.username) {
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { res.json({error:"must be level 100"}); return; }
-    } 
+      if (req.user.level < 100) { res.json({ error: "must be level 100" }); return; }
+    }
 
-    db.users.findOne({username: req.body.username}, (dbError:Error, user:any) => {
+    db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         var meta = {
           ip: req.ip,
@@ -691,7 +692,7 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
       }
     })
 
-  }else{
+  } else {
     if ((req.user) && (req.user.level) > 0) {
       if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
@@ -714,17 +715,17 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
-  app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
-    console.log("account registration")
-    console.log(req.body)
+app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+  console.log("account registration")
+  console.log(req.body)
 
 
-    req.user.email = req.body.email
-       accounts.Forgotpassword(db, req.user, (error: Error, result: any) => {
-      res.json({ error, result, account:req.user })
-    })
-
+  req.user.email = req.body.email
+  accounts.Forgotpassword(db, req.user, (error: Error, result: any) => {
+    res.json({ error, result, account: req.user })
   })
+
+})
 
 
 app.post("/api/v3/state/clear", (req: any, res: any) => {
@@ -785,18 +786,18 @@ app.post("/api/v3/state/query", (req: any, res: any) => {
 
 
 
-app.get("/api/v3/plugins/definitions", (req:any, res:any)=>{
+app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
-  var definitions:any = [];
+  var definitions: any = [];
 
   for (var plugin of plugins) {
     if (plugin.workflow) {
-      console.log("loading workflow definitions for plugin: "+plugin.name)
+      console.log("loading workflow definitions for plugin: " + plugin.name)
       definitions.push(plugin.workflowDefinitions);
     }
   }
 
-  res.json({definitions})
+  res.json({ definitions })
 })
 
 
@@ -804,15 +805,15 @@ app.get("/api/v3/plugins/definitions", (req:any, res:any)=>{
 
 
 
-export function processPacketWorkflow(db:any, apikey:string, deviceId:string, packet:any, plugins:any, cb:any) {
+export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
 
-  db.states.find({apikey:apikey}, (err:Error, states:any)=>{
+  db.states.find({ apikey: apikey }, (err: Error, states: any) => {
     if (err) { console.log("WORKFLOW ERROR"); }
-    
-    var statesObj:any = {}
+
+    var statesObj: any = {}
     for (var s in states) { statesObj[states[s].devid] = states[s]; }
 
-    var state:any = {};
+    var state: any = {};
     for (var s in states) {
       if (states[s].devid == deviceId) {
         state = states[s];
@@ -822,58 +823,58 @@ export function processPacketWorkflow(db:any, apikey:string, deviceId:string, pa
     if (state) {
       if (state.workflowCode) {
         // WORKFLOW EXISTS ON THIS DEVICE
-        
-        var sandbox:any = {
-          http : require("http"),
-          https : require("https"),
-          state:state,
-          states:states,
-          statesObj:statesObj,
+
+        var sandbox: any = {
+          http: require("http"),
+          https: require("https"),
+          state: state,
+          states: states,
+          statesObj: statesObj,
           packet: packet,
-          callback: (packetDone:any) => {
+          callback: (packetDone: any) => {
             //if (alreadyExitScript == false) { 
-              packetDone.err = "";
-              alreadyExitScript = true;              
-              cb(undefined, packetDone); 
+            packetDone.err = "";
+            alreadyExitScript = true;
+            cb(undefined, packetDone);
             //}
-            
+
           }
-        }  
+        }
 
         for (var plugin of plugins) {
           if (plugin.workflow) {
             sandbox[plugin.name] = plugin.workflow;
           }
         }
-        
+
         var alreadyExitScript = false;
 
         const vm = new VM({
           timeout: 1000,
-          sandbox: sandbox         
+          sandbox: sandbox
         });
 
 
 
         // Sync
         try {
-          vm.run(state.workflowCode);          
+          vm.run(state.workflowCode);
         } catch (err) {
           //console.error('Failed to execute script.', err);
-          
+
           //if (alreadyExitScript == false) { 
-            console.log("VM WORKFLOW ERROR!")
-            console.error(err);
-            alreadyExitScript = true;
-            packet.err = err.toString();
-            cb(undefined, packet); 
+          console.log("VM WORKFLOW ERROR!")
+          console.error(err);
+          alreadyExitScript = true;
+          packet.err = err.toString();
+          cb(undefined, packet);
           //}        
         }
 
 
 
 
-        
+
       } else {
         // NO WORKFLOW ON THIS DEVICE
         cb(undefined, packet);
@@ -882,7 +883,7 @@ export function processPacketWorkflow(db:any, apikey:string, deviceId:string, pa
       // NO DEVICE YET
       cb(undefined, packet);
     }
-    
+
 
   })
 
@@ -957,12 +958,12 @@ io.on('connection', function (socket: any) {
         if (key.split("|").length == 2) { testkey = key.split("|")[0] }
 
         var packet = {
-          id : data.id,
+          id: data.id,
           data: data.data,
-          meta: { method: "socketioclient"}
+          meta: { method: "socketioclient" }
         }
 
-        handleDeviceUpdate(testkey, packet, {socketio:true}, (e: Error, r: any) => { });
+        handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
 
 
 
