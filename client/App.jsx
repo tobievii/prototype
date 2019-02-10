@@ -99,7 +99,7 @@ class App extends Component {
             if (this.state.account.level > 0) {
                 return (
                     <div>
-                        <Dashboard state={this.state.states} />
+                        {/* <Dashboard state={this.state.states} /> */}
                         <StatesViewer username={this.state.account.username} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />

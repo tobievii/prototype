@@ -683,17 +683,24 @@ input[type="checkbox"]:checked {
   //border: 1px #f00 solid;
   cursor: pointer;
   min-height: 15px;
-  //border: 1px $borders solid;
+  border: 1px transparent solid;
   box-sizing: border-box;
   width: 100%;
+  transition: all 0.1s;
 }
 
 .dataView:hover {
-  background: lighten($panelBg, 20%)
+  background: lighten($panelBg, 5%);
+  border: 1px lighten($borders,10%) solid;
 }
 
 .dataViewName {
+  color: lighten($panelBg, 75%);
+}
 
+.dataView:hover .dataViewName{
+  //background: lighten($panelBg, 20%)
+  color: lighten($panelBg, 95%);
 }
 
 .dataViewValue {
@@ -719,8 +726,18 @@ input[type="checkbox"]:checked {
 
 
 .widgetLabel {
-  background: #2B2F37;
-  padding: 3px;
+  background: $panelBg;
+}
+
+.widgetOptions {
+  opacity: 0.25;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.widgetOptions:hover {
+  opacity: 0.5;
+  transition: all 0s;
 }
 
 .widgetContents {

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
-import { confirmAlert } from './react-confirm-alert'; 
-import './react-confirm-alert/src/react-confirm-alert.css' 
+import { confirmAlert } from './react-confirm-alert';
+import './react-confirm-alert/src/react-confirm-alert.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -11,7 +11,7 @@ import * as _ from "lodash"
 import * as p from "../prototype.ts"
 
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
-import { StatesViewerItem} from "./statesViewerItem.jsx"
+import { StatesViewerItem } from "./statesViewerItem.jsx"
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -113,7 +113,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem username={this.props.username} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid}/>)}
+          {devicelist.map(device => <StatesViewerItem username={this.props.username} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -156,23 +156,24 @@ export class StatesViewer extends Component {
               states[s].selected = false
             }
             this.setState({ devicesServer: states }, () => {
-      
+
               for (var device in this.state.devicesServer) {
                 this.socket.emit("join", this.state.devicesServer[device].key);
               }
-      
-              if(this.state.search.length < 1){
+
+              if (this.state.search.length < 1) {
                 this.setState({ devicesView: states }, () => {
-                //this.socketConnectDevices();
-                //this.sort();
-              })}
+                  //this.socketConnectDevices();
+                  //this.sort();
+                })
+              }
             })
           })
         }
       })
-      
+
       this.socket.on("post", (packet) => {
-        this.handleDevicePacket(packet)  
+        this.handleDevicePacket(packet)
       })
     });
 
@@ -205,8 +206,8 @@ export class StatesViewer extends Component {
     }
   }
 
-  componentWillUnmount = () => { 
-    this.socket.disconnect(); 
+  componentWillUnmount = () => {
+    this.socket.disconnect();
   }
 
   handleDevicePacket = (packet) => {
@@ -216,7 +217,7 @@ export class StatesViewer extends Component {
       if (devices[dev].devid == packet.id) {
         found = 1;
         devices[dev]["_last_seen"] = packet.timestamp;
-        devices[dev].payload = _.merge(devices[dev].payload, packet)        
+        devices[dev].payload = _.merge(devices[dev].payload, packet)
       }
     }
 
@@ -226,9 +227,9 @@ export class StatesViewer extends Component {
       console.log("recieved data for device not on our list yet.")
     } else {
       // update
-      if(this.state.search.length > 0){
+      if (this.state.search.length > 0) {
         this.setState({ devicesServer: devices })
-      }else{
+      } else {
         this.setState({ devicesServer: devices })
         this.setState({ devicesView: devices }, () => {
           // this.sort()
@@ -315,7 +316,7 @@ export class StatesViewer extends Component {
         selectCount++;
       }
     }
-    this.setState({selectCount : selectCount})
+    this.setState({ selectCount: selectCount })
   }
 
   selectAll = (value) => {
@@ -330,7 +331,7 @@ export class StatesViewer extends Component {
       this.setState({ selectAllState: true });
     }
     if (value == false) {
-      
+
       for (var dev in newDeviceList) {
         newDeviceList[dev].selected = false;
         this.state.selectedDevices.pop(newDeviceList[dev].devid);
@@ -342,42 +343,42 @@ export class StatesViewer extends Component {
 
   handleActionCall = (clickdata) => {
     var newDeviceList = _.clone(this.state.devicesView)
-    
+
     for (var dev in newDeviceList) {
       if (newDeviceList[dev].devid == clickdata.a) {
         if (clickdata.e == "deselect") {
-          if(this.state.selectAllState === true){
+          if (this.state.selectAllState === true) {
             this.setState({ selectAllState: false });
           }
           newDeviceList[dev].selected = false;
         }
-        if (clickdata.e == "select") { 
-          newDeviceList[dev].selected = true; 
+        if (clickdata.e == "select") {
+          newDeviceList[dev].selected = true;
         }
       }
     }
-    
-    this.setState({ devicesView: newDeviceList } , this.selectCountUpdate );
+
+    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
-  deleteSelectedDevices = () => { 
-    var devicesToDelete= this.state.devicesServer.filter( (device) => { return device.selected == true; })
+  deleteSelectedDevices = () => {
+    var devicesToDelete = this.state.devicesServer.filter((device) => { return device.selected == true; })
 
     for (var dev in devicesToDelete) {
-      if(devicesToDelete[dev].selected === true){
+      if (devicesToDelete[dev].selected === true) {
         fetch("/api/v3/state/delete", {
           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
           body: JSON.stringify({ id: devicesToDelete[dev].devid })
         }).then(response => response.json()).then(serverresponse => {
-            console.log(serverresponse)             
+          console.log(serverresponse)
         }).catch(err => console.error(err.toString()));
-      }   
+      }
     }
 
     // -------------------------------
-    var devicesServerTemp = this.state.devicesServer.filter( (device) => { return device.selected == false; })
-    var devicesViewTemp = this.state.devicesView.filter( (device) => { return device.selected == false; })
-    this.setState({devicesView:devicesViewTemp, devicesServer:devicesServerTemp}, this.selectCountUpdate)
+    var devicesServerTemp = this.state.devicesServer.filter((device) => { return device.selected == false; })
+    var devicesViewTemp = this.state.devicesView.filter((device) => { return device.selected == false; })
+    this.setState({ devicesView: devicesViewTemp, devicesServer: devicesServerTemp }, this.selectCountUpdate)
   }
 
   render() {
@@ -387,7 +388,7 @@ export class StatesViewer extends Component {
       return (
         <div className="" style={{ paddingTop: 25, margin: 30 }} >
           {/* <span>username: {this.props.username}</span> */}
-          <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+          <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
           <DeviceList username={this.props.username} devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
         </div>
       )

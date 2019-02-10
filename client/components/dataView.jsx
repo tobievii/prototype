@@ -65,13 +65,18 @@ export class DataView extends React.Component {
 
     if (data == null) { }
     if (typeof data == "string") {
-      return <span style={{ color: "rgb(212, 191, 128)" }}>{data.trim()}</span>
+      return <span style={{ float: "right", color: "#CCC" }}>{data.trim()}</span>
     }
     if (typeof data == "number") {
-      return <span style={{ color: "rgb(128, 212, 136)" }}>{data}</span>
+      return <span style={{ float: "right", color: "#15E47A" }}>{data}</span>
     }
     if (typeof data == "boolean") {
-      return <span style={{ color: "#FF1493" }}>{data.toString()}</span>
+      if (data == true) {
+        return <span style={{ float: "right", color: "#E4C315" }}>{data.toString()}</span>
+      } else {
+        return <span style={{ float: "right", color: "#15B9E4" }}>{data.toString()}</span>
+      }
+
     }
     if (typeof data == "object") {
 
@@ -97,42 +102,32 @@ export class DataView extends React.Component {
 
   renderObject = (data, level, path) => {
 
-    var columns = 0;
 
-    if (level > 0) {
-      if (Object.keys(data).length > 1) {
-        //columns = Math.round(12 / Object.keys(data).length);
-        columns = 1;
-      }
-    }
+    return (
+      <div style={{ overflowY: 'hidden' }}>
+        {Object.keys(data).map((name, i) => {
 
-    if (columns > 0) {
-      return (
-        <div style={{ overflowY: 'hidden' }}>
-          {Object.keys(data).map((name, i) => {
-            return (
-              <div key={i} className="dataView" style={{ float: "left", padding: 10, boxSizing: "border-box" }} draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
-                <div className="dataViewName">{name}:</div>
-                <div className="dataViewValue" >{this.renderData(data[name], level, path + "." + name)}</div>
-                <div style={{ clear: "both" }} />
-              </div>)
-          })}
-        </div>
-      )
-    } else {
-      return (
-        <div style={{ overflowY: 'hidden' }}>
-          {Object.keys(data).map((name, i) => {
+          if (typeof data[name] == "object") {
             return (
               <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
-                <div className="dataViewName">{name}:</div>
+                <div className="dataViewName" style={{ color: "" }}>{name}:</div>
                 <div className="dataViewValue" >{this.renderData(data[name], level, path + "." + name)}</div>
                 <div style={{ clear: "both" }} />
               </div>)
-          })}
-        </div>
-      )
-    }
+          } else {
+            return (
+              <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
+                <div className="dataViewName" style={{ float: "left" }}>{name}:</div>
+                <div className="dataViewValue" style={{ float: "right" }}>{this.renderData(data[name], level, path + "." + name)}</div>
+                <div style={{ clear: "both" }} />
+              </div>)
+          }
+
+
+        })}
+      </div>
+    )
+
 
 
   }
