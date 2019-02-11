@@ -30,7 +30,8 @@ import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
-var loggedInUser = "";
+var loggedInUser="";
+var currentDevice="";
 const customStyles = {
   content: {
     top: '50%',
@@ -74,6 +75,7 @@ export class DeviceView extends Component {
     EmailsharedDevice: [],
     display: "",
     EditorButton: " HIDE EDITOR",
+     shareDisplay:""
   };
 
   socket;
@@ -215,7 +217,16 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      loggedInUser = account;
+      loggedInUser=account;
+      currentDevice=this.state.state.apikey;
+      console.log(currentDevice)
+      if( loggedInUser.apikey != this.state.state.apikey && this.state.state.level <100){
+        console.log("tjerr");
+        this.setState({shareDisplay:"none"})
+      }
+      else{
+        this.setState({shareDisplay:""})
+      }
     }).catch(err => console.error(err.toString()));
     // p.getView(this.props.devid, (view) => {
     //   console.log(view)
@@ -464,7 +475,7 @@ export class DeviceView extends Component {
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} onClick={this.toggleModal}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10,display:this.state.shareDisplay }} onClick={this.toggleModal}>
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
