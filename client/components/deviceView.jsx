@@ -87,6 +87,9 @@ export class DeviceView extends Component {
         this.updateView(packet)
       })
     });
+    this.State={
+      showMe: true
+    }
   }
 
   handleActionCall = (clickdata) => {
@@ -335,6 +338,12 @@ export class DeviceView extends Component {
     }
   }
 
+  toggle_div(){
+    this.setState({
+      showMe:!this.state.showMe
+    })
+  }
+
   clearState = () => {
     //clears state, but retains history and workflow
 
@@ -496,20 +505,31 @@ export class DeviceView extends Component {
             <div className={this.state.DeviceDataSize}>
               <h4 className="spot">DEVICE DATA</h4>
               <DataView data={this.state.state} />
-
             </div>
 
-            <div className="col-6" style={{ display: this.state.display }}  >
-              <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
-
-              <Editor state={this.state.state} />
-
-            </div>
 
             <div className="col-3">
               <h4 className="spot">PLUGINS</h4>
               {plugins}
             </div>
+
+          <div className="col-17" style={{ width:"890px", marginTop: "10px", position:"relative" }}>
+
+            <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
+            <button className="smallButton" onClick={() => this.toggle_div()} style={{"align-self": "flex-start", marginBottom:"10px"}}>
+                    Hide/Show editor
+            </button>
+
+            {
+              this.state.showMe ?
+                <div className="col-20" style={{ Position:"relative"}}  >
+                  <Editor state={this.state.state}/>
+                </div>
+                :null
+            }
+          </div>
+
+
 
           </div>
         </div>
