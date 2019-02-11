@@ -416,8 +416,11 @@ describe("API", function () {
         if(mqttpacket === socketpacket){
           if(mqttpacket === originalData){
             if(socketpacket === originalData){
-              socket.disconnect();
-              done();
+              if(socket.disconnect()){
+                if(client.end()){
+                  done();
+                } 
+              }
             }else{
               done (new Error("Original Data sent and Socket packets recieved not the same!"))
             }  
@@ -504,8 +507,11 @@ describe("API", function () {
         if(restpacket === socketpacket){
           if(restpacket === originalData){
             if(socketpacket === originalData){
-              socket.disconnect();
-              done();
+              if(socket.disconnect()){
+                if(client.end()){
+                  done();
+                } 
+              }
             }else{
               done (new Error("Original Data sent and Socket packets recieved not the same!"))
             }  
@@ -653,8 +659,11 @@ describe("API", function () {
           if(restpacket === originalData){
             if(socketpacket === originalData){
               if(mqttpacket === originalData){
-                socket.disconnect();
-                done();
+                if(socket.disconnect()){
+                  if(client.end()){
+                    done();
+                  } 
+                }
               }else{
                 done (new Error("Original Data sent and MQTT packets recieved not the same!"))
               }

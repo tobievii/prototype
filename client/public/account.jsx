@@ -138,10 +138,6 @@ export class Account extends Component {
     }).then(response => response.json()).then(data => {
       console.log(data);
 
-      if (data.result) {
-        <Link to={"/recover"}/>
-        location.reload();
-      }
       // console.log(data);
       // if (data.signedin) {
       //   location.reload();
@@ -196,9 +192,9 @@ export class Account extends Component {
           <div className="col-7" style={{ textAlign: "right" }} >
               <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
           </div>
-                        <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
+            <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
 
-                             <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 90,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
+            <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 90,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
         </div>             
       )
     }else{
