@@ -30,7 +30,7 @@ import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
-var loggedInUser="";
+var loggedInUser = "";
 const customStyles = {
   content: {
     top: '50%',
@@ -87,7 +87,7 @@ export class DeviceView extends Component {
         this.updateView(packet)
       })
     });
-    this.State={
+    this.State = {
       showMe: true
     }
   }
@@ -121,7 +121,7 @@ export class DeviceView extends Component {
           newDeviceList.push("|");
         }
       });
-      temp = newDeviceList.filter((users) => { return users !== "|" && users.email !==loggedInUser.email})
+      temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== loggedInUser.email })
       this.setState({ userSearched: temp })
     })
   }
@@ -212,9 +212,10 @@ export class DeviceView extends Component {
 
     }).catch(err => console.error(err.toString()));
 
-    fetch("/api/v3/account", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } 
+    fetch("/api/v3/account", {
+      method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      loggedInUser=account;
+      loggedInUser = account;
     }).catch(err => console.error(err.toString()));
     // p.getView(this.props.devid, (view) => {
     //   console.log(view)
@@ -338,9 +339,9 @@ export class DeviceView extends Component {
     }
   }
 
-  toggle_div(){
+  toggle_div() {
     this.setState({
-      showMe:!this.state.showMe
+      showMe: !this.state.showMe
     })
   }
 
@@ -495,41 +496,39 @@ export class DeviceView extends Component {
 
 
 
-          <div className="row" >
+          <div className="row">
             <div className="col-12" >
               <Dashboard state={this.state.state} />
             </div>
           </div>
 
-          <div className="row"  >
+          <div className="row">
             <div className={this.state.DeviceDataSize}>
               <h4 className="spot">DEVICE DATA</h4>
               <DataView data={this.state.state} />
             </div>
 
 
-            <div className="col-3">
+            <div className="col-2">
               <h4 className="spot">PLUGINS</h4>
               {plugins}
             </div>
 
-          <div className="col-17" style={{ width:"890px", marginTop: "10px", position:"relative" }}>
+            <div className="col-5" style={{ position: "relative" }}>
 
-            <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
-            <button className="smallButton" onClick={() => this.toggle_div()} style={{"align-self": "flex-start", marginBottom:"10px"}}>
-                    Hide/Show editor
+              <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
+              <button className="smallButton" onClick={() => this.toggle_div()} style={{ "align-self": "flex-start", marginBottom: "10px" }}>
+                Hide/Show editor
             </button>
 
-            {
-              this.state.showMe ?
-                <div className="col-20" style={{ Position:"relative"}}  >
-                  <Editor state={this.state.state}/>
-                </div>
-                :null
-            }
-          </div>
-
-
+              {
+                this.state.showMe ?
+                  <div className="col-12" style={{ Position: "relative" }}  >
+                    <Editor state={this.state.state} />
+                  </div>
+                  : null
+              }
+            </div>
 
           </div>
         </div>
