@@ -12,6 +12,7 @@ import * as p from "../prototype.ts"
 
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
+import { MapDevices } from "./map.jsx"
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -134,6 +135,7 @@ export class StatesViewer extends Component {
     shareButton: "",
     selectedDevices: [],
     selectAllState: null,
+    view: "list"
   };
 
   socket = undefined;
@@ -381,17 +383,37 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: devicesViewTemp, devicesServer: devicesServerTemp }, this.selectCountUpdate)
   }
 
+  changeView = ( action ) => {
+    this.setState({ view: action})
+  }
+
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
     } else {
-      return (
-        <div className="" style={{ paddingTop: 25, margin: 30 }} >
-          {/* <span>username: {this.props.username}</span> */}
-          <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
-          <DeviceList username={this.props.username} devices={this.state.devicesView} max={15} actionCall={this.handleActionCall} />
-        </div>
-      )
+      if(this.state.view == "list"){
+        return (
+          <div style={{ paddingTop: 25, margin: 30 }} >
+            {/* <span>username: {this.props.username}</span> */}
+            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+            <DeviceList username={this.props.username} devices={this.state.devicesView} max={8} actionCall={this.handleActionCall} /> 
+          </div>
+        )
+      }else if(this.state.view == "map"){
+        return (
+          <div style={{ paddingTop: 25, margin: 30 }} >
+            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+            <div className="rowList">
+              <div >
+                <DeviceList username={this.props.username} devices={this.state.devicesView} max={8} actionCall={this.handleActionCall} />
+              </div>
+              <div>
+                <MapDevices />
+              </div>
+            </div>
+          </div>
+        )
+      }
     }
   }
 }

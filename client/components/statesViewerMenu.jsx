@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { confirmAlert } from 'react-confirm-alert';
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll : false, sort : ""}
+    state = { selectAll : false, sort : "", view: "list"}
 
     selectBox = () => {
         if (this.state.selectAll) {
@@ -46,21 +46,22 @@ export class StatesViewerMenu extends Component {
         
     }
 
+    viewButton = () => {
+        if(this.state.view == "list"){
+            return <i className="viewButton fas fa-map-marked-alt" title="Map View" style={{color:"grey",marginTop: "9px", cursor: "pointer"}} onClick={ this.viewButtonClicked("map") } ></i>;
+        }else if(this.state.view == "map"){
+            return <i className="viewButton fas fa-list-ul" title="List View" style={{color:"grey",marginTop: "9px"}} onClick={ this.viewButtonClicked("list") } ></i>;
+        } 
+    }
+
+    viewButtonClicked = (action) => {
+        return (e) => {
+            this.setState({ view:action })
+            this.props.view(action);
+        }
+    }
+
     clickDeleteConfirmation = () => {
-        // confirmAlert({
-        // title: 'Are you sure?',
-        // message: 'Deleting a device is irreversible',
-        // buttons: [
-        //     {
-        //     label: 'Yes',
-        //     onClick: () => this.props.deleteSelected()
-        //     },
-        //     {
-        //     label: 'No',
-        //     onClick: () => { }
-        //     }
-        // ]
-        // })
         confirmAlert({
             customUI: ({ onClose }) => {
               return (
@@ -108,9 +109,10 @@ export class StatesViewerMenu extends Component {
                         {/* { this.props.selectCount} */}
                     </div>
 
-                    <div className="col" style={{ flex: "0 0 120px" }}>  <i className="fas fa-map-marked-alt" style={{color:"grey",marginTop: "9px"}}></i>
+                    <div className="col" style={{ flex: "0 0 120px" }}>  
+                        { this.viewButton() }
                         <div style={{float:"right", marginTop: "7px", textAlign:"left", width: "20px"}}>
-                        { this.sortButtons() }
+                            { this.sortButtons() }
                         </div>
                     </div>
                 </div>
