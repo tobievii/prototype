@@ -15,10 +15,15 @@ export class StatesViewerItem extends Component {
       deleteButtonClick: 0,
       selected: undefined,
       active: false,
-      lastTimestamp: undefined
+      lastTimestamp: undefined, 
+      viewButton: "View Info"
     };
   
     intervalUpdator = undefined;
+
+    constructor(props){
+      super(props)
+    }
   
     componentDidMount = () => {
       console.log("mounted " + this.props.device.devid)
@@ -191,6 +196,20 @@ export class StatesViewerItem extends Component {
         )
       }
     }
+
+    adjustMapView = (device) => {
+      return (e) => {
+        this.props.mapActionCall(device);
+      }
+    }
+
+    showDeviceInfo = () =>{ 
+      if(this.state.viewButton == "View Info"){
+        this.setState({ viewButton: "Hide Info" })
+      }else{
+        this.setState({ viewButton: "View Info" })
+      }
+    }
   
     render() {
   
@@ -204,34 +223,80 @@ export class StatesViewerItem extends Component {
         var dataPreview = JSON.stringify(this.props.device.payload.data)
         var maxlength = 120;
         if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
-  
-        return (
-          <div className="container-fluid" style={{ marginBottom: 2 }}>
-            <div className="row statesViewerItem" style={this.calcStyle()} >
-  
-              {this.selectbox()}
-  
-              <Link className="col" to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} style={{ overflow: "hidden" }}>
-                <div>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-                  <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+        var viewUsed = this.props.view
+        if( viewUsed == "list" && this.state.viewButton == "View Info"){
+          return (
+            <div className="container-fluid" style={{ marginBottom: 2 }}>
+              <div className="row statesViewerItem" style={this.calcStyle()} >
+    
+                {this.selectbox()}
+    
+                <Link className="col" to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} style={{ overflow: "hidden" }}>
+                  <div>
+                    <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+                    <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+                  </div>
+                </Link>
+    
+                <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
+                  {/* <span className="trash" onClick={this.clickDeleteConfirmation(this.props.devID)}>{this.state.deleteButton}</span>
+                  <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
+                  <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span> */}
                 </div>
-              </Link>
-  
-              <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
-                {/* <span className="trash" onClick={this.clickDeleteConfirmation(this.props.devID)}>{this.state.deleteButton}</span>
-                <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
-                <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span> */}
+    
+                <div className="col" style={{ flex: "0 0 230px", textAlign: "right" }}>
+                  <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
+                  <span className="faded" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
+                </div>
+    
               </div>
-  
-              <div className="col" style={{ flex: "0 0 230px", textAlign: "right" }}>
-                <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
-                <span className="faded" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
-              </div>
-  
             </div>
-          </div>
-        );
+          );
+        }else if(viewUsed == "map" && this.state.viewButton == "Hide Info"){
+          return(
+            <div className="container-fluid" style={{ marginBottom: 2 }}>
+              <div className="row statesViewerItem" style={this.calcStyle()} >
+    
+                {this.selectbox()}
+
+                <div style={{ overflow: "hidden" }} className="col" onClick={this.adjustMapView}>
+                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+                  <Link  to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} >
+                    <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+                  </Link>
+                </div>
+
+                <div className="col" style={{ flex: "0 0 160px", textAlign: "right" }}>
+                  <div className="commanderBgPanel commanderBgPanelClickable" style={{ verticalAlign : "center", width: "auto", height: "auto" , float: "right", fontSize: 12 }} onClick = {this.showDeviceInfo}>
+                    {this.state.viewButton}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )
+        }else if(viewUsed == "map" && this.state.viewButton == "View Info"){
+          return(
+            <div className="container-fluid" style={{ marginBottom: 2 }}>
+              <div className="row statesViewerItem" style={this.calcStyle()} >
+    
+                {this.selectbox()}
+
+                <div className="col" style={{ overflow: "hidden" }}  onClick={this.adjustMapView(this.props.device.devid)}>
+                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+                  <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span><br />
+                </div>
+
+                <div className="col" style={{ flex: "0 0 160px", textAlign: "right" }}>
+                  <div className="commanderBgPanel commanderBgPanelClickable" style={{ verticalAlign : "center", width: "auto", height: "auto" , float: "right", fontSize: 12 }} onClick = {this.showDeviceInfo}>
+                    {this.state.viewButton}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )
+        }
       }
     }
   }

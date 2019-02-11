@@ -9,7 +9,7 @@ export class Widget extends React.Component {
         <div className="widgetLabel" style={{ position: "absolute", top: 0, width: "100%" }}>
 
           <div style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
-          <div className="widgetOptions" style={{ float: "right", padding: "6px 6px 0 0" }}><i class="fas fa-wrench"></i></div>
+          <div className="widgetOptions" style={{ float: "right", padding: "6px 6px 0 0" }}><i className="fas fa-wrench"></i></div>
 
         </div>
 

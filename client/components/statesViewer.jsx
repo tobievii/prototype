@@ -42,7 +42,7 @@ export class Pagination extends Component {
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div>
+      return (<div style = {{marginLeft: "8px"}}>
         {
           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
@@ -68,6 +68,12 @@ export class DeviceList extends Component {
       this.props.actionCall({ a, e })
     }
   }
+
+  handleMapAction = (device) => {
+    return (e) => {
+      this.props.mapactionCall({ device, e })
+    }
+  } 
 
   render() {
 
@@ -114,7 +120,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem username={this.props.username} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
+          {devicelist.map(device => <StatesViewerItem mapActionCall={this.handleMapAction(device.devid)} username={this.props.username} view={this.props.view} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -135,7 +141,8 @@ export class StatesViewer extends Component {
     shareButton: "",
     selectedDevices: [],
     selectAllState: null,
-    view: "list"
+    view: "map",
+    devicePressed: undefined
   };
 
   socket = undefined;
@@ -387,6 +394,10 @@ export class StatesViewer extends Component {
     this.setState({ view: action})
   }
 
+  deviceClicked = (device) =>{
+    this.setState({ devicePressed: device })
+  }
+
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
@@ -396,7 +407,7 @@ export class StatesViewer extends Component {
           <div style={{ paddingTop: 25, margin: 30 }} >
             {/* <span>username: {this.props.username}</span> */}
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
-            <DeviceList username={this.props.username} devices={this.state.devicesView} max={8} actionCall={this.handleActionCall} /> 
+            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} /> 
           </div>
         )
       }else if(this.state.view == "map"){
@@ -405,10 +416,10 @@ export class StatesViewer extends Component {
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
             <div className="rowList">
               <div >
-                <DeviceList username={this.props.username} devices={this.state.devicesView} max={8} actionCall={this.handleActionCall} />
+                <DeviceList mapactionCall={this.deviceClicked} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={9} actionCall={this.handleActionCall} />
               </div>
               <div>
-                <MapDevices />
+                <MapDevices deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
               </div>
             </div>
           </div>

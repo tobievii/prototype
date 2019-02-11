@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { confirmAlert } from 'react-confirm-alert';
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll : false, sort : "", view: "list"}
+    state = { selectAll : false, sort : "", view: "map"}
 
     selectBox = () => {
         if (this.state.selectAll) {
