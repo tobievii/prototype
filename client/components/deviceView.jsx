@@ -30,7 +30,7 @@ import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
-
+var loggedInUser="";
 const customStyles = {
   content: {
     top: '50%',
@@ -74,7 +74,6 @@ export class DeviceView extends Component {
     EmailsharedDevice: [],
     display: "",
     EditorButton: " HIDE EDITOR",
-    DeviceDataSize: "col-3"
   };
 
   socket;
@@ -119,7 +118,7 @@ export class DeviceView extends Component {
           newDeviceList.push("|");
         }
       });
-      temp = newDeviceList.filter((users) => { return users !== "|" })
+      temp = newDeviceList.filter((users) => { return users !== "|" && users.email !==loggedInUser.email})
       this.setState({ userSearched: temp })
     })
   }
@@ -210,6 +209,10 @@ export class DeviceView extends Component {
 
     }).catch(err => console.error(err.toString()));
 
+    fetch("/api/v3/account", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } 
+    }).then(response => response.json()).then(account => {
+      loggedInUser=account;
+    }).catch(err => console.error(err.toString()));
     // p.getView(this.props.devid, (view) => {
     //   console.log(view)
     //   this.setState({ view })
