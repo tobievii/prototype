@@ -251,7 +251,7 @@ export class StatesViewerItem extends Component {
     
                 {this.selectbox()}
 
-                <Link to={"/u/" +this.props.username +"/view/"+ this.props.device.devid}>
+                <Link to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} title="View Device Data">
                   <div style={{ overflow: "hidden", marginTop: "5px" }}>
                     <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   </div>
@@ -264,7 +264,7 @@ export class StatesViewerItem extends Component {
 
                 <div style={{ flex: "0 0 160px", textAlign: "right" }}>  
                   <div align="center" style={{ marginTop: "7px", width: "auto", height: "auto" , fontSize: 15 }} onClick={this.adjustMapView(this.props.device.devid)}>
-                    <span><i className="fas fa-map-marker-alt marker"></i></span>
+                    <span><i className="fas fa-map-marker-alt marker" title="Go To Device"></i></span>
                   </div>
                 </div>
 

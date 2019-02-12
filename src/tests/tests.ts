@@ -165,7 +165,7 @@ describe("API", function () {
       testvalue = "DEV" + Math.round(Math.random() * 1000);
       var testDevice: any = {
         id: testAccount.testDev,
-        data: { someval: testvalue }
+        data: { someval: testvalue , gps:{lat:25.566, lon: -25.39955}}
       };
 
       
@@ -440,7 +440,7 @@ describe("API", function () {
         /*************************** MQTT Connect *************************************/
 
         client.on('connect', function () {
-          var dataVar = { random : randomnumber, temp: {cold: Math.round(Math.random()*10000), hot: Math.round(Math.random()*10000)} };
+          var dataVar = { random : randomnumber, temp: {cold: Math.round(Math.random()*10000), hot: Math.round(Math.random()*10000)} , gps:{lat:25.566, lon: -25.39955}};
           /*************************** Http POST *************************************/
           trex.restJSON(
             {
@@ -489,7 +489,7 @@ describe("API", function () {
       var socket = require("socket.io-client")("http://localhost:8080")
 
       var randomnumber = Math.round(Math.random()*10000)
-      var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0} };
+      var dataVar = { random : randomnumber, temp: {cold: 1, hot: 0}, gps:{lat:25.566, lon: -25.39955} };
 
       var counter = 0;
 
@@ -578,7 +578,8 @@ describe("API", function () {
       var randomnumber = Math.round(Math.random()*10000)
       var dataVar = { 
         random : randomnumber, 
-        temp: {cold: 1, hot: 0} 
+        temp: {cold: 1, hot: 0},
+        gps:{lat:25.566, lon: -25.39955} 
       };
 
       var counter = 0;

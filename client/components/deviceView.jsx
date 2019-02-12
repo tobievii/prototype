@@ -220,9 +220,7 @@ export class DeviceView extends Component {
     }).then(response => response.json()).then(account => {
       loggedInUser = account;
       currentDevice = this.state.state.apikey;
-      console.log(currentDevice)
       if (loggedInUser.apikey != this.state.state.apikey && this.state.state.level < 100) {
-        console.log("tjerr");
         this.setState({ shareDisplay: "none" })
       }
       else {
