@@ -416,7 +416,7 @@ export class StatesViewer extends Component {
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
             <div className="rowList">
               <div >
-                <DeviceList mapactionCall={this.deviceClicked} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={9} actionCall={this.handleActionCall} />
+                <DeviceList mapactionCall={this.deviceClicked} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} actionCall={this.handleActionCall} />
               </div>
               <div>
                 <MapDevices deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
