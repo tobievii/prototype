@@ -74,7 +74,7 @@ export class DeviceView extends Component {
     DeviceSharedEmails: [],
     EmailsharedDevice: [],
     display: "",
-    EditorButton: " HIDE EDITOR",
+    EditorButton: " SHOW EDITOR",
      shareDisplay:""
   };
 
@@ -90,7 +90,7 @@ export class DeviceView extends Component {
       })
     });
     this.State = {
-      showMe: true
+      showMe: false
     }
   }
 
@@ -420,14 +420,16 @@ export class DeviceView extends Component {
 
     if (this.state.display == "none") {
       this.state.display = ""
-      this.state.EditorButton = "HIDE EDITOR";
-      this.state.DeviceDataSize = "col-3"
+      this.state.EditorButton = "SHOW EDITOR";
+      this.toggle_div()
     }
     else {
       this.state.display = "none";
-      this.state.EditorButton = "SHOW EDITOR";
-      this.state.DeviceDataSize = "col-6"
+      this.state.EditorButton = "HIDE EDITOR";
+      this.toggle_div()
     }
+
+    
   }
 
   render() {
@@ -526,15 +528,10 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col-5" style={{ position: "relative" }}>
-
-              <h4 style={{ color: " #f3353a" }} >PROCESSING</h4>
-              <button className="smallButton" onClick={() => this.toggle_div()} style={{ "align-self": "flex-start", marginBottom: "10px" }}>
-                Hide/Show editor
-            </button>
-
               {
                 this.state.showMe ?
                   <div className="col-12" style={{ Position: "relative" }}  >
+                  <h4 style={{ color: " #f3353a" }} >EDITOR</h4>
                     <Editor state={this.state.state} />
                   </div>
                   : null
