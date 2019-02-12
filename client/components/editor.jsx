@@ -206,7 +206,8 @@ export class Editor extends React.Component {
 
     onChange = (code, e) => {
         console.log(code)
-        this.setState({ code: code });
+        this.setState({ code: code, editorChanged: true });
+        this.props.onChange();
     };
 
     loadOnFirstData = () => {
