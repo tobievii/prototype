@@ -202,14 +202,6 @@ export class StatesViewerItem extends Component {
         this.props.mapActionCall(device);
       }
     }
-
-    showDeviceInfo = () =>{ 
-      if(this.state.viewButton == "View Info"){
-        this.setState({ viewButton: "Hide Info" })
-      }else{
-        this.setState({ viewButton: "View Info" })
-      }
-    }
   
     render() {
   
@@ -252,44 +244,27 @@ export class StatesViewerItem extends Component {
               </div>
             </div>
           );
-        }else if(viewUsed == "map" && this.state.viewButton == "Hide Info"){
+        }else if(viewUsed == "map"){
           return(
             <div className="container-fluid" style={{ marginBottom: 2 }}>
-              <div className="row statesViewerItem" style={this.calcStyle()} >
+              <div className="row statesViewerItemMap" style={this.calcStyle()} >
     
                 {this.selectbox()}
 
-                <div style={{ overflow: "hidden" }} className="col" onClick={this.adjustMapView}>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-                  <Link  to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} >
-                    <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
-                  </Link>
-                </div>
-
-                <div className="col" style={{ flex: "0 0 160px", textAlign: "right" }}>
-                  <div className="commanderBgPanel commanderBgPanelClickable" style={{ verticalAlign : "center", width: "auto", height: "auto" , float: "right", fontSize: 12 }} onClick = {this.showDeviceInfo}>
-                    {this.state.viewButton}
+                <Link to={"/u/" +this.props.username +"/view/"+ this.props.device.devid}>
+                  <div style={{ overflow: "hidden", marginTop: "5px" }}>
+                    <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   </div>
-                </div>
+                </Link>
 
-              </div>
-            </div>
-          )
-        }else if(viewUsed == "map" && this.state.viewButton == "View Info"){
-          return(
-            <div className="container-fluid" style={{ marginBottom: 2 }}>
-              <div className="row statesViewerItem" style={this.calcStyle()} >
-    
-                {this.selectbox()}
+                  <div align="right"style={{marginTop: "4px"}}>
+                    <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
+                  </div>
+                
 
-                <div className="col" style={{ overflow: "hidden" }}  onClick={this.adjustMapView(this.props.device.devid)}>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-                  <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span><br />
-                </div>
-
-                <div className="col" style={{ flex: "0 0 160px", textAlign: "right" }}>
-                  <div className="commanderBgPanel commanderBgPanelClickable" style={{ verticalAlign : "center", width: "auto", height: "auto" , float: "right", fontSize: 12 }} onClick = {this.showDeviceInfo}>
-                    {this.state.viewButton}
+                <div style={{ flex: "0 0 160px", textAlign: "right" }}>  
+                  <div align="center" style={{ marginTop: "7px", width: "auto", height: "auto" , fontSize: 15 }} onClick={this.adjustMapView(this.props.device.devid)}>
+                    <span><i className="fas fa-map-marker-alt marker"></i></span>
                   </div>
                 </div>
 
