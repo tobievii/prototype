@@ -24,7 +24,6 @@ export class MapDevices extends Component {
   }
 
   render() {
-    
     var allDevices = this.props.devices;
     var deviceSelected = this.props.deviceCall;
     
@@ -36,10 +35,7 @@ export class MapDevices extends Component {
       }
     });
 
-    var position = [details.lat, details.lng]
-
-    allDevices.map((marker, index) => {
-    });    
+    var position = [details.lat, details.lng]   
     
     return (
       <Map className="map" center={position} zoom={details.zoom}>
@@ -49,13 +45,36 @@ export class MapDevices extends Component {
         />
         {
           allDevices.map((marker, index) => {
-            return(
-              <Marker position={[details.lat, details.lng]} key={marker.devid}>
-                <Popup>
-                  <h5 className="popup">{marker.devid}</h5> <br />
-                </Popup>
-              </Marker>
-            )
+            var gps = {
+              gps:{
+                lat:-25.864170, 
+                lon: 28.209336
+              }
+            }
+      
+            if(marker.payload.data.gps == undefined ){
+              fetch("/api/v3/data/post", {
+                apikey : this.props.acc.apikey,
+                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: marker.devid, data: gps })
+              }).then(response => response.json()).then(serverresponse => {
+                return(
+                  <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
+                    <Popup>
+                      <h5 className="popup">{marker.devid}</h5> <br />
+                    </Popup>
+                  </Marker>
+                )
+              }).catch(err => console.error(err.toString()));
+            }else{
+              return(
+                <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
+                  <Popup>
+                    <h5 className="popup">{marker.devid}</h5> <br />
+                  </Popup>
+                </Marker>
+              )
+            }
           })
         }
       </Map>

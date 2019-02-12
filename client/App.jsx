@@ -100,7 +100,7 @@ class App extends Component {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer username={this.state.account.username} />
+                        <StatesViewer username={this.state.account.username} account={this.state.account}/>
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
@@ -131,7 +131,7 @@ class App extends Component {
             <div>
                 <UserPage username={match.params.username} />
 
-                <StatesViewer username={match.params.username} />
+                <StatesViewer username={match.params.username} account={this.state.account}/>
             </div>
 
         )
