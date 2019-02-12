@@ -43,6 +43,7 @@
     "monaco-themes": "^0.2.5",
     "node-sass": "^4.10.0",
     "npm": "^6.4.1",
+    "random-string": "^0.2.0",
     "react": "^16.5.2",
     "react-bootstrap-table-next": "^1.2.0",
     "react-bootstrap-table2-editor": "^1.1.0",

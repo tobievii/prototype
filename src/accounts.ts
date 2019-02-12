@@ -151,7 +151,6 @@ export function accountVerify(db: any) {
   }
 }
 
-
 export function accountVerifyCheck(db: any) {
   return function (req: any, res: any) {
     console.log("accountVerifyCheck");
@@ -218,12 +217,13 @@ export function Forgotpassword(db:any, user:any, cb:any) {
  if(user.email.length !=0){
     if (validateEmail(user.email)) {
       db.users.find({email:user.email}, (err:Error, result:any) => {
-     if (result.length==0) {
-       cb("Email does not exist")
-      } else {
-      cb(null,result);
-      }
-     })
+        if (result.length==0) {
+          cb("Email does not exist")
+        } else {
+              db.users.update({email:user.email},{ $set: {"recoverToken":null}})
+                cb(null,result);
+        }
+      })
   } 
    else{
     cb("not valid email", undefined)

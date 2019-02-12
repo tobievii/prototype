@@ -137,10 +137,10 @@ class App extends Component {
         )
     }
 
-    recoverPassword = () => {
+    recoverPassword = ({ match }) => {
         return (
             <div>
-                <Recovery />
+                <Recovery recoverToken={match.params.recoverToken}/>
             </div>
         )
     }
@@ -159,7 +159,7 @@ class App extends Component {
                     <div>
                         <NavBar version={this.state.version} account={this.state.account} />
                         <Route exact path="/" component={this.home} />
-                        <Route path="/recover" component={this.recoverPassword} />
+                        <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route path="/view/:devid" component={this.deviceView} />
                         <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />

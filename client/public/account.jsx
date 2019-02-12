@@ -137,16 +137,9 @@ export class Account extends Component {
       })
     }).then(response => response.json()).then(data => {
       console.log(data);
-
-      // console.log(data);
-      // if (data.signedin) {
-      //   location.reload();
-      // } 
-
       if (data.error) {
         this.setState({ serverError: data.error })
       }
-
     }).catch(err => console.error(err.toString()));
 
   }
@@ -156,14 +149,21 @@ export class Account extends Component {
     fetch("/api/v3/ForgetPassword", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: this.state.form.email
+        email: this.state.form.email,
       })
     }).then(response => response.json()).then(data => {
       console.log(data);
 
       if (data.result) {
         this.setState({ resetButton: "RESET PASSWORD" })
-      }
+          fetch("/api/v3/admin/recoverEmailLink", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: this.state.form.email,
+      })
+    }).then(response => response.json()).then(data => {
+      console.log(data);
+            })}
        if (data.error) {
         console.log("zzzzzzzzzzzzzzzzzzzzzzzzzz")
         this.setState({ serverError: data.error })
@@ -200,12 +200,7 @@ export class Account extends Component {
     }else{
       return(
         <div className="col-7" style={{ textAlign: "right" }} >
-          <div className="col-7" style={{ textAlign: "right" }} >
-              <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
-          </div>
-             <div><Link to={"/recover"} >
-            <button className="btn-spot" style={{ float: "right" }} onClick={()=> this.ForgotPassword()} > { this.state.resetButton } </button>
-          </Link></div> 
+ <div className="serverError" style={{ fontSize: "auto" }} >Check email for Password recovery link</div> 
             </div>
       )
     }

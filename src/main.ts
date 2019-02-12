@@ -1,7 +1,7 @@
 require('source-map-support').install();
-
+var nodemailer = require("nodemailer")
 var _ = require('lodash');
-
+var randomString = require('random-string');
 import * as fs from 'fs';
 
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
@@ -155,7 +155,7 @@ app.get('/admin/accounts', (req: any, res: any) => {
   })
 })
 
-app.get("/recover", (req: any, res: any) => {
+app.get("/recover/:recoverToken", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
@@ -393,7 +393,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 
 });
-
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
   if (req.body.username) {

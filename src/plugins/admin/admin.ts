@@ -1,5 +1,5 @@
 var nodemailer = require("nodemailer")
-
+var randomString = require('random-string');
 var mongojs = require('mongojs')
 var ObjectId = mongojs.ObjectId;
 
@@ -84,6 +84,42 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     }
 
   })
+app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
+db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass}})
+})
+  //####################################################################
+//Recover Password Link sent via email
+app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
+var recoverToken=randomString({length:128});
+ db.users.update({email:req.body.email},{ $set: {"recoverToken":recoverToken}})
+    var verifyLink = req.headers.referer + "recover/" +recoverToken
+        var smtpTransport = nodemailer.createTransport({
+          host:'smtp.mailtrap.io',
+          port: 2525,
+          auth: {
+              user: 'fceb57cb70ac6b',
+              pass: '313c8d2fba30bb'
+          }
+        });
+
+        var mail = {
+          from: 'prototype@iotnxt.com',
+          to: req.body.email,
+          subject: 'Password Recovery',
+          text: 'To reset forgotten Password go to '+verifyLink,
+          html: '<p>To reset forgotten Password go to <a href="'+verifyLink+'">'+verifyLink+'</a></p>'
+        }
+
+        smtpTransport.sendMail(mail, (err:any, info:any)=>{
+          if (err) { console.log(err); return;}
+          if (info) {
+           
+            res.json({err:{}, result:{ mail: "sent" }})
+          }
+        })      
+  })
+//Recover Password Link sent via email
+//####################################################################
  
 
   app.get("/api/v3/admin/registration", (req: any, res: any) => {
