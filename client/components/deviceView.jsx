@@ -416,20 +416,27 @@ export class DeviceView extends Component {
     }
 
   }
+
+   hideEditor = () => {
+    if (confirm('Are you sure? Any unsaved code will be discarded') == true) {
+      this.state.display = ""
+      this.toggle_div();
+      this.state.EditorButton = "SHOW EDITOR";
+    } else {
+      return;
+    }
+  }
+
   ShowEditor = () => {
 
     if (this.state.display == "none") {
-      this.state.display = ""
-      this.state.EditorButton = "SHOW EDITOR";
-      this.toggle_div()
+      this.hideEditor();
     }
     else {
       this.state.display = "none";
       this.state.EditorButton = "HIDE EDITOR";
-      this.toggle_div()
+      this.toggle_div();
     }
-
-    
   }
 
   render() {
