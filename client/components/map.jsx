@@ -39,7 +39,6 @@ export class MapDevices extends Component {
     var position = [details.lat, details.lng]
 
     allDevices.map((marker, index) => {
-      
     });    
     
     return (
@@ -51,7 +50,7 @@ export class MapDevices extends Component {
         {
           allDevices.map((marker, index) => {
             return(
-              <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
+              <Marker position={[details.lat, details.lng]} key={marker.devid}>
                 <Popup>
                   <h5 className="popup">{marker.devid}</h5> <br />
                 </Popup>
