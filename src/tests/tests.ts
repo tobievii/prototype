@@ -599,17 +599,12 @@ describe("API", function () {
           client.subscribe(testAccount.apikey, function (err: any) {
             if (err) { 
               console.log(err) 
-            }else{
-              //client.publish(testAccount.apikey, JSON.stringify({id: testAccount.testDev, data: dataVar}));
-              
             }   
           })
 
           socket.emit("post", {id: testAccount.testDev, data: dataVar })
           originalData = JSON.stringify(dataVar);
           //console.log(originalData+"---------------------original data sent")
-
-          
         })
 
         client.on('message', function (topic: any, message: any){
@@ -619,7 +614,6 @@ describe("API", function () {
           //console.log(message+"--------------------------mqtt")
           counter++;
           checkSuccess()
-          
         })
 
       });
@@ -641,8 +635,8 @@ describe("API", function () {
             }else{
               restpacket = JSON.stringify(result.data)
               //console.log(JSON.stringify(result)+"----------------------------rest")
-              
-              //checkSuccess();
+              counter++;
+              checkSuccess();
             } 
           }
         ); 
@@ -653,7 +647,7 @@ describe("API", function () {
       });
 
       function checkSuccess() {
-        if (counter >= 2) {
+        if (counter >= 3) {
           comparePackets();
         }
       }
@@ -686,14 +680,14 @@ describe("API", function () {
 
 });
 
-describe("UI Test", function(){
-  describe("Landing Page", function(){
-    it('Contains Login Button', function(done: any){
-      done();
-    });
-  })
+// describe("UI Test", function(){
+//   describe("Landing Page", function(){
+//     it('Contains Login Button', function(done: any){
+//       done();
+//     });
+//   })
   
-});
+// });
 
 function generateDifficult(count: number){
   var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
