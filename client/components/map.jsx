@@ -49,22 +49,22 @@ export class MapDevices extends Component {
               }
             }
       
-            // if(marker.payload.data.gps == undefined ){
-            //   console.log("Device Undefined: "+ marker.devid)
-            //   fetch("/api/v3/data/post", {
-            //     apikey : this.props.acc.apikey,
-            //     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            //     body: JSON.stringify({ id: marker.devid, data: gps })
-            //   }).then(response => response.json()).then(serverresponse => {
-            //     return(
-            //       <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
-            //         <Popup>
-            //           <h5 className="popup">{marker.devid}</h5> <br />
-            //         </Popup>
-            //       </Marker>
-            //     )
-            //   }).catch(err => console.error(err.toString()));
-            // }else{
+            if(marker.payload.data.gps == undefined ){
+              console.log("Device Undefined: "+ marker.devid)
+              fetch("/api/v3/data/post", {
+                apikey : this.props.acc.apikey,
+                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: marker.devid, data: gps })
+              }).then(response => response.json()).then(serverresponse => {
+                return(
+                  <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
+                    <Popup>
+                      <h5 className="popup">{marker.devid}</h5> <br />
+                    </Popup>
+                  </Marker>
+                )
+              }).catch(err => console.error(err.toString()));
+            }else{
               return(
                 <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
                   <Popup>
@@ -72,7 +72,7 @@ export class MapDevices extends Component {
                   </Popup>
                 </Marker>
               )
-            // }
+            }
           })
         }
       </Map>
