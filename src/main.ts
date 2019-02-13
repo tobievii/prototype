@@ -494,6 +494,14 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
 })
 
 
+app.post("/api/v3/dashboard", (req:any, res:any) => {
+  console.log(req.body.layout)
+  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+    dev.layout = req.body.layout
+    db.states.update({key:req.body.key}, dev)
+  })
+})
+
 
 app.post('/api/v3/accounts/create', (req: any, res: any) => {
   if (req.user.level < 100) { res.json({ error: "permission denied" }); return; }
@@ -824,6 +832,8 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   res.json({ definitions })
 })
+
+
 
 
 

@@ -21,119 +21,176 @@ import { ThreeDWidget } from "./three.jsx"
 
 export class Dashboard extends React.Component {
 
+  settingLayout = false;
+
   state = {
     grid: {
       width: 4000,
       cols: 40,
       rowHeight: 30
-    },
-    layout: [
-      { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
-      //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
-      //{ i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
-    ],
+    }
+
+    // ,
+    // layout: [
+    //   { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
+    //   //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
+    //   //{ i: 'asdf', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
+    // ],
   }
 
   draggingUnique = "";
 
-  onDragOver = (e, f) => {
-    let event = e
-    e.stopPropagation();
-    e.preventDefault();
-    //console.log("dragOver")
 
-    var location = {
-      x: Math.round(e.clientX / (this.state.grid.width / this.state.grid.cols)),
-      y: Math.round(e.clientY / this.state.grid.rowHeight / 2) - 1
-    }
-
-    if (this.draggingUnique != "") {
-
-      var needsUpdate = false;
-
-      for (var widget of this.state.layout) {
-
-        if (widget.i == this.draggingUnique) {
-          if (widget.x != location.x) { needsUpdate = true; }
-          if (widget.y != location.y) { needsUpdate = true; }
-        }
-      }
-
-
-      if (needsUpdate) {
-        console.log("needsUpdate")
-        var layout = _.clone(this.state.layout)
-
-        var layout = layout.filter(w => {
-          if (w.i == this.draggingUnique) {
-            w.x = location.x
-            w.y = location.y
-            return w;
-          } else { return w }
-        })
-
-        // for (var widget of layout) {
-        //   if (widget.i == this.draggingUnique) {
-
-        //   }
-        // }
-
-        var temp = this.draggingUnique;
-        this.draggingUnique = "";
-        console.log(layout);
-        this.setState({ layout }, () => {
-          console.log("updated")
-          this.draggingUnique = temp;
-        })
-      }
-
-
-    } else {
-      e.exists = true;
-
-      // console.log("drop")
-      // console.log(e.datapath)
-      // console.log(location)
-
-      var layout = _.clone(this.state.layout)
-      var unique = this.generateDifficult(32)
-
-
-      this.draggingUnique = unique;
-
-      layout.push({ i: unique, x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
-      this.setState({ layout: layout })
-    }
-
+  saveDashboard = () => {
+  
 
   }
 
-  onDrop = (e, f) => {
-    this.draggingUnique = "";
+  onDragOver = (e, f) => {
+    // let event = e
+    e.stopPropagation();
+    e.preventDefault();
+    // //console.log("dragOver")
 
     // var location = {
     //   x: Math.round(e.clientX / (this.state.grid.width / this.state.grid.cols)),
     //   y: Math.round(e.clientY / this.state.grid.rowHeight / 2) - 1
     // }
 
-    // console.log("drop")
-    // console.log(e.datapath)
-    // console.log(location)
+    // if (this.draggingUnique != "") {
 
-    // var layout = _.clone(this.state.layout)
-    // layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
-    // this.setState({ layout: layout })
+    //   var needsUpdate = false;
+
+    //   for (var widget of this.state.layout) {
+
+    //     if (widget.i == this.draggingUnique) {
+    //       if (widget.x != location.x) { needsUpdate = true; }
+    //       if (widget.y != location.y) { needsUpdate = true; }
+    //     }
+    //   }
+
+
+    //   if (needsUpdate) {
+    //     console.log("needsUpdate")
+    //     var layout = _.clone(this.state.layout)
+
+    //     var layout = layout.filter(w => {
+    //       if (w.i == this.draggingUnique) {
+    //         w.x = location.x
+    //         w.y = location.y
+    //         return w;
+    //       } else { return w }
+    //     })
+
+    //     // for (var widget of layout) {
+    //     //   if (widget.i == this.draggingUnique) {
+
+    //     //   }
+    //     // }
+
+    //     var temp = this.draggingUnique;
+    //     this.draggingUnique = "";
+    //     console.log(layout);
+    //     this.setState({ layout }, () => {
+    //       console.log("updated")
+    //       this.draggingUnique = temp;
+    //     })
+    //   }
+
+
+    // } else {
+    //   e.exists = true;
+
+    //   // console.log("drop")
+    //   // console.log(e.datapath)
+    //   // console.log(location)
+
+    //   var layout = _.clone(this.state.layout)
+    //   var unique = this.generateDifficult(32)
+
+
+    //   this.draggingUnique = unique;
+
+    //   layout.push({ i: unique, x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
+    //   this.setState({ layout: layout })
+    // }
+
+
   }
 
+  onDrop = (e, f) => {
+    //this.draggingUnique = "";
 
+    var location = {
+      x: Math.round(e.clientX / (this.state.grid.width / this.state.grid.cols)),
+      y: Math.round(e.clientY / this.state.grid.rowHeight / 2) - 1
+    }
+
+    console.log("drop")
+    console.log(e.datapath)
+    console.log(location)
+
+    var layout = _.clone(this.state.layout)
+    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
+    this.setState({ layout: layout }, () => {
+      
+    })
+  }
+
+  gridOnDragStart = () => { console.log("drag start"); }
+  gridOnDrag = () => { console.log("drag"); }
+  gridOnDragStop = () => {
+    console.log("drag stop");
+    
+  }
+  gridOnResizeStart = () => { console.log("resize start"); }
+  gridOnResize = () => { console.log("resize "); }
+  gridOnResizeStop = () => {
+    console.log("resize stop");
+    
+  }
+
+  gridOnLayoutChange = (layout) => {
+    console.log(layout)
+    console.log(this.state.layout)
+    var newlayout = _.clone(this.state.layout) 
+
+    for (var widgetup of layout) {
+      for (var widget of newlayout) {
+        if (widget.i == widgetup.i) {
+          widget.x = widgetup.x
+          widget.y = widgetup.y
+          widget.w = widgetup.w
+          widget.h = widgetup.h
+        }
+      }
+    }
+    
+
+
+    fetch("/api/v3/dashboard", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ key: this.props.state.key, layout:newlayout })
+    }).then(response => response.json()).then(result => { console.log(result) })
+      .catch(err => console.error(err.toString()));
+  }
 
   generateDashboard = () => {
 
     if (!this.props.state) {
       return (<div>loading..</div>)
     } else {
+      //console.log(this.props.state)
+
       return (
-        <GridLayout isRearrangeable={false} useCSSTransforms={true} preventCollision={true} className="layout" layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width} compactType={"vertical"} >
+        <GridLayout
+          onDragStart={this.gridOnDragStart}
+          onDrag={this.gridOnDrag}
+          onDragStop={this.gridOnDragStop}
+          onResizeStart={this.gridOnResizeStart}
+          onResize={this.gridOnResize}
+          onLayoutChange={this.gridOnLayoutChange}
+          onResizeStop={this.gridOnResizeStop} layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width}>
           {
             this.state.layout.map((data, i) => {
               if (data.type == "Calendar") {
@@ -190,18 +247,49 @@ export class Dashboard extends React.Component {
     }
   }
 
-  render() {
+  loading() {
 
-    // layout is an array of objects, see the demo for more complete usage
-    // var layout = [
-    //   {i: 'c', x: 0, y: 0, w: 8, h: 4},
-    //   {i: 'd', x: 0, y: 4, w: 8, h: 8}
-    // ];
-    return (
-      <div onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
-        {this.generateDashboard()}
-      </div>
-    )
+    if (this.props.state) {
+
+      if (this.props.state.layout) {
+
+        if (this.settingLayout == false) {
+          this.settingLayout = true;
+          console.log(this.props.state.layout)
+          this.setState({ layout: this.props.state.layout }, () => { console.log("state") })
+        }
+
+        return (<div>state</div>)
+      } else {
+
+        if (this.settingLayout == false) {
+          this.settingLayout = true;
+          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
+        }
+
+        return (<div>loading</div>)
+      }
+
+
+
+    } else {
+      console.log("no props yet")
+      return (<div>no props</div>)
+    }
+
+  }
+
+  render() {
+    if (this.state.layout) {
+      return (
+        <div style={{ background: "rgba(255,0,0,0.1)", minHeight: 50 }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
+          {this.generateDashboard()}
+        </div>
+      )
+    } else {
+      return this.loading()
+    }
+
   }
 
   generateDifficult(count) {
