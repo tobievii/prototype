@@ -1,6 +1,13 @@
 #!/bin/sh
 
 echo "test"
+npm install
+cd client
+npm install
+npm run build_dev
+cd ..
+npm run build
+
 gnome-terminal -- mongod
 gnome-terminal -- npm run buildwatch
 
