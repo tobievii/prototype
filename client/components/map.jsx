@@ -32,6 +32,8 @@ export class MapDevices extends Component {
       }
     });
 
+    
+
     var position = [details.lat, details.lng]   
     
     return (
@@ -43,27 +45,32 @@ export class MapDevices extends Component {
         {
           allDevices.map((marker, index) => {
             var gps = {
-              gps:{
-                lat:-25.864170, 
-                lon: 28.209336
-              }
             }
       
             if(marker.payload.data.gps == undefined ){
-              console.log("Device Undefined: "+ marker.devid)
-              fetch("/api/v3/data/post", {
+              fetch("/api/v3/getlocation", {
                 apikey : this.props.acc.apikey,
                 method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id: marker.devid, data: gps })
+                body: JSON.stringify({ id: marker.devid})
               }).then(response => response.json()).then(serverresponse => {
-                return(
-                  <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
-                    <Popup>
-                      <h5 className="popup">{marker.devid}</h5> <br />
-                    </Popup>
-                  </Marker>
-                )
-              }).catch(err => console.error(err.toString()));
+                gps = serverresponse.result;
+                marker.payload.data.gps.lat = serverresponse.result.gps.lat;
+                marker.payload.data.gps.lon = serverresponse.result.gps.lon;
+
+                fetch("/api/v3/data/post", {
+                  apikey : this.props.acc.apikey,
+                  method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: marker.devid, data: gps })
+                }).then(response => response.json()).then(serverresponse => {
+                  return(
+                    <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
+                      <Popup>
+                        <h5 className="popup">{marker.devid}</h5> <br />
+                      </Popup>
+                    </Marker>
+                  )
+                }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
+              }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
             }else{
               return(
                 <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} key={marker.devid}>
