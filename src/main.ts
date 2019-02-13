@@ -3,6 +3,7 @@ var nodemailer = require("nodemailer")
 var _ = require('lodash');
 var randomString = require('random-string');
 import * as fs from 'fs';
+import * as geoip from 'geoip-lite'
 
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
@@ -566,6 +567,16 @@ function handleState(req: any, res: any, next: any) {
     if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
     if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
     if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
+
+    if (!req.body.data.gps) {
+      var temp = req.body.data;
+      var change = {temp,
+        gps:{
+         lat: 25.3222,
+         lon: 15.2588
+      }}
+      req.body.data = change;
+   }
 
     var meta = {
       ip: req.ip,
