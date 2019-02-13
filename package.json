@@ -52,6 +52,7 @@
     "mqtt": "^2.18.8",
     "nodemailer": "^4.6.8",
     "nodemon": "^1.18.9",
+    "public-ip": "^3.0.0",
     "random-string": "^0.2.0",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",

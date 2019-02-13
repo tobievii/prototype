@@ -4,6 +4,7 @@ var _ = require('lodash');
 var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
+const publicIp = require('public-ip');
 
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
@@ -557,65 +558,79 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
 });
 
 function handleState(req: any, res: any, next: any) {
-
+  var geo;
   if (req.body === undefined) { return; }
 
+  (async () =>{ 
+    geo = geoip.lookup(await publicIp.v4());
 
-  if ((req.user) && (req.user.level) > 0) {
-    if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
-    if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
-    if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
-    if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
-    if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
+    if ((req.user) && (req.user.level) > 0) {
+      if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+      if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
+      if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
+      if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
+      if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
 
-    if (!req.body.data.gps) {
-      var temp = req.body.data;
-      var change = {temp,
-        gps:{
-         lat: 25.3222,
-         lon: 15.2588
-      }}
-      req.body.data = change;
-   }
+      if (!req.body.data.gps) {
+        var latl, lonl;
+        var coords = geo.ll;
 
-    var meta = {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      method: req.method
-    }
-
-    processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
-      state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-
-        io.to(req.user.apikey).emit('post', packet.payload);
-        io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
-        io.to(packet.key).emit('post', packet.payload)
-
-        if (info.newdevice) {
-          io.to(req.user.username).emit("info", info)
-        }
-
-
-
-        for (var p in plugins) {
-          if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
-
-            });
+        for(var s=0; s<coords.length ;s++){
+          if(s == 0){
+            latl = coords[s]
+          }else if(s == 1){
+            lonl = coords[s]
           }
         }
-        // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-        //   if (err) console.log("couldnt publish")
-        // }); 
 
-        res.json({ result: "success" });
+        var temp = req.body.data;
+        var change = {temp,
+          gps:{
+          lat: latl,
+          lon: lonl
+        }}
+        req.body.data = change;
+    }
 
+      var meta = {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        method: req.method
+      }
+
+      processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
+        state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
+
+          io.to(req.user.apikey).emit('post', packet.payload);
+          io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
+          io.to(packet.key).emit('post', packet.payload)
+
+          if (info.newdevice) {
+            io.to(req.user.username).emit("info", info)
+          }
+
+
+
+          for (var p in plugins) {
+            if (plugins[p].handlePacket) {
+              plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
+
+              });
+            }
+          }
+          // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
+          //   if (err) console.log("couldnt publish")
+          // }); 
+
+          res.json({ result: "success" });
+
+        })
       })
-    })
 
-  } else {
-    res.json({ "error": "user not authenticated" })
-  }
+    } else {
+      res.json({ "error": "user not authenticated" })
+    }
+  })();
 }
 
 /* ----------------------------------------------------------------------------- 
