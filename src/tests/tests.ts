@@ -613,10 +613,13 @@ describe("API", function () {
         })
 
         client.on('message', function (topic: any, message: any){
+          
           var t = JSON.parse(message.toString());
           mqttpacket = JSON.stringify(t.data);
           //console.log(message+"--------------------------mqtt")
+          counter++;
           checkSuccess()
+          
         })
 
       });
@@ -638,8 +641,8 @@ describe("API", function () {
             }else{
               restpacket = JSON.stringify(result.data)
               //console.log(JSON.stringify(result)+"----------------------------rest")
-              counter++;
-              checkSuccess();
+              
+              //checkSuccess();
             } 
           }
         ); 
