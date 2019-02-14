@@ -64,8 +64,9 @@ export class SetUsername extends React.Component {
     }
     
     checkpassword =()=> {
+        if(this.state.confirm !="" && this.state.password!="" && this.state.currentpassword!=""){
   if(this.state.confirm != this.state.password){
-    this.setState({message:"New password and confirm do not match"})
+    this.setState({message:"New password and confirm password do not match"})
   }
   else{
      fetch("/api/v3/admin/userpassword", {
@@ -78,14 +79,17 @@ export class SetUsername extends React.Component {
       })
     }).then(response => response.json()).then(data => {
         if(data.nModified==0){
-           this.setState({message:"Password could not be changed"}) 
+           this.setState({message:"Incorrect Current Password"}) 
         }
         else{
-           this.setState({message:"Password has successfully changed"}) 
+           this.setState({message:"Password has successfully been changed"}) 
         }
 }).catch(err => console.error(err.toString()))
 }
-
+        }
+        else{
+             this.setState({message:"Field(s) can not be empty"}) 
+        }
 }
 
     updateUsername = () => {
