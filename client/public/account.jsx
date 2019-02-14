@@ -112,7 +112,6 @@ export class Account extends Component {
         pass: this.state.form.passwordSignin
       })
     }).then(response => response.json()).then(data => {
-      console.log(data);
       if (data.signedin) {
         location.reload();
       }
@@ -120,7 +119,6 @@ export class Account extends Component {
       if (data.error) {
         this.setState({ serverError: data.error })
       }
-
     }).catch(err => console.error(err.toString()));
 
   }
@@ -136,7 +134,6 @@ export class Account extends Component {
         pass: this.state.form.passwordSignup
       })
     }).then(response => response.json()).then(data => {
-      console.log(data);
       if (data.error) {
         this.setState({ serverError: data.error })
       }
@@ -152,7 +149,6 @@ export class Account extends Component {
         email: this.state.form.email,
       })
     }).then(response => response.json()).then(data => {
-      console.log(data);
 
       if (data.result) {
         this.setState({ resetButton: "RESET PASSWORD" })
@@ -162,13 +158,11 @@ export class Account extends Component {
         email: this.state.form.email,
       })
     }).then(response => response.json()).then(data => {
-      console.log(data);
             })}
        if (data.error) {
         console.log("zzzzzzzzzzzzzzzzzzzzzzzzzz")
         this.setState({ serverError: data.error })
       }
-
     }).catch(err => console.error(err.toString()));
   }
 
@@ -238,19 +232,6 @@ export class Account extends Component {
           </div>
 
           <div className="row">
-
-            {/* <div className="col-7" style={{ textAlign: "right" }} >
-              <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
-            </div>
-
-            <button className="btn-spot" style={{ float: "right" }} onClick={()=> this.ForgotPassword()} ><FontAwesomeIcon icon="user-check" /> { this.showButton } </button>
-            
-
-            <div className="col-5">
-              <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
-            </div>
-
-          </div> */}
           { this.showButton() }
           </div>
         </div>
@@ -302,11 +283,6 @@ export class Account extends Component {
       </div>
     );
   }
-
-
-
-
-
 
   render() {
 

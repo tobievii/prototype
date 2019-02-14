@@ -85,20 +85,49 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   })
 app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
-db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass}})
+db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
+      if (response) {
+        if(response.nModified == 0){
+          res.json(response)
+        }else{
+          res.json(response)
+        }
+       } else if(err){
+        res.json(err)
+      }
 })
+var changeToken=randomString({length:128});
+db.users.update({recoverToken:req.body.person},{ $set: {"recoverToken":changeToken}})
+})
+
+app.post("/api/v3/admin/userpassword", (req: any, res: any) => {
+db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
+      if (response) {
+        if(response.nModified == 0){
+          res.json(response)
+        }else{
+          res.json(response)
+        }
+       } else if(err){
+        res.json(err)
+      }
+})
+})
+
   //####################################################################
 //Recover Password Link sent via email
 app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
 var recoverToken=randomString({length:128});
  db.users.update({email:req.body.email},{ $set: {"recoverToken":recoverToken}})
+ try {
+ getRegistration(db, (err:Error, result:any)=>{
     var verifyLink = req.headers.referer + "recover/" +recoverToken
         var smtpTransport = nodemailer.createTransport({
-          host:'smtp.mailtrap.io',
-          port: 2525,
+               host: result.nodeMailerTransportHost,
+               port: result.nodeMailerTransportPort,
           auth: {
-              user: 'fceb57cb70ac6b',
-              pass: '313c8d2fba30bb'
+               user: result.nodeMailerTransportAuthUser,
+               pass: result.nodeMailerTransportAuthPass
           }
         });
 
@@ -116,7 +145,10 @@ var recoverToken=randomString({length:128});
            
             res.json({err:{}, result:{ mail: "sent" }})
           }
-        })      
+        })    
+         })  } catch (err) {
+      res.json({err})
+    } 
   })
 //Recover Password Link sent via email
 //####################################################################
