@@ -390,6 +390,18 @@ export class DeviceView extends Component {
 
   shareDevice = () => {
     this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
+    for(let dev in this.state.EmailsharedDevice){
+       fetch("/api/v3/admin/shareDevice", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ email:this.state.EmailsharedDevice[dev].email,
+                      text: 'Hi a Device was shared with you called '+this.props.devid,
+                      html: '<p>Hi <br></br>'+this.props.username+' has shared ('+this.props.devid+ ') Device with you </p>',
+                      subject:'SHARED DEVICE'
+                    })
+                  }).then(response => response.json()).then(serverresponse => {
+                    console.log(serverresponse);        
+                  }).catch(err => console.error(err.toString()));
+     }
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
@@ -487,7 +499,7 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col-6" >
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{display: this.state.shareDisplay , width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
@@ -495,12 +507,12 @@ export class DeviceView extends Component {
                 <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
               </div>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, display: this.state.shareDisplay }} onClick={this.toggleModal}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
 
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
 
-              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10,display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
               <div ><center>
@@ -520,8 +532,9 @@ export class DeviceView extends Component {
                 </Modal>
               </center>
               </div>
+              </div>
             </div>
-          </div>
+          
 
           <hr />
 

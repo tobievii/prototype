@@ -2,13 +2,11 @@ var nodemailer = require("nodemailer")
 var randomString = require('random-string');
 var mongojs = require('mongojs')
 var ObjectId = mongojs.ObjectId;
-
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
 
 export var name = "admin";
-
 
 
 export function handlePacket(db: any, packet: any, cb: any) {
@@ -46,7 +44,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   })
 
-
+//####################################################################
+//Email Verification link
   app.get("/api/v3/admin/requestverificationemail", (req: any, res: any) => {
 
     var verifyLink = req.headers.referer + "verify/" + req.user._id
@@ -83,7 +82,13 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       res.json({err})
     }
 
+    //Email Verification link
+//####################################################################
+
   })
+
+
+  //Reset password after link
 app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
 db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
       if (response) {
@@ -100,6 +105,9 @@ var changeToken=randomString({length:128});
 db.users.update({recoverToken:req.body.person},{ $set: {"recoverToken":changeToken}})
 })
 
+//Reset password after link
+
+//Changing password while logged in
 app.post("/api/v3/admin/userpassword", (req: any, res: any) => {
 db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
       if (response) {
@@ -113,6 +121,9 @@ db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ 
       }
 })
 })
+//Changing password while logged in
+
+
 
   //####################################################################
 //Recover Password Link sent via email
@@ -151,6 +162,47 @@ var recoverToken=randomString({length:128});
     } 
   })
 //Recover Password Link sent via email
+//####################################################################
+
+
+ //####################################################################
+//Shared Device email
+app.post("/api/v3/admin/shareDevice", (req: any, res: any) => {
+try {
+ getRegistration(db, (err:Error, result:any)=>{
+    var smtpTransport = nodemailer.createTransport({
+               host: result.nodeMailerTransportHost,
+               port: result.nodeMailerTransportPort,
+          auth: {
+               user: result.nodeMailerTransportAuthUser,
+               pass: result.nodeMailerTransportAuthPass
+          },
+             pool: true, // use pooled connection
+  rateLimit: true, // enable to make sure we are limiting
+  maxConnections: 1, // set limit to 1 connection only
+  maxMessages: 1 // send 3 emails per second
+        });
+     
+      var mail = {
+          from: 'devtest@iotnxt.com',
+          to:req.body.email,
+          subject: req.body.subject,
+          text: req.body.text,
+          html: req.body.html
+        }
+
+        smtpTransport.sendMail(mail, (err:any, info:any)=>{
+          if (err) { console.log(err); return;}
+          if (info) {
+           
+            res.json({err:{}, result:{ mail: "sent" }})
+          }
+        })    
+         })  } catch (err) {
+      res.json({err})
+    } 
+  })
+//Shared Device email
 //####################################################################
  
 
