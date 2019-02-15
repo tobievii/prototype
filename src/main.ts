@@ -493,15 +493,22 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
   })
 })
 
-
 app.post("/api/v3/dashboard", (req:any, res:any) => {
   console.log(req.body.layout)
   db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
     dev.layout = req.body.layout
     db.states.update({key:req.body.key}, dev)
   })
-})
+}
+)
 
+app.post("/api/v3/selectedIcon", (req:any, res:any) => {
+
+  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+    dev.selectedIcon = req.body.selectedIcon
+    db.states.update({key:req.body.key}, dev)
+  })
+})
 
 app.post('/api/v3/accounts/create', (req: any, res: any) => {
   if (req.user.level < 100) { res.json({ error: "permission denied" }); return; }
@@ -516,20 +523,12 @@ app.post('/api/v3/accounts/create', (req: any, res: any) => {
   }
 })
 
-
-
-
 app.post('/api/v3/account/update', (req: any, res: any) => {
   db.users.update({ apikey: req.user.apikey }, { "$set": req.body }, (err: Error, result: any) => {
     if (err) res.json({ error: err.toString() });
     if (result) res.json(result);
   })
 })
-
-
-
-
-
 
 function safeParser(req: any, res: any, next: any) {
   var buf = ""
@@ -608,27 +607,42 @@ function handleState(req: any, res: any, next: any) {
       if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
       if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
       if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
-
+      
+      var k: any;
+      
       if (!req.body.data.gps) {
-        var latl, lonl;
-        var coords = geo.ll;
+        db.states.findOne({devid: req.body.id, gps: {$exists :false}}, (err: Error, res: any) => {
+            if(res.payload.data.gps == undefined){
+              k = false;
+            }else if(res.payload.data.gps){
+              k = true;
+            }
+        });
 
-        for(var s=0; s<coords.length ;s++){
-          if(s == 0){
-            latl = coords[s]
-          }else if(s == 1){
-            lonl = coords[s]
+        if(k == false){
+          var latl, lonl;
+          var coords = geo.ll;
+
+          for(var s=0; s<coords.length ;s++){
+            if(s == 0){
+              latl = coords[s]
+            }else if(s == 1){
+              lonl = coords[s]
+            }
           }
-        }
 
-        var temp = req.body.data;
-        var change = {temp,
-          gps:{
-          lat: latl,
-          lon: lonl
-        }}
-        req.body.data = change;
-    }
+          var tempv = req.body.data;
+          var change = {tempv,
+            gps:{
+            lat: latl,
+            lon: lonl
+          }}
+          req.body.data = change;
+        }else{
+          var tempv = req.body.data;
+          req.body.data = tempv;
+        }
+      }
 
       var meta = {
         ip: req.ip,
@@ -647,8 +661,6 @@ function handleState(req: any, res: any, next: any) {
             io.to(req.user.username).emit("info", info)
           }
 
-
-
           for (var p in plugins) {
             if (plugins[p].handlePacket) {
               plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
@@ -661,10 +673,8 @@ function handleState(req: any, res: any, next: any) {
           // }); 
 
           res.json({ result: "success" });
-
         })
       })
-
     } else {
       res.json({ "error": "user not authenticated" })
     }
@@ -699,7 +709,6 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
 
         //console.log(apikey + "|" + packetIn.id)
 
-
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
             plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
@@ -707,7 +716,6 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
             });
           }
         }
-
 
         // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
         //   if (err) console.log("couldnt publish")
@@ -803,9 +811,6 @@ app.post("/api/v3/state/clear", (req: any, res: any) => {
     if (err) res.json(err);
     if (cleared) res.json(cleared);
   })
-
-
-
 })
 
 

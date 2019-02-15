@@ -143,10 +143,7 @@ export function accountVerify(db: any) {
           console.log("USER NOT FOUND IN DB.");
           res.json({ result: "USER NOT FOUND" })
         }
-
       })
-
-
     }
   }
 }

@@ -16,7 +16,9 @@ export class StatesViewerItem extends Component {
       selected: undefined,
       active: false,
       lastTimestamp: undefined, 
-      viewButton: "View Info"
+      mapIcon: <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>,
+      iconClicked: 0,
+      device: undefined
     };
   
     intervalUpdator = undefined;
@@ -26,7 +28,7 @@ export class StatesViewerItem extends Component {
     }
   
     componentDidMount = () => {
-      console.log("mounted " + this.props.device.devid)
+      // console.log("mounted " + this.props.device.devid)
   
       this.intervalUpdator = setInterval(() => {
         this.updateTime();
@@ -178,6 +180,18 @@ export class StatesViewerItem extends Component {
         this.props.actionCall(action)
       }
     }
+
+    adjustMapView = (device) => {
+      var action;
+      if(device.payload.data.boundary == undefined){
+        action = true;
+      }else{
+        action = false;
+      }
+      return (e, n) => {
+        this.props.mapActionCall(device, action);
+      }
+    }
   
     selectbox = () => {
       
@@ -197,11 +211,34 @@ export class StatesViewerItem extends Component {
       }
     }
 
-    adjustMapView = (device) => {
-      return (e) => {
-        this.props.mapActionCall(device);
+    mapIcon = () => {
+
+      if(!this.props.device.selectedIcon){
+        return(
+          <div align="right" style={{ marginTop: "7px", width: "auto", height: "auto" , fontSize: 15 }} onClick={this.adjustMapView(this.props.device)}>
+            <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>  
+          </div>
+        )
+      }else{
+        return(
+          <div align="right" style={{ marginTop: "7px", width: "auto", height: "auto" , fontSize: 15 }} onClick={this.adjustMapView(this.props.device)}>
+            <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Go To Device"></i>  
+          </div>
+        )
       }
     }
+
+    
+
+    // changeMapIcon = (device) => {
+    //   if(device.selectedIcon){
+    //     this.setState({ iconClicked: 1})
+    //     this.setState({ mapIcon:  <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Go To Device"></i>})
+    //   }else if(!device.selectedIcon){
+    //     this.setState({ mapIcon:  <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>})
+    //     this.setState({ iconClicked: 0})
+    //   }
+    // }
   
     render() {
   
@@ -216,7 +253,7 @@ export class StatesViewerItem extends Component {
         var maxlength = 120;
         if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
         var viewUsed = this.props.view
-        if( viewUsed == "list" && this.state.viewButton == "View Info"){
+        if( viewUsed == "list"){
           return (
             <div className="container-fluid" style={{ marginBottom: 2 }}>
               <div className="row statesViewerItem" style={this.calcStyle()} >
@@ -257,17 +294,13 @@ export class StatesViewerItem extends Component {
                   </div>
                 </Link>
 
-                  <div className="col" align="right" style={{marginTop: "4px"}}>
-                    <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
-                  </div>
-                
-
-                <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}>  
-                  <div align="right" style={{ marginTop: "7px", width: "auto", height: "auto" , fontSize: 15 }} onClick={this.adjustMapView(this.props.device.devid)}>
-                    <span><i className="fas fa-map-marker-alt marker" title="Go To Device"></i></span>
-                  </div>
+                <div className="col" align="right" style={{marginTop: "4px"}}>
+                  <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
                 </div>
-
+                
+                <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}>  
+                  { this.mapIcon() }
+                </div>
               </div>
             </div>
           )

@@ -69,11 +69,11 @@ export class DeviceList extends Component {
     }
   }
 
-  handleMapAction = (device) => {
-    return (e) => {
-      this.props.mapactionCall({ device, e })
+  handleMapAction = (device, action) => {
+    return (e, n) => {
+      this.props.mapactionCall({ device, action, e, n})
     }
-  } 
+  }
 
   render() {
 
@@ -120,7 +120,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem mapActionCall={this.handleMapAction(device.devid)} username={this.props.username} view={this.props.view} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
+          {devicelist.map(device => <StatesViewerItem username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -142,7 +142,8 @@ export class StatesViewer extends Component {
     selectedDevices: [],
     selectAllState: null,
     view: "map",
-    devicePressed: undefined
+    devicePressed: undefined,
+    boundary: undefined
   };
 
   socket = undefined;
@@ -198,7 +199,7 @@ export class StatesViewer extends Component {
 
         this.setState({ devicesView: states }, () => {
           //this.socketConnectDevices();
-          this.sort();
+          //this.sort();
         })
       })
     })
@@ -370,6 +371,30 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
+  deviceClicked = (device) =>{
+    var newDeviceList = _.clone(this.state.devicesView)
+
+    for(var devices in newDeviceList){
+      if(newDeviceList[devices].selectedIcon == true){
+        newDeviceList[devices].selectedIcon = false;
+      }
+    }
+
+    for (var dev in newDeviceList) {
+      if (newDeviceList[dev].devid == device.e.devid){
+        if (!device.n) {
+          newDeviceList[dev].selectedIcon = false;
+        }
+        if (device.n) {
+          newDeviceList[dev].selectedIcon = true;
+        }
+      }
+    }
+    this.setState({ devicesView: newDeviceList });
+    this.setState({ devicePressed: device.device });
+    this.setState({ boundary: device.n });
+  }
+
   deleteSelectedDevices = () => {
     var devicesToDelete = this.state.devicesServer.filter((device) => { return device.selected == true; })
 
@@ -394,10 +419,6 @@ export class StatesViewer extends Component {
     this.setState({ view: action})
   }
 
-  deviceClicked = (device) =>{
-    this.setState({ devicePressed: device })
-  }
-
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
@@ -413,13 +434,13 @@ export class StatesViewer extends Component {
       }else if(this.state.view == "map"){
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
-            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
             <div className="rowList">
               <div >
-                <DeviceList mapactionCall={this.deviceClicked} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} actionCall={this.handleActionCall} />
+                <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
               </div>
               <div>
-                <MapDevices acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
+                <MapDevices boundary={this.state.boundary} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
               </div>
             </div>
           </div>
