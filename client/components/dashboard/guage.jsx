@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Gauge from 'react-svg-gauge';
-import calendar from './nivo_calendar.jsx'
 
 export class ProtoGuage extends React.Component {
     

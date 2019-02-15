@@ -19,7 +19,6 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGuage } from "./guage.jsx"
-// import { Gauge } from 'react-svg-gauge';
 
 
 
@@ -39,7 +38,7 @@ export class Dashboard extends React.Component {
     //   { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
     //   //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
     //   //{ i: '2', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
-      { i: "3", x: 0, y: 0, w: 1.7, h: 4.5, type: "Guage", dataname: "Proto guage" }
+      // { i: "3", x: 0, y: 0, w: 1.7, h: 4.5, type: "Guage", dataname: "Proto guage" }
 
     ],
   }
