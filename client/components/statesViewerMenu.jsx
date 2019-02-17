@@ -73,7 +73,7 @@ export class StatesViewerMenu extends Component {
         fetch("/api/v3/data/post", {
             apikey : this.props.acc.apikey,
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ id: this.props.deviceCall.devid, data: {boundary:{lat:lat, lon:lon, radius: 200}} })
+            body: JSON.stringify({ id: this.props.deviceCall.devid, data: {boundary: {lat: lat, lon: lon, radius: 50}} })
         }).then(response => response.json()).then(serverresponse => {
             console.log(serverresponse)
         }).catch(err => {console.error(err.toString());});

@@ -183,11 +183,7 @@ export class StatesViewerItem extends Component {
 
     adjustMapView = (device) => {
       var action;
-      if(device.payload.data.boundary == undefined){
-        action = true;
-      }else{
-        action = false;
-      }
+      action = true;
       return (e, n) => {
         this.props.mapActionCall(device, action);
       }

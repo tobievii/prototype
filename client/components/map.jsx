@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, TileLayer, Marker, Popup,  Rectangle , GeoJSON, Circle} from 'react-leaflet';
+import { Map, TileLayer, Marker, Popup, Circle} from 'react-leaflet';
 
 var details = {
   lat: -25.864170,
@@ -28,6 +28,7 @@ const L = require('leaflet');
 export class MapDevices extends Component {
   state = {
     bounds: outer,
+    circleColor: "blue"
   }
 
   componentWillMount = () =>{
@@ -35,13 +36,18 @@ export class MapDevices extends Component {
   }
 
   setvalues = (device) => {
-    details.lat = device.payload.data.gps.lat
-    details.lng = device.payload.data.gps.lon
+    details.lat = device.payload.data.gps.lat;
+    details.lng = device.payload.data.gps.lon;
     details.zoom = 17;
   }
 
   mouseclick = () => {
     alert("Lat, Lon: "+ e.latlng.lat+", " + e.latlng.lng)
+  }
+
+  circleClicked = () => {
+    console.log("circle clicked");
+    this.setState({ circleColor: "green" })
   }
 
   render() {
@@ -70,8 +76,6 @@ export class MapDevices extends Component {
           onClick={this.onClickOuter}
         /> */}
 
-        
-
         {
           allDevices.map((marker, index) => {
             if(marker.selectedIcon == undefined){
@@ -82,11 +86,10 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
             }
 
-            if(marker.selectedIcon == true && marker.payload.data.boundary == undefined){
-              
+            if(marker.payload.data.boundary == undefined){
+              console.log("logged")
               return(
                 <div key={marker.devid}>
-                  <Circle onclick={()=>console.log("circle clicked")} center={[-25.864170, 28.209336]} radius={100} />
                   <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
@@ -95,11 +98,11 @@ export class MapDevices extends Component {
                 </div>
               )
             }else{
-
               var gps = {
               }
         
-              if(marker.payload.data.gps == undefined ){
+              if(marker.payload.data.gps == undefined){
+
                 fetch("/api/v3/getlocation", {
                   apikey : this.props.acc.apikey,
                   method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -114,7 +117,6 @@ export class MapDevices extends Component {
                   }).then(response => response.json()).then(serverresponse => {
                     return(
                       <div key={marker.devid}>
-                        <Circle onclick={()=>console.log("circle clicked")} center={[-25.864170, 28.209336]} radius={100} />
                         <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
                           <Popup>
                             <h5 className="popup">{marker.devid}</h5> <br />
@@ -124,11 +126,23 @@ export class MapDevices extends Component {
                     )
                   }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
                 }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
+
+              }else if(marker.selectedIcon == true && marker.payload.data.boundary != undefined){
+
+                return(
+                  <div key={marker.devid}>
+                    <Circle  onclick={()=>this.circleClicked()} color={this.state.circleColor} center={[marker.payload.data.boundary.lat, marker.payload.data.boundary.lon]} radius={marker.payload.data.boundary.radius} />
+                    <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                      <Popup>
+                        <h5 className="popup">{marker.devid}</h5> <br />
+                      </Popup>
+                    </Marker>
+                  </div>
+                )
               }else{
                 return(
                   <div key={marker.devid}>
-                    {/* <Circle onclick={()=>console.log("circle clicked")} center={[-25.864170, 28.209336]} radius={100} /> */}
-                    <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                    <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
                       <Popup>
                         <h5 className="popup">{marker.devid}</h5> <br />
                       </Popup>

@@ -367,7 +367,6 @@ export class StatesViewer extends Component {
         }
       }
     }
-
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
@@ -384,9 +383,11 @@ export class StatesViewer extends Component {
       if (newDeviceList[dev].devid == device.e.devid){
         if (!device.n) {
           newDeviceList[dev].selectedIcon = false;
-        }
-        if (device.n) {
+        }else if (device.n && newDeviceList[dev].payload.data.boundary == undefined) {
           newDeviceList[dev].selectedIcon = true;
+        }else if(device.n && newDeviceList[dev].payload.data.boundary != undefined){
+          newDeviceList[dev].selectedIcon = true;
+          device.n = false;
         }
       }
     }
