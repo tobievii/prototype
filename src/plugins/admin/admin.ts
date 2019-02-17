@@ -63,7 +63,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
         });
 
         var mail = {
-          from: 'prototype@iotnxt.com',
+          from: 'devtest@iotnxt.com',
           to: req.user.email,
           subject: 'Account Verification',
           text: 'To verify your account please go to '+verifyLink,
@@ -143,7 +143,7 @@ var recoverToken=randomString({length:128});
         });
 
         var mail = {
-          from: 'prototype@iotnxt.com',
+          from: 'devtest@iotnxt.com',
           to: req.body.email,
           subject: 'Password Recovery',
           text: 'To reset forgotten Password go to '+verifyLink,
