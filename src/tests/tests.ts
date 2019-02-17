@@ -52,7 +52,6 @@ describe("API", function () {
           }
         }
       );
-      
     });
 
     /************************************   Account   ****************************************/
@@ -93,6 +92,50 @@ describe("API", function () {
       });
       req.end();
     });
+
+    /************************************   Recover Password   ****************************************/
+
+    it("/api/v3/ForgetPassword", function (done: any) {
+      const Account: any = { email: testAccount.email };
+
+      trex.restJSON(
+        {
+          path: "http://localhost:8080/api/v3/ForgetPassword",
+          method: "POST",
+          body: Account,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          }
+        },
+        (err: Error, result: any) => {
+          if (err) {
+            done(err);
+          }
+          if (result) {
+            done();
+            // trex.restJSON(
+            //   {
+            //     path: "http://localhost:8080/api/v3/admin/recoverEmailLink",
+            //     method: "POST",
+            //     body: Account,
+            //     headers: {
+            //       "Accept": "application/json",
+            //       "Content-Type": "application/json"
+            //     }
+            //   },
+            //   (error: Error, result: any) => {
+            //     if (error) {
+            //       done(err);
+            //     }else{
+            //       done();
+            //     }
+            //   }
+            // );
+          }
+        }
+      );
+    });    
 
     /************************************   Sign In   ****************************************/
 
