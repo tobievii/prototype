@@ -128,7 +128,7 @@ db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ 
   //####################################################################
 //Recover Password Link sent via email
 app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
-var recoverToken=randomString({length:128});
+  var recoverToken=randomString({length:128});
  db.users.update({email:req.body.email},{ $set: {"recoverToken":recoverToken}})
  try {
  getRegistration(db, (err:Error, result:any)=>{
@@ -153,8 +153,7 @@ var recoverToken=randomString({length:128});
         smtpTransport.sendMail(mail, (err:any, info:any)=>{
           if (err) { console.log(err); return;}
           if (info) {
-           
-            res.json({err:{}, result:{ mail: "sent" }})
+            res.json({err:{}, result:{ info }})
           }
         })    
          })  } catch (err) {

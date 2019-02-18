@@ -98,6 +98,8 @@ describe("API", function () {
     it("/api/v3/ForgetPassword", function (done: any) {
       const Account: any = { email: testAccount.email };
 
+      this.timeout(4000)
+
       trex.restJSON(
         {
           path: "http://localhost:8080/api/v3/ForgetPassword",
@@ -108,30 +110,39 @@ describe("API", function () {
             "Content-Type": "application/json"
           }
         },
-        (err: Error, result: any) => {
-          if (err) {
-            done(err);
+        (error: Error, result: any) => {
+          if (error != null) {
+            done(error);
           }
           if (result) {
-            done();
-            // trex.restJSON(
-            //   {
-            //     path: "http://localhost:8080/api/v3/admin/recoverEmailLink",
-            //     method: "POST",
-            //     body: Account,
-            //     headers: {
-            //       "Accept": "application/json",
-            //       "Content-Type": "application/json"
-            //     }
-            //   },
-            //   (error: Error, result: any) => {
-            //     if (error) {
-            //       done(err);
-            //     }else{
-            //       done();
-            //     }
-            //   }
-            // );
+            //done();
+            trex.restJSON(
+              {
+                path: "http://localhost:8080/api/v3/admin/recoverEmailLink",
+                method: "POST",
+                body: Account,
+                headers: {
+                  "Accept": "application/json",
+                  "Content-Type": "application/json"
+                }
+              },
+              (err: Error, result: any) => {
+                var infor = result.result.info;
+                if (err) {
+                  done(err);
+                }else if(infor.rejected.length < 1){
+                  for(var email in infor.accepted){
+                    if(testAccount.email == infor.accepted[email]){
+                      done();
+                    }else{
+                      done(new Error("Did not fine your email in the accepted emails list."));
+                    }
+                  }
+                }else{
+                  done(new Error("The email was rejected."));
+                }
+              } 
+            );
           }
         }
       );
