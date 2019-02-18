@@ -183,7 +183,11 @@ export class StatesViewerItem extends Component {
 
     adjustMapView = (device) => {
       var action;
-      action = true;
+      if(device.selectedIcon){
+        action = false;
+      }else{
+        action = true;
+      }
       return (e, n) => {
         this.props.mapActionCall(device, action);
       }

@@ -8,9 +8,9 @@ var details = {
 }
 
 const outer = [[-25.864170, 28.209336], [25.864170, -28.209336]]
+var circleColor = "#4c8ef7";
 
 const L = require('leaflet');
-
 // const myIcon = L.icon({
 //   iconUrl: 'https://image.flaticon.com/icons/svg/33/33622.svg',
 //   iconSize: [30, 46],
@@ -20,19 +20,19 @@ const L = require('leaflet');
 
 // const myIconSelected = L.icon({
 //   iconUrl: 'https://image.flaticon.com/icons/svg/33/33622.svg',
-//   iconSize: [30, 46],
-//   iconAnchor: [15, 46],
-//   popupAnchor: [0, -46]
+//   iconSize: [34, 50],
+//   iconAnchor: [19, 50],
+//   popupAnchor: [0, -50]
 // });
 
 export class MapDevices extends Component {
   state = {
-    bounds: outer,
-    circleColor: "blue"
+    bounds: outer
   }
 
   componentWillMount = () =>{
     this.setState({ devices: this.props.devices })
+    
   }
 
   setvalues = (device) => {
@@ -45,9 +45,37 @@ export class MapDevices extends Component {
     alert("Lat, Lon: "+ e.latlng.lat+", " + e.latlng.lng)
   }
 
-  circleClicked = () => {
-    console.log("circle clicked");
-    this.setState({ circleColor: "green" })
+  increaseBoundary = (device) => {    
+    circleColor = "green"; 
+
+    var lat = device.payload.data.boundary.lat;
+    var lon = device.payload.data.boundary.lon;
+    var radius = device.payload.data.boundary.radius + 5;
+
+    fetch("/api/v3/data/post", {
+      apikey : this.props.acc.apikey,
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: device.devid, data: {boundary: {lat: lat, lon: lon, radius: radius}} })
+    }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse)
+    }).catch(err => {console.error(err.toString());});
+  }
+
+  decreaseBoundary = (device) => {    
+    circleColor = "green";
+
+    var lat = device.payload.data.boundary.lat;
+    var lon = device.payload.data.boundary.lon;
+    var radius = device.payload.data.boundary.radius - 5;
+
+    fetch("/api/v3/data/post", {
+      apikey : this.props.acc.apikey,
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: device.devid, data: {boundary: {lat: lat, lon: lon, radius: radius}} })
+    }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse)
+    }).catch(err => {console.error(err.toString());});
+
   }
 
   render() {
@@ -78,6 +106,7 @@ export class MapDevices extends Component {
 
         {
           allDevices.map((marker, index) => {
+            
             if(marker.selectedIcon == undefined){
               fetch("/api/v3/selectedIcon", {
                 method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -87,10 +116,9 @@ export class MapDevices extends Component {
             }
 
             if(marker.payload.data.boundary == undefined){
-              console.log("logged")
               return(
                 <div key={marker.devid}>
-                  <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                  <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
@@ -117,7 +145,7 @@ export class MapDevices extends Component {
                   }).then(response => response.json()).then(serverresponse => {
                     return(
                       <div key={marker.devid}>
-                        <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                        <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                           <Popup>
                             <h5 className="popup">{marker.devid}</h5> <br />
                           </Popup>
@@ -128,13 +156,35 @@ export class MapDevices extends Component {
                 }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
 
               }else if(marker.selectedIcon == true && marker.payload.data.boundary != undefined){
+                //circleColor = "#4c8ef7";
+                var lat = marker.payload.data.gps.lat;
+                var lon = marker.payload.data.gps.lon;
+                var radius = marker.payload.data.boundary.radius;
 
+                if(marker.payload.data.gps.lat != marker.payload.data.boundary.lat || marker.payload.data.gps.lat != marker.payload.data.boundary.lat){
+                  console.log("Device outside of parameters")
+                  circleColor = "red";
+                }else{
+                  circleColor = "#4c8ef7";
+                }
+  
                 return(
                   <div key={marker.devid}>
-                    <Circle  onclick={()=>this.circleClicked()} color={this.state.circleColor} center={[marker.payload.data.boundary.lat, marker.payload.data.boundary.lon]} radius={marker.payload.data.boundary.radius} />
-                    <Marker position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                    <Circle color={circleColor} center={[marker.payload.data.boundary.lat, marker.payload.data.boundary.lon]} radius={marker.payload.data.boundary.radius} />
+                    <Marker 
+                      position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} 
+                      iconSize={[64, 80]} 
+                      iconAnchor={[49, 80]} 
+                      popupAnchor={[0, -80]}
+                      height="80px" 
+                      >
                       <Popup>
                         <h5 className="popup">{marker.devid}</h5> <br />
+                        <div>
+                          Zoom: 
+                          <button onClick={()=>this.increaseBoundary(marker)}>+</button>
+                          <button onClick={()=>this.decreaseBoundary(marker)}>-</button>
+                        </div>
                       </Popup>
                     </Marker>
                   </div>
@@ -142,7 +192,7 @@ export class MapDevices extends Component {
               }else{
                 return(
                   <div key={marker.devid}>
-                    <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} >
+                    <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                       <Popup>
                         <h5 className="popup">{marker.devid}</h5> <br />
                       </Popup>

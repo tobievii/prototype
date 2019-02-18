@@ -142,7 +142,7 @@ export class Account extends Component {
   }
 
   ForgotPassword = () =>{
-    console.log("ForgotPassword");
+    
     fetch("/api/v3/ForgetPassword", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -152,15 +152,15 @@ export class Account extends Component {
 
       if (data.result) {
         this.setState({ resetButton: "RESET PASSWORD" })
-          fetch("/api/v3/admin/recoverEmailLink", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: this.state.form.email,
-      })
-    }).then(response => response.json()).then(data => {
-            })}
-       if (data.error) {
-        console.log("zzzzzzzzzzzzzzzzzzzzzzzzzz")
+        fetch("/api/v3/admin/recoverEmailLink", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: this.state.form.email,
+        })
+        }).then(response => response.json()).then(data => {})
+      }
+
+      if (data.error) {
         this.setState({ serverError: data.error })
       }
     }).catch(err => console.error(err.toString()));
