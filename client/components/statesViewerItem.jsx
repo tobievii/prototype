@@ -17,7 +17,6 @@ export class StatesViewerItem extends Component {
       active: false,
       lastTimestamp: undefined, 
       mapIcon: <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>,
-      iconClicked: 0,
       device: undefined
     };
   
@@ -228,18 +227,6 @@ export class StatesViewerItem extends Component {
       }
     }
 
-    
-
-    // changeMapIcon = (device) => {
-    //   if(device.selectedIcon){
-    //     this.setState({ iconClicked: 1})
-    //     this.setState({ mapIcon:  <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Go To Device"></i>})
-    //   }else if(!device.selectedIcon){
-    //     this.setState({ mapIcon:  <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>})
-    //     this.setState({ iconClicked: 0})
-    //   }
-    // }
-  
     render() {
   
       if (this.props.device == undefined) {

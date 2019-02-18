@@ -560,7 +560,6 @@ app.post("/api/v3/getlocation", (req: any, res: any) => {
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
-    console.log("This works");
     (async () =>{ 
       geo = geoip.lookup(await publicIp.v4());
 

@@ -27,9 +27,10 @@ describe("API", function () {
 
       trex.restJSON(
         {
-          path: "http://localhost:8080/api/v3/admin/register",
+          path: testAccount.server + "/api/v3/admin/register",
           method: "POST",
           body: Account,
+          port: testAccount.port,
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -102,7 +103,7 @@ describe("API", function () {
 
       trex.restJSON(
         {
-          path: "http://localhost:8080/api/v3/ForgetPassword",
+          path: testAccount.server +":"+testAccount.port+ "/api/v3/ForgetPassword",
           method: "POST",
           body: Account,
           headers: {
@@ -118,9 +119,10 @@ describe("API", function () {
             //done();
             trex.restJSON(
               {
-                path: "http://localhost:8080/api/v3/admin/recoverEmailLink",
+                path: testAccount.server + "/api/v3/admin/recoverEmailLink",
                 method: "POST",
                 body: Account,
+                port: testAccount.port,
                 headers: {
                   "Accept": "application/json",
                   "Content-Type": "application/json"
@@ -155,7 +157,7 @@ describe("API", function () {
 
       trex.restJSON(
         {
-          path: "http://localhost:8080/signin",
+          path: testAccount.server +":"+testAccount.port+ "/signIn",
           method: "POST",
           body: Account,
           headers: {
@@ -227,7 +229,7 @@ describe("API", function () {
         {
           apikey: testAccount.apikey,
           method: "POST",
-          path: testAccount.server + "/api/v3/data/post",
+          path: testAccount.server + ":" + testAccount.port + "/api/v3/data/post",
           body: testDevice,
           port: testAccount.port
         },
@@ -257,6 +259,37 @@ describe("API", function () {
       );
     });
 
+    /************************************   Geo Location   ****************************************/
+    it("/api/v3/getlocation", function (done: any) {
+
+      trex.restJSON(
+        {
+          apikey: testAccount.apikey,
+          path: testAccount.server + ":" + testAccount.port + "/api/v3/getlocation",
+          method: "POST",
+          body: testAccount.testDev,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          }
+        },
+        (err: Error, result: any, account: any) => {
+          if (err) {
+            done(err);
+          }
+          if (result) {
+            if (result.error) 
+            { 
+              done(new Error(result.error)); 
+            }
+            else if(result.result.gps){
+              done();
+            }
+          }
+        }
+      );
+    });
+    
     /************************************   VIEW   ****************************************/
 
     it("/api/v3/view", function (done: any) {
