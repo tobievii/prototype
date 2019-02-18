@@ -217,7 +217,7 @@ export function Forgotpassword(db:any, user:any, cb:any) {
         if (result.length==0) {
           cb("Email does not exist")
         } else {
-              db.users.update({email:user.email},{ $set: {"recoverToken":null}})
+              db.users.update({email:user.email},{ $set: {recover:{"recoverToken":null,"recoverTime":""}}})
                 cb(null,result);
         }
       })

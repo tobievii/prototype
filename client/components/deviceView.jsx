@@ -396,7 +396,8 @@ export class DeviceView extends Component {
                     body: JSON.stringify({ email:this.state.EmailsharedDevice[dev].email,
                       text: 'Hi a Device was shared with you called '+this.props.devid,
                       html: '<p>Hi <br></br>'+this.props.username+' has shared ('+this.props.devid+ ') Device with you </p>',
-                      subject:'SHARED DEVICE'
+                      subject:'SHARED DEVICE',
+                      dev:this.props.devid
                     })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);        

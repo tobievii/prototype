@@ -90,7 +90,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   //Reset password after link
 app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
-db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
+   var date= new Date();
+  var timestamp = date.getMinutes()
+  console.log("i got here")
+db.users.update({'recover.recoverToken':req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
       if (response) {
         if(response.nModified == 0){
           res.json(response)
@@ -102,7 +105,7 @@ db.users.update({recoverToken:req.body.person},{ $set: {"password":req.body.pass
       }
 })
 var changeToken=randomString({length:128});
-db.users.update({recoverToken:req.body.person},{ $set: {"recoverToken":changeToken}})
+db.users.update({'recover.recoverToken':req.body.person},{ $set: {recover:{"recoverToken":changeToken,"recoverTime":timestamp}}})
 })
 
 //Reset password after link
@@ -128,8 +131,10 @@ db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ 
   //####################################################################
 //Recover Password Link sent via email
 app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
+  var date= new Date();
+  var timestamp = date.getMinutes()
   var recoverToken=randomString({length:128});
- db.users.update({email:req.body.email},{ $set: {"recoverToken":recoverToken}})
+ db.users.update({email:req.body.email},{ $set:{recover:{"recoverToken":recoverToken,"recoverTime":timestamp}}})
  try {
  getRegistration(db, (err:Error, result:any)=>{
     var verifyLink = req.headers.referer + "recover/" +recoverToken
@@ -195,6 +200,9 @@ try {
           if (info) {
            
             res.json({err:{}, result:{ mail: "sent" }})
+            db.users.findOne({email:req.body.email},{_id:1},(err:Error,result:any)=>{
+db.states.update({devid:req.body.dev},{ $push: { keys:result} } )//adds users _id to keys array
+            })
           }
         })    
          })  } catch (err) {
