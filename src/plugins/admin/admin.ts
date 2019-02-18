@@ -63,7 +63,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
         });
 
         var mail = {
-          from: 'devtest@iotnxt.com',
+          from: result.nodeMailerTransportFrom,
           to: req.user.email,
           subject: 'Account Verification',
           text: 'To verify your account please go to '+verifyLink,
@@ -143,7 +143,7 @@ app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
         });
 
         var mail = {
-          from: 'devtest@iotnxt.com',
+          from: result.nodeMailerTransportFrom,
           to: req.body.email,
           subject: 'Password Recovery',
           text: 'To reset forgotten Password go to '+verifyLink,
@@ -183,7 +183,7 @@ try {
         });
      
       var mail = {
-          from: 'devtest@iotnxt.com',
+          from: result.nodeMailerTransportFrom,
           to:req.body.email,
           subject: req.body.subject,
           text: req.body.text,
