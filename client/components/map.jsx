@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Map, TileLayer, Marker, Popup, Circle} from 'react-leaflet';
+import { Map, TileLayer, Marker, Popup, Circle, FeatureGroup} from 'react-leaflet';
+import { EditControl } from "react-leaflet-draw"
 
 var details = {
   lat: -25.864170,
@@ -94,6 +95,8 @@ export class MapDevices extends Component {
     return (
       <Map className="map" center={position} zoom={details.zoom} >
 
+        
+
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -115,9 +118,21 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
             }
 
-            if(marker.payload.data.boundary == undefined){
+            if(marker.payload.data.boundary == undefined && marker.selectedIcon == true){
               return(
                 <div key={marker.devid}>
+                  <FeatureGroup>
+                    <EditControl
+                      position='topleft'
+                      onEdited={this._onEditPath}
+                      onCreated={this._onCreate}
+                      onDeleted={this._onDeleted}
+                      draw={{
+                        rectangle: false
+                      }}
+                    />
+                    <Circle center={[51.51, -0.06]} radius={200} />
+                  </FeatureGroup>
                   <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
