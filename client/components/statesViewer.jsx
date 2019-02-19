@@ -441,7 +441,7 @@ export class StatesViewer extends Component {
                 <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
               </div>
               <div>
-                <MapDevices boundary={this.state.boundary} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
+                <MapDevices username={this.props.username} boundary={this.state.boundary} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
               </div>
             </div>
           </div>

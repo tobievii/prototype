@@ -503,10 +503,17 @@ app.post("/api/v3/dashboard", (req:any, res:any) => {
 )
 
 app.post("/api/v3/selectedIcon", (req:any, res:any) => {
-
   db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
     dev.selectedIcon = req.body.selectedIcon
     db.states.update({key:req.body.key}, dev)
+  })
+})
+
+app.post("/api/v3/boundaryLayer", (req:any, res:any) => {
+  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+    dev.boundaryLayer = req.body.boundaryLayer
+    db.states.update({key:req.body.key}, dev)
+    res.json({result: "success boundary"})
   })
 })
 
@@ -810,8 +817,19 @@ app.post("/api/v3/state/clear", (req: any, res: any) => {
     if (err) res.json(err);
     if (cleared) res.json(cleared);
   })
-})
+}
+)
 
+app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
+  if (!req.user) { return; }
+  if (req.user.level < 1) { return; }
+  if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+
+  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$unset": {boundary: {}}} , (err: Error, cleared: any) => {
+    if (err) res.json(err);
+    if (cleared) res.json(cleared);
+  })
+})
 
 app.post("/api/v3/state/query", (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }

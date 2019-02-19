@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Map, TileLayer, Marker, Popup, Circle, FeatureGroup} from 'react-leaflet';
+import { GeoJSON, Polygon, Map, TileLayer, Marker, Popup, Circle, FeatureGroup} from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw"
 
 var details = {
@@ -8,10 +8,10 @@ var details = {
   zoom: 2
 }
 
-const outer = [[-25.864170, 28.209336], [25.864170, -28.209336]]
 var circleColor = "#4c8ef7";
 
 const L = require('leaflet');
+
 // const myIcon = L.icon({
 //   iconUrl: 'https://image.flaticon.com/icons/svg/33/33622.svg',
 //   iconSize: [30, 46],
@@ -28,12 +28,16 @@ const L = require('leaflet');
 
 export class MapDevices extends Component {
   state = {
-    bounds: outer
+
+  }
+
+  constructor(props){
+    super(props);
+    
   }
 
   componentWillMount = () =>{
     this.setState({ devices: this.props.devices })
-    
   }
 
   setvalues = (device) => {
@@ -93,9 +97,7 @@ export class MapDevices extends Component {
     var position = [details.lat, details.lng]   
   
     return (
-      <Map className="map" center={position} zoom={details.zoom} >
-
-        
+      <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
 
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -121,17 +123,55 @@ export class MapDevices extends Component {
             if(marker.payload.data.boundary == undefined && marker.selectedIcon == true){
               return(
                 <div key={marker.devid}>
-                  <FeatureGroup>
+                  <FeatureGroup layeradd={()=>{
+                    console.log("layer added")
+                  }}>
                     <EditControl
                       position='topleft'
-                      onEdited={this._onEditPath}
-                      onCreated={this._onCreate}
+                      onCreated={e => {
+                        var latlngsArray = e.layer._latlngs;
+                        var latlngs = [];
+                        for(var x = 0; x < latlngsArray.length; x++){
+                          if(x == 0){
+                            var latlngsl = latlngsArray[x];
+                            for(var latlng in latlngsl){
+                              var k = [
+                                latlngsl[latlng].lat,
+                                latlngsl[latlng].lng
+                              ]
+                              latlngs.push(k)
+                            }
+                          }else{
+                            console.log("Result had two latLongs.")
+                          }
+                        }
+                        console.log(latlngs)
+                        fetch("/api/v3/data/post", {
+                          apikey : this.props.acc.apikey,
+                          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: marker.devid, data: {boundary: latlngs }})
+                        }).then(response => response.json()).then(serverresponse => {
+                            console.log(serverresponse)
+                            // fetch("/api/v3/boundaryLayer", {
+                            //   method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                            //   body: JSON.stringify({ key: marker.key, boundaryLayer: p})
+                            // }).then(response => response.json()).then(result => { console.log("Added Boundary Layer") 
+                            // }).catch(err => console.error(err.toString()));
+                        }).catch(err => {console.error(err.toString());});
+
+                      }}
                       onDeleted={this._onDeleted}
                       draw={{
-                        rectangle: false
+                        circlemarker: false,
+                        marker: false,
+                        rectangle: false,
+                        circle: false,
+                        polyline: false
+                      }}
+                      layeradd={()=>{
+                        console.log("layer added")
                       }}
                     />
-                    <Circle center={[51.51, -0.06]} radius={200} />
                   </FeatureGroup>
                   <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                     <Popup>
@@ -171,21 +211,50 @@ export class MapDevices extends Component {
                 }).catch(err => {console.error(err.toString()); return <div>No Data</div>;});
 
               }else if(marker.selectedIcon == true && marker.payload.data.boundary != undefined){
-                //circleColor = "#4c8ef7";
-                var lat = marker.payload.data.gps.lat;
-                var lon = marker.payload.data.gps.lon;
-                var radius = marker.payload.data.boundary.radius;
-
-                if(marker.payload.data.gps.lat != marker.payload.data.boundary.lat || marker.payload.data.gps.lat != marker.payload.data.boundary.lat){
-                  console.log("Device outside of parameters")
-                  circleColor = "red";
-                }else{
-                  circleColor = "#4c8ef7";
-                }
-  
+                
                 return(
                   <div key={marker.devid}>
-                    <Circle color={circleColor} center={[marker.payload.data.boundary.lat, marker.payload.data.boundary.lon]} radius={marker.payload.data.boundary.radius} />
+                    <FeatureGroup >
+                      <EditControl
+                        position='topleft'
+                        onEdited={e => {
+                              e.layers.eachLayer(a => {
+                                var t = a.toGeoJSON().geometry.coordinates;
+                                var fina = [];
+                                for(var r in t){
+                                  fina = t[0];
+                                }
+                                console.log(fina)
+                                fetch("/api/v3/data/post", {
+                                  apikey : this.props.acc.apikey,
+                                  method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                  body: JSON.stringify({ id: marker.devid, data: {boundary: fina }})
+                                }).then(response => response.json()).then(serverresponse => {
+                                    console.log(serverresponse)
+                                }).catch(err => {console.error(err.toString());});
+                            });
+                          }
+                        }
+                        onDeleted={ e =>{
+                          fetch("/api/v3/state/deleteBoundary", {
+                            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: marker.devid, username: this.props.username })
+                          }).then(response => response.json()).then(serverresponse => {
+                            console.log(serverresponse);
+                          }).catch(err => console.error(err.toString()));
+                        }}
+                        draw={{
+                          circlemarker: false,
+                          marker: false,
+                          rectangle: false,
+                          circle: false,
+                          polyline: false,
+                          polygon: false
+                        }}
+                      />
+                      <Polygon positions={marker.payload.data.boundary} />
+                    </FeatureGroup>
+                    <Polygon positions={marker.payload.data.boundary} />
                     <Marker 
                       position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} 
                       iconSize={[64, 80]} 
@@ -195,11 +264,6 @@ export class MapDevices extends Component {
                       >
                       <Popup>
                         <h5 className="popup">{marker.devid}</h5> <br />
-                        <div>
-                          Zoom: 
-                          <button onClick={()=>this.increaseBoundary(marker)}>+</button>
-                          <button onClick={()=>this.decreaseBoundary(marker)}>-</button>
-                        </div>
                       </Popup>
                     </Marker>
                   </div>
