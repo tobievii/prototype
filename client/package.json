@@ -57,6 +57,7 @@
     "react-modal": "^3.8.1",
     "react-moment": "^0.8.4",
     "react-monaco-editor": "^0.19.0",
+    "react-notifications": "^1.4.3",
     "react-router-dom": "^4.3.1",
     "react-simple-code-editor": "^0.6.1",
     "react-svg-gauge": "^1.0.10",

@@ -19,6 +19,9 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGuage } from "./guage.jsx"
+import { ProtoNotifications }  from "./notifications.jsx"
+import {NotificationContainer, NotificationManager} from 'react-notifications';
+
 
 
 
@@ -31,19 +34,22 @@ export class Dashboard extends React.Component {
       width: 4000,
       cols: 40,
       rowHeight: 30
-    }
+    },
+    dashboardEmpty: false
 
     ,
     layout: [
-    //   { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
-    //   //{ i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
-    //   //{ i: '2', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget" , dataname : "3dplaceholder" }
+      // { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
+      // { i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
+      // { i: '2', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget", dataname: "3dplaceholder" },
       // { i: "3", x: 0, y: 0, w: 1.7, h: 4.5, type: "Guage", dataname: "Proto guage" }
-
     ],
   }
 
   draggingUnique = "";
+  componentDidMount = () =>{
+    this.checkDashboard();
+  }
 
 
   saveDashboard = () => {
@@ -123,6 +129,36 @@ export class Dashboard extends React.Component {
 
   }
 
+  checkDashboard =()=> {
+
+    if (this.state.layout === undefined || this.state.layout.length == 0) {
+      setInterval(this.createNotification('warning') ,5000);
+    }
+    return;
+}
+
+  createNotification = (type) => {
+    return () => {
+      switch (type) {
+        case 'info':
+          NotificationManager.info('Info message');
+          break;
+        case 'success':
+          NotificationManager.success('Success message', 'Title here');
+          break;
+        case 'warning':
+          NotificationManager.warning('Your Dashboard is empty','', 4000, () =>
+          this.checkDashboardEntries());
+          break;
+        case 'error':
+          NotificationManager.error('Error message', 'Click me!', 5000, () => {
+            alert('callback');
+          });
+          break;
+      }
+    };
+  }
+
   onDrop = (e, f) => {
     //this.draggingUnique = "";
 
@@ -169,8 +205,8 @@ export class Dashboard extends React.Component {
           widget.h = widgetup.h
         }
       }
-    }
-    
+    }    
+
 
 
     fetch("/api/v3/dashboard", {
@@ -182,12 +218,11 @@ export class Dashboard extends React.Component {
 
   generateDashboard = () => {
 
-    if (!this.props.state) {
-      return (<div>loading..</div>)
-    } else {
-      //console.log(this.props.state)
 
-      return (
+    if (!this.props.state) {
+    return (<div>loading..</div>)
+    } else {
+    return (
         <GridLayout
           onDragStart={this.gridOnDragStart}
           onDrag={this.gridOnDrag}
@@ -250,11 +285,12 @@ export class Dashboard extends React.Component {
               }
 
               return (
+
                 <div>default</div>
               )
 
             })
-          }
+        }
         </GridLayout>
       )
     }
@@ -272,16 +308,17 @@ export class Dashboard extends React.Component {
           this.setState({ layout: this.props.state.layout }, () => { console.log("state") })
         }
 
-        return (<div>state</div>)
+    return (<div>state</div>)
       } else {
 
         if (this.settingLayout == false) {
+
           this.settingLayout = true;
           this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
-        }
+  }
 
         return (<div>loading</div>)
-      }
+  }
 
 
 
@@ -295,13 +332,14 @@ export class Dashboard extends React.Component {
   render() {
     if (this.state.layout) {
       return (
-        <div style={{ background: "rgba(255,0,0,0.1)", minHeight: 50 }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
+        <div style={{ background: "rgba(255,0,0,0.1)", minHeight: 50, textAlign: "center" }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
           {this.generateDashboard()}
+          <NotificationContainer />
         </div>
       )
     } else {
       return this.loading()
-    }
+  }
 
   }
 
@@ -330,4 +368,3 @@ export class Dashboard extends React.Component {
     return o;
   }
 }
-
