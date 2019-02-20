@@ -19,7 +19,6 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGuage } from "./guage.jsx"
-import { ProtoNotifications }  from "./notifications.jsx"
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 
