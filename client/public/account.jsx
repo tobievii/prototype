@@ -37,8 +37,7 @@ export class Account extends Component {
     this.getServerRegistrationOptions();
   }
 
-
-  generateRandomPass = () => {
+generateRandomPass = () => {
     var form = { ...this.state.form }
     form["passwordSignup"] = this.generateDifficult(16);
     this.setState({ form })
@@ -157,7 +156,12 @@ export class Account extends Component {
         body: JSON.stringify({
           email: this.state.form.email,
         })
-        }).then(response => response.json()).then(data => {})
+        }).then(response => response.json()).then(data => {
+          fetch("/api/v3/admin/expire", {
+            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            body: JSON.stringify({person:this.state.form.email, button:true })
+          }).then(response => response.json()).then(data => {})
+        })
       }
 
       if (data.error) {
@@ -188,13 +192,13 @@ export class Account extends Component {
           </div>
             <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
 
-            <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 90,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
+            <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 120,marginLeft: 15,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
         </div>             
       )
     }else{
       return(
-        <div className="col-7" style={{ textAlign: "right" }} >
- <div className="serverError" style={{ fontSize: "auto" }} >Check email for Password recovery link</div> 
+        <div className="col-10" style={{ textAlign: "right" }} >
+ <span className="serverError" style={{ fontSize: "auto" }} >Check email for Password recovery link(Valid only for 10 minutes)</span> 
             </div>
       )
     }

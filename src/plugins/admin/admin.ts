@@ -90,22 +90,33 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   //Reset password after link
 app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
-   var date= new Date();
-  var timestamp = date.getMinutes()
-  console.log("i got here")
-db.users.update({'recover.recoverToken':req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
-      if (response) {
-        if(response.nModified == 0){
-          res.json(response)
-        }else{
-          res.json(response)
+  var today = new Date();
+  today.setHours(today.getHours() + 2);
+  db.users.update({'recover.recoverToken':req.body.person},{ $set: {"password":req.body.pass}}, (err:Error, response:any) => {
+        if (response) {
+          if(response.nModified == 0){
+            res.json(response)
+          }else{
+            res.json(response)
+          }
+        } else if(err){
+          res.json(err)
         }
-       } else if(err){
-        res.json(err)
-      }
+  })
+  var changeToken=randomString({length:128});
+  db.users.update({'recover.recoverToken':req.body.person},{ $set: {recover:{"recoverToken":changeToken,"recoverTime":today}}})
 })
-var changeToken=randomString({length:128});
-db.users.update({'recover.recoverToken':req.body.person},{ $set: {recover:{"recoverToken":changeToken,"recoverTime":timestamp}}})
+
+app.post("/api/v3/admin/expire", (req: any, res: any) => {
+  
+  if(req.body.button){
+    var expire=setTimeout(() => {
+      var today = new Date();
+      today.setHours(today.getHours() + 2);
+      var changeTokens=randomString({length:128});
+      db.users.update({'email':req.body.person},{ $set: {recover:{"recoverToken":changeTokens,"recoverTime":today}}})
+    }, 600000);
+  }
 })
 
 //Reset password after link
@@ -131,10 +142,10 @@ db.users.update({$and:[{username:req.body.user},{password:req.body.current}]},{ 
   //####################################################################
 //Recover Password Link sent via email
 app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
-  var date= new Date();
-  var timestamp = date.getMinutes()
+  var today = new Date();
+today.setHours(today.getHours() + 2);
   var recoverToken=randomString({length:128});
- db.users.update({email:req.body.email},{ $set:{recover:{"recoverToken":recoverToken,"recoverTime":timestamp}}})
+ db.users.update({email:req.body.email},{ $set:{recover:{"recoverToken":recoverToken,"recoverTime":today}}})
  try {
  getRegistration(db, (err:Error, result:any)=>{
     var verifyLink = req.headers.referer + "recover/" +recoverToken
@@ -172,6 +183,8 @@ app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
  //####################################################################
 //Shared Device email
 app.post("/api/v3/admin/shareDevice", (req: any, res: any) => {
+ var today = new Date();
+today.setHours(today.getHours() + 2);
 try {
  getRegistration(db, (err:Error, result:any)=>{
     var smtpTransport = nodemailer.createTransport({
@@ -201,8 +214,14 @@ try {
            
             res.json({err:{}, result:{ mail: "sent" }})
             db.users.findOne({email:req.body.email},{_id:1},(err:Error,result:any)=>{
-db.states.update({devid:req.body.dev},{ $push: { keys:result} } )//adds users _id to keys array
-            })
+              console.log(result._id)
+
+// db.states.update({devid:req.body.dev},{ $push:{keys:result._id }} )//adds users _id to keys array
+
+//  const cursor =db.states.find({devid:req.body.dev},{keys:1,_id:0},{keys:ObjectId("5c46d6f117c8e941a4d39505")},(err:Error,ress:any)=>{
+//    console.log(ress)
+//  })
+})
           }
         })    
          })  } catch (err) {
