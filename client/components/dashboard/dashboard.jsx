@@ -20,9 +20,14 @@ import { Widget } from "./widget.jsx"
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGuage } from "./guage.jsx"
 import {NotificationContainer, NotificationManager} from 'react-notifications';
+import { MapDevices } from "../map.jsx"
 
-
-
+var mapDetails = {
+  un : undefined,
+  acc : undefined,
+  dc : undefined,
+  ds : undefined
+}
 
 export class Dashboard extends React.Component {
 
@@ -41,7 +46,8 @@ export class Dashboard extends React.Component {
       // { i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" },
       // { i: '1', x: 0, y: 4, w: 8, h: 6, type: "Line", dataname: "line" },
       // { i: '2', x: 8, y: 0, w: 4, h: 8, type: "ThreeDWidget", dataname: "3dplaceholder" },
-      // { i: "3", x: 0, y: 0, w: 1.7, h: 4.5, type: "Guage", dataname: "Proto guage" }
+      // { i: "3", x: 0, y: 0, w: 1.7, h: 4.5, type: "Guage", dataname: "Proto guage" },
+      // { i: "4", x: 0, y: 0, w: 4.5, h: 8, type: "map", dataname: "Proto map" }
     ],
   }
 
@@ -215,14 +221,29 @@ export class Dashboard extends React.Component {
       .catch(err => console.error(err.toString()));
   }
 
+  showMap = () => {
+    mapDetails.un = this.props.username;
+    mapDetails.acc = this.props.acc;
+    mapDetails.dc = this.props.state;
+    mapDetails.ds = this.props.devices;
+  }
+
   generateDashboard = () => {
 
 
     if (!this.props.state) {
     return (<div>loading..</div>)
     } else {
+      var draggble = true;
+      this.state.layout.map((data, i) => {
+      if(data.type == "map"){
+        draggble = false;
+      }else{
+        draggble = true;
+      }})
     return (
         <GridLayout
+          isDraggable = {draggble}
           onDragStart={this.gridOnDragStart}
           onDrag={this.gridOnDrag}
           onDragStop={this.gridOnDragStop}
@@ -282,7 +303,16 @@ export class Dashboard extends React.Component {
                   </div>
                 )
               }
-
+              if (data.type == "map") {
+                { this.showMap() }
+                return (
+                  <div key={data.i} >
+                    <Widget label={data.dataname} >
+                      <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true}/>
+                    </Widget>
+                  </div>
+                )
+              }
               return (
 
                 <div>default</div>

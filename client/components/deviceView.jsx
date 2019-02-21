@@ -25,9 +25,6 @@ import * as p from "../prototype.ts"
 
 import socketio from "socket.io-client";
 
-
-
-
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
 var loggedInUser = "";
@@ -76,13 +73,15 @@ export class DeviceView extends Component {
     display: "",
     EditorButton: " SHOW EDITOR",
     shareDisplay: "",
-    editorChanged: false
+    editorChanged: false,
+    devicesServer: undefined
   };
 
   socket;
 
   constructor(props) {
     super(props);
+
     this.socket = socketio();
     this.state.devid = props.devid
     this.socket.on("connect", a => {
@@ -93,6 +92,15 @@ export class DeviceView extends Component {
     this.State = {
       showMe: false
     }
+    p.statesByUsername(this.props.username, (states) => {
+      for (var s in states) {
+        states[s].selected = false
+        if(states[s].devid == this.props.devid){
+          states[s].selectedIcon = true;
+        }
+      }
+      this.setState({ devicesServer: states })
+    })
   }
 
   handleActionCall = (clickdata) => {
@@ -543,7 +551,13 @@ export class DeviceView extends Component {
 
           <div className="row">
             <div className="col-12" >
-              <Dashboard state={this.state.state} />
+              <Dashboard 
+                username={this.props.username} 
+                acc={this.props.acc} 
+                deviceCall={this.state.state} 
+                devices={this.state.devicesServer}
+                state={this.state.state} 
+              />
             </div>
           </div>
 

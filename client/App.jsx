@@ -29,6 +29,12 @@ import { Dashboard } from "./components/dashboard/dashboard.jsx"
 
 //import socketio from "socket.io-client";
 //const socket = socketio();
+const test = {
+    un: undefined,
+    acc: undefined,
+    dc: undefined,
+    ds: undefined
+}
 
 class App extends Component {
 
@@ -92,7 +98,12 @@ class App extends Component {
     //       }
     // }
 
-
+    setProps = (a) => {
+        test.un = a.un;
+        test.acc = a.acc;
+        test.dc = a.dc;
+        test.ds = a.ds;
+    }
 
     home = ({ match }) => {
         if (this.state.account) {
@@ -100,7 +111,7 @@ class App extends Component {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer username={this.state.account.username} account={this.state.account}/>
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account}/>
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
@@ -121,7 +132,13 @@ class App extends Component {
     deviceView = ({ match }) => {
         return (
             <div>
-                <DeviceView devid={match.params.devid} username={match.params.username} />
+                <DeviceView 
+                    devid={match.params.devid} 
+                    username={match.params.username}
+                    acc={test.acc} 
+                    deviceCall={test.dc} 
+                    devices={test.ds} 
+                />
             </div>
         )
     }

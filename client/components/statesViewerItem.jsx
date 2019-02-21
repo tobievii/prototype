@@ -276,7 +276,7 @@ export class StatesViewerItem extends Component {
                 {this.selectbox()}
 
                 <Link className="col" to={"/u/" +this.props.username +"/view/"+ this.props.device.devid} title="View Device Data">
-                  <div style={{ overflow: "hidden", marginTop: "5px" }}>
+                  <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
                     <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   </div>
                 </Link>

@@ -151,6 +151,11 @@ export class StatesViewer extends Component {
 
   constructor(props) {
     super(props)
+    var un = this.props.username;
+    var acc = this.props.account;
+    var dc = this.state.devicePressed;
+    var ds = this.state.devicesServer;
+    this.props.sendProps({un, acc, dc, ds});
 
     this.socket = socketio();
 
@@ -215,9 +220,24 @@ export class StatesViewer extends Component {
       });
     }
   }
+  // componentWillMount = () => {
+  //   var un = this.props.username;
+  //   var acc = this.props.account;
+  //   var dc = this.state.devicePressed;
+  //   var ds = this.state.devicesServer;
+  //   this.props.sendProps({un, acc, dc, ds});
+  // }
 
   componentWillUnmount = () => {
     this.socket.disconnect();
+  }
+
+  componentDidUpdate = () => {
+    var un = this.props.username;
+    var acc = this.props.account;
+    var dc = this.state.devicePressed;
+    var ds = this.state.devicesServer;
+    this.props.sendProps({un, acc, dc, ds})
   }
 
   handleDevicePacket = (packet) => {
@@ -440,8 +460,8 @@ export class StatesViewer extends Component {
               <div >
                 <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
               </div>
-              <div>
-                <MapDevices username={this.props.username} boundary={this.state.boundary} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
+              <div style={{ height:"605px"}}>
+                <MapDevices widget={false} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
               </div>
             </div>
           </div>

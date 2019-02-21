@@ -825,7 +825,7 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$unset": {boundary: {}}} , (err: Error, cleared: any) => {
+  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: {'payload.data.boundary': 1}} , (err: Error, cleared: any) => {
     if (err) res.json(err);
     if (cleared) res.json(cleared);
   })
