@@ -405,7 +405,8 @@ export class DeviceView extends Component {
                       text: 'Hi a Device was shared with you called '+this.props.devid,
                       html: '<p>Hi <br></br>'+this.props.username+' has shared ('+this.props.devid+ ') Device with you </p>',
                       subject:'SHARED DEVICE',
-                      dev:this.props.devid
+                      dev:this.props.devid,
+                      person:this.props.username
                     })
                   }).then(response => response.json()).then(serverresponse => {
                     console.log(serverresponse);        

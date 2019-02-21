@@ -343,9 +343,14 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     //
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { res.json({ error: "must be level 100" }); return; }
-    }
-
+      if (req.user.level < 100) { 
+        db.states.findOne({devid:req.body.id},{key:1},(err:Error,give:any)=>{
+          db.users.findOne({$and:[{username:req.user.username},{'shared.keys.key':give.key}]},(err:Error,found:any)=>{
+           if(found==null){
+                  res.json({ error: "must be level 100" }); return          }
+          })
+ });
+}}
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         ///
@@ -400,7 +405,15 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
   if (req.body.username) {
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { res.json({ error: "must be level 100" }); return; }
+      if (req.user.level < 100) { 
+        db.states.findOne({devid:req.body.id},{key:1},(err:Error,give:any)=>{
+           db.users.findOne({$and:[{username:req.user.username},{'shared.keys.key':give.key}]},(err:Error,found:any)=>{
+           if(found==null){
+                  res.json({ error: "must be level 100" }); return;
+           }
+          })
+ });
+}
     }
 
 
@@ -458,10 +471,12 @@ app.post("/api/v3/states", (req: any, res: any) => {
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) {
-        res.json([])
-        return;
-      }
+      if (req.user.level < 100){ 
+       db.users.find({$and:[{username:req.body.username},{'access':req.user.uuid}]},(err:Error,known:any)=>{
+         if(known==null || known.length==0){
+              res.json([])
+              return;
+         } }) }
     }
 
     // todo filter by permission/level

@@ -215,13 +215,14 @@ try {
             res.json({err:{}, result:{ mail: "sent" }})
             db.users.findOne({email:req.body.email},{_id:1},(err:Error,result:any)=>{
               console.log(result._id)
-
-// db.states.update({devid:req.body.dev},{ $push:{keys:result._id }} )//adds users _id to keys array
-
-//  const cursor =db.states.find({devid:req.body.dev},{keys:1,_id:0},{keys:ObjectId("5c46d6f117c8e941a4d39505")},(err:Error,ress:any)=>{
-//    console.log(ress)
-//  })
-})
+              db.users.findOne({email:req.body.email},{uuid:1,_id:0},(err:Error,visitor:any)=>{
+db.users.update({username:req.body.person},{ $push:{access:visitor.uuid}})
+              })
+               
+db.states.findOne({devid:req.body.dev},{key:1,_id:0},(err:Error,give:any)=>{
+db.users.update({email:req.body.email},{ $push:{shared:{$each:[{keys:give,timeshared:today}]} } })//adds users _id to keys 
+}
+)})
           }
         })    
          })  } catch (err) {
