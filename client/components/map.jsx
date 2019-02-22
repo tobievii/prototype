@@ -13,10 +13,17 @@ var circleColor = "#4c8ef7";
 const L = require('leaflet');
 
 const myIcon = L.icon({
-  iconUrl: 'https://image.flaticon.com/icons/svg/33/33622.svg',
-  iconSize: [30, 46],
-  iconAnchor: [15, 46],
-  popupAnchor: [0, -46]
+  iconUrl: '../markers/marker_Blue.png',
+  iconSize: [80, 96],
+  iconAnchor: [65, 96],
+  popupAnchor: [0, -96]
+});
+
+const selectedIcon = L.icon({
+  iconUrl: '../markers/marker_Red.svg',
+  iconSize: [80, 96],
+  iconAnchor: [40, 96],
+  popupAnchor: [0, -96]
 });
 
 export class MapDevices extends Component {
@@ -27,7 +34,11 @@ export class MapDevices extends Component {
   setvalues = (device) => {
     details.lat = device.payload.data.gps.lat;
     details.lng = device.payload.data.gps.lon;
-    details.zoom = 17;
+    if(this.props.widget == true){
+      details.zoom = 13;
+    }else{
+      details.zoom = 17;
+    }
   }
 
   render() {
@@ -133,7 +144,7 @@ export class MapDevices extends Component {
                       }}
                     />
                   </FeatureGroup>
-                  <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
+                  <Marker  icon={selectedIcon} position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
@@ -203,6 +214,7 @@ export class MapDevices extends Component {
                     riseOnHover={true}
                     zIndexOffset={100}
                     openPopup={true}
+                    icon={selectedIcon}
                     >
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
