@@ -16,7 +16,7 @@ export class Notification extends Component {
   render() {
     return (
       <div style={{ border: "1px #fff solid", padding: 5, margin: 5 }}>
-        <span style={{ fontWeight: "bold" }}>{this.props.notification.type}</span>&nbsp;<br />
+        <span style={{ fontWeight: "bold", color: "red" }}>{this.props.notification.type}</span>&nbsp;<br />
         <span style={{ color: "#888" }}>{this.props.notification.desc}</span><br />
         {moment(this.props.notification["_created_on"]).fromNow()}
       </div>
@@ -28,7 +28,6 @@ export class NavBar extends Component {
 
   constructor() {
     super();
-
 
     this.state = {
       showMenu: false,
