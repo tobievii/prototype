@@ -472,11 +472,14 @@ app.post("/api/v3/states", (req: any, res: any) => {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100){ 
-       db.users.find({$and:[{username:req.body.username},{'access':req.user.uuid}]},(err:Error,known:any)=>{
+      db.users.findOne({username:req.body.username},{apikey:1,_id:0},(err:Error,sharedwith:any)=>{
+        
+      
+        db.states.find({$and:[{apikey:sharedwith.apikey},{'access':req.user.uuid}]},(err:Error,known:any)=>{
          if(known==null || known.length==0){
               res.json([])
               return;
-         } }) }
+         } })}) }
     }
 
     // todo filter by permission/level
