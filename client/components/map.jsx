@@ -232,7 +232,7 @@ export class MapDevices extends Component {
             }else if(marker.selectedIcon == false){
               return(
                 <div key={marker.devid}>
-                  <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]} icon={myIcon}>
+                  <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
