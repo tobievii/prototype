@@ -479,13 +479,37 @@ app.post("/api/v3/states", (req: any, res: any) => {
          if(known==null || known.length==0){
               res.json([])
               return;
-         } })}) }
+         } })}) 
+
+        }
     }
 
     // todo filter by permission/level
+    if (req.body.username != req.user.username) {
+      if (req.user.level < 100){ 
+  if (req.body.username) {
+      db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+        if (e) { res.json({ error: "db error" }) }
+        if (user) {
+
+
+          db.states.find({$and:[{ apikey: user.apikey },{'access':req.user.uuid}]}, (er: Error, states: any[]) => {
+            var cleanStates: any = []
+            for (var a in states) {
+              var cleanState = _.clone(states[a])
+              delete cleanState["apikey"]
+              cleanStates.push(cleanState);
+            }
+            res.json(cleanStates)
+          })
+        }
+      })
+    }
+      }
+    }
+    else{
     if (req.body.username) {
       db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
-
         if (e) { res.json({ error: "db error" }) }
         if (user) {
 
@@ -502,7 +526,7 @@ app.post("/api/v3/states", (req: any, res: any) => {
         }
       })
     }
-  }
+  }}
 })
 
 app.get("/api/v3/states/full", (req: any, res: any) => {
