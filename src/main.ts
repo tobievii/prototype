@@ -1,3 +1,5 @@
+import { log } from "./utils"
+log("MAIN \tStart ===============================")
 require('source-map-support').install();
 var nodemailer = require("nodemailer")
 var _ = require('lodash');
@@ -5,7 +7,6 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
-const requestIp = require('request-ip');
 
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
@@ -15,7 +16,7 @@ import * as trex from './utils'
 import * as state from "./state"
 //import * as discordBot from './discordBot'
 
-trex.log("\n\n======================== START PROCESS ===============================\n\n")
+
 let config: any = configGen();
 var version = config.version; //
 //trex.log(config);
@@ -50,6 +51,9 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 
+
+
+
 app.disable('x-powered-by');
 app.use(cookieParser());
 app.use(compression());
@@ -69,7 +73,7 @@ app.use('/u/:username/view', express.static('../client/dist'))
 // PLUGINS
 
 eventHub.on("device", (data: any) => {
-  //console.log("----")
+  //log("----")
 
 
 
@@ -97,7 +101,10 @@ app.use(accounts.midware(db));
 db.on('connect', function () {
 
   for (var p in plugins) {
-    if (plugins[p].init) { plugins[p].init(app, db, eventHub); }
+    if (plugins[p].init) {
+      log("PLUGIN\tinit [" + plugins[p].name + "]")
+      plugins[p].init(app, db, eventHub);
+    }
   }
 
 })
@@ -106,7 +113,12 @@ db.on('connect', function () {
 // USERS LAST SEEN / ACTIVE
 app.use((req: any, res: any, next: any) => {
   if (req.user) {
-    console.log("user active:\t" + req.user.email + "\t" + req.url)
+
+    if (req.user.level == 0) {
+      log("USER\tunregistered" + "\t" + req.url)
+    }
+
+
     db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
       user["_last_seen"] = new Date();
       db.users.update({ apikey: req.user.apikey }, user, (e2: Error, r2: any) => {
@@ -344,14 +356,16 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     //
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { 
-        db.states.findOne({devid:req.body.id},{key:1},(err:Error,give:any)=>{
-          db.users.findOne({$and:[{username:req.user.username},{'shared.keys.key':give.key}]},(err:Error,found:any)=>{
-           if(found==null){
-                  res.json({ error: "must be level 100" }); return          }
+      if (req.user.level < 100) {
+        db.states.findOne({ devid: req.body.id }, { key: 1 }, (err: Error, give: any) => {
+          db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
+            if (found == null) {
+              res.json({ error: "must be level 100" }); return
+            }
           })
- });
-}}
+        });
+      }
+    }
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         ///
@@ -406,21 +420,21 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
   if (req.body.username) {
 
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100) { 
-        db.states.findOne({devid:req.body.id},{key:1},(err:Error,give:any)=>{
-           db.users.findOne({$and:[{username:req.user.username},{'shared.keys.key':give.key}]},(err:Error,found:any)=>{
-           if(found==null){
-                  res.json({ error: "must be level 100" }); return;
-           }
+      if (req.user.level < 100) {
+        db.states.findOne({ devid: req.body.id }, { key: 1 }, (err: Error, give: any) => {
+          db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
+            if (found == null) {
+              res.json({ error: "must be level 100" }); return;
+            }
           })
- });
-}
+        });
+      }
     }
 
 
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
-        console.log(user)
+        log(user)
         /////
         if (req.body.id) {
           db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
@@ -472,62 +486,65 @@ app.post("/api/v3/states", (req: any, res: any) => {
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100){ 
-      db.users.findOne({username:req.body.username},{apikey:1,_id:0},(err:Error,sharedwith:any)=>{
-        
-      
-        db.states.find({$and:[{apikey:sharedwith.apikey},{'access':req.user.uuid}]},(err:Error,known:any)=>{
-         if(known==null || known.length==0){
+      if (req.user.level < 100) {
+        db.users.findOne({ username: req.body.username }, { apikey: 1, _id: 0 }, (err: Error, sharedwith: any) => {
+
+
+          db.states.find({ $and: [{ apikey: sharedwith.apikey }, { 'access': req.user.uuid }] }, (err: Error, known: any) => {
+            if (known == null || known.length == 0) {
               res.json([])
               return;
-         } })}) 
+            }
+          })
+        })
 
-        }
+      }
     }
 
     // todo filter by permission/level
     if (req.body.username != req.user.username) {
-      if (req.user.level < 100){ 
-  if (req.body.username) {
-      db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
-        if (e) { res.json({ error: "db error" }) }
-        if (user) {
+      if (req.user.level < 100) {
+        if (req.body.username) {
+          db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+            if (e) { res.json({ error: "db error" }) }
+            if (user) {
 
 
-          db.states.find({$and:[{ apikey: user.apikey },{'access':req.user.uuid}]}, (er: Error, states: any[]) => {
-            var cleanStates: any = []
-            for (var a in states) {
-              var cleanState = _.clone(states[a])
-              delete cleanState["apikey"]
-              cleanStates.push(cleanState);
+              db.states.find({ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, (er: Error, states: any[]) => {
+                var cleanStates: any = []
+                for (var a in states) {
+                  var cleanState = _.clone(states[a])
+                  delete cleanState["apikey"]
+                  cleanStates.push(cleanState);
+                }
+                res.json(cleanStates)
+              })
             }
-            res.json(cleanStates)
           })
         }
-      })
-    }
       }
     }
-    else{
-    if (req.body.username) {
-      db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
-        if (e) { res.json({ error: "db error" }) }
-        if (user) {
+    else {
+      if (req.body.username) {
+        db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+          if (e) { res.json({ error: "db error" }) }
+          if (user) {
 
 
-          db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
-            var cleanStates: any = []
-            for (var a in states) {
-              var cleanState = _.clone(states[a])
-              delete cleanState["apikey"]
-              cleanStates.push(cleanState);
-            }
-            res.json(cleanStates)
-          })
-        }
-      })
+            db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
+              var cleanStates: any = []
+              for (var a in states) {
+                var cleanState = _.clone(states[a])
+                delete cleanState["apikey"]
+                cleanStates.push(cleanState);
+              }
+              res.json(cleanStates)
+            })
+          }
+        })
+      }
     }
-  }}
+  }
 })
 
 app.get("/api/v3/states/full", (req: any, res: any) => {
@@ -536,27 +553,27 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
   })
 })
 
-app.post("/api/v3/dashboard", (req:any, res:any) => {
-  console.log(req.body.layout)
-  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+app.post("/api/v3/dashboard", (req: any, res: any) => {
+  log(req.body.layout)
+  db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
-    db.states.update({key:req.body.key}, dev)
+    db.states.update({ key: req.body.key }, dev)
   })
 }
 )
 
-app.post("/api/v3/selectedIcon", (req:any, res:any) => {
-  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+app.post("/api/v3/selectedIcon", (req: any, res: any) => {
+  db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.selectedIcon = req.body.selectedIcon
-    db.states.update({key:req.body.key}, dev)
+    db.states.update({ key: req.body.key }, dev)
   })
 })
 
-app.post("/api/v3/boundaryLayer", (req:any, res:any) => {
-  db.states.findOne({key:req.body.key}, (e:Error, dev:any)=>{
+app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
+  db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.boundaryLayer = req.body.boundaryLayer
-    db.states.update({key:req.body.key}, dev)
-    res.json({result: "success boundary"})
+    db.states.update({ key: req.body.key }, dev)
+    res.json({ result: "success boundary" })
   })
 })
 
@@ -605,29 +622,32 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 ///////// END
 
 app.post("/api/v3/getlocation", (req: any, res: any) => {
-  var geo
+  var geo;
+
   if (req.body === undefined) { return; }
-  if ((req.user) && (req.user.level) > 0 && (req.body.ip)) {
-    (async () =>{ 
-      geo = geoip.lookup(req.body.ip);
+
+  if ((req.user) && (req.user.level) > 0) {
+    (async () => {
+      geo = geoip.lookup(await publicIp.v4());
 
       var latl, lonl;
       var coords = geo.ll;
 
-      for(var s=0; s<coords.length ;s++){
-        if(s == 0){
+      for (var s = 0; s < coords.length; s++) {
+        if (s == 0) {
           latl = coords[s]
-        }else if(s == 1){
+        } else if (s == 1) {
           lonl = coords[s]
         }
       }
 
-      res.json({ result: {
-        gps:{
-          lat: latl,
-          lon: lonl
+      res.json({
+        result: {
+          gps: {
+            lat: latl,
+            lon: lonl
+          }
         }
-      } 
       });
     })();
   }
@@ -642,13 +662,11 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
 });
 
 function handleState(req: any, res: any, next: any) {
-  var geo:any;
+  var geo;
   if (req.body === undefined) { return; }
 
-  const clientIp = requestIp.getClientIp(req); 
-
-  (async () =>{ 
-    geo = geoip.lookup(clientIp);
+  (async () => {
+    geo = geoip.lookup(await publicIp.v4());
 
     if ((req.user) && (req.user.level) > 0) {
       if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
@@ -656,36 +674,43 @@ function handleState(req: any, res: any, next: any) {
       if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
       if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
       if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
-      
+
       var k: any;
-      
+
       if (!req.body.data.gps) {
-        db.states.findOne({devid: req.body.id, gps: {$exists :false}}, (err: Error, res: any) => {
-          if(res == null){
+        db.states.findOne({ devid: req.body.id, gps: { $exists: false } }, (err: Error, res: any) => {
+          if (res.payload.data.gps == undefined) {
             k = false;
-            var latl, lonl;
-            var coords = geo.ll;
+          } else if (res.payload.data.gps) {
+            k = true;
+          }
+        });
 
-            for(var s=0; s<coords.length ;s++){
-              if(s == 0){
-                latl = coords[s]
-              }else if(s == 1){
-                lonl = coords[s]
-              }
+        if (k == false) {
+          var latl, lonl;
+          var coords = geo.ll;
+
+          for (var s = 0; s < coords.length; s++) {
+            if (s == 0) {
+              latl = coords[s]
+            } else if (s == 1) {
+              lonl = coords[s]
             }
-
-            var tempv = req.body.data;
-            var change = {tempv,
-              gps:{
-              lat: latl,
-              lon: lonl
-            }}
-            req.body.data = change;
-          }  else{
-              k = true;
           }
 
-        });
+          var tempv = req.body.data;
+          var change = {
+            tempv,
+            gps: {
+              lat: latl,
+              lon: lonl
+            }
+          }
+          req.body.data = change;
+        } else {
+          var tempv = req.body.data;
+          req.body.data = tempv;
+        }
       }
 
       var meta = {
@@ -713,7 +738,7 @@ function handleState(req: any, res: any, next: any) {
             }
           }
           // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-          //   if (err) console.log("couldnt publish")
+          //   if (err) log("couldnt publish")
           // }); 
 
           res.json({ result: "success" });
@@ -734,7 +759,7 @@ function handleState(req: any, res: any, next: any) {
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
 
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
-    if (err) { console.log(err); cb(err, undefined); return; }
+    if (err) { log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
       state.postState(db, user, newpacket, packetIn.meta, (packet: any, info: any) => {
@@ -751,7 +776,7 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
           }
         }
 
-        //console.log(apikey + "|" + packetIn.id)
+        //log(apikey + "|" + packetIn.id)
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
@@ -762,7 +787,7 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
         }
 
         // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-        //   if (err) console.log("couldnt publish")
+        //   if (err) log("couldnt publish")
         // }); 
 
         cb(undefined, { result: "success" });
@@ -830,9 +855,9 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
-app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
-  console.log("account registration")
-  console.log(req.body)
+app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+  log("account registration")
+  log(req.body)
 
 
   req.user.email = req.body.email
@@ -863,7 +888,7 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: {'payload.data.boundary': 1}} , (err: Error, cleared: any) => {
+  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: { 'payload.data.boundary': 1 } }, (err: Error, cleared: any) => {
     if (err) res.json(err);
     if (cleared) res.json(cleared);
   })
@@ -915,7 +940,7 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   for (var plugin of plugins) {
     if (plugin.workflow) {
-      console.log("loading workflow definitions for plugin: " + plugin.name)
+      log("loading workflow definitions for plugin: " + plugin.name)
       definitions.push(plugin.workflowDefinitions);
     }
   }
@@ -933,7 +958,7 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
 
   db.states.find({ apikey: apikey }, (err: Error, states: any) => {
-    if (err) { console.log("WORKFLOW ERROR"); }
+    if (err) { log("WORKFLOW ERROR"); }
 
     var statesObj: any = {}
     for (var s in states) { statesObj[states[s].devid] = states[s]; }
@@ -988,7 +1013,7 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           //console.error('Failed to execute script.', err);
 
           //if (alreadyExitScript == false) { 
-          console.log("VM WORKFLOW ERROR!")
+          log("VM WORKFLOW ERROR!")
           console.error(err);
           alreadyExitScript = true;
           packet.err = err.toString();
@@ -1064,16 +1089,12 @@ io.on('connection', function (socket: any) {
   }, 5000)
 
   socket.on('join', function (path: string) {
-    console.log(socket.id + " joins " + path)
-    //console.log(socket)
-    //AUTH
-    //trex.log("SOCKET.IO JOIN "+path)
     socket.join(path);
   });
 
   socket.on('post', (data: any) => {
     //trex.log("socket posted");
-    //console.log(data);
+    //log(data);
 
     for (var key in socket.rooms) {
       if (socket.rooms.hasOwnProperty(key)) {
@@ -1093,7 +1114,7 @@ io.on('connection', function (socket: any) {
 
 
         // state.validApiKey(db, testkey, (err: Error, result: any) => {
-        //   if (err) { console.log(err); return; }
+        //   if (err) { log(err); return; }
         //   if (result) {
 
         //     if (result.valid) {
@@ -1140,7 +1161,7 @@ if (config.ssl) {
 
   /////
 } else {
-  trex.log("server running on port HTTP " + config.httpPort)
+  trex.log("HTTP\tServer port: " + config.httpPort)
   server.listen(config.httpPort);
 }
 
@@ -1158,5 +1179,5 @@ server.on('error', (e: any) => {
 
 
 
-process.on('unhandledRejection', console.log);
-process.on("uncaughtException", console.log);
+process.on('unhandledRejection', log);
+process.on("uncaughtException", log);

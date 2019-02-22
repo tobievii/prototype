@@ -3,23 +3,23 @@ import * as geoip from 'geoip-lite' // https://www.npmjs.com/package/geoip-lite
 import { generate, generateDifficult, log } from './utils';
 import * as _ from 'lodash';
 
-var dbglobal:any;
+var dbglobal: any;
 
 export function midware(db: any) {
   dbglobal = db;
-  return function (req: any, res: any, next: any) {  
-    
-    
+  return function (req: any, res: any, next: any) {
+
+
     if (req.headers.authorization) {
-      console.log("req.headers.auth")
+
       var auth = Buffer.from(req.headers.authorization.split(" ")[1], 'base64').toString()
-      
+
       if (auth.split(":")[0] == "api") {
         var apiAuth = auth.split(":")[1];
         var apikey = apiAuth.split("-")[1]
-        
-        
- 
+
+
+
         db.users.findOne({ apikey: apikey }, (err: Error, user: any) => {
           if (user) {
             req.user = user;
@@ -29,20 +29,20 @@ export function midware(db: any) {
           }
         });
       } else {
-        res.json({error:"Authorization header invalid"})
+        res.json({ error: "Authorization header invalid" })
         return;
       }
 
 
     } else {
       if (req.cookies) {
-        
+
         if (!req.cookies.uuid) {
-          
-          accountCreate(db, "", req.get('User-Agent'), req.ip, (err:Error, user:any) => {
-            if (err) { next(); } else { cookieSetFromUser(user, req, res, next);  }          
-          },undefined)
-  
+
+          accountCreate(db, "", req.get('User-Agent'), req.ip, (err: Error, user: any) => {
+            if (err) { next(); } else { cookieSetFromUser(user, req, res, next); }
+          }, undefined)
+
         } else {
           db.users.findOne({ uuid: req.cookies.uuid }, (err: any, user: any) => {
             if (user) {
@@ -53,11 +53,11 @@ export function midware(db: any) {
             } else {
               console.log("ERROR USER NOT FOUND IN DB")
               res.clearCookie('uuid');
-              
-              accountCreate(db, "", req.get('User-Agent'), req.ip, (err:Error, user:any) => {
-                if (err) { next(); } else { cookieSetFromUser(user, req, res, next);  }          
-              },undefined)
-  
+
+              accountCreate(db, "", req.get('User-Agent'), req.ip, (err: Error, user: any) => {
+                if (err) { next(); } else { cookieSetFromUser(user, req, res, next); }
+              }, undefined)
+
             }
           })
         }
@@ -71,7 +71,7 @@ export function midware(db: any) {
   }
 }
 
-export function cookieSetFromUser(user:any, req:any, res:any, next:any) {
+export function cookieSetFromUser(user: any, req: any, res: any, next: any) {
   var expiryDate = new Date(Number(new Date()) + 315360000000);  //10 years
   res.cookie('uuid', user.uuid, { expires: expiryDate, httpOnly: true });
   req.user = user;
@@ -81,16 +81,16 @@ export function cookieSetFromUser(user:any, req:any, res:any, next:any) {
 
 
 export function signInFromWeb(db: any) {
-  return function(req: any, res: any, next: any) {
+  return function (req: any, res: any, next: any) {
 
-    
+
 
     if (req.body) {
-      
+
       if (req.body.email) {
-        
+
         if (validateEmail(req.body.email) && req.body.pass) {
-          
+
           db.users.findOne(
             { email: req.body.email.toLowerCase(), password: req.body.pass },
             (err: Error, user: any | undefined) => {
@@ -108,7 +108,7 @@ export function signInFromWeb(db: any) {
           res.json({ error: "not valid email and/or password" });
         }
       } else {
-        res.json({ error: "email address can not be empty"})
+        res.json({ error: "email address can not be empty" })
       }
     } else {
       res.json({ error: "could not parse json" });
@@ -156,7 +156,7 @@ export function accountVerifyCheck(db: any) {
 
       if (user) {
         user.emailverified = true;
-        db.users.update({ uuid: req.params.uuid }, user, (errUpd:Error, resultUpd:any) => {
+        db.users.update({ uuid: req.params.uuid }, user, (errUpd: Error, resultUpd: any) => {
           res.json(resultUpd);
         })
       } else {
@@ -170,11 +170,11 @@ export function accountVerifyCheck(db: any) {
 
 
 
-export function defaultAdminAccount(db:any) {
+export function defaultAdminAccount(db: any) {
   // check if this is the first account.
-  db.users.find({}).count( (errUsers:Error, usersCount:number) => {
+  db.users.find({}).count((errUsers: Error, usersCount: number) => {
     if (errUsers) console.log("ERR CANT ACCESS DB.USERS");
-    
+
     if (usersCount == 0) {
       console.log("==== ADMIN ACCCOUNT ===")
       console.log(usersCount);
@@ -184,60 +184,60 @@ export function defaultAdminAccount(db:any) {
   //
 }
 
-export function createDefaultAdminAccount(db:any) {
+export function createDefaultAdminAccount(db: any) {
   log("creating default admin account")
 
-  accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err:Error,user:any)=>{
-  }, {password:"admin", level:99})
+  accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err: Error, user: any) => {
+  }, { password: "admin", level: 99 })
 }
 
 
-export function registerExistingAccount(db:any, user:any, cb:any) {
-  console.log("registerExistingAccount")
+export function registerExistingAccount(db: any, user: any, cb: any) {
+
   if (validateEmail(user.email)) {
-    db.users.find({email:user.email}, (err:Error, usersEmailExists:any) => {
+    db.users.find({ email: user.email }, (err: Error, usersEmailExists: any) => {
 
       if (usersEmailExists.length == 0) {
-        db.users.update({ uuid: user.uuid }, user, { upsert: true },cb);  
+        db.users.update({ uuid: user.uuid }, user, { upsert: true }, cb);
       } else {
         cb("that email is taken", undefined)
       }
     })
-    
+
   } else {
     cb("not valid email", undefined);
   }
 }
 
-export function Forgotpassword(db:any, user:any, cb:any) {
+export function Forgotpassword(db: any, user: any, cb: any) {
   console.log("forgotpassword backend")
- if(user.email.length !=0){
+  if (user.email.length != 0) {
     if (validateEmail(user.email)) {
-      db.users.find({email:user.email}, (err:Error, result:any) => {
-        if (result.length==0) {
+      db.users.find({ email: user.email }, (err: Error, result: any) => {
+        if (result.length == 0) {
           cb("Email does not exist")
         } else {
-              db.users.update({email:user.email},{ $set: {recover:{"recoverToken":null,"recoverTime":""}}})
-                cb(null,result);
+          db.users.update({ email: user.email }, { $set: { recover: { "recoverToken": null, "recoverTime": "" } } })
+          cb(null, result);
         }
       })
-  } 
-   else{
-    cb("not valid email", undefined)
+    }
+    else {
+      cb("not valid email", undefined)
     }
   }
- else{
-   cb("email can not be empty", undefined)
- }
+  else {
+    cb("email can not be empty", undefined)
+  }
 }
 
 // V3 API: ACCOUNT CREATE
-export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: any, accRequest:any|undefined) {
+export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: any, accRequest: any | undefined) {
   var event = new Date();
   var geoIPLoc = geoip.lookup(ip);
- 
 
-  var user:any = {
+
+  var user: any = {
     uuid: generate(128),
     "_created_on": new Date(),
     created: {
@@ -251,7 +251,7 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     ip: ip,
     ipLoc: geoIPLoc,
     userAgent: userAgent,
-    username : generate(32).toLowerCase(),
+    username: generate(32).toLowerCase(),
     emailverified: false,
     email: email.toLowerCase(),
     apikey: generate(32),
@@ -259,7 +259,7 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     level: 0
   };
 
-  
+
   if (accRequest) {
     // not ideal, used for automated testing
     if (accRequest.password) { user.password = accRequest.password }
@@ -271,12 +271,12 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     if (validateEmail(user.email)) {
       console.log("valid email")
       user.level++;
-      db.users.find({email:user.email}, (err:Error, userExists:any) => {
+      db.users.find({ email: user.email }, (err: Error, userExists: any) => {
         if (err) cb(err, undefined);
-        
-        if (userExists.length > 0) { 
-          cb({error:"email exists"}, undefined );
-          console.log("USER ALREADY EXISTS"); 
+
+        if (userExists.length > 0) {
+          cb({ error: "email exists" }, undefined);
+          console.log("USER ALREADY EXISTS");
         } else {
           console.log("USER email does not exist in db yet.")
           db.users.save(user, cb);
@@ -290,29 +290,29 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     // auto created from cookies (no email data);
     db.users.save(user, cb);
   }
-  
+
 
 }
 
 
-export function accountClear(db:any, account:any, cb:any) {
+export function accountClear(db: any, account: any, cb: any) {
   if (account) {
     db.users.remove(account, cb);
   }
 }
 
-export function accountDelete(db:any, user:any, cb:any ) {
+export function accountDelete(db: any, user: any, cb: any) {
   console.log("USER!")
   console.log(user);
-  db.users.remove(user, (err:Error, result:any) => {
+  db.users.remove(user, (err: Error, result: any) => {
     if (err) { cb(err, undefined); }
-    if (result) { cb(undefined,result); }    
+    if (result) { cb(undefined, result); }
   })
 }
 
 
 
-export function validateEmail(email:string) {
+export function validateEmail(email: string) {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
@@ -325,33 +325,32 @@ export function validateEmail(email:string) {
  * @return {Object}        Return a new object who represent the diff
  */
 
-export function difference(object:any, base:any) {
+export function difference(object: any, base: any) {
 
-	function changes(object:any, base:any) {
-		return _.transform(object, function(result:any, value:any, key:any) {
-			if (!_.isEqual(value, base[key])) {
-				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
-			}
-		});
-    }
-    
-	return changes(object, base);
+  function changes(object: any, base: any) {
+    return _.transform(object, function (result: any, value: any, key: any) {
+      if (!_.isEqual(value, base[key])) {
+        result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+      }
+    });
+  }
+
+  return changes(object, base);
 }
 
 
 
-export function validApiKey(db:any,testkey:string,cb:any) {
-  console.log("check validApi")
-  db.users.findOne({apikey:testkey}, (err:Error, user:any)=>{
+export function validApiKey(db: any, testkey: string, cb: any) {
+  db.users.findOne({ apikey: testkey }, (err: Error, user: any) => {
     if (user) {
-      cb(undefined,{testkey:testkey, valid: true, user: user})
+      cb(undefined, { testkey: testkey, valid: true, user: user })
     } else {
-      cb({testkey:testkey, valid: false}, undefined)
+      cb({ testkey: testkey, valid: false }, undefined)
     }
   })
 }
 
-export function checkApiKey(testkey:string, cb:any) {
+export function checkApiKey(testkey: string, cb: any) {
   validApiKey(dbglobal, testkey, cb)
 }
 

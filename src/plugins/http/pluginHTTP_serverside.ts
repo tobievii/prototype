@@ -4,20 +4,20 @@ import { generate, generateDifficult } from "../../utils";
 
 export var serversMem: any = {};
 
-export function init(app: any, db: any, eventHub: events.EventEmitter) {
-  console.log("init http plugin");
+export const name = "HTTP"
 
+export function init(app: any, db: any, eventHub: events.EventEmitter) {
   app.get("/api/v3/http/routes", (req: any, res: any) => {
-    
-    getroutes(db, (err: Error, routes: any) => {  
+
+    getroutes(db, (err: Error, routes: any) => {
       if (err) res.json({ err: err.toString() });
-   
+
 
       res.json(routes);
     });
   });
 
-  app.post("/api/v3/http/setapikey", (req:any, res:any)=>{
+  app.post("/api/v3/http/setapikey", (req: any, res: any) => {
     console.log("--..")
     console.log(req.body);
 
@@ -25,7 +25,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       { portNum: req.body.portNum },
       { $set: { apikey: req.user.apikey } },
       (err: Error, resultUpd: any) => {
-        if (err) { res.json( err )}
+        if (err) { res.json(err) }
         if (resultUpd) {
           res.json(resultUpd)
         }
@@ -48,8 +48,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       } else {
         listenRoute(app, result, eventHub);
         res.json(result);
-        
-        
+
+
       }
     });
   });
@@ -79,8 +79,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 }
 
 
-export function listenRoute(app:any, route:any, eventHub:events.EventEmitter) {
-  app[route.method]("/plugin/http/"+route.route, (req:any, res:any)=>{
+export function listenRoute(app: any, route: any, eventHub: events.EventEmitter) {
+  app[route.method]("/plugin/http/" + route.route, (req: any, res: any) => {
     //console.log(req.body);
 
 
@@ -92,11 +92,12 @@ export function listenRoute(app:any, route:any, eventHub:events.EventEmitter) {
         data: req.body,
         //http: { route: route },
         meta: { method: "http" }
-      }});
+      }
+    });
 
-      res.end("success")
-      
-      
+    res.end("success")
+
+
   })
 }
 
@@ -105,15 +106,15 @@ export function getroutes(db: any, cb: any) {
 }
 
 
-export function addroute(db: any, routeOptions: any, apikey:any, cb: any) {
+export function addroute(db: any, routeOptions: any, apikey: any, cb: any) {
 
   routeOptions.apikey = apikey;
-  db.plugins_http.find({ route: routeOptions.route, method: routeOptions.method , apikey:apikey},
+  db.plugins_http.find({ route: routeOptions.route, method: routeOptions.method, apikey: apikey },
     (err: Error, conflictingroutes: any) => {
       if (err) console.log(err);
 
       if (conflictingroutes.length == 0) {
-        
+
         db.plugins_http.save(routeOptions, cb);
       } else {
         cb(new Error("route already taken"), undefined);
@@ -135,13 +136,13 @@ export function connectport(db: any, routeOptions: any, eventHub: any, cb: any) 
   console.log("http Server " + routeOptions.portNum + " \t| loading...");
 
   var server = net.createServer((client: any) => {
-    server.getConnections(function(err: Error, count: number) {
+    server.getConnections(function (err: Error, count: number) {
       console.log("There are %d connections now. ", count);
       updateport(
         db,
         routeOptions.portNum,
         { connections: count },
-        (err: Error, result: any) => {}
+        (err: Error, result: any) => { }
       );
       eventHub.emit("plugin", { plugin: "http", event: "connections" });
     });
@@ -153,24 +154,25 @@ export function connectport(db: any, routeOptions: any, eventHub: any, cb: any) 
         //apikey: config.apikey,
         apikey: "mfradh6drivbykz7s4p3vlyeljb8666v",
         packet: {
-          id: "httpPort"+routeOptions.portNum,
+          id: "httpPort" + routeOptions.portNum,
           level: 1,
-          data: { text: data.toString().replace("\r\n","")},
+          data: { text: data.toString().replace("\r\n", "") },
           http: { hexBuffer: data.toString("hex"), },
           routeOptions,
           meta: { method: "http" }
-        }});
+        }
+      });
     });
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     client.on("end", () => {
       // Get current connections count.
-      server.getConnections(function(err: Error, count: number) {
+      server.getConnections(function (err: Error, count: number) {
         console.log("There are %d connections now. ", count);
         updateport(
           db,
           routeOptions.portNum,
           { connections: count },
-          (err: Error, result: any) => {}
+          (err: Error, result: any) => { }
         );
       });
       eventHub.emit("plugin", { plugin: "http", event: "connections" });
@@ -182,11 +184,11 @@ export function connectport(db: any, routeOptions: any, eventHub: any, cb: any) 
     console.log("http Server " + routeOptions.portNum + " \t| ready.");
   });
 
-  server.on("close", function() {
+  server.on("close", function () {
     console.log("http server socket is closed.");
   });
 
-  server.on("error", function(error: Error) {
+  server.on("error", function (error: Error) {
     console.error(JSON.stringify(error));
   });
 

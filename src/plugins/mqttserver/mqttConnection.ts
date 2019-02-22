@@ -12,14 +12,16 @@ import { log } from "../../utils"
 export class mqttConnection extends EventEmitter {
     socket: net.Socket;
     apikey: string = "";
+    subscriptions: any = [];
+    connected: Boolean = false;
 
     constructor(socket: net.Socket) {
         super()
         this.socket = socket;
+        this.connected = true;
         socket.on("data", this.handleData(socket))
         socket.on("close", (err) => {
-            console.log("close event")
-            console.log(err)
+            this.connected = false;
             this.emit("close", err);
         })
     }
@@ -32,10 +34,9 @@ export class mqttConnection extends EventEmitter {
         }
 
         try {
-            console.log("MQTT publishing to client")
             this.socket.write(buildMqttPublishPacket(topic, data));
         } catch (err) {
-            console.log(err);
+            log(err);
         }
 
 
@@ -46,17 +47,12 @@ export class mqttConnection extends EventEmitter {
         // http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/errata01/os/mqtt-v3.1.1-errata01-os-complete.html#_Toc442180831
         return (data: Buffer) => {
 
-            //console.log("\n---- mqtt packet ---- ")
             var packetTypeHex = data.slice(0, 1).toString('hex')[0]
             var mqttPacketType = Buffer.from('0' + packetTypeHex, 'hex')[0];
-            //console.log("mqttPacketType:"+mqttPacketType);
-            var remainingLength = data.readUInt8(1)
-            // console.log("remainLength:"+remainingLength)
-            // console.log("total Length"+data.length)
 
-            // console.log(data.toString("hex"));
-            // console.log(data.toString())
-
+            /*
+                CONNECT
+            */
             if (mqttPacketType == 1) {
 
                 var connect: any = {
@@ -94,30 +90,24 @@ export class mqttConnection extends EventEmitter {
                 var passwordOffset = usernameOffset + usernameLength + 2
                 connect.password = data.slice(passwordOffset, passwordOffset + passwordLength).toString()
 
-                console.log(connect);
-
                 //CHECK APIKEY
                 var apikey = connect.password.split("-")
                 if ((apikey[0] == "key") && (apikey.length == 2)) {
                     apikey = apikey[1]
                     accounts.checkApiKey(apikey, (err: Error, result: any) => {
 
-
-
                         if (err) {
-                            console.log("NOT VALID")
-                            console.log(err);
+                            log("MQTT invalid username/pass")
                             socket.destroy();
                             return;
                         }
-
 
                         this.apikey = apikey;
                         this.emit("connect", connect)
                         socket.write(" \u0002\u0000\u0000");
                     })
                 } else {
-
+                    log("MQTT invalid username/pass")
                     socket.destroy();
                 }
 
@@ -125,76 +115,116 @@ export class mqttConnection extends EventEmitter {
             }
 
             if (mqttPacketType == 2) {
-                console.log("CONNACK")
+                log("CONNACK")
             }
 
+            /*-----------------------------------------------------------------------
+                      Handle an incoming PUBLISH packet
+                  */
             if (mqttPacketType == 3) {
-                log("PUBLISH")
-                var parsed = parseMqttPublish(data)
-                // //console.log(data.toString("hex"))
-                // console.log( data.slice(2,3).toString('hex'))
 
-                // var topicLength = 32; //Buffer.from(data.slice(3,4).toString('hex'), "hex")[0];
-                // var packetLength = Buffer.from(data.slice(1,2).toString('hex'), "hex")[0] - topicLength -2;
+                var dataToParse = true;
+                var byteOffset = 0;
 
-                // console.log(topicLength)
-                // console.log(packetLength)
+                while (dataToParse) {
+                    var parse: any = {}
+                    //packet Type
+                    var packetTypeHex = data.slice(byteOffset, byteOffset + 1).toString('hex')[0]
+                    parse.packetType = Buffer.from('0' + packetTypeHex, 'hex')[0];
+                    parse.remainingLength = data.readUInt8(byteOffset + 1)
+                    parse.remainingDataTotal = data.length - byteOffset;
 
-                // var parsed = {
-                //     //raw : data,
-                //     //rawString : data.toString(),
-                //     //topicLength : topicLength,
-                //     topic : data.toString().slice(5, 5+topicLength ),
-                //     payload : data.toString().slice(4+topicLength),
-                //     //packetLength: packetLength
-                // }   
+                    parse.retain = !!parseInt(bufferToBinary(data, byteOffset)[7 - 0])
+                    parse.dup = !!parseInt(bufferToBinary(data, byteOffset)[7 - 3])
+                    parse.qos = parseInt(bufferToBinary(data, byteOffset).slice(-3, -1), 2);
 
-                //console.log(parsed)
+                    parse.length = data.readUInt16BE(byteOffset + 2);
 
-                this.emit("publish", parsed)
+                    var topicStartByte = byteOffset + 4
+                    var topicEndByte = topicStartByte + parse.length
+                    parse.topicEndByte = topicEndByte
+                    parse.topic = data.slice(topicStartByte, topicEndByte).toString()
+
+
+                    // for (var d = byteOffset; d <= (byteOffset + parse.remainingLength) + 1; d++) {
+                    //   log(d + "\t" + bufferToBinary(data, d) + "\t" + data.slice(d, d + 1).toString())
+                    // }
+
+                    var payloadByte = topicEndByte;
+                    if (parse.qos > 0) {
+                        payloadByte += 2; /// if QOS 1 or 2 then these two bytes exist for packetIdentifier
+                        parse.packetIdentifier = data.readUInt16BE(topicEndByte);
+                        parse.packetIdentifierBuffer = data.slice(topicEndByte, topicEndByte + 2)
+                    }
+
+                    //PAYLOAD
+                    parse.payloadStartByte = payloadByte
+                    parse.payloadEndByte = byteOffset + parse.remainingLength + 2
+                    parse.payloadBuffer = data.slice(parse.payloadStartByte, parse.payloadEndByte);
+                    parse.payload = parse.payloadBuffer.toString()
+
+
+                    //log(parse);
+                    if (parse.qos == 1) {
+                        //var remaininglength = 4;
+                        var PUBACK = Buffer.concat([Buffer.from([0b01000000]), Buffer.from([2]), parse.packetIdentifierBuffer]); //header
+                        socket.write(PUBACK)
+                    }
+                    if (parse.qos == 2) {
+                        var PUBREC = Buffer.concat([Buffer.from([0b01010000]), Buffer.from([2]), parse.packetIdentifierBuffer]); //header
+                        socket.write(PUBREC)
+                    }
+
+                    this.emit("publish", parse)
+                    dataToParse = false;
+                }
             }
+
+            /*-----------------------------------------------------------------------
+                PUBACK
+            */
 
             if (mqttPacketType == 4) {
-                console.log("PUBACK")
+                log("PUBACK")
             }
+
+            /*-----------------------------------------------------------------------
+                PUBREC
+            */
+
             if (mqttPacketType == 5) {
-                console.log("PUBREC")
+                log("PUBREC")
             }
+
+            /*-----------------------------------------------------------------------
+               PUBREL used for QOS2
+            */
+
             if (mqttPacketType == 6) {
-                console.log("PUBREL")
+                var parse: any = {}
+                var packetTypeHex = data.slice(0, 0 + 1).toString('hex')[0]
+                parse.packetType = Buffer.from('0' + packetTypeHex, 'hex')[0];
+                parse.packetIdentifier = data.readUInt16BE(2);
+                parse.packetIdentifierBuffer = data.slice(2, 4)
+                var PUBCOMP = Buffer.concat([Buffer.from([0b01110000]), Buffer.from([2]), parse.packetIdentifierBuffer]); //header
+                socket.write(PUBCOMP)
             }
+
+            /*-----------------------------------------------------------------------
+               PUBCOMP     
+            */
+
             if (mqttPacketType == 7) {
-                console.log("PUBCOMP")
+                log("PUBCOMP")
             }
+
+            /*-----------------------------------------------------------------------
+                SUBSCRIBE
+            */
 
             if (mqttPacketType == 8) {
-                console.log("SUBSCRIBE ----------------------------")
-                console.log(data)
-                console.log(data.toString())
-                console.log("---------------------------")
                 var parse: any = {}
-
-                //console.log(parseInt(data.slice(0,1).toString("hex"), 16).toString(2)) // 10000010               
-                //console.log( bufferToBinary(data, 0) ) // 1000 0010   - always
-
-                //parse.packetIdentifier = getPacketIdentifier(data.slice(1,5)).total
                 parse.packetIdentifier = data.slice(2, 4)
-
-                //console.log("------")
-                for (var d = 0; d < data.length; d++) {
-                    console.log(d + "\t" + bufferToBinary(data, d) + "\t" + data.slice(d, d + 1).toString())
-                }
-                // console.log(bufferToBinary(data, 0))       // MQTT CONTROL PACKET TYPE 8
-                // console.log(bufferToBinary(data, 1))       // REMAINING LENGTH
-                // console.log(bufferToBinary(data, 2))       // PACKET IDENTIFIER MSB
-                // console.log(bufferToBinary(data, 3))       // PACKET IDENTIFIER LSB
-                // console.log(bufferToBinary(data, 4)) //
-                // console.log(bufferToBinary(data, 5)) //
-                // console.log(bufferToBinary(data, 6))
-                // console.log(bufferToBinary(data, 7))
-                // console.log(bufferToBinary(data, 8))
-                //console.log("------")
-
                 parse.remainingLength = getRemainingLength(data)
 
                 var subTopics = true;
@@ -217,40 +247,13 @@ export class mqttConnection extends EventEmitter {
                 }
 
 
-
-                // parse.topicLength = data.readUInt16BE(4);
-                // parse.topic = data.slice(6, -1).toString()
-                // parse.qos = parseInt(bufferToBinary(data, data.length - 1).slice(-2), 2);
-                // parse.remainingLength = getRemainingLength(data)
-                // parse.topicLengthTest = data.readUInt16BE(33)
-
-                // parse.packetType = data.slice(0,1).toString('hex')[0]
-                // parse.totalLength = data.length;
-                //data.readUInt8(1)
-
-
-                // var offset = parse.remainingLength.bytenum;
-                // offset  += 2;
-                // var topicLength = Buffer.from(data.slice(offset,offset+1).toString('hex'), "hex")[0];
-
-                // console.log(topicLength)
-
-                // offset += 3;
-                // parse.topic = data.slice(offset,-1).toString() 
-                // offset += topicLength;
-                // parse.payload = data.slice(offset).toString()
-                // return parse;
-
-                console.log(parse)
-
-                //console.log("suback.")
                 var suback = Buffer.concat([
                     Buffer.from([parseInt("10010000", 2)]),
                     Buffer.from([3]),
                     parse.packetIdentifier,
                     Buffer.from([parse.qos])
                 ])
-                console.log(suback);
+                //log(suback);
                 socket.write(suback);
 
                 for (var sub of parse.subs) {
@@ -259,20 +262,36 @@ export class mqttConnection extends EventEmitter {
                     })
                 }
 
-
-
                 return;
             }
 
-            if (mqttPacketType == 9) { console.log("SUBACK") }
-            if (mqttPacketType == 10) { console.log("UNSUBSCRIBE") }
-            if (mqttPacketType == 11) { console.log("UNSUBACK") }
-            if (mqttPacketType == 12) { console.log("PINGREQ") }
-            if (mqttPacketType == 13) { console.log("PINGRESP") }
-            if (mqttPacketType == 14) { console.log("DISCONNECT") }
-            // console.log("---")
-            // console.log(data.toString());
-            // console.log(data.toString().length)
+            /*-----------------------------------------------------------------------
+                SUBACK
+            */
+
+            if (mqttPacketType == 9) { log("SUBACK") }
+            if (mqttPacketType == 10) { log("UNSUBSCRIBE") }
+            if (mqttPacketType == 11) { log("UNSUBACK") }
+
+            /*-----------------------------------------------------------------------
+                PINGREQ
+            */
+
+            if (mqttPacketType == 12) {
+                var ping = Buffer.concat([Buffer.from([0b11010000]), Buffer.from([0b0000000])]); //header
+                socket.write(ping)
+            }
+
+            /*-----------------------------------------------------------------------
+                PINGRESP
+            */
+
+            if (mqttPacketType == 13) { log("PINGRESP") }
+
+            /*-----------------------------------------------------------------------
+                DISCONNECT    
+            */
+            if (mqttPacketType == 14) { log("MQTT DISCONNECT") }
 
         }
     }
@@ -368,12 +387,6 @@ function checkBit(data: Buffer, bitnum: number) {
 
 
 function buildMqttPublishPacket(topic: any, data: any) {
-
-    console.log("----------")
-    console.log(topic);
-    console.log(data);
-    console.log("----------")
-
     var totalLength = topic.length + data.length + 2
     var remainingdataBuffer;
 
@@ -387,7 +400,7 @@ function buildMqttPublishPacket(topic: any, data: any) {
         }
 
     }
-    //console.log(remainingdataBuffer)
+    //log(remainingdataBuffer)
 
     var pubbuf = Buffer.concat([Buffer.from([0b00110000]), //header
         remainingdataBuffer,
