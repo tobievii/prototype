@@ -8,6 +8,8 @@ var details = {
   zoom: 3
 }
 
+const publicIp = require('public-ip');
+
 var circleColor = "#4c8ef7";
 
 const L = require('leaflet');
@@ -97,6 +99,7 @@ export class MapDevices extends Component {
           allDevices.map((marker, index) => {
             var gps = {
             }
+            
 
             if(marker.selectedIcon == undefined){
               fetch("/api/v3/selectedIcon", {
@@ -106,30 +109,33 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
 
             }else if(marker.payload.data.gps == undefined){
+              (async () =>{ 
+                var iploc = await publicIp.v4()
 
-              fetch("/api/v3/getlocation", {
-                apikey : this.props.acc.apikey,
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id: marker.devid})
-              }).then(response => response.json()).then(serverresponse => {
-                gps = serverresponse.result;
-  
-                fetch("/api/v3/data/post", {
+                fetch("/api/v3/getlocation", {
                   apikey : this.props.acc.apikey,
                   method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                  body: JSON.stringify({ id: marker.devid, data: gps })
+                  body: JSON.stringify({ id: marker.devid, ip: iploc})
                 }).then(response => response.json()).then(serverresponse => {
-                  return(
-                    <div key={marker.devid}>
-                      <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
-                        <Popup>
-                          <h5 className="popup">{marker.devid}</h5> <br />
-                        </Popup>
-                      </Marker>
-                    </div>
-                  )
+                  gps = serverresponse.result;
+    
+                  fetch("/api/v3/data/post", {
+                    apikey : this.props.acc.apikey,
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: marker.devid, data: gps })
+                  }).then(response => response.json()).then(serverresponse => {
+                    return(
+                      <div key={marker.devid}>
+                        <Marker  position={[marker.payload.data.gps.lat, marker.payload.data.gps.lon]}>
+                          <Popup>
+                            <h5 className="popup">{marker.devid}</h5> <br />
+                          </Popup>
+                        </Marker>
+                      </div>
+                    )
+                  }).catch(err => {console.error(err.toString());});
                 }).catch(err => {console.error(err.toString());});
-              }).catch(err => {console.error(err.toString());});
+              })();
             }
               
             if(marker.selectedIcon == true && marker.payload.data.boundary == undefined){
@@ -209,12 +215,18 @@ export class MapDevices extends Component {
             }else if(marker.selectedIcon == true && marker.payload.data.boundary != undefined){
               var set;
               var shapeColor = "";
+              var result;
 
               for(var h in marker.boundaryLayer){
                 var d = marker.boundaryLayer[h];
                 var t = undefined;
-                var result = this.PointInTriangle({ x: marker.payload.data.gps.lat, y: marker.payload.data.gps.lon }, d[0], d[1], d[2]);
-                console.log(result)
+                result = this.PointInTriangle({ x: marker.payload.data.gps.lat, y: marker.payload.data.gps.lon }, d[0], d[1], d[2]);
+              }
+
+              if(result){
+                circleColor = "#4c8ef7";
+              }else{
+                circleColor = "red";
               }
 
               return(
@@ -268,7 +280,7 @@ export class MapDevices extends Component {
                         polygon: false
                       }}
                     />
-                    <Polygon positions={marker.payload.data.boundary} />
+                    <Polygon positions={marker.payload.data.boundary} color={circleColor}/>
                   </FeatureGroup>
 
                   <Marker 

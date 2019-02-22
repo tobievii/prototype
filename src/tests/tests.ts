@@ -96,59 +96,59 @@ describe("API", function () {
 
     /************************************   Recover Password   ****************************************/
 
-    it("/api/v3/ForgetPassword", function (done: any) {
-      const Account: any = { email: testAccount.email };
+    // it("/api/v3/account/recoveraccount", function (done: any) {
+    //   const Account: any = { email: testAccount.email };
 
-      this.timeout(4000)
+    //   this.timeout(4000)
 
-      trex.restJSON(
-        {
-          path: testAccount.server +":"+testAccount.port+ "/api/v3/ForgetPassword",
-          method: "POST",
-          body: Account,
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          }
-        },
-        (error: Error, result: any) => {
-          if (error != null) {
-            done(error);
-          }
-          if (result) {
-            //done();
-            trex.restJSON(
-              {
-                path: testAccount.server + "/api/v3/admin/recoverEmailLink",
-                method: "POST",
-                body: Account,
-                port: testAccount.port,
-                headers: {
-                  "Accept": "application/json",
-                  "Content-Type": "application/json"
-                }
-              },
-              (err: Error, result: any) => {
-                var infor = result.result.info;
-                if (err) {
-                  done(err);
-                }else if(infor.rejected.length < 1){
-                  for(var email in infor.accepted){
-                    if(testAccount.email == infor.accepted[email]){
-                      done();
-                    }else{
-                      done(new Error("Did not fine your email in the accepted emails list."));
-                    }
-                  }
-                }else{
-                  done(new Error("The email was rejected."));
-                }
-              } 
-            );
-          }
-        }
-      );
-    });    
+    //   trex.restJSON(
+    //     {
+    //       path: testAccount.server +":"+testAccount.port+ "/api/v3/account/recoveraccount",
+    //       method: "POST",
+    //       body: Account,
+    //       headers: {
+    //         "Accept": "application/json",
+    //         "Content-Type": "application/json"
+    //       }
+    //     },
+    //     (error: Error, result: any) => {
+    //       if (error != null) {
+    //         done(error);
+    //       }
+    //       if (result) {
+    //         //done();
+    //         trex.restJSON(
+    //           {
+    //             path: testAccount.server + "/api/v3/admin/recoverEmailLink",
+    //             method: "POST",
+    //             body: Account,
+    //             port: testAccount.port,
+    //             headers: {
+    //               "Accept": "application/json",
+    //               "Content-Type": "application/json"
+    //             }
+    //           },
+    //           (err: Error, result: any) => {
+    //             var infor = result.result.info;
+    //             if (err) {
+    //               done(err);
+    //             }else if(infor.rejected.length < 1){
+    //               for(var email in infor.accepted){
+    //                 if(testAccount.email == infor.accepted[email]){
+    //                   done();
+    //                 }else{
+    //                   done(new Error("Did not fine your email in the accepted emails list."));
+    //                 }
+    //               }
+    //             }else{
+    //               done(new Error("The email was rejected."));
+    //             }
+    //           } 
+    //         );
+    //       }
+    //     }
+    //   );
+    // });    
 
     /************************************   Sign In   ****************************************/
 
@@ -261,33 +261,38 @@ describe("API", function () {
 
     /************************************   Geo Location   ****************************************/
     it("/api/v3/getlocation", function (done: any) {
-
-      trex.restJSON(
-        {
-          apikey: testAccount.apikey,
-          path: testAccount.server + ":" + testAccount.port + "/api/v3/getlocation",
-          method: "POST",
-          body: testAccount.testDev,
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          }
-        },
-        (err: Error, result: any, account: any) => {
-          if (err) {
-            done(err);
-          }
-          if (result) {
-            if (result.error) 
-            { 
-              done(new Error(result.error)); 
+      const publicIp = require('public-ip');
+      (async () =>{
+        var iploc = await publicIp.v4()
+      
+        var loc = {id: testAccount.testDev, ip:iploc}
+        trex.restJSON(
+          {
+            apikey: testAccount.apikey,
+            path: testAccount.server + ":" + testAccount.port + "/api/v3/getlocation",
+            method: "POST",
+            body: loc,
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json"
             }
-            else if(result.result.gps){
-              done();
+          },
+          (err: Error, result: any, account: any) => {
+            if (err) {
+              done(err);
+            }
+            if (result) {
+              if (result.error) 
+              { 
+                done(new Error(result.error)); 
+              }
+              else{
+                done();
+              }
             }
           }
-        }
-      );
+        );
+      })();
     });
     
     /************************************   VIEW   ****************************************/

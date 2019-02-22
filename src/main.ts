@@ -5,6 +5,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
+const requestIp = require('request-ip');
 
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
@@ -604,13 +605,11 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 ///////// END
 
 app.post("/api/v3/getlocation", (req: any, res: any) => {
-  var geo;
-
+  var geo
   if (req.body === undefined) { return; }
-
-  if ((req.user) && (req.user.level) > 0) {
+  if ((req.user) && (req.user.level) > 0 && (req.body.ip)) {
     (async () =>{ 
-      geo = geoip.lookup(await publicIp.v4());
+      geo = geoip.lookup(req.body.ip);
 
       var latl, lonl;
       var coords = geo.ll;
@@ -643,11 +642,13 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
 });
 
 function handleState(req: any, res: any, next: any) {
-  var geo;
+  var geo:any;
   if (req.body === undefined) { return; }
 
+  const clientIp = requestIp.getClientIp(req); 
+
   (async () =>{ 
-    geo = geoip.lookup(await publicIp.v4());
+    geo = geoip.lookup(clientIp);
 
     if ((req.user) && (req.user.level) > 0) {
       if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
@@ -660,36 +661,31 @@ function handleState(req: any, res: any, next: any) {
       
       if (!req.body.data.gps) {
         db.states.findOne({devid: req.body.id, gps: {$exists :false}}, (err: Error, res: any) => {
-            if(res.payload.data.gps == undefined){
-              k = false;
-            }else if(res.payload.data.gps){
+          if(res == null){
+            k = false;
+            var latl, lonl;
+            var coords = geo.ll;
+
+            for(var s=0; s<coords.length ;s++){
+              if(s == 0){
+                latl = coords[s]
+              }else if(s == 1){
+                lonl = coords[s]
+              }
+            }
+
+            var tempv = req.body.data;
+            var change = {tempv,
+              gps:{
+              lat: latl,
+              lon: lonl
+            }}
+            req.body.data = change;
+          }  else{
               k = true;
-            }
-        });
-
-        if(k == false){
-          var latl, lonl;
-          var coords = geo.ll;
-
-          for(var s=0; s<coords.length ;s++){
-            if(s == 0){
-              latl = coords[s]
-            }else if(s == 1){
-              lonl = coords[s]
-            }
           }
 
-          var tempv = req.body.data;
-          var change = {tempv,
-            gps:{
-            lat: latl,
-            lon: lonl
-          }}
-          req.body.data = change;
-        }else{
-          var tempv = req.body.data;
-          req.body.data = tempv;
-        }
+        });
       }
 
       var meta = {
