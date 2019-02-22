@@ -54,30 +54,30 @@ export class StatesViewerMenu extends Component {
         } 
     }
 
-    boundaryButton = () => {
-        if(this.state.view == "map"){
-            if(this.props.boundary == true){
-                return <i className="viewButton fas fa-exclamation" title="Create Boundary" style={{color:"grey", marginTop: "10px", marginRight: "22px"}} onClick={()=>this.boundaryButtonClicked(this.props.devid) }></i>;
-            }else if(!this.state.boundary || this.state.boundary == undefined){
-                return <i className="viewButton fas fa-exclamation" title="Select A Device" style={{color:"grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed"}}></i>;
-            }
-        }else{
-            return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
-        }
-    }
+    // boundaryButton = () => {
+    //     if(this.state.view == "map"){
+    //         if(this.props.boundary == true){
+    //             return <i className="viewButton fas fa-exclamation" title="Create Boundary" style={{color:"grey", marginTop: "10px", marginRight: "22px"}} onClick={()=>this.boundaryButtonClicked(this.props.devid) }></i>;
+    //         }else if(!this.state.boundary || this.state.boundary == undefined){
+    //             return <i className="viewButton fas fa-exclamation" title="Select A Device" style={{color:"grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed"}}></i>;
+    //         }
+    //     }else{
+    //         return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
+    //     }
+    // }
 
-    boundaryButtonClicked = (device) => {
-        var device = this.props.deviceCall;
-        var lat = device.payload.data.gps.lat;
-        var lon = device.payload.data.gps.lon;
-        fetch("/api/v3/data/post", {
-            apikey : this.props.acc.apikey,
-            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ id: this.props.deviceCall.devid, data: {boundary: {lat: lat, lon: lon, radius: 50}} })
-        }).then(response => response.json()).then(serverresponse => {
-            console.log(serverresponse)
-        }).catch(err => {console.error(err.toString());});
-    }
+    // boundaryButtonClicked = (device) => {
+    //     var device = this.props.deviceCall;
+    //     var lat = device.payload.data.gps.lat;
+    //     var lon = device.payload.data.gps.lon;
+    //     fetch("/api/v3/data/post", {
+    //         apikey : this.props.acc.apikey,
+    //         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    //         body: JSON.stringify({ id: this.props.deviceCall.devid, data: {boundary: {lat: lat, lon: lon, radius: 50}} })
+    //     }).then(response => response.json()).then(serverresponse => {
+    //         console.log(serverresponse)
+    //     }).catch(err => {console.error(err.toString());});
+    // }
 
     viewButtonClicked = (action) => {
         return (e) => {
@@ -115,12 +115,12 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    setBoundary = (b) => {
-        this.setState({ boundary: this.props.boundary });
-        return(
-            <div></div>
-        )
-    }
+    // setBoundary = (b) => {
+    //     this.setState({ boundary: this.props.boundary });
+    //     return(
+    //         <div></div>
+    //     )
+    // }
 
     render() {
 
