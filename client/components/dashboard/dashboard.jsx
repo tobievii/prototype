@@ -19,14 +19,14 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGuage } from "./guage.jsx"
-import {NotificationContainer, NotificationManager} from 'react-notifications';
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 import { MapDevices } from "../map.jsx"
 
 var mapDetails = {
-  un : undefined,
-  acc : undefined,
-  dc : undefined,
-  ds : undefined
+  un: undefined,
+  acc: undefined,
+  dc: undefined,
+  ds: undefined
 }
 
 export class Dashboard extends React.Component {
@@ -52,13 +52,13 @@ export class Dashboard extends React.Component {
   }
 
   draggingUnique = "";
-  componentDidMount = () =>{
+  componentDidMount = () => {
     this.checkDashboard();
   }
 
 
   saveDashboard = () => {
-  
+
 
   }
 
@@ -134,13 +134,13 @@ export class Dashboard extends React.Component {
 
   }
 
-  checkDashboard =()=> {
+  checkDashboard = () => {
 
     if (this.state.layout === undefined || this.state.layout.length == 0) {
-      setInterval(this.createNotification('warning') ,5000);
+      setInterval(this.createNotification('warning'), 5000);
     }
     return;
-}
+  }
 
   createNotification = (type) => {
     return () => {
@@ -152,8 +152,8 @@ export class Dashboard extends React.Component {
           NotificationManager.success('Success message', 'Title here');
           break;
         case 'warning':
-          NotificationManager.warning('Your Dashboard is empty','', 4000, () =>
-          this.checkDashboardEntries());
+          NotificationManager.warning('Your Dashboard is empty', '', 4000, () =>
+            this.checkDashboardEntries());
           break;
         case 'error':
           NotificationManager.error('Error message', 'Click me!', 5000, () => {
@@ -179,7 +179,7 @@ export class Dashboard extends React.Component {
     var layout = _.clone(this.state.layout)
     layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
     this.setState({ layout: layout }, () => {
-      
+
     })
   }
 
@@ -187,19 +187,19 @@ export class Dashboard extends React.Component {
   gridOnDrag = () => { console.log("drag"); }
   gridOnDragStop = () => {
     console.log("drag stop");
-    
+
   }
   gridOnResizeStart = () => { console.log("resize start"); }
   gridOnResize = () => { console.log("resize "); }
   gridOnResizeStop = () => {
     console.log("resize stop");
-    
+
   }
 
   gridOnLayoutChange = (layout) => {
     console.log(layout)
     console.log(this.state.layout)
-    var newlayout = _.clone(this.state.layout) 
+    var newlayout = _.clone(this.state.layout)
 
     for (var widgetup of layout) {
       for (var widget of newlayout) {
@@ -210,13 +210,13 @@ export class Dashboard extends React.Component {
           widget.h = widgetup.h
         }
       }
-    }    
+    }
 
 
 
     fetch("/api/v3/dashboard", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key: this.props.state.key, layout:newlayout })
+      body: JSON.stringify({ key: this.props.state.key, layout: newlayout })
     }).then(response => response.json()).then(result => { console.log(result) })
       .catch(err => console.error(err.toString()));
   }
@@ -232,18 +232,19 @@ export class Dashboard extends React.Component {
 
 
     if (!this.props.state) {
-    return (<div>loading..</div>)
+      return (<div>loading..</div>)
     } else {
       var draggble = true;
       this.state.layout.map((data, i) => {
-      if(data.type == "map"){
-        draggble = false;
-      }else{
-        draggble = true;
-      }})
-    return (
+        if (data.type == "map") {
+          draggble = false;
+        } else {
+          draggble = true;
+        }
+      })
+      return (
         <GridLayout
-          isDraggable = {draggble}
+          isDraggable={draggble}
           onDragStart={this.gridOnDragStart}
           onDrag={this.gridOnDrag}
           onDragStop={this.gridOnDragStop}
@@ -308,7 +309,7 @@ export class Dashboard extends React.Component {
                 return (
                   <div key={data.i} >
                     <Widget label={data.dataname} >
-                      <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true}/>
+                      <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
                     </Widget>
                   </div>
                 )
@@ -319,7 +320,7 @@ export class Dashboard extends React.Component {
               )
 
             })
-        }
+          }
         </GridLayout>
       )
     }
@@ -337,17 +338,17 @@ export class Dashboard extends React.Component {
           this.setState({ layout: this.props.state.layout }, () => { console.log("state") })
         }
 
-    return (<div>state</div>)
+        return (<div>state</div>)
       } else {
 
         if (this.settingLayout == false) {
 
           this.settingLayout = true;
           this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
-  }
+        }
 
         return (<div>loading</div>)
-  }
+      }
 
 
 
@@ -368,7 +369,7 @@ export class Dashboard extends React.Component {
       )
     } else {
       return this.loading()
-  }
+    }
 
   }
 
