@@ -142,7 +142,7 @@ generateRandomPass = () => {
 
   ForgotPassword = () =>{
     
-    fetch("/api/v3/ForgetPassword", {
+    fetch("/api/v3/account/recoveraccount", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
         email: this.state.form.email,

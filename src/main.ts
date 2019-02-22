@@ -834,7 +834,7 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
-app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
   console.log("account registration")
   console.log(req.body)
 
