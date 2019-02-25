@@ -95,8 +95,10 @@ export class MapDevices extends Component {
             }
 
             if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
-              marker.meta.ipLoc.lat = 0.01;
-              marker.meta.ipLoc.lng = 0.01;
+              marker.meta.ipLoc = {
+                lat: 0.01,
+                lng: 0.01
+              }
             }
 
             if (marker.selectedIcon == true && marker.boundaryLayer == undefined) {
