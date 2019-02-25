@@ -662,92 +662,48 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
 });
 
 function handleState(req: any, res: any, next: any) {
-  var geo;
   if (req.body === undefined) { return; }
 
-  (async () => {
-    geo = geoip.lookup(await publicIp.v4());
+  if ((req.user) && (req.user.level) > 0) {
+    if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+    if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
+    if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
+    if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
+    if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
 
-    if ((req.user) && (req.user.level) > 0) {
-      if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
-      if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
-      if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
-      if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
-      if (!req.body.data) { res.json({ "error": "data parameter missing" }); return; }
-
-      var k: any;
-
-      if (!req.body.data.gps) {
-        db.states.findOne({ devid: req.body.id, gps: { $exists: false } }, (err: Error, res: any) => {
-          if (res.payload.data.gps == undefined) {
-            k = false;
-          } else if (res.payload.data.gps) {
-            k = true;
-          }
-        });
-
-        if (k == false) {
-          var latl, lonl;
-          var coords = geo.ll;
-
-          for (var s = 0; s < coords.length; s++) {
-            if (s == 0) {
-              latl = coords[s]
-            } else if (s == 1) {
-              lonl = coords[s]
-            }
-          }
-
-          var tempv = req.body.data;
-          var change = {
-            tempv,
-            gps: {
-              lat: latl,
-              lon: lonl
-            }
-          }
-          req.body.data = change;
-        } else {
-          var tempv = req.body.data;
-          req.body.data = tempv;
-        }
-      }
-
-      var meta = {
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        method: req.method
-      }
-
-      processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
-        state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-
-          io.to(req.user.apikey).emit('post', packet.payload);
-          io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
-          io.to(packet.key).emit('post', packet.payload)
-
-          if (info.newdevice) {
-            io.to(req.user.username).emit("info", info)
-          }
-
-          for (var p in plugins) {
-            if (plugins[p].handlePacket) {
-              plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
-
-              });
-            }
-          }
-          // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-          //   if (err) log("couldnt publish")
-          // }); 
-
-          res.json({ result: "success" });
-        })
-      })
-    } else {
-      res.json({ "error": "user not authenticated" })
+    var meta = {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      method: req.method
     }
-  })();
+
+    processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
+      state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
+
+        io.to(req.user.apikey).emit('post', packet.payload);
+        io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
+        io.to(packet.key).emit('post', packet.payload)
+
+        if (info.newdevice) {
+          io.to(req.user.username).emit("info", info)
+        }
+
+        for (var p in plugins) {
+          if (plugins[p].handlePacket) {
+            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
+            });
+          }
+        }
+        // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
+        //   if (err) log("couldnt publish")
+        // }); 
+
+        res.json({ result: "success" });
+      })
+    })
+  } else {
+    res.json({ "error": "user not authenticated" })
+  }
 }
 
 /* ----------------------------------------------------------------------------- 
@@ -888,7 +844,7 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: { 'payload.data.boundary': 1 } }, (err: Error, cleared: any) => {
+  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: { 'boundaryLayer': 1 } }, (err: Error, cleared: any) => {
     if (err) res.json(err);
     if (cleared) res.json(cleared);
   })
