@@ -494,11 +494,11 @@ app.post('/api/v3/shared', (req: any, res: any) => {
 //unshare Device
 app.post('/api/v3/unshare', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
-  // db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-  //   console.log(result.key)
-  //   db.users.update({ uuid: req.body.removeuser }, { $pull: { 'shared.$.keys': { "key": result.key } } }, { multi: true })
-  //   // { $pull: { 'shared.keys': { $in: [result] } } }, { multi: true }
-  // })
+  db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
+    console.log(result.key)
+    db.users.update({ uuid: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
+    // { $pull: { 'shared.keys': { $in: [result] } } }, { multi: true }
+  })
   //remove device from user
 
 
