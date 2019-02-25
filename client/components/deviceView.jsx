@@ -74,7 +74,8 @@ export class DeviceView extends Component {
     EditorButton: " SHOW EDITOR",
     shareDisplay: "",
     editorChanged: false,
-    devicesServer: undefined
+    devicesServer: undefined,
+    shared: []
   };
 
   socket;
@@ -95,7 +96,7 @@ export class DeviceView extends Component {
     p.statesByUsername(this.props.username, (states) => {
       for (var s in states) {
         states[s].selected = false
-        if(states[s].devid == this.props.devid){
+        if (states[s].devid == this.props.devid) {
           states[s].selectedIcon = true;
         }
       }
@@ -119,7 +120,14 @@ export class DeviceView extends Component {
       }
     }
   }
-
+  unshare = (remove) => {
+    fetch("/api/v3/unshare", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
+    }).then(response => response.json()).then(stats => {
+      this.setState({ stats: stats })
+    }).catch(err => console.error(err.toString()));
+  }
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
       var temp = [];
@@ -133,6 +141,16 @@ export class DeviceView extends Component {
         }
       });
       temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== loggedInUser.email })
+      for (var look in this.state.shared) {
+        console.log(this.state.shared)
+        for (var i in temp) {
+          //console.log(this.state.shared[1].uuid + ".........." + temp[i].uuid)
+          if (temp[i].uuid == this.state.shared[look]) {
+            temp[i].shared = "yes"
+          }
+        }
+      }
+
       this.setState({ userSearched: temp })
     })
   }
@@ -155,7 +173,12 @@ export class DeviceView extends Component {
       return (<div style={{ height: "20%" }}>
         {
           this.state.userSearched.map((user, i) => {
-            return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+            if (user.shared == "no") {
+              return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+            }
+            else {
+              return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+            }
           })
         }
       </div>)
@@ -260,6 +283,14 @@ export class DeviceView extends Component {
       })
     }).catch(err => console.error(err.toString()));
 
+  }
+  sharedList = () => {
+    fetch("/api/v3/shared", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ dev: this.props.devid, })
+    }).then(response => response.json()).then(states => {
+      this.state.shared = _.clone(states.access)
+    })
   }
 
   componentWillUnmount = () => {
@@ -398,20 +429,21 @@ export class DeviceView extends Component {
 
   shareDevice = () => {
     this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
-    for(let dev in this.state.EmailsharedDevice){
-       fetch("/api/v3/admin/shareDevice", {
-                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ email:this.state.EmailsharedDevice[dev].email,
-                      text: 'Hi a Device was shared with you called '+this.props.devid,
-                      html: '<p>Hi <br></br>'+this.props.username+' has shared ('+this.props.devid+ ') Device with you </p>',
-                      subject:'SHARED DEVICE',
-                      dev:this.props.devid,
-                      person:this.props.username
-                    })
-                  }).then(response => response.json()).then(serverresponse => {
-                    console.log(serverresponse);        
-                  }).catch(err => console.error(err.toString()));
-     }
+    for (let dev in this.state.EmailsharedDevice) {
+      fetch("/api/v3/admin/shareDevice", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: this.state.EmailsharedDevice[dev].email,
+          text: 'Hi a Device was shared with you called ' + this.props.devid,
+          html: '<p>Hi <br></br>' + this.props.username + ' has shared (' + this.props.devid + ') Device with you </p>',
+          subject: 'SHARED DEVICE',
+          dev: this.props.devid,
+          person: this.props.username
+        })
+      }).then(response => response.json()).then(serverresponse => {
+        console.log(serverresponse);
+      }).catch(err => console.error(err.toString()));
+    }
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
@@ -509,7 +541,7 @@ export class DeviceView extends Component {
             </div>
 
             <div className="col-6" >
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{display: this.state.shareDisplay , width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.shareDisplay, width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
@@ -522,7 +554,7 @@ export class DeviceView extends Component {
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
 
-              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10,display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
               <div ><center>
@@ -542,22 +574,22 @@ export class DeviceView extends Component {
                 </Modal>
               </center>
               </div>
-              </div>
             </div>
-          
+          </div>
+
 
           <hr />
 
 
-
+          {this.sharedList()}
           <div className="row">
             <div className="col-12" >
-              <Dashboard 
-                username={this.props.username} 
-                acc={this.props.acc} 
-                deviceCall={this.state.state} 
+              <Dashboard
+                username={this.props.username}
+                acc={this.props.acc}
+                deviceCall={this.state.state}
                 devices={this.state.devicesServer}
-                state={this.state.state} 
+                state={this.state.state}
               />
             </div>
           </div>

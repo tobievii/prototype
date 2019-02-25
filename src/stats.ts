@@ -54,9 +54,7 @@ export function init(app: any, db: any) {
       db.users.find({ level: { $gt: 0 }, }, (err: Error, userList: any) => {
         var nameList: any = []
         for (var user of userList) {
-
-
-          nameList.push({ email: user.email, username: user.username, selected: "deselected" });
+          nameList.push({ email: user.email, username: user.username, selected: "deselected", uuid: user.uuid, shared: "no" });
         }
         resolve(nameList)
       })
@@ -69,9 +67,7 @@ export function init(app: any, db: any) {
       db.users.find({ level: { $gt: 0 }, "_last_seen": { $gt: new Date(Date.now() - time) } }, (err: Error, userList: any) => {
         var nameList: any = []
         for (var user of userList) {
-
-
-          nameList.push({ email: user.email, username: user.username });
+          nameList.push({ email: user.email, username: user.username, uuid: user.uuid });
         }
         resolve(nameList)
       })

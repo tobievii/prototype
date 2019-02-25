@@ -481,6 +481,33 @@ app.get('/api/v3/states', (req: any, res: any) => {
   })
 })
 
+//Share Device
+app.post('/api/v3/shared', (req: any, res: any) => {
+  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+
+  db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
+    res.json(states)
+  })
+})
+//Share Device
+
+//unshare Device
+app.post('/api/v3/unshare', (req: any, res: any) => {
+  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+  // db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
+  //   console.log(result.key)
+  //   db.users.update({ uuid: req.body.removeuser }, { $pull: { 'shared.$.keys': { "key": result.key } } }, { multi: true })
+  //   // { $pull: { 'shared.keys': { $in: [result] } } }, { multi: true }
+  // })
+  //remove device from user
+
+
+  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { $pull: { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
+    res.json(states)
+  })
+})
+//unshare device
+
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
   if (req.body) {
