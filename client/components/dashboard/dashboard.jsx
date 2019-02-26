@@ -4,7 +4,7 @@ import GridLayout from 'react-grid-layout';
 
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css"
-import "./index.scss"
+
 
 import { Calendar } from "./nivo_calendar.jsx"
 import { Line } from "./nivo_line.jsx"
@@ -196,6 +196,14 @@ export class Dashboard extends React.Component {
     mapDetails.ds = this.props.devices;
   }
 
+  widgetRemove = (id) => {
+    return (e) => {
+      console.log(id)
+      var temp = this.state.layout.filter(item => { if (item.i != id) return item })
+      this.setState({ layout: temp })
+    }
+  }
+
   generateDashboard = () => {
 
 
@@ -219,13 +227,18 @@ export class Dashboard extends React.Component {
           onResizeStart={this.gridOnResizeStart}
           onResize={this.gridOnResize}
           onLayoutChange={this.gridOnLayoutChange}
-          onResizeStop={this.gridOnResizeStop} layout={this.state.layout} cols={this.state.grid.cols} rowHeight={this.state.grid.rowHeight} width={this.state.grid.width}>
+          useCSSTransforms={false}
+          onResizeStop={this.gridOnResizeStop}
+          layout={this.state.layout}
+          cols={this.state.grid.cols}
+          rowHeight={this.state.grid.rowHeight}
+          width={this.state.grid.width}>
           {
             this.state.layout.map((data, i) => {
               if (data.type == "Calendar") {
                 return (
                   <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname} >
+                    <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
                       <Calendar state={this.props.state} />
                     </Widget>
 
@@ -247,7 +260,7 @@ export class Dashboard extends React.Component {
               if (data.type == "Blank") {
                 return (
                   <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.datapath} >
+                    <Widget label={data.datapath} remove={this.widgetRemove(data.i)} >
                       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
                     </Widget>
                   </div>

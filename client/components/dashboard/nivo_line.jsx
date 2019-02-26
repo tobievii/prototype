@@ -4,16 +4,16 @@ import protoGraphTheme from './theme.jsx'
 // Nivo calendar http://nivo.rocks/calendar
 
 import { ResponsiveLine } from '@nivo/line'
-import "./index.scss"
+//import "./index.scss"
 
 export class Line extends React.Component {
-  state = {  }
+  state = {}
 
-  
+
 
 
   render() {
-    
+
     var linedata = [
       {
         "id": "japan",
@@ -246,36 +246,36 @@ export class Line extends React.Component {
         ]
       }
     ]
-    
+
 
     return (
 
-      
+
       <ResponsiveLine
-      data={linedata}
-      margin={{
+        data={linedata}
+        margin={{
           "top": 35,
           "right": 35,
           "bottom": 55,
           "left": 55
-      }}
-      xScale={{
+        }}
+        xScale={{
           "type": "point"
-      }}
-      yScale={{
+        }}
+        yScale={{
           "type": "linear",
           "stacked": true,
           "min": "auto",
           "max": "auto"
-      }}
-      minY="auto"
-      maxY="auto"
+        }}
+        minY="auto"
+        maxY="auto"
 
-      stacked={true}
-      curve="natural"
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
+        stacked={true}
+        curve="natural"
+        axisTop={null}
+        axisRight={null}
+        axisBottom={{
           "orient": "bottom",
           "tickSize": 5,
           "tickPadding": 5,
@@ -283,8 +283,8 @@ export class Line extends React.Component {
           "legend": "transportation",
           "legendOffset": 36,
           "legendPosition": "middle"
-      }}
-      axisLeft={{
+        }}
+        axisLeft={{
           "orient": "left",
           "tickSize": 5,
           "tickPadding": 5,
@@ -292,21 +292,21 @@ export class Line extends React.Component {
           "legend": "count",
           "legendOffset": -40,
           "legendPosition": "middle"
-      }}
-      dotSize={10}
-      dotColor="inherit:darker(0.3)"
-      dotBorderWidth={2}
-      dotBorderColor="rgba(0,0,0,0)"
-      enableDotLabel={true}
-      dotLabel="y"
-      dotLabelYOffset={-12}
-      animate={true}
-      motionStiffness={90}
-      motionDamping={15}
-      theme = {protoGraphTheme}
-      
-  />
-      
+        }}
+        dotSize={10}
+        dotColor="inherit:darker(0.3)"
+        dotBorderWidth={2}
+        dotBorderColor="rgba(0,0,0,0)"
+        enableDotLabel={true}
+        dotLabel="y"
+        dotLabelYOffset={-12}
+        animate={true}
+        motionStiffness={90}
+        motionDamping={15}
+        theme={protoGraphTheme}
+
+      />
+
     )
   }
 }
