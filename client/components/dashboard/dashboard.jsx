@@ -134,7 +134,7 @@ export class Dashboard extends React.Component {
 
     // add widget to layout
     var layout = _.clone(this.state.layout)
-    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 3, type: "Blank", datapath: e.datapath, dataname: e.dataname })
+    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: "Guage", datapath: e.datapath, dataname: e.dataname })
     this.setState({ layout: layout }, () => { })
   }
 
@@ -241,7 +241,6 @@ export class Dashboard extends React.Component {
                     <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
                       <Calendar state={this.props.state} />
                     </Widget>
-
                   </div>
                 )
               }
@@ -249,7 +248,6 @@ export class Dashboard extends React.Component {
               if (data.type == "Line") {
                 return (
                   <div className="dashboardBlock" key={data.i} >
-
                     <Widget label={data.dataname} >
                       <Line />
                     </Widget>
@@ -260,7 +258,7 @@ export class Dashboard extends React.Component {
               if (data.type == "Blank") {
                 return (
                   <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.datapath} remove={this.widgetRemove(data.i)} >
+                    <Widget label={data.datapath.split("root.data.")[1]} remove={this.widgetRemove(data.i)} >
                       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
                     </Widget>
                   </div>
@@ -278,9 +276,9 @@ export class Dashboard extends React.Component {
               }
               if (data.type == "Guage") {
                 return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname} >
-                      <ProtoGuage value={this.props.state} />
+                  <div className="dashboardBlock" key={data.i}  >
+                    <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
+                      <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()} />
                     </Widget>
                   </div>
                 )
