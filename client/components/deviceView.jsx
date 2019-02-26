@@ -558,7 +558,7 @@ export class DeviceView extends Component {
           <hr />
 
 
-          {this.sharedList()}
+
           <div className="row">
             <div className="col-12" >
               <Dashboard
