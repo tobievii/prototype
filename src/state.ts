@@ -52,8 +52,11 @@ export function postState(
     packet.meta.ipLoc = geoip.lookup(meta.ip);
     if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
       packet.meta.ipLoc = {
-        lat: 0.01,
-        lng: 0.01
+        ll:
+          [
+            0.01,
+            0.01
+          ]
       }
     }
   }

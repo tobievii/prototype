@@ -32,8 +32,18 @@ export class MapDevices extends Component {
   }
 
   setvalues = (device) => {
-    details.lat = device.meta.ipLoc.lat;
-    details.lng = device.meta.ipLoc.lng;
+    if (device.meta.ipLoc == undefined || device.meta.ipLoc == null) {
+      device.meta.ipLoc = {
+        ll:
+          [
+            0.01,
+            0.01
+          ]
+      }
+    }
+
+    details.lat = device.meta.ipLoc.ll[0];
+    details.lng = device.meta.ipLoc.ll[1];
 
     if (this.props.widget == true) {
       details.zoom = 13;
@@ -79,6 +89,7 @@ export class MapDevices extends Component {
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+
         />
         {
           allDevices.map((marker, index) => {
@@ -96,8 +107,11 @@ export class MapDevices extends Component {
 
             if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
               marker.meta.ipLoc = {
-                lat: 0.01,
-                lng: 0.01
+                ll:
+                  [
+                    0.01,
+                    0.01
+                  ]
               }
             }
 
@@ -151,7 +165,7 @@ export class MapDevices extends Component {
                       }}
                     />
                   </FeatureGroup>
-                  <Marker position={[marker.meta.ipLoc.lat, marker.meta.ipLoc.lng]}>
+                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
@@ -185,7 +199,7 @@ export class MapDevices extends Component {
                 for (var j in trianglePoints) {
                   triangle.push(trianglePoints[j])
                 }
-                temp.push(this.PointInTriangle({ x: marker.meta.ipLoc.lat, y: marker.meta.ipLoc.lng }, triangle[0], triangle[1], triangle[2]));
+                temp.push(this.PointInTriangle({ x: marker.meta.ipLoc.ll[0], y: marker.meta.ipLoc.ll[1] }, triangle[0], triangle[1], triangle[2]));
               }
 
               for (var t in temp) {
@@ -255,7 +269,7 @@ export class MapDevices extends Component {
                   </FeatureGroup>
 
                   <Marker
-                    position={[marker.meta.ipLoc.lat, marker.meta.ipLoc.lng]}
+                    position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
                     riseOnHover={true}
                     zIndexOffset={100}
                     openPopup={true}
@@ -276,7 +290,7 @@ export class MapDevices extends Component {
             } else if (marker.selectedIcon == false) {
               return (
                 <div key={marker.devid}>
-                  <Marker position={[marker.meta.ipLoc.lat, marker.meta.ipLoc.lng]}>
+                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
