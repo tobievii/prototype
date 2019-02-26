@@ -288,9 +288,6 @@ export class MapDevices extends Component {
                 </div>
               )
             } else if (marker.selectedIcon == false) {
-
-              console.log(marker.meta)
-
               return (
                 <div key={marker.devid}>
                   <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
