@@ -29,6 +29,7 @@ var poly2tri = require('poly2tri');
 
 export class MapDevices extends Component {
   state = {
+
   }
 
   setvalues = (device) => {
@@ -173,10 +174,10 @@ export class MapDevices extends Component {
                         }
 
                         fetch("/api/v3/boundaryLayer", {
-                          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                          method: "POST",
+                          headers: { "Accept": "application/json", "Content-Type": "application/json" },
                           body: JSON.stringify({ key: marker.key, boundaryLayer: b })
                         }).then(response => response.json()).then(result => {
-                          console.log(result)
                         }).catch(err => console.error(err.toString()));
 
                       }}
@@ -269,8 +270,9 @@ export class MapDevices extends Component {
                             }
                           }
                           var b = {
-                            boundary: p
+                            boundaryPoints: p
                           }
+
                           fetch("/api/v3/boundaryLayer", {
                             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                             body: JSON.stringify({ key: marker.key, boundaryLayer: b })
@@ -283,8 +285,9 @@ export class MapDevices extends Component {
                       onDeleted={e => {
                         fetch("/api/v3/state/deleteBoundary", {
                           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                          body: JSON.stringify({ id: marker.devid, username: this.props.username })
+                          body: JSON.stringify({ id: marker.devid })
                         }).then(response => response.json()).then(serverresponse => {
+                          console.log(serverresponse)
                         }).catch(err => console.error(err.toString()));
                       }}
                       draw={{

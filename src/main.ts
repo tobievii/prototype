@@ -588,7 +588,8 @@ app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.boundaryLayer = req.body.boundaryLayer
     db.states.update({ key: req.body.key }, dev)
-    res.json({ result: "success boundary" })
+    io.to(req.body.key).emit('boundary', dev)
+    res.json({ result: "Successfully Added Boundary" })
   })
 })
 
@@ -855,7 +856,12 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
 
   db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: { 'boundaryLayer': 1 } }, (err: Error, cleared: any) => {
     if (err) res.json(err);
-    if (cleared) res.json(cleared);
+    if (cleared) {
+      db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (e: Error, dev: any) => {
+        io.to(dev.key).emit('boundary', dev)
+        res.json(cleared);
+      })
+    }
   })
 })
 
