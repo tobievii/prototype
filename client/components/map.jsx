@@ -105,7 +105,7 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
             }
 
-            if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+            if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc == null) {
               marker.meta.ipLoc = {
                 ll:
                   [
@@ -288,6 +288,9 @@ export class MapDevices extends Component {
                 </div>
               )
             } else if (marker.selectedIcon == false) {
+
+              console.log(marker.meta)
+
               return (
                 <div key={marker.devid}>
                   <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
