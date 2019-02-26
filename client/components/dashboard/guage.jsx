@@ -134,7 +134,7 @@ export class ProtoGuage extends React.Component {
                         textAnchor="middle"
                         alignmentBaseline="middle"
                         dominantBaseline="central">{this.state.value.toFixed(3)}</text>
-                    <path className="value" fill="none" stroke="#666" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
+                    <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
                     {this.drawguageSvg(-20, this.state.valueanim, 120)}
                 </svg>
             </div >

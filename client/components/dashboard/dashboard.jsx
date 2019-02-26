@@ -306,7 +306,6 @@ export class Dashboard extends React.Component {
   }
 
   loading() {
-    console.log("loading")
     if (this.props.state) {
 
       if (this.props.state.layout) {
@@ -314,7 +313,7 @@ export class Dashboard extends React.Component {
         if (this.settingLayout == false) {
           this.settingLayout = true;
           //console.log(this.props.state.layout)
-          this.setState({ layout: this.props.state.layout }, () => { console.log("state") })
+          this.setState({ layout: this.props.state.layout })
         }
 
         return (<div>state</div>)
