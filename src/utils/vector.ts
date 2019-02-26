@@ -137,4 +137,10 @@ export class Vector {
     }
 
   }
+
+  scale(scale: number) {
+    this.x *= scale
+    this.y *= scale
+    this.z *= scale
+  }
 }

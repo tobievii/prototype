@@ -10,6 +10,7 @@ export class ProtoGuage extends React.Component {
         min: -25,
         max: 120,
         valueanim: 0,
+        typeError: false
     }
 
     animtimer;
@@ -25,12 +26,17 @@ export class ProtoGuage extends React.Component {
             // }
             if (this.props.value) {
 
-                //ANIMATE GAUGE
-                if (this.state.valueanim != this.props.value) {
-                    var difference = this.props.value - this.state.valueanim
-                    var step = difference / 10;
-                    var valueanim = this.state.valueanim + step;
-                    this.setState({ valueanim: valueanim })
+                if (typeof this.props.value != "number") {
+                    console.log("guage requires value of type number")
+                    this.setState({ typeError: true })
+                } else {
+                    //ANIMATE GAUGE
+                    if (this.state.valueanim != this.props.value) {
+                        var difference = this.props.value - this.state.valueanim
+                        var step = difference / 10;
+                        var valueanim = this.state.valueanim + step;
+                        this.setState({ valueanim: valueanim })
+                    }
                 }
 
                 //SET VALUE
@@ -74,12 +80,18 @@ export class ProtoGuage extends React.Component {
     }
 
     drawguageSvg(min, value, max) {
-        var range = max - min;
-        var valr = value - min;
-        var ratio = valr / range;
+        if (this.state.typeError) {
+            return null;
+        } else {
+            console.log(value)
+            var range = max - min;
+            var valr = value - min;
+            var ratio = valr / range;
 
-        var graphdegree = ((180 + 35 + 35) * ratio) - 35
-        return (<path className="value" fill="none" stroke="#0ff" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+            var graphdegree = ((180 + 35 + 35) * ratio) - 35
+            return (<path className="value" fill="none" stroke="#0ff" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+        }
+
     }
 
 

@@ -278,7 +278,7 @@ export class Dashboard extends React.Component {
                 return (
                   <div className="dashboardBlock" key={data.i}  >
                     <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
-                      <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()} />
+                      <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
                     </Widget>
                   </div>
                 )
