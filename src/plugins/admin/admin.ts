@@ -18,8 +18,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
   app.get("/verify/:id", (req: any, res: any) => {
-    //log(req.user._id)
-    //log(req.params.id)
     db.users.findOne({ "_id": ObjectId(req.params.id) }, (err: Error, user: any) => {
       if (err) { log(err); return; }
       if (user == null) {
@@ -217,7 +215,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
             res.json({ err: {}, result: { mail: "sent" } })
             db.users.findOne({ email: req.body.email }, { _id: 1 }, (err: Error, result: any) => {
-              log(result._id)
               db.users.findOne({ email: req.body.email }, { uuid: 1, _id: 0 }, (err: Error, visitor: any) => {
                 db.states.update({ devid: req.body.dev }, { $push: { access: visitor.uuid } })
               })

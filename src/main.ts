@@ -435,7 +435,6 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
         log(user)
-        /////
         if (req.body.id) {
           db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
             res.json(state);
@@ -443,13 +442,8 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
         }
-        /////
       }
     })
-    // mash to complete.
-    // search db for username
-    // db.users.find({username})
-    // db.states.findOne({apikey, id}m )
   } else {
 
     if (!req.user) { res.json({ error: "user not authenticated" }); return; }
@@ -484,7 +478,6 @@ app.get('/api/v3/states', (req: any, res: any) => {
 //Share Device
 app.post('/api/v3/shared', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
-
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
     res.json(states)
   })
@@ -495,9 +488,7 @@ app.post('/api/v3/shared', (req: any, res: any) => {
 app.post('/api/v3/unshare', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
   db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-    console.log(result.key)
     db.users.update({ uuid: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
-    // { $pull: { 'shared.keys': { $in: [result] } } }, { multi: true }
   })
   //remove device from user
 
@@ -515,8 +506,6 @@ app.post("/api/v3/states", (req: any, res: any) => {
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
         db.users.findOne({ username: req.body.username }, { apikey: 1, _id: 0 }, (err: Error, sharedwith: any) => {
-
-
           db.states.find({ $and: [{ apikey: sharedwith.apikey }, { 'access': req.user.uuid }] }, (err: Error, known: any) => {
             if (known == null || known.length == 0) {
               res.json([])
@@ -535,8 +524,6 @@ app.post("/api/v3/states", (req: any, res: any) => {
           db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
             if (e) { res.json({ error: "db error" }) }
             if (user) {
-
-
               db.states.find({ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, (er: Error, states: any[]) => {
                 var cleanStates: any = []
                 for (var a in states) {
@@ -556,8 +543,6 @@ app.post("/api/v3/states", (req: any, res: any) => {
         db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
           if (e) { res.json({ error: "db error" }) }
           if (user) {
-
-
             db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
               var cleanStates: any = []
               for (var a in states) {
@@ -627,7 +612,6 @@ app.post('/api/v3/account/update', (req: any, res: any) => {
 function safeParser(req: any, res: any, next: any) {
   var buf = ""
   req.on("data", (chunk: any) => { buf += chunk.toString(); })
-
   req.on("end", () => {
     if (buf.length > 0) {
       try {
@@ -650,16 +634,12 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 
 app.post("/api/v3/getlocation", (req: any, res: any) => {
   var geo;
-
   if (req.body === undefined) { return; }
-
   if ((req.user) && (req.user.level) > 0) {
     (async () => {
       geo = geoip.lookup(await publicIp.v4());
-
       var latl, lonl;
       var coords = geo.ll;
-
       for (var s = 0; s < coords.length; s++) {
         if (s == 0) {
           latl = coords[s]
@@ -759,7 +739,6 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
           }
         }
 
-        //log(apikey + "|" + packetIn.id)
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {

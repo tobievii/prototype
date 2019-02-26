@@ -142,9 +142,7 @@ export class DeviceView extends Component {
       });
       temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== loggedInUser.email })
       for (var look in this.state.shared) {
-        console.log(this.state.shared)
         for (var i in temp) {
-          //console.log(this.state.shared[1].uuid + ".........." + temp[i].uuid)
           if (temp[i].uuid == this.state.shared[look]) {
             temp[i].shared = "yes"
           }
@@ -239,7 +237,6 @@ export class DeviceView extends Component {
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
     }).then(response => response.json()).then(view => {
       if (view.error) {
-        console.log(view.error)
       } else {
         this.setState({ view })
       }
@@ -258,16 +255,6 @@ export class DeviceView extends Component {
         this.setState({ shareDisplay: "" })
       }
     }).catch(err => console.error(err.toString()));
-    // p.getView(this.props.devid, (view) => {
-    //   console.log(view)
-    //   this.setState({ view })
-    // })
-
-    // p.getState(this.props.devid, (state) => {
-    //   this.setState({ state }, ()=>{
-    //     this.socket.emit("join", state.key)
-    //   })      
-    // })
 
     fetch("/api/v3/state", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -279,7 +266,6 @@ export class DeviceView extends Component {
         } else {
           this.socket.emit("join", state.key)
         }
-
       })
     }).catch(err => console.error(err.toString()));
 
@@ -318,13 +304,11 @@ export class DeviceView extends Component {
               <button onClick={onClose}>No</button>
 
               <button style={{ margin: "15px" }} onClick={() => {
-                //this.handleClickDelete()
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: id, username: this.props.username })
                   }).then(response => response.json()).then(serverresponse => {
-                    console.log(serverresponse);
                     window.location.href = "/"
                   }).catch(err => console.error(err.toString()));
                 }
@@ -414,7 +398,6 @@ export class DeviceView extends Component {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: this.state.devid, username: this.props.username })
                   }).then(response => response.json()).then(serverresponse => {
-                    console.log(serverresponse);
                     window.location.reload()
                   }).catch(err => console.error(err.toString()));
                 }
@@ -441,7 +424,6 @@ export class DeviceView extends Component {
           person: this.props.username
         })
       }).then(response => response.json()).then(serverresponse => {
-        console.log(serverresponse);
       }).catch(err => console.error(err.toString()));
     }
     this.setState({ isOpen: !this.state.isOpen })
@@ -456,10 +438,6 @@ export class DeviceView extends Component {
         <div style={{ maxWidth: "400px", overflow: "hidden", margin: 0, padding: 0 }}>
 
           <SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(this.state.state.payload, null, 2)}</SyntaxHighlighter>
-
-          {/* <pre className="commanderBgPanel" style={{ fontSize: "10px", padding: 5, margin: 0}}>
-            {JSON.stringify(this.state.state, null, 2)}
-          </pre>           */}
         </div>
       )
     } else {
@@ -510,7 +488,6 @@ export class DeviceView extends Component {
     var lastTimestamp = "";
     var packets = [];
     var socketDataIn = "socketDataIn";
-    //console.log(this.props);
 
     var latestState = {};
 
@@ -616,7 +593,6 @@ export class DeviceView extends Component {
                   : null
               }
             </div>
-
           </div>
         </div>
       </div>
