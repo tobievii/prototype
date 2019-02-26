@@ -480,7 +480,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("/api/v3/data/post + SOCKETS + MQTT", function (done: any) {
-
+      this.timeout(4000)
       var mqtt = require('mqtt');
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
 

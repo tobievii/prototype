@@ -40,6 +40,16 @@ export class MapDevices extends Component {
             0.01
           ]
       }
+    } else if (device.meta.ipLoc != undefined || device.meta.ipLoc != null) {
+      if (device.meta.ipLoc.ll == undefined || device.meta.ipLoc == null) {
+        device.meta.ipLoc = {
+          ll:
+            [
+              0.01,
+              0.01
+            ]
+        }
+      }
     }
 
     details.lat = device.meta.ipLoc.ll[0];
@@ -105,13 +115,34 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
             }
 
-            if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc == null) {
+            if (marker.payload.data.gps != undefined) {
               marker.meta.ipLoc = {
                 ll:
                   [
-                    0.01,
-                    0.01
+                    marker.payload.data.gps.lat,
+                    marker.payload.data.gps.lon
                   ]
+              }
+            } else {
+
+              if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                marker.meta.ipLoc = {
+                  ll:
+                    [
+                      0.01,
+                      0.01
+                    ]
+                }
+              } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc == null) {
+                  marker.meta.ipLoc = {
+                    ll:
+                      [
+                        0.01,
+                        0.01
+                      ]
+                  }
+                }
               }
             }
 
@@ -288,9 +319,6 @@ export class MapDevices extends Component {
                 </div>
               )
             } else if (marker.selectedIcon == false) {
-
-              console.log(marker.meta)
-
               return (
                 <div key={marker.devid}>
                   <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
