@@ -83,7 +83,6 @@ export class ProtoGuage extends React.Component {
         if (this.state.typeError) {
             return null;
         } else {
-            console.log(value)
             var range = max - min;
             var valr = value - min;
             var ratio = valr / range;
