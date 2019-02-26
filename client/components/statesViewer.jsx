@@ -42,7 +42,7 @@ export class Pagination extends Component {
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div style = {{marginLeft: "8px"}}>
+      return (<div style={{ marginLeft: "8px" }}>
         {
           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
@@ -71,7 +71,7 @@ export class DeviceList extends Component {
 
   handleMapAction = (device, action) => {
     return (e, n) => {
-      this.props.mapactionCall({ device, action, e, n})
+      this.props.mapactionCall({ device, action, e, n })
     }
   }
 
@@ -155,7 +155,7 @@ export class StatesViewer extends Component {
     var acc = this.props.account;
     var dc = this.state.devicePressed;
     var ds = this.state.devicesServer;
-    this.props.sendProps({un, acc, dc, ds});
+    this.props.sendProps({ un, acc, dc, ds });
 
     this.socket = socketio();
 
@@ -188,6 +188,10 @@ export class StatesViewer extends Component {
       })
 
       this.socket.on("post", (packet) => {
+        this.handleDevicePacket(packet)
+      })
+
+      this.socket.on('boundary', (packet) => {
         this.handleDevicePacket(packet)
       })
     });
@@ -237,7 +241,7 @@ export class StatesViewer extends Component {
     var acc = this.props.account;
     var dc = this.state.devicePressed;
     var ds = this.state.devicesServer;
-    this.props.sendProps({un, acc, dc, ds})
+    this.props.sendProps({ un, acc, dc, ds })
   }
 
   handleDevicePacket = (packet) => {
@@ -248,6 +252,15 @@ export class StatesViewer extends Component {
         found = 1;
         devices[dev]["_last_seen"] = packet.timestamp;
         devices[dev].payload = _.merge(devices[dev].payload, packet)
+      } else if (devices[dev].devid == packet.devid) {
+        if (packet.boundaryLayer != undefined) {
+          found = 1;
+          devices[dev].boundaryLayer = packet.boundaryLayer;
+        } else {
+          found = 1;
+          packet.selectedIcon = true;
+          devices[dev] = _.merge(devices[dev].boundaryLayer, packet);
+        }
       }
     }
 
@@ -390,22 +403,22 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
-  deviceClicked = (device) =>{
+  deviceClicked = (device) => {
     var newDeviceList = _.clone(this.state.devicesView)
 
-    for(var devices in newDeviceList){
-      if(newDeviceList[devices].selectedIcon == true){
+    for (var devices in newDeviceList) {
+      if (newDeviceList[devices].selectedIcon == true) {
         newDeviceList[devices].selectedIcon = false;
       }
     }
 
     for (var dev in newDeviceList) {
-      if (newDeviceList[dev].devid == device.e.devid){
+      if (newDeviceList[dev].devid == device.e.devid) {
         if (!device.n) {
           newDeviceList[dev].selectedIcon = false;
-        }else if (device.n && newDeviceList[dev].payload.data.boundary == undefined) {
+        } else if (device.n && newDeviceList[dev].payload.data.boundary == undefined) {
           newDeviceList[dev].selectedIcon = true;
-        }else if(device.n && newDeviceList[dev].payload.data.boundary != undefined){
+        } else if (device.n && newDeviceList[dev].payload.data.boundary != undefined) {
           newDeviceList[dev].selectedIcon = true;
           device.n = false;
         }
@@ -436,32 +449,32 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: devicesViewTemp, devicesServer: devicesServerTemp }, this.selectCountUpdate)
   }
 
-  changeView = ( action ) => {
-    this.setState({ view: action})
+  changeView = (action) => {
+    this.setState({ view: action })
   }
 
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
     } else {
-      if(this.state.view == "list"){
+      if (this.state.view == "list") {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
             {/* <span>username: {this.props.username}</span> */}
-            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
-            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} /> 
+            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} />
           </div>
         )
-      }else if(this.state.view == "map"){
+      } else if (this.state.view == "map") {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
-            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices}/>
+            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <div className="rowList">
               <div >
                 <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
               </div>
-              <div style={{ height:"605px"}}>
-                <MapDevices widget={false} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer}/>
+              <div style={{ height: "605px" }}>
+                <MapDevices widget={false} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
               </div>
             </div>
           </div>
