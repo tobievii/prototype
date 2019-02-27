@@ -696,7 +696,28 @@ function handleState(req: any, res: any, next: any) {
         io.to(packet.key).emit('post', packet.payload)
 
         if (info.newdevice) {
+
+          var newDeviceNotification = {
+            type: "New Device Added",
+            device: req.body.id,
+            created: packet._created_on
+          }
+
           io.to(req.user.username).emit("info", info)
+
+          if (req.user.notifications) {
+            req.user.notifications.push(newDeviceNotification)
+          } else {
+            req.user.notifications = [newDeviceNotification]
+          }
+
+          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+            console.log("hello")
+            if (err) res.json(err);
+            if (updated) res.json(updated);
+            io.to(req.user).emit("notification")
+
+          })
         }
 
         for (var p in plugins) {

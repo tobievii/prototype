@@ -13,16 +13,42 @@ library.add(faTimes)
 library.add(faBell);
 
 export class Notification extends Component {
+
+
+  constructor(props) {
+    super(props);
+  }
+
+  newDevice = () => {
+
+    if (this.props.notification.type == "New device Added") {
+      return this.props.notification.type
+    }
+    return this.props.notification.type
+  }
+
+  device = () => {
+    if (this.props.notification.type == "New device Added") {
+      return this.props.notification.device
+    }
+    return this.props.notification.device
+
+  }
+  deviceDescription() {
+    return this.props.notification.desc
+  }
+
   render() {
     return (
-      <div style={{ border: "1px #fff solid", padding: 5, margin: 5 }}>
-        <span style={{ fontWeight: "bold", color: "red" }}>{this.props.notification.type}</span>&nbsp;<br />
-        <span style={{ color: "#888" }}>{this.props.notification.desc}</span><br />
-        {moment(this.props.notification["_created_on"]).fromNow()}
+      <div className="container-fluid">
+        <span style={{ fontSize: 15 }} >{this.newDevice()}</span><br />
+        <span style={{ color: "#888" }}>{this.device()}</span><br />
+        <span style={{ fontSize: 11, color: "rgba(225,255,225,0.5)" }}>{moment(this.props.notification.created).fromNow()}</span>
       </div>
     )
   }
 }
+
 
 export class NavBar extends Component {
 
