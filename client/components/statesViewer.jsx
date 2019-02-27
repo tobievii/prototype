@@ -14,6 +14,7 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 import { MapDevices } from "./map.jsx"
 
+
 library.add(faSort)
 library.add(faSortNumericDown);
 library.add(faSortAlphaDown);
@@ -167,6 +168,7 @@ export class StatesViewer extends Component {
         console.log(info);
         if (info.newdevice) {
           p.statesByUsername(this.props.username, (states) => {
+            // this.props.account.notification.type = "New device added"
             for (var s in states) {
               states[s].selected = false
             }
