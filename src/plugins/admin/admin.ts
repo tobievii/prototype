@@ -217,7 +217,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
             db.users.findOne({ email: req.body.email }, { _id: 1 }, (err: Error, result: any) => {
               db.users.findOne({ email: req.body.email }, { uuid: 1, _id: 0 }, (err: Error, visitor: any) => {
 
-                db.states.update({ devid: req.body.dev }, { $push: { access: visitor.uuid } })
+                db.states.update({ devid: req.body.dev, apikey: req.user.apikey }, { $push: { access: visitor.uuid } })
               })
 
               db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
