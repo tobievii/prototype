@@ -501,7 +501,7 @@ app.post('/api/v3/unshare', (req: any, res: any) => {
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
-  if (req.body) {
+  if (req.body.username) {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
@@ -822,7 +822,7 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
-app.post("/api/v3/ForgetPassword", (req: any, res: any) => {
+app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
   log("account registration")
   log(req.body)
 

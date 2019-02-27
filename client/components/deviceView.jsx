@@ -226,6 +226,7 @@ export class DeviceView extends Component {
   }
 
   componentDidMount = () => {
+    this.sharedList()
     this.updateTime();
     setInterval(() => {
       this.updateTime();
