@@ -173,9 +173,11 @@ export class Editor extends React.Component {
 
         this.loadStates((err, resp) => {
             // extra libraries
+            console.log("==========")
+            console.log(JSON.stringify(this.props.state.payload))
 
             var definitions = [
-                // "declare var packet = " + JSON.stringify(this.state.lastPacket),
+                "declare var packet = " + JSON.stringify(this.props.state.payload),
                 // "const state = " + JSON.stringify(this.state.lastState),
                 // "const states = " + JSON.stringify(resp.lastStates),
                 // "const statesObj = " + JSON.stringify(resp.lastStatesObj),
@@ -192,10 +194,10 @@ export class Editor extends React.Component {
             definitions = definitions.concat(resp.pluginDefinitions.definitions);
 
 
-            // monaco.languages.typescript.javascriptDefaults.addExtraLib(
-            //     definitions.join("\n"),
-            //     "filename/facts.d.ts"
-            // );
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+                definitions.join("\n"),
+                "filename/facts.d.ts"
+            );
 
         });
 
@@ -246,10 +248,10 @@ export class Editor extends React.Component {
 
             if (!this.state.code) {
                 if (this.props.state.workflowCode) {
-                    this.setState({code: this.props.state.workflowCode })
+                    this.setState({ code: this.props.state.workflowCode })
                 } else {
-                    this.setState({code:`// uncomment below to test "workflow" processing \n// packet.data.test = "hello world"\ncallback(packet); `})
-                }                
+                    this.setState({ code: `// uncomment below to test "workflow" processing \n// packet.data.test = "hello world"\ncallback(packet); ` })
+                }
                 return (<div>loading....</div>)
             } else {
                 const options = {
@@ -276,7 +278,7 @@ export class Editor extends React.Component {
                             <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>statesObj</span>                        
                         </div> */}
 
-                        <div style={{ backgroundColor: "black",}}>
+                        <div style={{ backgroundColor: "black", }}>
                             <MonacoEditor
                                 width="auto"
                                 height="900"
@@ -294,7 +296,7 @@ export class Editor extends React.Component {
 
 
 
-            
+
         }
     }
 }
