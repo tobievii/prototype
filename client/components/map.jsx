@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Polygon, Map, TileLayer, Marker, Popup, FeatureGroup } from 'react-leaflet';
+import { Polyline, Polygon, Map, TileLayer, Marker, Popup, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
 
 var details = {
@@ -12,6 +12,7 @@ var circleColor = "#4c8ef7";
 
 const L = require('leaflet');
 var poly2tri = require('poly2tri');
+var test = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]];
 
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
@@ -29,10 +30,11 @@ var poly2tri = require('poly2tri');
 
 export class MapDevices extends Component {
   state = {
-
   }
 
   setvalues = (device) => {
+
+
     if (device.meta.ipLoc == undefined || device.meta.ipLoc == null) {
       device.meta.ipLoc = {
         ll:
@@ -59,12 +61,49 @@ export class MapDevices extends Component {
     if (this.props.widget == true) {
       details.zoom = 13;
     } else {
-      details.zoom = 19;
+      details.zoom = 16.05;
     }
   };
 
   sign = (p1, p2, p3) => {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+  }
+
+  getHistory = (marker) => {
+    fetch("/api/v3/boundaryPackets", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: marker })
+    })
+      .then(response => response.json()).then(result => {
+        var last = [];
+        var finalCoords = [];
+        for (var count in result) {
+          if (result[count].ll != undefined) {
+            if (count == 0) {
+              last = result[count].ll
+              finalCoords.push(result[count].ll)
+            } else {
+              last = result[count - 1].ll
+              if (last[0] != result[count].ll[0] && last[1] != result[count].ll[1]) {
+                finalCoords.push(result[count].ll)
+              }
+            }
+          } else if (result[count].data.gps != undefined) {
+            console.log("Inside the gps statement")
+          } else {
+            console.log("Something is wrong with server code")
+          }
+        }
+        return (
+          <Polyline color="blue" positions={finalCoords} />
+        )
+      })
+      .catch(err => {
+        console.error(err.toString())
+        return (
+          <div></div>
+        )
+      })
   }
 
   PointInTriangle = (pt, v1, v2, v3) => {
@@ -300,7 +339,9 @@ export class MapDevices extends Component {
                       }}
                     />
                     <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
+
                   </FeatureGroup>
+                  {this.getHistory(marker.devid)}
 
                   <Marker
                     position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}

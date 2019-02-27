@@ -280,6 +280,98 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   }
 });
 
+app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
+
+  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+
+  var limit = 25;
+  if (req.body.limit) { limit = req.body.limit }
+
+  if (req.body.id) {
+    db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+      rawpackets = rawpackets.reverse();
+      var packets = []
+
+      for (var p in rawpackets) {
+        var payload = rawpackets[p];
+        var devicepacket: any;
+
+        if (payload.boundaryLayer != undefined || payload.boundaryLayer != null) {
+          devicepacket = payload.boundaryLayer;
+          devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+          devicepacket.id = payload.payload.id
+          devicepacket.timestamp = payload.payload.timestamp
+
+          if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
+            console.log("Piano")
+            devicepacket.payload = payload.payload.data;
+          } else {
+            console.log("Piano 2")
+            if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
+              payload.meta.ipLoc = {
+                ll:
+                  [
+                    0.01,
+                    0.01
+                  ]
+              }
+              devicepacket.meta.ipLoc = payload.meta.ipLoc;
+            } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
+              if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
+                payload.meta.ipLoc = {
+                  ll:
+                    [
+                      0.01,
+                      0.01
+                    ]
+                }
+              }
+              devicepacket.meta.ipLoc = payload.meta.ipLoc;
+            }
+          }
+        } else {
+          if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
+            payload.meta.ipLoc = {
+              ll:
+                [
+                  0.01,
+                  0.01
+                ]
+            }
+            devicepacket = payload.meta.ipLoc;
+            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+            devicepacket.id = payload.payload.id
+            devicepacket.timestamp = payload.payload.timestamp
+          } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
+            if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
+              payload.meta.ipLoc = {
+                ll:
+                  [
+                    0.01,
+                    0.01
+                  ]
+              }
+            }
+            devicepacket = payload.meta.ipLoc;
+            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+            devicepacket.id = payload.payload.id
+            devicepacket.timestamp = payload.payload.timestamp
+          } else {
+            if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
+              devicepacket = payload.payload;
+              devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+            }
+          }
+        }
+        packets.push(devicepacket)
+      }
+      res.json(packets);
+    })
+  } else {
+    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+  }
+});
+
 // run to update old packet data to have correct timestamp
 // app.get("/admin/processpackets", (req:any, res:any)=>{
 //   if (req.user.level < 100) { res.end("no permission"); return; }

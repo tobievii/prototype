@@ -256,9 +256,11 @@ export class StatesViewer extends Component {
       } else if (devices[dev].devid == packet.devid) {
         if (packet.boundaryLayer != undefined) {
           found = 1;
+          devices[dev]["_last_seen"] = packet.payload.timestamp;
           devices[dev].boundaryLayer = packet.boundaryLayer;
         } else {
           found = 1;
+          devices[dev]["_last_seen"] = packet.payload.timestamp;
           packet.selectedIcon = true;
           devices[dev] = _.merge(devices[dev].boundaryLayer, packet);
         }
