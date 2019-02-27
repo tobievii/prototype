@@ -221,7 +221,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
               })
 
               db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
-                db.users.update({ email: req.body.email, apikey: req.user.apikey }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+                db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
               }
               )
             })
