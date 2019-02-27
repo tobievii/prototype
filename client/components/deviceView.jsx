@@ -482,6 +482,26 @@ export class DeviceView extends Component {
     this.state.editorChanged = true;
   }
 
+  shareWindow = () => {
+    return (<div ><center>
+      <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
+        <center style={{ color: "white" }}>
+          Search For users to share  with<br></br>
+
+          <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
+        <br></br><div>
+          {this.ShareButton()}</div><hr></hr>
+        <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
+          {this.userNameList()}
+        </div>
+        <center>
+          {/* <button>Share Device</button> */}
+        </center>
+      </Modal>
+    </center>
+    </div>)
+  }
+
   render() {
 
     var devid = "loading";
@@ -534,23 +554,9 @@ export class DeviceView extends Component {
               <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
-              <div ><center>
-                <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
-                  <center style={{ color: "white" }}>
-                    Search For users to share  with<br></br>
 
-                    <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-                  <br></br><div>
-                    {this.ShareButton()}</div><hr></hr>
-                  <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
-                    {this.userNameList()}
-                  </div>
-                  <center>
-                    {/* <button>Share Device</button> */}
-                  </center>
-                </Modal>
-              </center>
-              </div>
+              {this.shareWindow()}
+
             </div>
           </div>
 

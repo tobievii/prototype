@@ -636,32 +636,12 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 
 ///////// END
 
-app.post("/api/v3/getlocation", (req: any, res: any) => {
-  var geo;
-  if (req.body === undefined) { return; }
-  if ((req.user) && (req.user.level) > 0) {
-    (async () => {
-      geo = geoip.lookup(await publicIp.v4());
-      var latl, lonl;
-      var coords = geo.ll;
-      for (var s = 0; s < coords.length; s++) {
-        if (s == 0) {
-          latl = coords[s]
-        } else if (s == 1) {
-          lonl = coords[s]
-        }
-      }
-
-      res.json({
-        result: {
-          gps: {
-            lat: latl,
-            lon: lonl
-          }
-        }
-      });
-    })();
-  }
+app.get("/api/v3/getlocation", (req: any, res: any) => {
+  console.log("-------")
+  console.log(req.ip)
+  var geoIPLoc = geoip.lookup(req.ip);
+  console.log(geoIPLoc)
+  res.json(geoIPLoc)
 });
 
 app.put("/api/v3/data/put", (req: any, res: any, next: any) => {
