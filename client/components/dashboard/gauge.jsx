@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 import { Vector } from "../../../src/utils/vector"
 
-export class ProtoGuage extends React.Component {
+export class ProtoGauge extends React.Component {
 
     state = {
         value: 0,

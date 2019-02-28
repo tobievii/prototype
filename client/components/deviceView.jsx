@@ -247,13 +247,16 @@ export class DeviceView extends Component {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
       loggedInUser = account;
-      currentDevice = this.state.state.apikey;
-      if (loggedInUser.apikey != this.state.state.apikey && this.state.state.level < 100) {
-        this.setState({ shareDisplay: "none" })
+      if (this.state.state) {
+        currentDevice = this.state.state.apikey;
+        if (loggedInUser.apikey != this.state.state.apikey && this.state.state.level < 100) {
+          this.setState({ shareDisplay: "none" })
+        }
+        else {
+          this.setState({ shareDisplay: "" })
+        }
       }
-      else {
-        this.setState({ shareDisplay: "" })
-      }
+
     }).catch(err => console.error(err.toString()));
 
     fetch("/api/v3/state", {
@@ -521,6 +524,8 @@ export class DeviceView extends Component {
     var latestState = {};
 
     let plugins;
+
+
 
     if (this.state.view) {
       latestState = this.state.view;

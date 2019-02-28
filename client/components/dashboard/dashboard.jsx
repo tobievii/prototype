@@ -16,7 +16,7 @@ import * as _ from "lodash"
 import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
-import { ProtoGuage } from "./guage.jsx"
+import { ProtoGauge } from "./gauge.jsx"
 import { MapDevices } from "../map.jsx"
 
 var mapDetails = {
@@ -134,7 +134,7 @@ export class Dashboard extends React.Component {
 
     // add widget to layout
     var layout = _.clone(this.state.layout)
-    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: "Guage", datapath: e.datapath, dataname: e.dataname })
+    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: "Gauge", datapath: e.datapath, dataname: e.dataname })
     this.setState({ layout: layout }, () => { })
   }
 
@@ -175,19 +175,27 @@ export class Dashboard extends React.Component {
 
     //if there are fewer or more widgets then we update the server
     if (layout.length != this.state.layout) {
+      console.log("widget count changed!")
       updated = true;
     }
 
     if (updated) {
       // update the server
-      fetch("/api/v3/dashboard", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ key: this.props.state.key, layout: newlayout })
-      }).then(response => response.json()).then(result => { console.log(result) })
-        .catch(err => console.error(err.toString()));
+      this.setState({ layout: newlayout }, () => {
+        this.updateServer();
+      })
     }
-
   }
+
+  updateServer() {
+    console.log("dashboard update to server")
+    fetch("/api/v3/dashboard", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
+    }).then(response => response.json()).then(result => { console.log(result) })
+      .catch(err => console.error(err.toString()));
+  }
+
 
   showMap = () => {
     mapDetails.un = this.props.username;
@@ -198,9 +206,67 @@ export class Dashboard extends React.Component {
 
   widgetRemove = (id) => {
     return (e) => {
-      console.log(id)
+
       var temp = this.state.layout.filter(item => { if (item.i != id) return item })
-      this.setState({ layout: temp })
+      this.setState({ layout: temp }, () => {
+        this.updateServer();
+      })
+    }
+  }
+
+  widgetChange = (i) => {
+    return (option, data) => {
+      var layout = _.clone(this.state.layout);
+      for (var w in layout) {
+        if (layout[w].i == i) {
+          layout[w][option] = data;
+        }
+      }
+
+      console.log("widgetChange");
+      console.log({ option, data })
+      this.setState({ layout }, () => {
+        this.updateServer();
+      })
+    }
+  }
+
+  // Depending on type prop of widget, this returns correct React component
+  widgetType = (data) => {
+    if (data.type == "Calendar") {
+      return (
+        <Calendar state={this.props.state} />
+      )
+    }
+
+    if (data.type == "Line") {
+      return (
+        <Line value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
+      )
+    }
+
+    if (data.type == "Blank") {
+      return (
+        <div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>
+      )
+    }
+
+    if (data.type == "ThreeDWidget") {
+      return (
+        <ThreeDWidget />
+
+      )
+    }
+    if (data.type == "Gauge") {
+      return (
+        <ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
+      )
+    }
+    if (data.type == "map") {
+      { this.showMap() }
+      return (
+        <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
+      )
     }
   }
 
@@ -240,69 +306,14 @@ export class Dashboard extends React.Component {
             width={this.state.grid.width}>
             {
               this.state.layout.map((data, i) => {
-                if (data.type == "Calendar") {
-                  return (
-                    <div className="dashboardBlock" key={data.i} >
-                      <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
-                        <Calendar state={this.props.state} />
-                      </Widget>
-                    </div>
-                  )
-                }
-
-                if (data.type == "Line") {
-                  return (
-                    <div className="dashboardBlock" key={data.i} >
-                      <Widget label={data.dataname} >
-                        <Line />
-                      </Widget>
-                    </div>
-                  )
-                }
-
-                if (data.type == "Blank") {
-                  return (
-                    <div className="dashboardBlock" key={data.i} >
-                      <Widget label={data.datapath.split("root.data.")[1]} remove={this.widgetRemove(data.i)} >
-                        {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-                      </Widget>
-                    </div>
-                  )
-                }
-
-                if (data.type == "ThreeDWidget") {
-                  return (
-                    <div className="dashboardBlock" key={data.i} >
-                      <Widget label={data.dataname} >
-                        <ThreeDWidget />
-                      </Widget>
-                    </div>
-                  )
-                }
-                if (data.type == "Guage") {
-                  return (
-                    <div className="dashboardBlock" key={data.i}  >
-                      <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
-                        <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
-                      </Widget>
-                    </div>
-                  )
-                }
-                if (data.type == "map") {
-                  { this.showMap() }
-                  return (
-                    <div key={data.i} >
-                      <Widget label={data.dataname} >
-                        <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
-                      </Widget>
-                    </div>
-                  )
-                }
                 return (
-
-                  <div>default</div>
-                )
-
+                  <div className="dashboardBlock" key={data.i} >
+                    <Widget label={data.dataname}
+                      change={this.widgetChange(data.i)}
+                      remove={this.widgetRemove(data.i)}>
+                      {this.widgetType(data)}
+                    </Widget>
+                  </div>)
               })
             }
           </GridLayout>
@@ -367,6 +378,7 @@ export class Dashboard extends React.Component {
   }
 
   objectByString = (o, s) => {
+
     s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
     s = s.replace(/^\./, '');           // strip a leading dot
     var a = s.split('.');
