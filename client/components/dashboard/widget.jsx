@@ -16,25 +16,26 @@ export class Widget extends React.Component {
       return (<div className="widgetMenu" style={{
         position: "absolute",
         zIndex: 100,
-        width: 100,
+        width: 200,
         fontSize: 14
       }} >
-        <div className="widgetMenuItem" onClick={this.removeWidget} >
+        <div className="widgetMenuItem widgetMenuItemButton" onClick={this.removeWidget} >
           <i className="fas fa-trash-alt"></i> REMOVE</div>
 
-        <div><select onChange={(e) => {
-          console.log(e.target.value);
-          this.props.change("type", e.target.value)
-        }}>
-          <option unselectable="true">select</option>
-          <option>Calendar</option>
-          <option>NivoLine</option>
-          <option>ChartLine</option>
-          <option>Blank</option>
-          <option>ThreeDWidget</option>
-          <option>Gauge</option>
-          <option>map</option>
-        </select></div>
+        <div className="widgetMenuItem" >Change Type:
+          <select onChange={(e) => {
+            console.log(e.target.value);
+            this.props.change("type", e.target.value)
+          }}>
+            <option unselectable="true">select</option>
+            <option>Calendar</option>
+            <option>NivoLine</option>
+            <option>ChartLine</option>
+            <option>Blank</option>
+            <option>ThreeDWidget</option>
+            <option>Gauge</option>
+            <option>map</option>
+          </select></div>
       </div>)
     } else {
       return null;
