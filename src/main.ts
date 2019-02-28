@@ -289,6 +289,7 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
 
   if (req.body.id) {
     db.packets.find({ apikey: req.user.apikey, devid: req.body.id, boundaryLayer: { $exists: true } }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+      // db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
 
@@ -313,7 +314,7 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
                     0.01
                   ]
               }
-              devicepacket.meta.ipLoc = payload.meta.ipLoc;
+              devicepacket.ipLoc = payload.meta.ipLoc;
             } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
               if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
                 payload.meta.ipLoc = {
@@ -324,7 +325,7 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
                     ]
                 }
               }
-              devicepacket.meta.ipLoc = payload.meta.ipLoc;
+              devicepacket.ipLoc = payload.meta.ipLoc;
             }
           }
         } else {
