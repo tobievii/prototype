@@ -33,7 +33,8 @@ export class Editor extends React.Component {
     state = {
         message: "",
         messageOpacity: 0,
-        loaded: 0
+        loaded: 0,
+        unsaved: false
     };
 
     saveWorkflow = () => {
@@ -47,7 +48,7 @@ export class Editor extends React.Component {
         })
             .then(response => response.json())
             .then(serverresponse => {
-                this.setState({ message: serverresponse.result, messageOpacity: 1.0 });
+                this.setState({ message: serverresponse.result, messageOpacity: 1.0, unsaved: false });
                 setTimeout(() => {
                     this.setState({ messageOpacity: 0 });
                 }, 1000);
@@ -173,9 +174,11 @@ export class Editor extends React.Component {
 
         this.loadStates((err, resp) => {
             // extra libraries
+            console.log("==========")
+            console.log(JSON.stringify(this.props.state.payload))
 
             var definitions = [
-                // "declare var packet = " + JSON.stringify(this.state.lastPacket),
+                "declare var packet = " + JSON.stringify(this.props.state.payload),
                 // "const state = " + JSON.stringify(this.state.lastState),
                 // "const states = " + JSON.stringify(resp.lastStates),
                 // "const statesObj = " + JSON.stringify(resp.lastStatesObj),
@@ -192,10 +195,10 @@ export class Editor extends React.Component {
             definitions = definitions.concat(resp.pluginDefinitions.definitions);
 
 
-            // monaco.languages.typescript.javascriptDefaults.addExtraLib(
-            //     definitions.join("\n"),
-            //     "filename/facts.d.ts"
-            // );
+            monaco.languages.typescript.javascriptDefaults.addExtraLib(
+                definitions.join("\n"),
+                "filename/facts.d.ts"
+            );
 
         });
 
@@ -206,7 +209,8 @@ export class Editor extends React.Component {
 
     onChange = (code, e) => {
         console.log(code)
-        this.setState({ code: code });
+        this.setState({ code: code, editorChanged: true, unsaved: true });
+        this.props.onChange();
     };
 
     loadOnFirstData = () => {
@@ -235,6 +239,18 @@ export class Editor extends React.Component {
         }
     };
 
+    saveButton = () => {
+        var unsavedClass = ""
+        var text = ""
+        if (this.state.unsaved) {
+            unsavedClass = "deviceViewButtonAlert"
+            text = "unsaved changes"
+        }
+        return (<div className={"deviceViewButton " + unsavedClass}
+            style={{ float: "right" }}
+            onClick={this.saveWorkflow} title="Save [CTRL+S]" > {text} <FontAwesomeIcon icon="hdd" /></div>)
+    }
+
     ///https://microsoft.github.io/monaco-editor/playground.html#interacting-with-the-editor-adding-an-action-to-an-editor-instance
 
     render() {
@@ -245,10 +261,10 @@ export class Editor extends React.Component {
 
             if (!this.state.code) {
                 if (this.props.state.workflowCode) {
-                    this.setState({code: this.props.state.workflowCode })
+                    this.setState({ code: this.props.state.workflowCode })
                 } else {
-                    this.setState({code:`// uncomment below to test "workflow" processing \n// packet.data.test = "hello world"\ncallback(packet); `})
-                }                
+                    this.setState({ code: `// uncomment below to test "workflow" processing \n// packet.data.test = "hello world"\ncallback(packet); ` })
+                }
                 return (<div>loading....</div>)
             } else {
                 const options = {
@@ -256,15 +272,17 @@ export class Editor extends React.Component {
                     minimap: { enabled: false }
                 };
                 return (
-
-                    <div  >
+                    <div className="deviceViewBlock isResizable" style={{ marginBottom: 10 }}>
                         <div>
-                            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: 160, marginBottom: 20, float: "left" }} onClick={this.saveWorkflow} > <FontAwesomeIcon icon="hdd" /> SAVE CODE </div>
-
-                            <div style={{ transition: "all 0.25s ease-out", opacity: this.state.messageOpacity, width: 110, marginTop: 20, marginBottom: 20, float: "left", textAlign: "left", paddingLeft: 20 }} >
-                                {this.state.message}
-                            </div>
-
+                            <div className="deviceViewTitle" >editor</div>
+                            {this.saveButton()}
+                            <div style={{
+                                transition: "all 0.25s ease-out",
+                                opacity: this.state.messageOpacity,
+                                padding: 5,
+                                width: 110,
+                                float: "right", textAlign: "left", paddingLeft: 20
+                            }} >{this.state.message}</div>
                             <div style={{ clear: "both" }} />
                         </div>
 
@@ -275,15 +293,16 @@ export class Editor extends React.Component {
                             <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>statesObj</span>                        
                         </div> */}
 
-                        <div style={{ backgroundColor: "black", width: "90%" }}>
+                        <div style={{ backgroundColor: "red", height: "100%" }}>
                             <MonacoEditor
+                                height="2000"
                                 width="auto"
-                                height="900"
                                 language="javascript"
                                 theme="vs-dark"
                                 value={this.state.code}
                                 options={options}
                                 onChange={this.onChange}
+                                automaticLayout={true}
                                 editorDidMount={this.editorDidMount}
                             />
                         </div>
@@ -293,7 +312,7 @@ export class Editor extends React.Component {
 
 
 
-            
+
         }
     }
 }

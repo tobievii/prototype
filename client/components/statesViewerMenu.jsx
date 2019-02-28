@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { confirmAlert } from 'react-confirm-alert';
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll : false, sort : ""}
+    state = { selectAll : false, sort : "", view: "map", boundary: undefined}
 
     selectBox = () => {
         if (this.state.selectAll) {
@@ -46,21 +46,47 @@ export class StatesViewerMenu extends Component {
         
     }
 
+    viewButton = () => {
+        if(this.state.view == "list"){
+            return <i className="viewButton fas fa-map-marked-alt" title="Map View" style={{color:"grey",marginTop: "10px", cursor: "pointer"}} onClick={ this.viewButtonClicked("map") } ></i>;
+        }else if(this.state.view == "map"){
+            return <i className="viewButton fas fa-list-ul" title="List View" style={{color:"grey",marginTop: "10px"}} onClick={ this.viewButtonClicked("list") } ></i>;
+        } 
+    }
+
+    // boundaryButton = () => {
+    //     if(this.state.view == "map"){
+    //         if(this.props.boundary == true){
+    //             return <i className="viewButton fas fa-exclamation" title="Create Boundary" style={{color:"grey", marginTop: "10px", marginRight: "22px"}} onClick={()=>this.boundaryButtonClicked(this.props.devid) }></i>;
+    //         }else if(!this.state.boundary || this.state.boundary == undefined){
+    //             return <i className="viewButton fas fa-exclamation" title="Select A Device" style={{color:"grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed"}}></i>;
+    //         }
+    //     }else{
+    //         return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
+    //     }
+    // }
+
+    // boundaryButtonClicked = (device) => {
+    //     var device = this.props.deviceCall;
+    //     var lat = device.payload.data.gps.lat;
+    //     var lon = device.payload.data.gps.lon;
+    //     fetch("/api/v3/data/post", {
+    //         apikey : this.props.acc.apikey,
+    //         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    //         body: JSON.stringify({ id: this.props.deviceCall.devid, data: {boundary: {lat: lat, lon: lon, radius: 50}} })
+    //     }).then(response => response.json()).then(serverresponse => {
+    //         console.log(serverresponse)
+    //     }).catch(err => {console.error(err.toString());});
+    // }
+
+    viewButtonClicked = (action) => {
+        return (e) => {
+            this.setState({ view:action })
+            this.props.view(action);
+        }
+    }
+
     clickDeleteConfirmation = () => {
-        // confirmAlert({
-        // title: 'Are you sure?',
-        // message: 'Deleting a device is irreversible',
-        // buttons: [
-        //     {
-        //     label: 'Yes',
-        //     onClick: () => this.props.deleteSelected()
-        //     },
-        //     {
-        //     label: 'No',
-        //     onClick: () => { }
-        //     }
-        // ]
-        // })
         confirmAlert({
             customUI: ({ onClose }) => {
               return (
@@ -69,7 +95,7 @@ export class StatesViewerMenu extends Component {
                   <p>Deleting a device is irreversible</p>
                   <button onClick={onClose}>No</button>
                   
-                  <button onClick={() => {
+                  <button style = {{ margin:"15px" }} onClick={() => {
                       //this.handleClickDelete()
                       this.props.deleteSelected()
                       onClose()
@@ -89,7 +115,15 @@ export class StatesViewerMenu extends Component {
         }
     }
 
+    // setBoundary = (b) => {
+    //     this.setState({ boundary: this.props.boundary });
+    //     return(
+    //         <div></div>
+    //     )
+    // }
+
     render() {
+
         return (
             <div className="container-fluid protoMenu" style={{  }}>
                 <div className="row" style={{ padding: 5 }} >
@@ -108,9 +142,10 @@ export class StatesViewerMenu extends Component {
                         {/* { this.props.selectCount} */}
                     </div>
 
-                    <div className="col" style={{ flex: "0 0 120px" }}>
+                    <div className="col" style={{ flex: "0 0 120px" }}>  
+                        { this.viewButton() }
                         <div style={{float:"right", marginTop: "7px", textAlign:"left", width: "20px"}}>
-                        { this.sortButtons() }
+                            { this.sortButtons() }
                         </div>
                     </div>
                 </div>

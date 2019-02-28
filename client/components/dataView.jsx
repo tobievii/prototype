@@ -48,7 +48,7 @@ export class RenderObject extends Component {
     // }  catch (err) {
     //   return ( <div>err</div>)
     // }
-   
+
   }
 }
 
@@ -56,65 +56,102 @@ export class RenderObject extends Component {
 export class DataView extends React.Component {
 
   state = {
-    dragging : false
+    dragging: false
   }
 
   dragging = false;
 
   renderData = (data, level, path) => {
-    
-    if (data == null) {}
+
+    if (data == null) { }
     if (typeof data == "string") {
-      return <span>{data}</span>
+      return <span style={{ float: "right", color: "#CCC" }}>{data.trim()}</span>
     }
     if (typeof data == "number") {
-      return <span>{data}</span>
+      return <span style={{ float: "right", color: "#15E47A" }}>{data}</span>
     }
     if (typeof data == "boolean") {
-      return <span>{data.toString()}</span>
+      if (data == true) {
+        return <span style={{ float: "right", color: "#E4C315" }}>{data.toString()}</span>
+      } else {
+        return <span style={{ float: "right", color: "#15B9E4" }}>{data.toString()}</span>
+      }
+
     }
     if (typeof data == "object") {
-      return <div>{ this.renderObject(data, level+1, path)}</div>
+
+
+      if (Array.isArray(data)) {
+        //Arrays
+        return <div style={{}}>{this.renderObject(data, level + 1, path)}</div>
+      } else {
+        //Objects
+
+        if (Object.keys(data).length > 1) {
+          return <div style={{}}>{this.renderObject(data, level + 1, path)}</div>
+        } else {
+          return <div style={{}}>{this.renderObject(data, level + 1, path)}</div>
+        }
+
+
+      }
+
     }
 
   }
 
-  renderObject = (data,level, path) => {    
-    try {
-      return (
-        <div>
-          {Object.keys(data).map((name,i) => {
+  renderObject = (data, level, path) => {
+
+
+    return (
+      <div style={{ overflowY: 'hidden' }}>
+        {Object.keys(data).map((name, i) => {
+
+          if (typeof data[name] == "object") {
             return (
-              <div key={i} className="dataView" draggable onDragStart={(e)=>this.onDragStart(e, name, i, data[name],level, path+"."+name)}  >
-                <div className="dataViewName">{name}:</div> 
-                <div className="dataViewValue" >{this.renderData(data[name],level,path+"."+name)}</div>
-                <div style={{clear:"both"}}/>
+              <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
+                <div className="dataViewName" style={{ color: "" }}>{name}:</div>
+                <div className="dataViewValue" >{this.renderData(data[name], level, path + "." + name)}</div>
+                <div style={{ clear: "both" }} />
               </div>)
-          })}                  
-        </div>
-      )
-    } catch(err) {}
+          } else {
+            return (
+              <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
+                <div className="dataViewName" style={{ float: "left" }}>{name}:</div>
+                <div className="dataViewValue" style={{ float: "right" }}>{this.renderData(data[name], level, path + "." + name)}</div>
+                <div style={{ clear: "both" }} />
+              </div>)
+          }
+
+
+        })}
+      </div>
+    )
+
+
+
   }
 
   onDragStart = (e, name, i, data, level, path) => {
 
-    
+    e.dataTransfer.setData('text/plain', 'anything');
+
 
     if (this.dragging == false) {
-      console.log( { e, name, i, data, level, path } )
+      console.log({ e, name, i, data, level, path })
       this.dragging = true;
-      
+
       e.dataname = name;
       e.datapath = path;
 
-      setTimeout( ()=>{
+      setTimeout(() => {
         this.dragging = false;
-      },500)
+      }, 500)
 
     } else {
       //console.log("already dragging")
     }
-    
+
   }
 
   render() {
@@ -122,20 +159,20 @@ export class DataView extends React.Component {
       if (this.props.data.payload) {
         return (
           <div>
-            { this.renderObject(this.props.data.payload, 0, "root")}
+            {this.renderObject(this.props.data.payload, 0, "root")}
           </div>
         );
       } else {
         return (
           <div>
-            { this.renderObject(this.props.data, 0, "root")}
+            {this.renderObject(this.props.data, 0, "root")}
           </div>
         );
       }
     } else {
       return (<div>loading..</div>)
     }
-    
+
   }
 
 }

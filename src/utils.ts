@@ -243,14 +243,14 @@ export function createDBIndexes(db: any) {
     // creates optimized indexes
     // meant to be run on first start or when upgrading from an older version
     log("creating db indexes")
-    
+
     db.states.createIndex({ apikey: 1 })
     db.states.createIndex({ apikey: 1, devid: 1 })
     db.states.createIndex({ "_last_seen": 1 })
-    
+
     db.packets.createIndex({ "_created_on": 1 })
     db.packets.createIndex({ apikey: 1 })
-    db.packets.createIndex({ apikey: 1, devid:1, "created_on":1 })
+    db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
 
     db.users.createIndex({ uuid: 1 })
     db.users.createIndex({ apikey: 1 })
@@ -259,18 +259,14 @@ export function createDBIndexes(db: any) {
 
 export function checkFirstRun(db: any) {
     // checks if this is the first run
-    log("check first run")
 
     db.users.find({}).count((errUsers: Error, usersCount: number) => {
         if (errUsers) console.log("ERR CANT ACCESS DB.USERS");
 
         if (usersCount == 0) {
-            log("performing first run tasks");
+            log("Performing first run tasks");
             accounts.createDefaultAdminAccount(db);
             createDBIndexes(db);
-
-        } else {
-            log("not first run");
         }
     })
 
@@ -278,21 +274,21 @@ export function checkFirstRun(db: any) {
 
 
 
-export function createUsernamesForOldAccounts(db:any) {
-    db.users.find({"username" : { "$exists" : false }}).limit(10000, (err:Error, users:any)=>{
+export function createUsernamesForOldAccounts(db: any) {
+    db.users.find({ "username": { "$exists": false } }).limit(10000, (err: Error, users: any) => {
         for (var user of users) {
             user["username"] = generate(32).toLowerCase()
-            db.users.update({"_id" : user["_id"]}, user)                
+            db.users.update({ "_id": user["_id"] }, user)
         }
-      }) 
+    })
 }
 
 
-export function createDeviceKeysForOldAccounts(db:any) {
-    db.states.find({"key" : { "$exists" : false }}).limit(10000, (err:Error, states:any)=>{
+export function createDeviceKeysForOldAccounts(db: any) {
+    db.states.find({ "key": { "$exists": false } }).limit(10000, (err: Error, states: any) => {
         for (var state of states) {
             state["key"] = generateDifficult(128)
-            db.states.update({"_id" : state["_id"]}, state)                
+            db.states.update({ "_id": state["_id"] }, state)
         }
-      }) 
+    })
 }

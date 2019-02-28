@@ -125,7 +125,7 @@ export class DevicePluginPanel extends React.Component {
 
         <br />
         <h5>SELECT FROM AVAILABLE GATEWAYS:</h5>
-        <select className="settingsSelect" onChange={this.onChange} defaultValue={this.state.deviceGateway.GatewayId+"|"+this.state.deviceGateway.HostAddress}>
+        <select style={{width: "100%"}} className="settingsSelect" onChange={this.onChange} defaultValue={this.state.deviceGateway.GatewayId+"|"+this.state.deviceGateway.HostAddress}>
           <option key="none" value="none">select gateway</option>
           <option key="clear" value=" | ">clear</option>
           {
