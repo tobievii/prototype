@@ -1,9 +1,18 @@
 import React, { Component } from "react";
-import moment from 'moment'
+
+import { confirmAlert } from './react-confirm-alert';
+import './react-confirm-alert/src/react-confirm-alert.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
+import * as _ from "lodash"
+
+import * as p from "../prototype.ts"
+
+import { StatesViewerMenu } from "./statesViewerMenu.jsx"
+import { StatesViewerItem } from "./statesViewerItem.jsx"
+import { MapDevices } from "./map.jsx"
 
 
 library.add(faSort)
@@ -11,124 +20,14 @@ library.add(faSortNumericDown);
 library.add(faSortAlphaDown);
 library.add(faSortAmountDown);
 
-class StatesViewerItem extends Component {
-  state = {
-    timeago: "",
-    timestamp: "",
-    millisago : 0
-  };
 
-  intvalM = undefined;
-  intvalT = undefined;
-
-  
-
-
-
-  componentWillUnmount = () => {
-
-    clearInterval(this.intvalM)
-    clearInterval(this.intvalT)
-  }
-
-  updateTime = () => {
-    if (this.props.timestamp) {
-      var timeago = moment(this.props.timestamp).fromNow()
-      this.setState({ timeago })
-    }
-  }
-
-  updateMillis = () => {
-    // if (this.props.timestamp) {
-    //   var lastChange = new Date(this.props.timestamp);     
-    //   this.setState({ millisago : Date.now() - lastChange.getTime() })    
-    // }
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.intvalT = setInterval(() => {
-      this.updateTime();
-    }, 1000/60)
-
-    this.intvalM = setInterval(()=>{
-      this.updateMillis();
-    },1000/60);
-  }
-
-  blendrgba(x,y,ratio) {
-
-    if (ratio <= 0) {
-      return "rgba("+Math.round(x.r)+","+Math.round(x.g)+","+Math.round(x.b)+","+x.a+")"
-    } else if (ratio >= 1) {
-      return "rgba("+Math.round(y.r)+","+Math.round(y.g)+","+Math.round(y.b)+","+y.a+")"
-    } else {
-      var blended = {
-        r : (x.r*(1-ratio)) + (y.r*ratio),
-        g : (x.g*(1-ratio)) + (y.g*ratio),
-        b : (x.b*(1-ratio)) + (y.b*ratio),
-        a : (x.a*(1-ratio)) + (y.a*ratio),
-      }
-      return "rgba("+Math.round(blended.r)+","+Math.round(blended.g)+","+Math.round(blended.b)+","+blended.a+")"
-    }
-    
-    //return "rgba(255,255,255,1)"
-  }
-
-
-  calcStyle = () => {
-    var timefade = 3000;
-
-    var lastChange = new Date(this.props.timestamp);     
-    var millisago = Date.now() - lastChange.getTime();    
-    var ratio = (timefade-millisago)/timefade;
-
-    //var ratio = (timefade-this.state.millisago)/timefade;
-    if (ratio < 0) { ratio = 0 }
-    if (ratio > 1) { ratio = 1 }
-        
-    return { marginBottom: 2, padding: "7px 0px 7px 0px", 
-      backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5),"+this.blendrgba({r:3, g:4, b:5, a:0.5}, {r:125, g:255, b:175, a: 0.75}, (ratio/1.5) - 0.35)+")",
-      borderRight: "5px solid "+this.blendrgba( {r:60, g:19, b:25, a:0}, {r:125, g:255, b:175, a: 1.0}, ratio) }    
-  }
-
-
-  render() {
-
-    var dataPreview = JSON.stringify(this.props.data)
-    var maxlength = 120;
-    if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
-
-    return (
-      <a  href={"/view/" + this.props.id}>
-        <div className="row statesViewerItem" 
-          key={this.props._id} 
-
-          style={ this.calcStyle() }>
-
-            <div className="col-8" style={{ overflow: "hidden" }}>{this.props.id} <br />
-              <span className="faded" style={{ fontSize: 12 }} >{dataPreview}</span>
-            </div>
-            
-            <div className="col-4" style={{textAlign:"right"}}>
-              <span style={{ fontSize: 12 }}>{ this.state.timeago}</span><br />
-              <span className="faded" style={{ fontSize: 12 }}>{ this.props.timestamp}</span>
-            </div>
-
-        </div>
-      </a>
-    );
-  }
-}
-
+import socketio from "socket.io-client";
 
 
 export class Pagination extends Component {
 
   onClick = (button) => {
     return evt => {
-      
       this.props.onPageChange(button)
     }
   }
@@ -139,24 +38,21 @@ export class Pagination extends Component {
     } else {
       return "pagination"
     }
-    
+
   }
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div>
+      return (<div style={{ marginLeft: "8px" }}>
         {
-          this.props.pages.map( (button, i) =>  <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div> )
+          this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
       </div>)
     } else {
-      return ( <div></div>)
+      return (<div></div>)
     }
-    
-    
   }
 }
-
 
 export class DeviceList extends Component {
 
@@ -165,33 +61,46 @@ export class DeviceList extends Component {
   }
 
   onPageChange = (data) => {
-    console.log(data);
-    this.setState( { activePage: data.text })
+    this.setState({ activePage: data.text })
+  }
+
+  handleActionCall = (a) => {
+    return (e) => {
+      this.props.actionCall({ a, e })
+    }
+  }
+
+  handleMapAction = (device, action) => {
+    return (e, n) => {
+      this.props.mapactionCall({ device, action, e, n })
+    }
   }
 
   render() {
+
+    if (this.props.devices == undefined) {
+      return null
+    }
+
     var pagesNum = Math.ceil(this.props.devices.length / this.props.max);
 
-    
+
     //if (pagesNum < this.state.activePage) { this.setState({activePage : 1 })}
-    
-    
-    
 
     var pages = [];
-    for (var a = 1; a <= pagesNum; a++) { 
-      pages.push({text:a, active: (this.state.activePage == a) }); 
+    for (var a = 1; a <= pagesNum; a++) {
+      pages.push({ text: a, active: (this.state.activePage == a) });
     }
 
 
     if (this.props.devices.length == 0) {
       return (
-        <div className="row " style={{opacity:0.5}}>
+        <div className="row " style={{ opacity: 0.5 }}>
           <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
-              <div className="commanderBgPanel" style={{ margin: 0}}>
-                <center>No devices to display.</center>
-              </div>            
-          </div>          
+            <div className="commanderBgPanel" style={{ margin: 0 }}>
+              <center>No devices to display.</center>
+            </div>
+          </div>
         </div>
       )
     } else {
@@ -199,142 +108,381 @@ export class DeviceList extends Component {
       var devicelist = _.clone(this.props.devices);
 
       if (this.props.max) {
-        var start = this.props.max * (this.state.activePage-1)
+        var start = this.props.max * (this.state.activePage - 1)
         var end = this.props.max * this.state.activePage
-        devicelist = devicelist.slice(start,end);
+        devicelist = devicelist.slice(start, end);
       }
 
       if (devicelist.length == 0) {
         if (this.state.activePage != 1) {
-          this.setState({activePage : 1})
-        }        
+          this.setState({ activePage: 1 })
+        }
       }
 
-      return ( 
-          <div>
-             { devicelist.map(item => <StatesViewerItem key={item.id} id={item.id} data={item.data} timestamp={item.timestamp} />)  }
-             <div style={{marginLeft:-9}}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
-          </div>
-        )
+      return (
+        <div>
+          {devicelist.map(device => <StatesViewerItem username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
+          <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+        </div>
+      )
     }
   }
 }
 
 export class StatesViewer extends Component {
-  state = { search: "", sort: "" };
+  state = {
+    search: "",
+    sort: "",
+    devicesServer: [],
+    devicesView: [],
+    checkboxstate: "Select All",
+    boxtick: "far fa-check-square",
+    publicButton: "",
+    deleteButton: "",
+    shareButton: "",
+    selectedDevices: [],
+    selectAllState: null,
+    view: "map",
+    devicePressed: undefined,
+    boundary: undefined
+  };
 
-  search = evt => {
-    this.setState({ search: evt.target.value })
+  socket = undefined;
+  busyGettingNewDevice = false;
+
+  constructor(props) {
+    super(props)
+    var un = this.props.username;
+    var acc = this.props.account;
+    var dc = this.state.devicePressed;
+    var ds = this.state.devicesServer;
+    this.props.sendProps({ un, acc, dc, ds });
+
+    this.socket = socketio();
+
+    this.socket.on("connect", a => {
+      console.log("socket connected")
+      //this.loadList();
+      this.socket.emit("join", this.props.username)
+      this.socket.on("info", (info) => {
+        console.log(info);
+        if (info.newdevice) {
+          p.statesByUsername(this.props.username, (states) => {
+            for (var s in states) {
+              states[s].selected = false
+            }
+            this.setState({ devicesServer: states }, () => {
+
+              for (var device in this.state.devicesServer) {
+                this.socket.emit("join", this.state.devicesServer[device].key);
+              }
+
+              if (this.state.search.length < 1) {
+                this.setState({ devicesView: states }, () => {
+                  //this.socketConnectDevices();
+                  //this.sort();
+                })
+              }
+            })
+          })
+        }
+      })
+
+      this.socket.on("post", (packet) => {
+        this.handleDevicePacket(packet)
+      })
+
+      this.socket.on('boundary', (packet) => {
+        this.handleDevicePacket(packet)
+      })
+    });
+
+    p.statesByUsername(this.props.username, (states) => {
+      for (var s in states) {
+        states[s].selected = false
+      }
+      this.setState({ devicesServer: states }, () => {
+
+        for (var device in this.state.devicesServer) {
+          this.socket.emit("join", this.state.devicesServer[device].key);
+        }
+
+        this.setState({ devicesView: states }, () => {
+          //this.socketConnectDevices();
+          //this.sort();
+        })
+      })
+    })
   }
 
-  sort = property => {
-    return (evt) => {
-      console.log(property);
+  getNewDevice = () => {
+    if (this.busyGettingNewDevice == true) {
+      console.log("already busy.. please wait")
+    } else {
+      console.log("getting new device(s)")
+      p.statesByUsername(this.props.username, (states) => {
+        console.log(states);
+      });
+    }
+  }
+  // componentWillMount = () => {
+  //   var un = this.props.username;
+  //   var acc = this.props.account;
+  //   var dc = this.state.devicePressed;
+  //   var ds = this.state.devicesServer;
+  //   this.props.sendProps({un, acc, dc, ds});
+  // }
 
-      if (this.state.sort == "") {
-        this.setState({sort:"timedesc"});
-        return;
-      }
+  componentWillUnmount = () => {
+    this.socket.disconnect();
+  }
 
-      if (this.state.sort == "timedesc") {
-        this.setState({sort:"namedesc"});
-        return;
-      }
-      
-      if (this.state.sort == "namedesc") {
-        this.setState({sort:""});
-        return;
-      }
+  componentDidUpdate = () => {
+    var un = this.props.username;
+    var acc = this.props.account;
+    var dc = this.state.devicePressed;
+    var ds = this.state.devicesServer;
+    this.props.sendProps({ un, acc, dc, ds })
+  }
 
+  handleDevicePacket = (packet) => {
+    var devices = _.clone(this.state.devicesServer)
+    var found = 0;
+    for (var dev in devices) {
+      if (devices[dev].devid == packet.id) {
+        found = 1;
+        devices[dev]["_last_seen"] = packet.timestamp;
+        devices[dev].payload = _.merge(devices[dev].payload, packet)
+      } else if (devices[dev].devid == packet.devid) {
+        if (packet.boundaryLayer != undefined) {
+          found = 1;
+          devices[dev]["_last_seen"] = packet.payload.timestamp;
+          devices[dev].boundaryLayer = packet.boundaryLayer;
+        } else {
+          found = 1;
+          devices[dev]["_last_seen"] = packet.payload.timestamp;
+          packet.selectedIcon = true;
+          devices[dev] = _.merge(devices[dev].boundaryLayer, packet);
+        }
+      }
+    }
+
+    if (found == 0) {
+      // new device?
+      // this.loadList()
+      console.log("recieved data for device not on our list yet.")
+    } else {
+      // update
+      if (this.state.search.length > 0) {
+        this.setState({ devicesServer: devices })
+      } else {
+        this.setState({ devicesServer: devices })
+        this.setState({ devicesView: devices }, () => {
+          // this.sort()
+        })
+      }
     }
   }
 
-  sortButtons = () => {
-    if (this.state.sort == "") { return <FontAwesomeIcon icon="sort-amount-down" /> } 
-    if (this.state.sort == "timedesc") { return <FontAwesomeIcon icon="sort-numeric-down" /> }    
-    if (this.state.sort == "namedesc") { return <FontAwesomeIcon icon="sort-alpha-down" /> }    
+  // updateDeviceList = () => {
+  //   var loadList = _.clone(this.state.devicesView);
+
+  //   this.setState({ devicesServer: loadList })
+  //   this.setState({ devicesView: loadList }, () => {
+  //     this.sort()
+  //   })    
+
+  // }
+
+  search = evt => {
+    this.setState({ search: evt.target.value.toString() }, () => {
+      var newDeviceList = []
+      //filter
+      for (var device of this.state.devicesServer) {
+        if (this.state.search.length > 0) {
+          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+            newDeviceList.push(device)
+          }
+        } else {
+          newDeviceList.push(device)
+        }
+      }
+      //end filter
+      this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+    })
+  }
+
+  sort = (sorttype) => {
+    var value;
+    if (sorttype != undefined) {
+      value = sorttype;
+      this.setState({ sort: value })
+    } else {
+      value = this.state.sort;
+    }
+
+    var newDeviceList = _.clone(this.state.devicesView)
+
+    if (value == "timedesc") {
+      newDeviceList.sort((a, b) => {
+        if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
+          return 1
+        } else {
+          return -1
+        }
+      }).reverse();
+    }
+
+    if (value == "namedesc") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      })
+    }
+
+    if (value == "") {
+      newDeviceList.sort((a, b) => {
+        if (new Date(a["_created_on"]) > new Date(b["_created_on"])) {
+          return 1
+        } else {
+          return -1
+        }
+      }).reverse();
+    }
+
+    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+
+  }
+
+  selectCountUpdate = () => {
+    var selectCount = 0;
+    for (var dev in this.state.devicesView) {
+      if (this.state.devicesView[dev].selected) {
+        selectCount++;
+      }
+    }
+    this.setState({ selectCount: selectCount })
+  }
+
+  selectAll = (value) => {
+    var newDeviceList = _.clone(this.state.devicesView)
+
+    if (value == true) {
+      for (var dev in newDeviceList) {
+        newDeviceList[dev].selected = true;
+        this.state.selectedDevices.push(newDeviceList[dev].devid);
+      }
+      this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+      this.setState({ selectAllState: true });
+    }
+    if (value == false) {
+
+      for (var dev in newDeviceList) {
+        newDeviceList[dev].selected = false;
+        this.state.selectedDevices.pop(newDeviceList[dev].devid);
+      }
+      this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
+      this.setState({ selectAllState: false });
+    }
+  }
+
+  handleActionCall = (clickdata) => {
+    var newDeviceList = _.clone(this.state.devicesView)
+
+    for (var dev in newDeviceList) {
+      if (newDeviceList[dev].devid == clickdata.a) {
+        if (clickdata.e == "deselect") {
+          if (this.state.selectAllState === true) {
+            this.setState({ selectAllState: false });
+          }
+          newDeviceList[dev].selected = false;
+        }
+        if (clickdata.e == "select") {
+          newDeviceList[dev].selected = true;
+        }
+      }
+    }
+    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
+  }
+
+  deviceClicked = (device) => {
+    var newDeviceList = _.clone(this.state.devicesView)
+
+    for (var devices in newDeviceList) {
+      if (newDeviceList[devices].selectedIcon == true) {
+        newDeviceList[devices].selectedIcon = false;
+      }
+    }
+
+    for (var dev in newDeviceList) {
+      if (newDeviceList[dev].devid == device.e.devid) {
+        if (!device.n) {
+          newDeviceList[dev].selectedIcon = false;
+        } else if (device.n && newDeviceList[dev].payload.data.boundary == undefined) {
+          newDeviceList[dev].selectedIcon = true;
+        } else if (device.n && newDeviceList[dev].payload.data.boundary != undefined) {
+          newDeviceList[dev].selectedIcon = true;
+          device.n = false;
+        }
+      }
+    }
+    this.setState({ devicesView: newDeviceList });
+    this.setState({ devicePressed: device.device });
+    this.setState({ boundary: device.n });
+  }
+
+  deleteSelectedDevices = () => {
+    var devicesToDelete = this.state.devicesServer.filter((device) => { return device.selected == true; })
+
+    for (var dev in devicesToDelete) {
+      if (devicesToDelete[dev].selected === true) {
+        fetch("/api/v3/state/delete", {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ id: devicesToDelete[dev].devid })
+        }).then(response => response.json()).then(serverresponse => {
+          console.log(serverresponse)
+        }).catch(err => console.error(err.toString()));
+      }
+    }
+
+    // -------------------------------
+    var devicesServerTemp = this.state.devicesServer.filter((device) => { return device.selected == false; })
+    var devicesViewTemp = this.state.devicesView.filter((device) => { return device.selected == false; })
+    this.setState({ devicesView: devicesViewTemp, devicesServer: devicesServerTemp }, this.selectCountUpdate)
+  }
+
+  changeView = (action) => {
+    this.setState({ view: action })
   }
 
   render() {
-    var deviceStates = []
-
-    
-
-      for (var device of this.props.states) {
-        if (this.state.search.length > 0) {
-          if (device.id.includes(this.state.search)) {
-            deviceStates.push(device)
-          }
-        } else {
-          deviceStates.push(device)
-        }
-      } 
-
-    
-
-      if (this.state.sort == "timedesc") {
-        deviceStates.sort( (a,b) => {          
-          if (new Date(a.timestamp) > new Date(b.timestamp)) {
-            return 1 } else {
-              return -1
-            }
-          
-        }).reverse();
-      }
-      if (this.state.sort == "namedesc") {
-        deviceStates.sort( (a,b) => {
-          if (a.id >= b.id ) {
-            return 1 } else { return -1 }
-        })
-      }
-
-      if (this.state.sort == "") {
-        deviceStates.reverse();
-      }
-
-    
-    
-
-    return (
-      <div className="" style={{ paddingTop: 25, margin: 30 }} >
-
-        
-
-        <div className="row">
-          <div className="d-none d-md-block col-md-6" >
-            <form id="search" style={{ textAlign: "left", marginLeft:-8, marginBottom: 10 }}>
-              <input name="query" onChange={this.search} placeholder="filter"  />
-            </form>
+    if (this.state.deleted == true) {
+      return (<div style={{ display: "none" }}></div>);
+    } else {
+      if (this.state.view == "list") {
+        return (
+          <div style={{ paddingTop: 25, margin: 30 }} >
+            {/* <span>username: {this.props.username}</span> */}
+            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} />
           </div>
-
-          <div className="d-none d-md-block col-md-6" style={{ textAlign: "right" }} >
-            <span className="headerClickable" onClick={this.sort("timestamp")}> 
-              { this.sortButtons() }
-            </span>
+        )
+      } else if (this.state.view == "map") {
+        return (
+          <div style={{ paddingTop: 25, margin: 30 }} >
+            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <div className="rowList">
+              <div >
+                <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+              </div>
+              <div style={{ height: "605px" }}>
+                <MapDevices widget={false} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
+              </div>
+            </div>
           </div>
-        </div>
-
-        <DeviceList devices={deviceStates} max={15} />
-
-
-      </div>
-
-    )
-    // } else {
-    //   return (
-    //     <div className="container" style={{ paddingTop: 25 }} >
-    //       <div className="row">            
-    //         <div className="col-sm-12"> 
-    //           <form id="search" style={{ paddingBottom: 10 , textAlign: "right" }}>
-    //             Search <input name="query" onChange={this.search}/>
-    //           </form> 
-    //         </div>
-    //         <div className="col-sm-12" style={{ textAlign: "center"}}> 
-    //           <div>No devices yet.</div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   )
-    // }
+        )
+      }
+    }
   }
 }

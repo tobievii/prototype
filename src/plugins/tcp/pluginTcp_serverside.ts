@@ -4,19 +4,19 @@ import * as events from "events";
 export var serversMem: any = {};
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
-  console.log("init tcp plugin");
+
 
   app.get("/api/v3/tcp/ports", (req: any, res: any) => {
 
-    db.plugins_tcp.find({}, (err:Error, ports:any)=>{
+    db.plugins_tcp.find({}, (err: Error, ports: any) => {
       if (err) { res.json(err); return; }
       res.json(ports);
     });
 
     // getports(db, (err: Error, ports: any) => {
-      
+
     //   if (err) res.json({ err: err.toString() });
-      
+
     //   var cleanports:any = []
     //   for (var p in ports) {
     //     //delete ports[p].apikey
@@ -27,14 +27,14 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     //       ports[p].apikey = false
     //     } 
     //     // cleanports
-        
+
     //   }      
 
     //   res.json(ports);
     // });
   });
 
-  app.post("/api/v3/tcp/setapikey", (req:any, res:any)=>{
+  app.post("/api/v3/tcp/setapikey", (req: any, res: any) => {
     console.log("--..")
     console.log(req.body);
 
@@ -42,7 +42,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
       { portNum: req.body.portNum },
       { $set: { apikey: req.user.apikey } },
       (err: Error, resultUpd: any) => {
-        if (err) { res.json( err )}
+        if (err) { res.json(err) }
         if (resultUpd) {
           res.json(resultUpd)
         }
@@ -68,7 +68,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
         connectport(db, port, eventHub, (err: any, result: any) => {
           res.json(result);
         });
-        
+
       }
     });
   });
@@ -88,7 +88,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   getports(db, (err: Error, ports: any) => {
     if (ports) {
       for (var p in ports) {
-        connectport(db, ports[p], eventHub, (err: any, result: any) => {});
+        connectport(db, ports[p], eventHub, (err: any, result: any) => { });
       }
     }
   });
@@ -129,42 +129,43 @@ export function connectport(db: any, portOptions: any, eventHub: any, cb: any) {
   console.log("TCP Server " + portOptions.portNum + " \t| loading...");
 
   var server = net.createServer((client: any) => {
-    server.getConnections(function(err: Error, count: number) {
+    server.getConnections(function (err: Error, count: number) {
       console.log("There are %d connections now. ", count);
       updateport(
         db,
         portOptions.portNum,
         { connections: count },
-        (err: Error, result: any) => {}
+        (err: Error, result: any) => { }
       );
       eventHub.emit("plugin", { plugin: "tcp", event: "connections" });
     });
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     client.on("data", (data: any) => {
-      console.log(data);
+      //console.log(data);
       eventHub.emit("device", {
         //apikey: config.apikey,
         apikey: portOptions.apikey,
         packet: {
-          id: "tcpPort"+portOptions.portNum,
+          id: "tcpPort" + portOptions.portNum,
           level: 1,
-          data: { text: data.toString().replace("\r\n","")},
+          data: { text: data.toString().replace("\r\n", "") },
           tcp: { hexBuffer: data.toString("hex"), },
           portOptions,
           meta: { method: "tcp" }
-        }});
+        }
+      });
     });
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     client.on("end", () => {
       // Get current connections count.
-      server.getConnections(function(err: Error, count: number) {
+      server.getConnections(function (err: Error, count: number) {
         console.log("There are %d connections now. ", count);
         updateport(
           db,
           portOptions.portNum,
           { connections: count },
-          (err: Error, result: any) => {}
+          (err: Error, result: any) => { }
         );
       });
       eventHub.emit("plugin", { plugin: "tcp", event: "connections" });
@@ -177,11 +178,11 @@ export function connectport(db: any, portOptions: any, eventHub: any, cb: any) {
     cb(undefined, portOptions);
   });
 
-  server.on("close", function() {
+  server.on("close", function () {
     console.log("TCP server socket is closed.");
   });
 
-  server.on("error", function(error: Error) {
+  server.on("error", function (error: Error) {
     console.error(JSON.stringify(error));
   });
 

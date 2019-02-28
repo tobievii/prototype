@@ -1,15 +1,18 @@
 import * as fs from 'fs';
 
+import { log } from "./utils"
 
-export var version = { 
-    "version": "5.0.31", 
-    "description": "prototype" 
+export var version = {
+    "version": "5.0.35",
+    "description": "prototype"
 }
 
-export var configGen : any = () => {
+log("VERSION\t" + version.version)
+
+export var configGen: any = () => {
 
     try {
-        var mainconfig = JSON.parse( fs.readFileSync('../../../iotconfig.json').toString() );
+        var mainconfig = JSON.parse(fs.readFileSync('../../../iotconfig.json').toString());
         mainconfig.version = version
         mainconfig.mongoCollections = ['packets', 'users', 'states']
 
@@ -19,21 +22,21 @@ export var configGen : any = () => {
             if (mainconfig.sslOptions.caPath) {
                 mainconfig.sslOptions.ca = fs.readFileSync(mainconfig.sslOptions.caPath)
             }
-            
+
         }
 
         return mainconfig
-    } catch(err) {
-        console.log("MAIN CONFIG MISSING. USING DEFAULTS")
+    } catch (err) {
+        log("CONFIG \tFile not found. Using defaults. See /src/config.ts for details.")
         //DEFAULTS
         var defaultconfig = {
             "ssl": false,
             "httpPort": 8080,
             "mongoConnection": "prototype",
-            "iotnxtV3Queue" : {
-                "gateways" : []
+            "iotnxtV3Queue": {
+                "gateways": []
             },
-            version : version
+            version: version
         }
         return defaultconfig
     }

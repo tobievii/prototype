@@ -12,11 +12,20 @@ module.exports = options => {
       extensions: [".ts", ".tsx", ".js"]
     },
     watchOptions: {
-      poll: true
+      poll: false,
+      ignored: ["node_modules", "build"]
     },
     plugins: [ new MonacoWebpackPlugin()],
     module: {
       rules: [
+        {
+          test: /\.scss$/,
+          use: [
+              "style-loader", // creates style nodes from JS strings
+              "css-loader", // translates CSS into CommonJS
+              "sass-loader" // compiles Sass to CSS, using Node Sass by default
+          ]
+      },
         { test: /\.tsx?$/, loader: "ts-loader" },
         {
           test: /.js$/,

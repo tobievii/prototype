@@ -73,7 +73,7 @@ export class IotnxtQueue extends events.EventEmitter {
           this.emit('error', err);          
         }
         if (secret) {
-          this.connectRedQ((err:Error,result:any)=>{
+          this.connectRedQ((err:Error,result:any)=>{            
             if (err) console.log(err);
             if (result) {
               this.register((err:Error, result:any)=>{
@@ -161,7 +161,7 @@ export class IotnxtQueue extends events.EventEmitter {
               ReplyKey: replyKey.toUpperCase()
           }
 
-          console.log(wrappedMessage)
+          //console.log(wrappedMessage)
 
           mqttGreen.publish("MESSAGEAUTHREQUEST", JSON.stringify(wrappedMessage), { qos: 1 }, function (err: any) {
               if (err) { console.error("publisherror:" + err) }
@@ -188,6 +188,7 @@ export class IotnxtQueue extends events.EventEmitter {
           this.secret = secret;
           cb(undefined, secret);
         } else {
+          console.log(secret)
           if (secret.ErrorMsg) {
             cb(secret.ErrorMsg.split('\n')[0], undefined);
           } else {
@@ -327,7 +328,7 @@ export class IotnxtQueue extends events.EventEmitter {
     packet.fromUtc = fromUtc.toISOString();
     packet.sourceMessageID = getGUID();
 
-    console.log(packet);
+    //console.log(packet);
 
     var textBuffer = Buffer.from(JSON.stringify(packet));
 
@@ -344,7 +345,7 @@ export class IotnxtQueue extends events.EventEmitter {
     try {
 
         var routingkey = this.secret.RoutingKeyBase + ".NFY"
-        console.log(routingkey)
+        //console.log(routingkey)
         this.mqttRed.publish(routingkey, JSON.stringify(wrappedMessage), { qos: 0 }, function (err:Error) {
 
             if (err) { 

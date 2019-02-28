@@ -1,5 +1,8 @@
 # Prototype
 
+Live: https://prototype.iotnxt.io
+Discord: https://discord.gg/rTQmvbT
+
 IoT framework for general purpose remote monitoring/control.   
 Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://webpack.js.org/),[react](https://reactjs.org/), [mongoDB](https://www.mongodb.com/), [express](https://expressjs.com/) and [socket.io](https://socket.io/).
 
@@ -12,6 +15,80 @@ Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://web
 - Fast mongodb for the data.
 - Extendable plugin architecture.
 - Edit code in the browser using the VSCode editor with intellisense autocompletion and deploy custom code instantly.
+
+# Roadmap
+
+Preliminary roadmap for future development:
+
+## Planning (Continuous)
+
+* User Stories - Discuss/plan various use cases. Find similarities and often used functionality to focus on by streamlining and polishing user experience.
+
+* Market research - Request feedback from current users on their experience, feature wishlist and use cases.
+
+* UI design mockups - Wireframe + photoshop mockups of user interface. Must be minimalist, minimal viable product design that is powerful and revolutionary for managing and extracting value from data streams.
+
+## Phase 1 (Proof of concept) - 100% Done
+
+This was the stealth phase. It has been built and is being used on a daily basis by multiple parties.
+
+* Users can register. (Landing page, registration, email verification)
+* Users can add (any*) device, (Documentation)
+* Devices can send data in various protocols/formats. (HTTP/SOCKETIO/MQTT/TELTONIKA etc..)
+* Devices can be linked to IoTnxt platform. (IoTnxt gateway management, bidirectional)
+* Platform can emit commands to devices. (From commander to device)
+* Users can reprogram how the platform handles and propagates data. (Workflow/processing functionality)
+
+
+## Phase 2 (Foundation) - 5% - In progress 
+
+During this phase we focus on building the foundation strong and elegantly.
+With our end goals in sight there will be basic functionality or structure we'd need to refine to be able to build the functionality we plan to meet.
+
+* Dashboard - Basic widgets for viewing historical data. As well as the api/db calls needed to make this happen.
+
+      * Calendar (100% done)
+      * Line graphs (20% in progress)
+      * Dials
+
+* 3D capability - Built to handle current and future demand on spacial awareness. (Factory/Space/City) This includes VR interface to view data as well as set up areas for triggers.   
+
+      * 3D Widget (35% done)
+      * VR compatible   
+      * Vector math functions in workflows
+      * 3D area triggers   
+      * Documentation for the workflow/processing editor   
+
+* Social - Here we will focus on the social aspects of IoT. Sharing of devices, security and permissions, groups and ease of use. We need to make it possible to copy paste a URL, and the new user would be able to simply click the link and directly gain the value of the information shared. This could be a local weather station device, traffic camera, parking sensor and so on. From here it should be as simple as possible to link this data to a third party service (api), website (embed snippet)  and so on.
+
+      * Extend API documentation/
+      * Develop tutorial content
+      * Embeddable snippet of html
+
+* Branding/Themeing (white labeling) - Simplification of the stylesheets, with some basic white label theme as default. This will enable partners to easily/quickly modify prototype and enable them to resell to their customers/industry.
+
+      * Colour/logo variables at the top of the scss stylesheet
+      * Simplification/optimization of style classes
+      * Cleanup of hardcoded react html code 
+
+* Streamling adding devices - Prototype/develop some IoT devices that are SUPER easy to add to the platform.
+
+      * ESP32 + LDR light sensor. Software flashes a block of pixels to transfer connection information.
+      * Arduino temperature sensor.
+      * Embeddable snippet for monitoring your website.
+
+## Phase 3 (Expansion)
+
+* Mission critical dashboards - Harden the system to survive severe data spikes or timeouts. Maintain uptime and handle high datarates.
+
+* Mobile - Fix all mobile usage issues for chrome browser. 
+Investigate possibility of converting React app to apple/android app.
+
+* High datarate streams -  Video/audio/telemetry or even realtime robotic control. Enable the system to handle raw video/audio and telemetry data streams. Perform cloud machine vision, backup and retrieval. Another use case would be highdata rate vehicle telemetry like racecars, aerospace and drones.
+
+* Integrations - At this stage we should have a large amount of devices/individuals/companies using the platform. We need to enable deep integration between these and develop the components that are missing. Integrations from home assistant and other IoT platforms can enable rapid growth and increased capability.
+
+
 
 ## Screenshots
 
@@ -50,6 +127,9 @@ cd prototype
 # install node_modules for server side
 npm install
 
+# if you're installing on Windows, you'll need to install webpack dependencies
+npm install webpack-dev-server
+
 # build automatically on server file changes for development
 npm run buildwatch
 
@@ -77,8 +157,6 @@ Go to [http://localhost:8080/](http://localhost:8080/) and log in with the defau
 To get started we recommend using the HTTP REST api at first. After you've logged into your account using the web interface you will find your api key and pregenerated HTTP Authorization headers at the bottom of the screen:
 
 ![webapi example](https://i.imgur.com/n86DoeL.png)
-
-
 
 GET [http://localhost:8080/api/v3/version](http://localhost:8080/api/v3/version)
 
@@ -333,3 +411,35 @@ The serialports plugin enables autodetection of arduino or similar serialport de
 
 **26 Oct 2018 Fri at 19:41 SAST**  
 Rouan van der Ende - Initial public release v5.0.30
+
+# Developers
+
+## Keep your forked repository up-to-date
+
+```sh
+# Add the remote and call it 'upstream'.
+
+git remote add upstream https://github.com/IoT-prototype/prototype.git
+
+# Fetch all the branches of that remote into remote-tracking branches
+
+git fetch upstream
+
+# Merge upstream changes in to your downstream repository.
+
+git merge upstream/master
+
+# Create a new branch of where you want to work. or use the exsisting Dev branch.
+
+git checkout -b 'branch_name' # Without the single quotes
+
+# Perform your work locally using standard local repo workflow.
+
+# Then push your changes in to your Downstream remote repository.
+
+git push origin branch_name
+
+# Repeat above steps whenever you need to update your repository with the work that has occurred upstream since the last merge was performed.
+
+```
+[https://medium.com/sweetmeat/how-to-keep-a-downstream-git-repository-current-with-upstream-repository-changes-10b76fad6d97](https://medium.com/sweetmeat/how-to-keep-a-downstream-git-repository-current-with-upstream-repository-changes-10b76fad6d97)
