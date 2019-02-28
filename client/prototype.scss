@@ -860,51 +860,33 @@ input[type="checkbox"]:checked {
 
 .newNotificationItem {
   position: relative;
-  color: #8ffc8c;
+  color: #6feaab;
   box-sizing: border-box;
-  background: linear-gradient(rgba(204, 255, 191, 0.3), rgba(22, 37, 57, 0.9));
-  border-left: 5px solid rgba(0, 255, 21, 0.9);
+  background: linear-gradient(rgba(24, 47, 53, 0.9), rgba(24, 47, 53, 0.9));
+  border-left: 5px solid rgba(111, 234, 171, 0.9);
   border-top: 1px solid rgba(0, 0, 0, 0.9);
   border-bottom: 1px solid rgba(0, 0, 0, 0.9);
   border-right: 2px solid rgba(0, 0, 0, 0.9);
   box-sizing: border-box;
   opacity: 0.9;
-  padding-top: 16px;
+  padding-top: 5px;
   padding-left: 6px;
   padding-bottom: 16px;
   padding-right: 6px;
 }
 
-.newdevice{
-  font-size: 20px;
-  position: relative;
-  left: 2%;
-}
-
-.devicename{
-  color: white;
-}
-
-.lastseen{
-  font-size: 11px;
-  color: rgba(225,255,225,0.7);
-  position: absolute;
-  left: 72%;
-  top: 30%;
-}
-
 .warningNotificationItem {
   position: relative;
-  color: #d2df23;
+  color: #ffc72d;
   box-sizing: border-box;
-  background: linear-gradient(rgba(189, 151, 26, 0.3), rgba(22, 37, 57, 0.9));
-  border-left: 5px solid rgba(255, 251, 0, 0.9);
+  background: linear-gradient(rgba(36, 42, 42, 0.9), rgba(36, 42, 42, 0.9));
+  border-left: 5px solid rgba(255, 199, 45, 0.9);
   border-top: 1px solid rgba(0, 0, 0, 0.9);
   border-bottom: 1px solid rgba(0, 0, 0, 0.9);
   border-right: 2px solid rgba(0, 0, 0, 0.9);
   box-sizing: border-box;
   opacity: 0.9;
-  padding-top: 16px;
+  padding-top: 5px;
   padding-left: 6px;
   padding-bottom: 16px;
   padding-right: 6px;
@@ -912,19 +894,40 @@ input[type="checkbox"]:checked {
 
 .alarmNotificationItem {
   position: relative;
-  color: #ff4141;
+  color: #f62636;
   box-sizing: border-box;
-  background: linear-gradient(rgba(255, 18, 18, 0.3), rgba(22, 37, 57, 0.9));
-  border-left: 5px solid rgba(255, 0, 0, 0.9);
-  border-top: 1px solid rgba(0, 0, 0, 0);
-  border-bottom: 1px solid rgba(0, 0, 0, 0);
-  border-right: 2px solid rgba(0, 0, 0, 0);
+  background: linear-gradient(rgba(33, 30, 41, 0.9), rgba(33, 30, 41, 0.9));
+  border-left: 5px solid rgba(246, 38, 54, 0.9);
+  border-top: 1px solid rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.9);
+  border-right: 2px solid rgba(0, 0, 0, 0.9);
   box-sizing: border-box;
   opacity: 0.9;
-  padding-top: 16px;
+  padding-top: 5px;
   padding-left: 6px;
   padding-bottom: 16px;
   padding-right: 6px;
+}
+
+.newdevice{
+  font-size: 14px;
+  position: relative;
+  left: 2%;
+}
+
+.devicename{
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: 49%;
+}
+
+.lastseen{
+  font-size: 11px;
+  color: rgba(225,255,225,0.7);
+  position: absolute;
+  left: 80%;
+  top: 12.5%;
 }
 
 // .notificationItem::after {
