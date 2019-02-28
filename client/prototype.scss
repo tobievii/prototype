@@ -764,12 +764,6 @@ input[type="checkbox"]:checked {
   opacity: 0.75;
 }
 
-.widgetMenu {
-  background: rgb(20, 35, 45);
-  border: 1px solid rgb(37, 52, 66);
-}
-
-
 .widgetMenuItem {
   padding: 5px;
   cursor: pointer;
@@ -846,13 +840,13 @@ input[type="checkbox"]:checked {
 
 .newNotificationItem {
   position: relative;
-  color: #e1e1e1;
+  color: #8ffc8c;
   box-sizing: border-box;
-  background: linear-gradient(rgba(34, 160, 3, 0.5), rgba(2, 3, 4, 0.5));
-  border-left: 2px solid rgba(0, 0, 0, 0);
-  border-top: 1px solid rgba(0, 0, 0, 0);
-  border-bottom: 1px solid rgba(0, 0, 0, 0);
-  border-right: 2px solid rgba(0, 0, 0, 0);
+  background: linear-gradient(rgba(204, 255, 191, 0.3), rgba(22, 37, 57, 0.9));
+  border-left: 5px solid rgba(0, 255, 21, 0.9);
+  border-top: 1px solid rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.9);
+  border-right: 2px solid rgba(0, 0, 0, 0.9);
   box-sizing: border-box;
   opacity: 0.9;
   padding-top: 16px;
@@ -861,15 +855,33 @@ input[type="checkbox"]:checked {
   padding-right: 6px;
 }
 
+.newdevice{
+  font-size: 20px;
+  position: relative;
+  left: 2%;
+}
+
+.devicename{
+  color: white;
+}
+
+.lastseen{
+  font-size: 11px;
+  color: rgba(225,255,225,0.7);
+  position: absolute;
+  left: 72%;
+  top: 30%;
+}
+
 .warningNotificationItem {
   position: relative;
-  color: #e1e1e1;
+  color: #d2df23;
   box-sizing: border-box;
-  background: linear-gradient(rgba(189, 151, 26, 0.5), rgba(2, 3, 4, 0.5));
-  border-left: 2px solid rgba(0, 0, 0, 0);
-  border-top: 1px solid rgba(0, 0, 0, 0);
-  border-bottom: 1px solid rgba(0, 0, 0, 0);
-  border-right: 2px solid rgba(0, 0, 0, 0);
+  background: linear-gradient(rgba(189, 151, 26, 0.3), rgba(22, 37, 57, 0.9));
+  border-left: 5px solid rgba(255, 251, 0, 0.9);
+  border-top: 1px solid rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.9);
+  border-right: 2px solid rgba(0, 0, 0, 0.9);
   box-sizing: border-box;
   opacity: 0.9;
   padding-top: 16px;
@@ -880,10 +892,10 @@ input[type="checkbox"]:checked {
 
 .alarmNotificationItem {
   position: relative;
-  color: #e1e1e1;
+  color: #ff4141;
   box-sizing: border-box;
-  background: linear-gradient(rgba(221, 30, 30, 0.5), rgba(2, 3, 4, 0.5));
-  border-left: 2px solid rgba(0, 0, 0, 0);
+  background: linear-gradient(rgba(255, 18, 18, 0.3), rgba(22, 37, 57, 0.9));
+  border-left: 5px solid rgba(255, 0, 0, 0.9);
   border-top: 1px solid rgba(0, 0, 0, 0);
   border-bottom: 1px solid rgba(0, 0, 0, 0);
   border-right: 2px solid rgba(0, 0, 0, 0);
@@ -1022,6 +1034,7 @@ input[type="checkbox"]:checked {
 .map {
   width: 100%;
   height: 100%;
+  z-index: 0;
 }
 
 .popup {
@@ -1049,49 +1062,4 @@ input[type="checkbox"]:checked {
 
 .nivo_calendar_month_legend {
   color: "#fff"
-}
-
-
-.deviceViewContainer {
-  background: rgb(20, 34, 44);
-}
-
-.deviceViewBlock {
-  background: rgb(16, 23, 32);
-}
-
-.deviceViewButton {
-  padding: 5px 10px 5px 10px;
-  color: rgb(135, 144, 153);
-  
-  cursor: pointer;
-  transition: color 0.2s linear;
-}
-
-.deviceViewButton:hover {
-  background: rgba(255,255,255,0.025);
-  color: rgb(200,200,200);
-  transition: color 0.2s linear;
-}
-
-.deviceViewButtonAlert {
-  color: $spot;
-}
-
-.deviceViewButtonAlert:hover {
-  color: $spot;
-}
-
-.deviceViewTitle {
-  color: rgb(135, 144, 153);
-  padding: 5px 0px 5px 10px;
-  float: left;
-}
-
-.isResizable { 
-  overflow: hidden;
-  resize: vertical;
-  height: 400px;
-  min-height: 250px;
-  max-height: 1500px;
 }
