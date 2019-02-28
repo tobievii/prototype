@@ -259,10 +259,37 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
 app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
+  var resolved = false;
+
+  // find history by key
+  if (req.body.key) {
+    resolved = true;
+    console.log("key!")
+    db.states.findOne({ key: req.body.key }, (e: Error, device: any) => {
+      if (req.body.datapath) {
+        var query: any = { apikey: device.apikey, devid: device.devid }
+        query["payload." + req.body.datapath] = { $exists: true }
+        var result: any = []
+        db.packets.find(query, (packetError: Error, packets: any) => {
+          for (var p of packets) {
+            var clean: any = {}
+            //clean[req.body.datapath] = _.get(p, "payload." + req.body.datapath, "notfound");
+            //clean["_created_on"] = p["_created_on"]
+            clean["x"] = p["_created_on"]
+            clean["y"] = _.get(p, "payload." + req.body.datapath, "notfound");
+            result.push(clean)
+          }
+          res.json(result);
+        })
+      }
+    })
+  }
+
+  ////////////////////////////////
   var limit = 25;
   if (req.body.limit) { limit = req.body.limit }
-
   if (req.body.id) {
+    resolved = true;
     db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
@@ -275,8 +302,11 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
       }
       res.json(packets);
     })
-  } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+  }
+
+
+  if (resolved == false) {
+    res.json({ error: "We require either an id or device key for this query" })
   }
 });
 

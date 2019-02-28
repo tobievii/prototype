@@ -7,7 +7,7 @@ import "react-resizable/css/styles.css"
 
 
 import { Calendar } from "./nivo_calendar.jsx"
-import { Line } from "./nivo_line.jsx"
+import { NivoLine } from "./nivo_line.jsx"
 
 import * as _ from "lodash"
 
@@ -18,6 +18,8 @@ import { Widget } from "./widget.jsx"
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
 import { MapDevices } from "../map.jsx"
+
+import { ChartLine } from "./chart_line.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -234,39 +236,31 @@ export class Dashboard extends React.Component {
   // Depending on type prop of widget, this returns correct React component
   widgetType = (data) => {
     if (data.type == "Calendar") {
-      return (
-        <Calendar state={this.props.state} />
-      )
+      return (<Calendar state={this.props.state} />)
     }
 
-    if (data.type == "Line") {
-      return (
-        <Line value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
-      )
+    if (data.type == "NivoLine") {
+      return (<NivoLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+    }
+
+    if (data.type == "ChartLine") {
+      return (<ChartLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "Blank") {
-      return (
-        <div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>
-      )
+      return (<div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>)
     }
 
     if (data.type == "ThreeDWidget") {
-      return (
-        <ThreeDWidget />
-
-      )
+      return (<ThreeDWidget />)
     }
+
     if (data.type == "Gauge") {
-      return (
-        <ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
-      )
+      return (<ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
     }
     if (data.type == "map") {
       { this.showMap() }
-      return (
-        <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
-      )
+      return (<MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />)
     }
   }
 

@@ -6,253 +6,43 @@ import protoGraphTheme from './theme.jsx'
 import { ResponsiveLine } from '@nivo/line'
 //import "./index.scss"
 
-export class Line extends React.Component {
+export class NivoLine extends React.Component {
   state = {}
 
+  componentDidMount() {
+    if (this.props.state) {
+      if (this.props.state.key) {
 
-
-
-  render() {
-
-    var linedata = [
-      {
-        "id": "japan",
-        "color": "hsl(198, 70%, 50%)",
-        "data": [
-          {
-            "x": "plane",
-            "y": 181
-          },
-          {
-            "x": "helicopter",
-            "y": 262
-          },
-          {
-            "x": "boat",
-            "y": 112
-          },
-          {
-            "x": "train",
-            "y": 289
-          },
-          {
-            "x": "subway",
-            "y": 195
-          },
-          {
-            "x": "bus",
-            "y": 6
-          },
-          {
-            "x": "car",
-            "y": 75
-          },
-          {
-            "x": "moto",
-            "y": 121
-          },
-          {
-            "x": "bicycle",
-            "y": 29
-          },
-          {
-            "x": "others",
-            "y": 220
-          }
-        ]
-      },
-      {
-        "id": "france",
-        "color": "hsl(332, 70%, 50%)",
-        "data": [
-          {
-            "x": "plane",
-            "y": 140
-          },
-          {
-            "x": "helicopter",
-            "y": 191
-          },
-          {
-            "x": "boat",
-            "y": 175
-          },
-          {
-            "x": "train",
-            "y": 98
-          },
-          {
-            "x": "subway",
-            "y": 176
-          },
-          {
-            "x": "bus",
-            "y": 97
-          },
-          {
-            "x": "car",
-            "y": 181
-          },
-          {
-            "x": "moto",
-            "y": 171
-          },
-          {
-            "x": "bicycle",
-            "y": 145
-          },
-          {
-            "x": "others",
-            "y": 62
-          }
-        ]
-      },
-      {
-        "id": "us",
-        "color": "hsl(280, 70%, 50%)",
-        "data": [
-          {
-            "x": "plane",
-            "y": 146
-          },
-          {
-            "x": "helicopter",
-            "y": 212
-          },
-          {
-            "x": "boat",
-            "y": 217
-          },
-          {
-            "x": "train",
-            "y": 190
-          },
-          {
-            "x": "subway",
-            "y": 223
-          },
-          {
-            "x": "bus",
-            "y": 131
-          },
-          {
-            "x": "car",
-            "y": 67
-          },
-          {
-            "x": "moto",
-            "y": 47
-          },
-          {
-            "x": "bicycle",
-            "y": 236
-          },
-          {
-            "x": "others",
-            "y": 80
-          }
-        ]
-      },
-      {
-        "id": "germany",
-        "color": "hsl(160, 70%, 50%)",
-        "data": [
-          {
-            "x": "plane",
-            "y": 160
-          },
-          {
-            "x": "helicopter",
-            "y": 288
-          },
-          {
-            "x": "boat",
-            "y": 77
-          },
-          {
-            "x": "train",
-            "y": 214
-          },
-          {
-            "x": "subway",
-            "y": 7
-          },
-          {
-            "x": "bus",
-            "y": 198
-          },
-          {
-            "x": "car",
-            "y": 203
-          },
-          {
-            "x": "moto",
-            "y": 174
-          },
-          {
-            "x": "bicycle",
-            "y": 235
-          },
-          {
-            "x": "others",
-            "y": 86
-          }
-        ]
-      },
-      {
-        "id": "norway",
-        "color": "hsl(168, 70%, 50%)",
-        "data": [
-          {
-            "x": "plane",
-            "y": 219
-          },
-          {
-            "x": "helicopter",
-            "y": 84
-          },
-          {
-            "x": "boat",
-            "y": 204
-          },
-          {
-            "x": "train",
-            "y": 267
-          },
-          {
-            "x": "subway",
-            "y": 178
-          },
-          {
-            "x": "bus",
-            "y": 246
-          },
-          {
-            "x": "car",
-            "y": 299
-          },
-          {
-            "x": "moto",
-            "y": 268
-          },
-          {
-            "x": "bicycle",
-            "y": 99
-          },
-          {
-            "x": "others",
-            "y": 276
-          }
-        ]
+        this.fetchData(this.props.state.key, this.props.datapath)
       }
-    ]
+    }
+  }
+
+  fetchData(key, datapath) {
+    fetch("/api/v3/packets", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ key, datapath })
+    }).then(response => response.json()).then(result => {
+      //console.log(result);
+
+      var linedata = [{
+        id: datapath,
+        color: "rgb(0, 255, 255)",
+        data: result
+      }]
+
+      this.setState({ linedata })
+    }).catch(err => console.error(err.toString()));
+  }
+
+
+  renderLine() {
+
 
 
     return (
-
-
       <ResponsiveLine
-        data={linedata}
+        data={this.state.linedata}
         margin={{
           "top": 35,
           "right": 35,
@@ -295,6 +85,7 @@ export class Line extends React.Component {
         }}
         dotSize={10}
         dotColor="inherit:darker(0.3)"
+        colorBy={function (e) { return e.color }}
         dotBorderWidth={2}
         dotBorderColor="rgba(0,0,0,0)"
         enableDotLabel={true}
@@ -304,9 +95,254 @@ export class Line extends React.Component {
         motionStiffness={90}
         motionDamping={15}
         theme={protoGraphTheme}
-
       />
 
     )
+  }
+
+  render() {
+
+
+    // var linedata = [
+    //   {
+    //     "id": "japan",
+    //     "color": "hsl(198, 70%, 50%)",
+    //     "data": [
+    //       {
+    //         "x": "plane",
+    //         "y": 181
+    //       },
+    //       {
+    //         "x": "helicopter",
+    //         "y": 262
+    //       },
+    //       {
+    //         "x": "boat",
+    //         "y": 112
+    //       },
+    //       {
+    //         "x": "train",
+    //         "y": 289
+    //       },
+    //       {
+    //         "x": "subway",
+    //         "y": 195
+    //       },
+    //       {
+    //         "x": "bus",
+    //         "y": 6
+    //       },
+    //       {
+    //         "x": "car",
+    //         "y": 75
+    //       },
+    //       {
+    //         "x": "moto",
+    //         "y": 121
+    //       },
+    //       {
+    //         "x": "bicycle",
+    //         "y": 29
+    //       },
+    //       {
+    //         "x": "others",
+    //         "y": 220
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "id": "france",
+    //     "color": "hsl(332, 70%, 50%)",
+    //     "data": [
+    //       {
+    //         "x": "plane",
+    //         "y": 140
+    //       },
+    //       {
+    //         "x": "helicopter",
+    //         "y": 191
+    //       },
+    //       {
+    //         "x": "boat",
+    //         "y": 175
+    //       },
+    //       {
+    //         "x": "train",
+    //         "y": 98
+    //       },
+    //       {
+    //         "x": "subway",
+    //         "y": 176
+    //       },
+    //       {
+    //         "x": "bus",
+    //         "y": 97
+    //       },
+    //       {
+    //         "x": "car",
+    //         "y": 181
+    //       },
+    //       {
+    //         "x": "moto",
+    //         "y": 171
+    //       },
+    //       {
+    //         "x": "bicycle",
+    //         "y": 145
+    //       },
+    //       {
+    //         "x": "others",
+    //         "y": 62
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "id": "us",
+    //     "color": "hsl(280, 70%, 50%)",
+    //     "data": [
+    //       {
+    //         "x": "plane",
+    //         "y": 146
+    //       },
+    //       {
+    //         "x": "helicopter",
+    //         "y": 212
+    //       },
+    //       {
+    //         "x": "boat",
+    //         "y": 217
+    //       },
+    //       {
+    //         "x": "train",
+    //         "y": 190
+    //       },
+    //       {
+    //         "x": "subway",
+    //         "y": 223
+    //       },
+    //       {
+    //         "x": "bus",
+    //         "y": 131
+    //       },
+    //       {
+    //         "x": "car",
+    //         "y": 67
+    //       },
+    //       {
+    //         "x": "moto",
+    //         "y": 47
+    //       },
+    //       {
+    //         "x": "bicycle",
+    //         "y": 236
+    //       },
+    //       {
+    //         "x": "others",
+    //         "y": 80
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "id": "germany",
+    //     "color": "hsl(160, 70%, 50%)",
+    //     "data": [
+    //       {
+    //         "x": "plane",
+    //         "y": 160
+    //       },
+    //       {
+    //         "x": "helicopter",
+    //         "y": 288
+    //       },
+    //       {
+    //         "x": "boat",
+    //         "y": 77
+    //       },
+    //       {
+    //         "x": "train",
+    //         "y": 214
+    //       },
+    //       {
+    //         "x": "subway",
+    //         "y": 7
+    //       },
+    //       {
+    //         "x": "bus",
+    //         "y": 198
+    //       },
+    //       {
+    //         "x": "car",
+    //         "y": 203
+    //       },
+    //       {
+    //         "x": "moto",
+    //         "y": 174
+    //       },
+    //       {
+    //         "x": "bicycle",
+    //         "y": 235
+    //       },
+    //       {
+    //         "x": "others",
+    //         "y": 86
+    //       }
+    //     ]
+    //   },
+    //   {
+    //     "id": "norway",
+    //     "color": "hsl(168, 70%, 50%)",
+    //     "data": [
+    //       {
+    //         "x": "plane",
+    //         "y": 219
+    //       },
+    //       {
+    //         "x": "helicopter",
+    //         "y": 84
+    //       },
+    //       {
+    //         "x": "boat",
+    //         "y": 204
+    //       },
+    //       {
+    //         "x": "train",
+    //         "y": 267
+    //       },
+    //       {
+    //         "x": "subway",
+    //         "y": 178
+    //       },
+    //       {
+    //         "x": "bus",
+    //         "y": 246
+    //       },
+    //       {
+    //         "x": "car",
+    //         "y": 299
+    //       },
+    //       {
+    //         "x": "moto",
+    //         "y": 268
+    //       },
+    //       {
+    //         "x": "bicycle",
+    //         "y": 99
+    //       },
+    //       {
+    //         "x": "others",
+    //         "y": 276
+    //       }
+    //     ]
+    //   }
+    // ]
+
+
+    if (this.state.linedata) {
+      return (this.renderLine())
+    } else {
+      return (<div>loading..</div>)
+    }
+
+
   }
 }

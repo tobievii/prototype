@@ -27,8 +27,13 @@ export class Widget extends React.Component {
           this.props.change("type", e.target.value)
         }}>
           <option unselectable="true">select</option>
+          <option>Calendar</option>
+          <option>NivoLine</option>
+          <option>ChartLine</option>
+          <option>Blank</option>
+          <option>ThreeDWidget</option>
           <option>Gauge</option>
-          <option>Line</option>
+          <option>map</option>
         </select></div>
       </div>)
     } else {
