@@ -119,7 +119,7 @@ export class Dashboard extends React.Component {
 
 
   onDrop = (e, f) => {
-
+    e.preventDefault();
     // pixel location
     var droplocation = {
       x: e.pageX - e.target.getBoundingClientRect().x,

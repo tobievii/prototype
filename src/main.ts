@@ -526,7 +526,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
-        log(user)
+        //log(user)
         if (req.body.id) {
           db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
             res.json(state);

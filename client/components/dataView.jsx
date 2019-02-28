@@ -134,6 +134,7 @@ export class DataView extends React.Component {
 
   onDragStart = (e, name, i, data, level, path) => {
 
+    e.dataTransfer.setData('text/plain', 'anything');
 
 
     if (this.dragging == false) {

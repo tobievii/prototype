@@ -302,8 +302,8 @@ export function accountClear(db: any, account: any, cb: any) {
 }
 
 export function accountDelete(db: any, user: any, cb: any) {
-  console.log("USER!")
-  console.log(user);
+  //console.log("USER!")
+  //console.log(user);
   db.users.remove(user, (err: Error, result: any) => {
     if (err) { cb(err, undefined); }
     if (result) { cb(undefined, result); }
