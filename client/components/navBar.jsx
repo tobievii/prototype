@@ -21,30 +21,105 @@ export class Notification extends Component {
 
   newDevice = () => {
 
-    if (this.props.notification.type == "New device Added") {
+    if (this.props.notification.type == "New Device Added") {
+
+    } return this.props.notification.type
+  }
+
+  device = () => {
+    if (this.props.notification.type) {
+      return this.props.notification.device
+    }
+  }
+
+  render() {
+    return (
+
+      <div className="newNotificationItem">
+        <i class="fas fa-exclamation-circle"></i>
+        <span style={{ fontSize: 15 }} >{this.newDevice()}</span><br />
+        <span style={{ color: "#888" }}>{this.device()}</span><br />
+        <span style={{ fontSize: 11, color: "rgba(225,255,225,0.5)" }}>{moment(this.props.notification.created).fromNow()}</span>
+      </div>
+
+    )
+  }
+}
+
+export class Alarm extends Component {
+
+
+  constructor(props) {
+    super(props);
+  }
+
+  newDevice = () => {
+
+    if (this.props.notification.type == "Alarm") {
       return this.props.notification.type
     }
     return this.props.notification.type
   }
 
   device = () => {
-    if (this.props.notification.type == "New device Added") {
+    if (this.props.notification.type) {
       return this.props.notification.device
     }
-    return this.props.notification.device
-
   }
+
   deviceDescription() {
     return this.props.notification.desc
   }
 
   render() {
     return (
-      <div className="container-fluid">
+
+      <div className="alarmNotificationItem">
+        <i class="fas fa-bullhorn"></i>
         <span style={{ fontSize: 15 }} >{this.newDevice()}</span><br />
         <span style={{ color: "#888" }}>{this.device()}</span><br />
         <span style={{ fontSize: 11, color: "rgba(225,255,225,0.5)" }}>{moment(this.props.notification.created).fromNow()}</span>
       </div>
+
+    )
+  }
+}
+
+export class Connection extends Component {
+
+
+  constructor(props) {
+    super(props);
+  }
+
+  newDevice = () => {
+
+    if (this.props.notification.type == "Alarm") {
+      return this.props.notification.type
+    }
+    return this.props.notification.type
+  }
+
+  device = () => {
+    if (this.props.notification.type) {
+      return this.props.notification.device
+    }
+  }
+
+  deviceDescription() {
+    return this.props.notification.desc
+  }
+
+  render() {
+    return (
+
+      <div className="warningNotificationItem">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span style={{ fontSize: 15 }} >{this.newDevice()}</span><br />
+        <span style={{ color: "#888" }}>{this.device()}</span><br />
+        <span style={{ fontSize: 11, color: "rgba(225,255,225,0.5)" }}>{moment(this.props.notification.created).fromNow()}</span>
+      </div>
+
     )
   }
 }
@@ -101,6 +176,9 @@ export class NavBar extends Component {
             ? (
               <div style={{ position: "absolute", color: "#ccc", background: "#333", width: 300, right: "25px", top: 25, zIndex: 1000 }}>
                 {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+                {account.notifications.map((notification, i) => <Alarm key={i} notification={notification}></Alarm>)}
+                {account.notifications.map((notification, i) => <Connection key={i} notification={notification}></Connection>)}
+
               </div>
             )
             : (

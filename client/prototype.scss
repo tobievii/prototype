@@ -5,6 +5,7 @@
   src: local('Share Tech Mono'), local('ShareTechMono-Regular'), url(/fonts/ShareTechMono-Regular.ttf) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
 $panelBg: rgba(3, 4, 5, 0.5);
 $spot: #f3353a;
 $borders: rgb(34, 39, 44);
@@ -173,7 +174,10 @@ input[type=color]:focus,
   background: #f3353a;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-weight: bold;
 }
 
@@ -221,13 +225,17 @@ h1, h2, h3, h4 {
   border: none;
 }
 
-thead, tbody, tr, td {
+thead,
+tbody,
+tr,
+td {
   border: none;
   border-bottom: none;
   border-top: none;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   border-top: 0;
 }
 
@@ -418,15 +426,15 @@ td.react-bootstrap-table-editing-cell {
   transition: 0.4s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #2196F3;
 }
 
-input:focus + .slider {
+input:focus+.slider {
   box-shadow: 0 0 1px #2196F3;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   -webkit-transform: translateX(13px);
   -ms-transform: translateX(13px);
   transform: translateX(13px);
@@ -653,13 +661,14 @@ input:focus {
   margin: 22px;
   margin-top: 5px;
 }
+
 input[type="checkbox"] {
   /* remove standard background appearance */
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   /* create custom checkbox appearance */
- 
+
   width: 15px;
   height: 15px;
   padding: 3px;
@@ -667,7 +676,7 @@ input[type="checkbox"] {
   background-clip: content-box;
   border: 1px solid white;
   background-color: #e7e6e7;
-  
+
 }
 
 /* appearance for checked checkbox */
@@ -695,7 +704,7 @@ input[type="checkbox"]:checked {
 
 .dataView:hover {
   background: lighten($panelBg, 5%);
-  border: 1px lighten($borders,10%) solid;
+  border: 1px lighten($borders, 10%) solid;
 }
 
 .dataViewName {
@@ -703,14 +712,14 @@ input[type="checkbox"]:checked {
   overflow: hidden;
 }
 
-.dataView:hover .dataViewName{
+.dataView:hover .dataViewName {
   //background: lighten($panelBg, 20%)
   color: lighten($panelBg, 95%);
 }
 
 .dataViewValue {
-  
-  overflow: hidden;  
+
+  overflow: hidden;
   padding: 5px;
 
 }
@@ -719,9 +728,9 @@ input[type="checkbox"]:checked {
   width: 100px;
   height: 100px;
   background: #333;
-  float:left;
+  float: left;
   margin-right: 10px;
-  margin-bottom:10px;
+  margin-bottom: 10px;
 }
 
 .avatarProfile img {
@@ -750,6 +759,7 @@ input[type="checkbox"]:checked {
   opacity: 0.25;
   transition: opacity 0.25s linear;
 }
+
 .widgetOptionsButton:hover {
   opacity: 0.75;
 }
@@ -760,33 +770,33 @@ input[type="checkbox"]:checked {
 }
 
 .widgetMenuItem:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .widgetContents {
   padding: 5px;
 }
 
-.linkPointer{
+.linkPointer {
   cursor: pointer;
 }
 
-.trash i:hover{
+.trash i:hover {
   color: #f00 !important;
   padding: 5px;
 }
 
-.share i:hover{
+.share i:hover {
   color: orange !important;
   padding: 5px;
 }
 
-.visibility i:hover{
+.visibility i:hover {
   color: green !important;
-  padding: 5px ;
+  padding: 5px;
 }
 
-.icon{
+.icon {
   margin-top: 1rem;
   font-size: 1.2rem;
 }
@@ -798,7 +808,7 @@ input[type="checkbox"]:checked {
   cursor: pointer;
 }
 
-.marker:hover{
+.marker:hover {
   color: red;
   cursor: pointer;
 }
@@ -810,7 +820,7 @@ input[type="checkbox"]:checked {
   border-left: 2px solid rgba(0, 0, 0, 0);
   border-top: 1px solid rgba(0, 0, 0, 0);
   border-bottom: 1px solid rgba(0, 0, 0, 0);
-  border-right: 2px solid rgba(0,0,0,0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
   box-sizing: border-box;
   opacity: 0.9;
 }
@@ -822,11 +832,96 @@ input[type="checkbox"]:checked {
   border-left: 2px solid rgba(0, 0, 0, 0);
   border-top: 1px solid rgba(0, 0, 0, 0);
   border-bottom: 1px solid rgba(0, 0, 0, 0);
-  border-right: 2px solid rgba(0,0,0,0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
   box-sizing: border-box;
   opacity: 0.9;
   display: flex;
 }
+
+.newNotificationItem {
+  position: relative;
+  color: #e1e1e1;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(34, 160, 3, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 16px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+}
+
+.warningNotificationItem {
+  position: relative;
+  color: #e1e1e1;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(189, 151, 26, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 16px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+}
+
+.alarmNotificationItem {
+  position: relative;
+  color: #e1e1e1;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(221, 30, 30, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 16px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+}
+
+// .notificationItem::after {
+//   position: absolute;
+//   width: 50px;
+//   height: 50px;
+//   color: #e1e1e1;
+//   box-sizing: border-box;
+//   background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
+//   border-left: 0px solid rgba(0, 0, 0, 0);
+//   border-top: 0px solid rgba(0, 0, 0, 0);
+//   border-bottom: 1px solid rgba(0, 0, 0, 0);
+//   border-right: 2px solid rgba(0, 0, 0, 0);
+//   box-sizing: border-box;
+//   opacity: 0.9;
+//   top: 100%;
+//   left: 50%;
+//   margin-left: -25px;
+//   content: '';
+//   transform: rotate(45deg);
+//   margin-top: -25px;
+//   background-color: rgb(44, 44, 44);
+// }
+
+.alarm {
+  position: relative;
+  color: crimson;
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
+  opacity: 0.9;
+}
+
+
 
 .statesViewerItem:hover {
   opacity: 1;
@@ -839,8 +934,8 @@ input[type="checkbox"]:checked {
 }
 
 .statesViewerItemActivity {
-  border-right: 2px solid rgba( 125,255,175, 0.75);
-  background: linear-gradient(to right, rgba(3, 4, 5, 0.5), rgba( 125,255,175, 0.1) );
+  border-right: 2px solid rgba(125, 255, 175, 0.75);
+  background: linear-gradient(to right, rgba(3, 4, 5, 0.5), rgba(125, 255, 175, 0.1));
 }
 
 
@@ -886,7 +981,7 @@ input[type="checkbox"]:checked {
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
-  font-size: 15px;  
+  font-size: 15px;
 }
 
 .protoButtonClickable:hover {
@@ -906,8 +1001,8 @@ input[type="checkbox"]:checked {
 }
 
 .react-confirm-alert {
-  background: rgba(0,0,0,0.1);
-  background-color: rgba(0,0,0,0.1)
+  background: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.1)
 }
 
 .react-confirm-alert-overlay {
@@ -918,17 +1013,17 @@ input[type="checkbox"]:checked {
   background: rgba(124, 42, 42, 0.1)
 }
 
-.map{
+.map {
   width: 100%;
   height: 100%;
 }
 
-.popup{
+.popup {
   color: red;
   font-family: 'Share Tech Mono';
 }
 
-.rowList{
+.rowList {
   display: grid;
   grid-template-columns: 30% 70%;
 }
