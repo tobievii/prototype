@@ -660,7 +660,6 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
 app.post("/api/v3/dashboard", (req: any, res: any) => {
 
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
-    log("DASHBOARD UPDATED " + dev.devid)
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
       res.json(resultUpdating);
