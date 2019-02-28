@@ -75,17 +75,20 @@ export class MapDevices extends Component {
       body: JSON.stringify({ id: marker })
     })
       .then(response => response.json()).then(result => {
+        console.log(result)
+        var resultl = result;
         var last = [];
         var finalCoords = [];
+
         for (var count in result) {
-          if (result[count].ll != undefined) {
+          if (result[count].ipLoc != undefined) {
             if (count == 0) {
-              last = result[count].ll
-              finalCoords.push(result[count].ll)
+              last = result[count].ipLoc.ll
+              finalCoords.push(result[count].ipLoc.ll)
             } else {
-              last = result[count - 1].ll
-              if (last[0] != result[count].ll[0] && last[1] != result[count].ll[1]) {
-                finalCoords.push(result[count].ll)
+              last = result[count - 1].ipLoc.ll
+              if (last[0] != result[count].ipLoc.ll[0] && last[1] != result[count].ipLoc.ll[1]) {
+                finalCoords.push(result[count].ipLoc.ll)
               }
             }
           } else if (result[count].data.gps != undefined) {
@@ -94,9 +97,11 @@ export class MapDevices extends Component {
             console.log("Something is wrong with server code")
           }
         }
+        console.log(finalCoords)
         return (
           <Polyline color="blue" positions={finalCoords} />
         )
+
       })
       .catch(err => {
         console.error(err.toString())
@@ -144,6 +149,10 @@ export class MapDevices extends Component {
         {
           allDevices.map((marker, index) => {
             var gps = {
+            }
+            var bLayer = marker.boundaryLayer;
+            if (bLayer == 0) {
+              marker.boundaryLayer = undefined;
             }
 
             if (marker.selectedIcon == undefined) {
