@@ -174,7 +174,7 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div style={{ position: "absolute", color: "#ccc", background: "", width: 400, right: "25px", top: 25, zIndex: 1000 }}>
+              <div style={{ position: "absolute", color: "#ccc", background: "black", width: 400, right: "25px", top: 25, zIndex: 1000 }}>
                 {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
                 {account.notifications.map((notification, i) => <Alarm key={i} notification={notification}></Alarm>)}
                 {account.notifications.map((notification, i) => <Connection key={i} notification={notification}></Connection>)}
