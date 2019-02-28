@@ -14,7 +14,13 @@ export class Widget extends React.Component {
 
   menu() {
     if (this.state.menuVisible) {
-      return (<div style={{ position: "absolute", zIndex: 100, width: 100, height: 100, fontSize: 14, background: "#013" }} >
+      return (<div className="widgetMenu" style={{
+        position: "absolute",
+        zIndex: 100,
+        width: 100,
+        height: 100,
+        fontSize: 14
+      }} >
         <div className="widgetMenuItem" onClick={this.removeWidget} ><i className="fas fa-trash-alt"></i> REMOVE</div>
       </div>)
     } else {
@@ -36,6 +42,13 @@ export class Widget extends React.Component {
     }
   }
 
+  onDrag = () => {
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
   render() {
     return (
       <div style={{ overflow: "hidden" }} style={{ height: "100%", position: "relative", paddingTop: 30 }}>
@@ -44,7 +57,7 @@ export class Widget extends React.Component {
           <div style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
 
           <div className="widgetOptions" style={{ float: "right" }}>
-            <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onClick={this.showMenu()}></i></div>
+            <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag()} onClick={this.showMenu()}></i></div>
             {this.menu()}
           </div>
 

@@ -219,88 +219,95 @@ export class Dashboard extends React.Component {
         }
       })
       return (
-        <GridLayout
-          isDraggable={draggble}
-          onDragStart={this.gridOnDragStart}
-          onDrag={this.gridOnDrag}
-          onDragStop={this.gridOnDragStop}
-          onResizeStart={this.gridOnResizeStart}
-          onResize={this.gridOnResize}
-          onLayoutChange={this.gridOnLayoutChange}
-          useCSSTransforms={false}
-          onResizeStop={this.gridOnResizeStop}
-          layout={this.state.layout}
-          cols={this.state.grid.cols}
-          rowHeight={this.state.grid.rowHeight}
-          width={this.state.grid.width}>
-          {
-            this.state.layout.map((data, i) => {
-              if (data.type == "Calendar") {
-                return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
-                      <Calendar state={this.props.state} />
-                    </Widget>
-                  </div>
-                )
-              }
+        <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
+          <div>
+            <div className="deviceViewTitle">dashboard</div>
+            <div style={{ clear: "both" }} />
+          </div>
+          <GridLayout
+            isDraggable={draggble}
+            onDragStart={this.gridOnDragStart}
+            onDrag={this.gridOnDrag}
+            onDragStop={this.gridOnDragStop}
+            onResizeStart={this.gridOnResizeStart}
+            onResize={this.gridOnResize}
+            onLayoutChange={this.gridOnLayoutChange}
+            useCSSTransforms={false}
+            onResizeStop={this.gridOnResizeStop}
+            layout={this.state.layout}
+            cols={this.state.grid.cols}
+            rowHeight={this.state.grid.rowHeight}
+            width={this.state.grid.width}>
+            {
+              this.state.layout.map((data, i) => {
+                if (data.type == "Calendar") {
+                  return (
+                    <div className="dashboardBlock" key={data.i} >
+                      <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
+                        <Calendar state={this.props.state} />
+                      </Widget>
+                    </div>
+                  )
+                }
 
-              if (data.type == "Line") {
-                return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname} >
-                      <Line />
-                    </Widget>
-                  </div>
-                )
-              }
+                if (data.type == "Line") {
+                  return (
+                    <div className="dashboardBlock" key={data.i} >
+                      <Widget label={data.dataname} >
+                        <Line />
+                      </Widget>
+                    </div>
+                  )
+                }
 
-              if (data.type == "Blank") {
-                return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.datapath.split("root.data.")[1]} remove={this.widgetRemove(data.i)} >
-                      {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-                    </Widget>
-                  </div>
-                )
-              }
+                if (data.type == "Blank") {
+                  return (
+                    <div className="dashboardBlock" key={data.i} >
+                      <Widget label={data.datapath.split("root.data.")[1]} remove={this.widgetRemove(data.i)} >
+                        {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+                      </Widget>
+                    </div>
+                  )
+                }
 
-              if (data.type == "ThreeDWidget") {
+                if (data.type == "ThreeDWidget") {
+                  return (
+                    <div className="dashboardBlock" key={data.i} >
+                      <Widget label={data.dataname} >
+                        <ThreeDWidget />
+                      </Widget>
+                    </div>
+                  )
+                }
+                if (data.type == "Guage") {
+                  return (
+                    <div className="dashboardBlock" key={data.i}  >
+                      <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
+                        <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
+                      </Widget>
+                    </div>
+                  )
+                }
+                if (data.type == "map") {
+                  { this.showMap() }
+                  return (
+                    <div key={data.i} >
+                      <Widget label={data.dataname} >
+                        <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
+                      </Widget>
+                    </div>
+                  )
+                }
                 return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname} >
-                      <ThreeDWidget />
-                    </Widget>
-                  </div>
-                )
-              }
-              if (data.type == "Guage") {
-                return (
-                  <div className="dashboardBlock" key={data.i}  >
-                    <Widget label={data.dataname} remove={this.widgetRemove(data.i)}>
-                      <ProtoGuage value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />
-                    </Widget>
-                  </div>
-                )
-              }
-              if (data.type == "map") {
-                { this.showMap() }
-                return (
-                  <div key={data.i} >
-                    <Widget label={data.dataname} >
-                      <MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />
-                    </Widget>
-                  </div>
-                )
-              }
-              return (
 
-                <div>default</div>
-              )
+                  <div>default</div>
+                )
 
-            })
-          }
-        </GridLayout>
+              })
+            }
+          </GridLayout>
+        </div>
+
       )
     }
   }
@@ -339,7 +346,7 @@ export class Dashboard extends React.Component {
   render() {
     if (this.state.layout) {
       return (
-        <div style={{ background: "rgba(255,0,0,0.1)", minHeight: 50, textAlign: "center" }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
+        <div style={{ minHeight: 50, textAlign: "center" }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
           {this.generateDashboard()}
         </div>
       )

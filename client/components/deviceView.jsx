@@ -22,7 +22,6 @@ library.add(faEraser);
 
 import * as p from "../prototype.ts"
 
-
 import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
@@ -479,6 +478,15 @@ export class DeviceView extends Component {
     }
   }
 
+  editorBlock = () => {
+    if (this.state.showMe) {
+      return (
+        <Editor state={this.state.state} />
+      )
+    }
+  }
+
+
   editorChanged = () => {
     this.state.editorChanged = true;
   }
@@ -530,7 +538,7 @@ export class DeviceView extends Component {
 
     return (
       <div>
-        <div className="container-fluid  commanderBgPanel" >
+        <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 50 }} >
           <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
 
             <div className="col-6">
@@ -567,7 +575,13 @@ export class DeviceView extends Component {
 
 
           <div className="row">
-            <div className="col-12" >
+            <div className="col-3">
+              <DataView data={this.state.state} />
+              {plugins}
+            </div>
+            <div className="col-9" >
+              {this.editorBlock()}
+
               <Dashboard
                 username={this.props.username}
                 acc={this.props.acc}
@@ -578,29 +592,7 @@ export class DeviceView extends Component {
             </div>
           </div>
 
-          <div className="row">
-            <div className={this.state.DeviceDataSize}>
-              <h4 className="spot">DEVICE DATA</h4>
-              <DataView data={this.state.state} />
-            </div>
 
-
-            <div className="col-2">
-              <h4 className="spot">PLUGINS</h4>
-              {plugins}
-            </div>
-
-            <div className="col-5" style={{ position: "relative" }}>
-              {
-                this.state.showMe ?
-                  <div className="col-12" style={{ Position: "relative" }}  >
-                    <h4 style={{ color: " #f3353a" }} >EDITOR</h4>
-                    <Editor state={this.state.state} onChange={this.editorChanged} />
-                  </div>
-                  : null
-              }
-            </div>
-          </div>
         </div>
       </div>
     );
