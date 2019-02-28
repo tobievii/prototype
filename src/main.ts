@@ -7,7 +7,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
-
+var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
 import { configGen } from "./config"
@@ -171,6 +171,12 @@ app.get('/admin/accounts', (req: any, res: any) => {
 })
 
 app.get("/recover/:recoverToken", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/accounts/secure", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
@@ -502,8 +508,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             } else {
               res.json({ error: "state not found" })
             }
-
-
           })
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -536,6 +540,17 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 
 });
+
+app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
+  var scryptParameters = scrypt.paramsSync(0.1);
+
+  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
+    for (var i in result) {
+      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
+      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
+    }
+  })
+});
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
   if (req.body.username) {
@@ -551,6 +566,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
         });
       }
     }
+
 
 
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {

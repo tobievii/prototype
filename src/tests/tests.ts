@@ -3,10 +3,11 @@
 import { log } from "../utils"
 import { describe, it } from "mocha";
 import * as trex from "../utils";
-
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('prototype');
 var testAccount = {
   email: "",
-  password: "newUser",
+  password: cryptr.encrypt("newUser"),
   apikey: "",
   server: "http://localhost",
   port: 8080,

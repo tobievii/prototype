@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom'
 import App from '../App.jsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('prototype');
 
 export class Recovery extends Component {
   state = {
@@ -18,16 +19,17 @@ export class Recovery extends Component {
       this.setState({ message: "New password and confirm do not match" })
     }
     else {
+      this.setState({ message: "Please wait for a few seconds..." })
       fetch("/api/v3/admin/changepassword", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({
-          pass: this.state.password,
+          pass: cryptr.encrypt(this.state.password),
           person: this.props.recoverToken
         })
       }).then(response => response.json()).then(data => {
 
         if (data.nModified == 0) {
-          this.setState({ message: "Password could not be changed" })
+          this.setState({ message: "Password could not be changed Token has expired" })
         }
         else {
           this.setState({ message: "Password has successfully changed" })
