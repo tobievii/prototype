@@ -75,28 +75,33 @@ export class MapDevices extends Component {
       body: JSON.stringify({ id: marker })
     })
       .then(response => response.json()).then(result => {
+        console.log(result)
+        var resultl = result;
         var last = [];
         var finalCoords = [];
-        for (var count in result) {
-          if (result[count].ll != undefined) {
-            if (count == 0) {
-              last = result[count].ll
-              finalCoords.push(result[count].ll)
-            } else {
-              last = result[count - 1].ll
-              if (last[0] != result[count].ll[0] && last[1] != result[count].ll[1]) {
+        if (resultl.length == null || resultl.length < 1 || resultl.length == undefined) {
+          for (var count in result) {
+            if (result[count].ll != undefined) {
+              if (count == 0) {
+                last = result[count].ll
                 finalCoords.push(result[count].ll)
+              } else {
+                last = result[count - 1].ll
+                if (last[0] != result[count].ll[0] && last[1] != result[count].ll[1]) {
+                  finalCoords.push(result[count].ll)
+                }
               }
+            } else if (result[count].data.gps != undefined) {
+              console.log("Inside the gps statement")
+            } else {
+              console.log("Something is wrong with server code")
             }
-          } else if (result[count].data.gps != undefined) {
-            console.log("Inside the gps statement")
-          } else {
-            console.log("Something is wrong with server code")
           }
+          return (
+            <Polyline color="blue" positions={finalCoords} />
+          )
         }
-        return (
-          <Polyline color="blue" positions={finalCoords} />
-        )
+
       })
       .catch(err => {
         console.error(err.toString())
@@ -144,6 +149,10 @@ export class MapDevices extends Component {
         {
           allDevices.map((marker, index) => {
             var gps = {
+            }
+            var bLayer = marker.boundaryLayer;
+            if (bLayer == 0) {
+              marker.boundaryLayer = undefined;
             }
 
             if (marker.selectedIcon == undefined) {

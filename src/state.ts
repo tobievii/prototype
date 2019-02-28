@@ -71,6 +71,7 @@ export function postState(
   db.states.findOne({ apikey: user.apikey, devid: request.id },
     (findErr: Error, findResult: any) => {
       var packetToUpsert: any = {};
+
       var info: any = {}
       if (findResult) {
         delete findResult["_id"];
@@ -82,10 +83,19 @@ export function postState(
         packetToUpsert["_last_seen"] = new Date();
         packetToUpsert["_created_on"] = new Date();
         packetToUpsert["key"] = utils.generateDifficult(128);
+        packetToUpsert["boundaryLayer"] = undefined;
+        packetToUpsert["selectedIcon"] = false;
         info.newdevice = true
       }
 
       packet["key"] = packetToUpsert.key
+
+      if (packetToUpsert.boundaryLayer != null || packetToUpsert.boundaryLayer != undefined) {
+        var bLayer = packetToUpsert.boundaryLayer;
+        if (bLayer.length > 0) {
+          packet["boundaryLayer"] = packetToUpsert.boundaryLayer;
+        }
+      }
 
       db.states.update(
         { apikey: user.apikey, devid: request.id },
@@ -104,14 +114,11 @@ export function postState(
                 cb(resSave, info);
               })
             })
-
-
           });
         }
       );
     }
   );
-
 }
 
 export function queryProject(

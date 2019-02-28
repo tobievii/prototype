@@ -288,7 +288,7 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
   if (req.body.limit) { limit = req.body.limit }
 
   if (req.body.id) {
-    db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+    db.packets.find({ apikey: req.user.apikey, devid: req.body.id, boundaryLayer: { $exists: true } }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
 
@@ -303,10 +303,8 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
           devicepacket.timestamp = payload.payload.timestamp
 
           if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-            console.log("Piano")
-            devicepacket.payload = payload.payload.data;
+            devicepacket.data = payload.payload.data;
           } else {
-            console.log("Piano 2")
             if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
               payload.meta.ipLoc = {
                 ll:
@@ -678,9 +676,30 @@ app.post("/api/v3/selectedIcon", (req: any, res: any) => {
 app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.boundaryLayer = req.body.boundaryLayer
-    db.states.update({ key: req.body.key }, dev)
+
     io.to(req.body.key).emit('boundary', dev)
-    res.json({ result: "Successfully Added Boundary" })
+    var device = dev;
+    delete device["_last_seen"]
+    delete device["selectedIcon"]
+    delete device["layout"]
+    device["_created_on"] = new Date();
+    db.packets.save(dev, (errSave: Error, resSave: any) => {
+
+      dev["_last_seen"] = new Date();
+      db.states.update({ key: req.body.key }, dev)
+      // update user account activity timestamp
+      db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
+        user["_last_seen"] = new Date();
+        db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
+          console.log(r2)
+          if (e2) {
+            res.json(e2)
+          } else if (r2) {
+            res.json({ result: "Successfully Added Boundary" })
+          }
+        })
+      })
+    })
   })
 })
 
@@ -946,7 +965,7 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $unset: { 'boundaryLayer': 1 } }, (err: Error, cleared: any) => {
+  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { $set: { 'boundaryLayer': undefined } }, (err: Error, cleared: any) => {
     if (err) res.json(err);
     if (cleared) {
       db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (e: Error, dev: any) => {
@@ -1083,11 +1102,6 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           cb(undefined, packet);
           //}        
         }
-
-
-
-
-
       } else {
         // NO WORKFLOW ON THIS DEVICE
         cb(undefined, packet);
