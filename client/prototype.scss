@@ -1063,3 +1063,48 @@ input[type="checkbox"]:checked {
 .nivo_calendar_month_legend {
   color: "#fff"
 }
+
+
+.deviceViewContainer {
+  background: rgb(20, 34, 44);
+}
+
+.deviceViewBlock {
+  background: rgb(16, 23, 32);
+}
+
+.deviceViewButton {
+  padding: 5px 10px 5px 10px;
+  color: rgb(135, 144, 153);
+
+  cursor: pointer;
+  transition: color 0.2s linear;
+}
+
+.deviceViewButton:hover {
+  background: rgba(255,255,255,0.025);
+  color: rgb(200,200,200);
+  transition: color 0.2s linear;
+}
+
+.deviceViewButtonAlert {
+  color: $spot;
+}
+
+.deviceViewButtonAlert:hover {
+  color: $spot;
+}
+
+.deviceViewTitle {
+  color: rgb(135, 144, 153);
+  padding: 5px 0px 5px 10px;
+  float: left;
+}
+
+.isResizable { 
+  overflow: hidden;
+  resize: vertical;
+  height: 400px;
+  min-height: 250px;
+  max-height: 1500px;
+}
