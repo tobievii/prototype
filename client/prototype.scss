@@ -764,6 +764,16 @@ input[type="checkbox"]:checked {
   opacity: 0.75;
 }
 
+.widgetMenu {
+  background: rgb(20, 35, 45);
+  border: 1px solid rgb(37, 52, 66);
+  padding: 10px;
+}
+
+.widgetMenu select {
+  width: 100%;
+}
+
 .widgetMenuItem {
   padding: 5px;
   cursor: pointer;
