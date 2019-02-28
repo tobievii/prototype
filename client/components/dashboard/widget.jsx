@@ -8,7 +8,6 @@ export class Widget extends React.Component {
   }
 
   removeWidget = () => {
-    console.log("remove")
     if (this.props.remove) { this.props.remove() }
   }
 
@@ -18,10 +17,19 @@ export class Widget extends React.Component {
         position: "absolute",
         zIndex: 100,
         width: 100,
-        height: 100,
         fontSize: 14
       }} >
-        <div className="widgetMenuItem" onClick={this.removeWidget} ><i className="fas fa-trash-alt"></i> REMOVE</div>
+        <div className="widgetMenuItem" onClick={this.removeWidget} >
+          <i className="fas fa-trash-alt"></i> REMOVE</div>
+
+        <div><select onChange={(e) => {
+          console.log(e.target.value);
+          this.props.change("type", e.target.value)
+        }}>
+          <option unselectable="true">select</option>
+          <option>Gauge</option>
+          <option>Line</option>
+        </select></div>
       </div>)
     } else {
       return null;
