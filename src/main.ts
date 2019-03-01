@@ -638,7 +638,7 @@ app.post('/api/v3/unshare', (req: any, res: any) => {
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
-  if (req.body.username) {
+  if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
@@ -651,6 +651,22 @@ app.post("/api/v3/states", (req: any, res: any) => {
           })
         })
 
+      }
+      else if (req.user.level) {
+        db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+          if (e) { res.json({ error: "db error" }) }
+          if (user) {
+            db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
+              var cleanStates: any = []
+              for (var a in states) {
+                var cleanState = _.clone(states[a])
+                delete cleanState["apikey"]
+                cleanStates.push(cleanState);
+              }
+              res.json(cleanStates)
+            })
+          }
+        })
       }
     }
 
