@@ -13,7 +13,6 @@ var inBound = false;
 var circleColor = "#4c8ef7";
 
 var llprod = [0.012, 0.012]
-
 const L = require('leaflet');
 var poly2tri = require('poly2tri');
 const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
@@ -199,7 +198,13 @@ export class MapDevices extends Component {
     });
 
     var position = [details.lat, details.lng]
-
+    var defaultLoc = {
+      ll:
+        [
+          0.01,
+          0.01
+        ]
+    }
     return (
       <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
         <TileLayer
@@ -208,7 +213,7 @@ export class MapDevices extends Component {
 
         />
         {
-          allDevices.map((marker, index) => {
+          allDevices.map((marker) => {
             var gps = {
             }
             var bLayer = marker.boundaryLayer;
@@ -225,34 +230,38 @@ export class MapDevices extends Component {
                 .catch(err => console.error(err.toString()));
             }
 
-            if (marker.payload.data.gps != undefined) {
-              marker.meta.ipLoc = {
-                ll:
-                  [
-                    marker.payload.data.gps.lat,
-                    marker.payload.data.gps.lon
-                  ]
-              }
-            } else {
+            marker.meta.ipLoc.ll = undefined;
 
-              if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+            if (marker.payload.data.gps != undefined) {
+              if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
                 marker.meta.ipLoc = {
                   ll:
                     [
-                      0.01,
-                      0.01
+                      marker.payload.data.gps.lat,
+                      marker.payload.data.gps.lon
                     ]
                 }
-              } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
-                if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc == null) {
+              } else {
+                if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
                   marker.meta.ipLoc = {
                     ll:
                       [
-                        0.01,
-                        0.01
+                        marker.payload.data.gps.latitude,
+                        marker.payload.data.gps.longitude
                       ]
                   }
+                } else {
+                  marker.meta.ipLoc = defaultLoc;
                 }
+              }
+            } else {
+              if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                marker.meta.ipLoc = defaultLoc
+              } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                  marker.meta.ipLoc = defaultLoc
+                }
+                return marker.meta.ipLoc.ll;
               }
             }
 
