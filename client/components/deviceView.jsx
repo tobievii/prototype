@@ -278,7 +278,9 @@ export class DeviceView extends Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ dev: this.props.devid, })
     }).then(response => response.json()).then(states => {
-      this.state.shared = _.clone(states.access)
+      if (states.acces) {
+        this.state.shared = _.clone(states.access)
+      }
     })
   }
 
