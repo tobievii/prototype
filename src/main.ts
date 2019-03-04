@@ -824,10 +824,9 @@ function handleState(req: any, res: any, next: any) {
           }
 
           db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            console.log("hello")
+            io.to(req.user).emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
-            io.to(req.user).emit("notification")
 
           })
         }
