@@ -309,8 +309,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   }
-
-
   if (resolved == false) {
     res.json({ error: "We require either an id or device key for this query" })
   }
@@ -324,78 +322,39 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
   if (req.body.limit) { limit = req.body.limit }
 
   if (req.body.id) {
-    db.packets.find({ apikey: req.user.apikey, devid: req.body.id, boundaryLayer: { $exists: true } }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+    db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       // db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
+      var latlng = {
+        ll:
+          [
+            0.01,
+            0.01
+          ]
+      }
 
       for (var p in rawpackets) {
         var payload = rawpackets[p];
         var devicepacket: any;
+        var t = {
+          meta: { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method },
+          id: payload.payload.id,
+          timestamp: payload.payload.timestamp
+        }
+        devicepacket = t;
 
-        if (payload.boundaryLayer != undefined || payload.boundaryLayer != null) {
-          devicepacket = payload.boundaryLayer;
-          devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-          devicepacket.id = payload.payload.id
-          devicepacket.timestamp = payload.payload.timestamp
-
-          if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-            devicepacket.data = payload.payload.data;
-          } else {
-            if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-              if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-                payload.meta.ipLoc = {
-                  ll:
-                    [
-                      0.01,
-                      0.01
-                    ]
-                }
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            }
+        if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
+          devicepacket.data = payload.payload.data;
+        } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
+          if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
+            payload.meta.ipLoc = latlng;
           }
+          devicepacket.ipLoc = payload.meta.ipLoc;
         } else {
           if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-            payload.meta.ipLoc = {
-              ll:
-                [
-                  0.01,
-                  0.01
-                ]
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-            if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else {
-            if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-              devicepacket = payload.payload;
-              devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            }
+            payload.meta.ipLoc = latlng;
+            devicepacket.ipLoc = payload.meta.ipLoc;
           }
         }
         packets.push(devicepacket)

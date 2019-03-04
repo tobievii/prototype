@@ -2,9 +2,9 @@ import React, { Component } from "react";
 
 export class Widget extends React.Component {
 
-
   state = {
-    menuVisible: false
+    menuVisible: false,
+    boundaryVisible: false
   }
 
   removeWidget = () => {
@@ -24,7 +24,7 @@ export class Widget extends React.Component {
 
         <div className="widgetMenuItem" >Change Type:
           <select onChange={(e) => {
-            console.log(e.target.value);
+            // console.log(e.target.value);
             this.props.change("type", e.target.value)
           }}>
             <option unselectable="true">select</option>
@@ -40,7 +40,6 @@ export class Widget extends React.Component {
     } else {
       return null;
     }
-
   }
 
   showMenu = () => {
@@ -51,7 +50,6 @@ export class Widget extends React.Component {
         this.setState({ menuVisible: false })
       } else {
         this.setState({ menuVisible: true })
-
       }
     }
   }
@@ -60,6 +58,34 @@ export class Widget extends React.Component {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
+    }
+  }
+
+  showBoundary = () => {
+    if (this.state.boundaryVisible == false) {
+      this.props.showBoundary(true);
+      this.setState({ boundaryVisible: true })
+    } else if (this.state.boundaryVisible == true) {
+      this.props.showBoundary(false);
+      this.setState({ boundaryVisible: false })
+    }
+  }
+
+  mapWidget = () => {
+    var p = this.props.children.type;
+    var color = "";
+
+    if (this.props.children.type.name == "MapDevices") {
+      if (this.state.boundaryVisible == true) {
+        color = "white";
+      } else {
+        color = "grey";
+      }
+      return (
+        <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px", color: color }} ><i className="fas fa-route" title="Show Boundary" onClick={this.showBoundary}></i></div>
+      )
+    } else {
+      return;
     }
   }
 
@@ -73,6 +99,10 @@ export class Widget extends React.Component {
           <div className="widgetOptions" style={{ float: "right" }}>
             <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag()} onClick={this.showMenu()}></i></div>
             {this.menu()}
+          </div>
+
+          <div className="widgetOptions" style={{ float: "right" }}>
+            {this.mapWidget()}
           </div>
 
         </div>
