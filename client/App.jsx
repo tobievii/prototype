@@ -28,8 +28,9 @@ import * as p from "./prototype.ts"
 
 import { Dashboard } from "./components/dashboard/dashboard.jsx"
 
-//import socketio from "socket.io-client";
-//const socket = socketio();
+import socketio from "socket.io-client";
+var socket = socketio();
+
 const test = {
     un: undefined,
     acc: undefined,
@@ -38,22 +39,29 @@ const test = {
 }
 
 class App extends Component {
-
     state = {};
 
     constructor(props) {
         super(props);
-
-        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
-
         p.getAccount(account => {
             this.setState({ account });
             if (account.level > 0) {
-                //socket.emit("join", account.apikey);
+                socket.emit("join", account.apikey);
                 this.setState({ loggedIn: true })
-                // if its a real user (level >0 ) then we get device data.
             }
         })
+
+        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
+
+        socket.on("connect", a => {
+            socket.on("post", a => {
+            })
+            socket.on("notification", (account) => {
+                p.getAccount(account => {
+                    this.setState({ account });
+                })
+            })
+        });
 
         p.getStates((states) => { this.setState({ states }) })
 
