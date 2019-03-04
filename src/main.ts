@@ -7,7 +7,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
-
+var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
 import { configGen } from "./config"
@@ -176,6 +176,12 @@ app.get("/recover/:recoverToken", (req: any, res: any) => {
   })
 })
 
+app.get("/accounts/secure", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
+
 app.get('/signout', (req: any, res: any) => {
   res.clearCookie("uuid");
   res.redirect('/');
@@ -303,8 +309,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   }
-
-
   if (resolved == false) {
     res.json({ error: "We require either an id or device key for this query" })
   }
@@ -318,78 +322,39 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
   if (req.body.limit) { limit = req.body.limit }
 
   if (req.body.id) {
-    db.packets.find({ apikey: req.user.apikey, devid: req.body.id, boundaryLayer: { $exists: true } }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+    db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       // db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
+      var latlng = {
+        ll:
+          [
+            0.01,
+            0.01
+          ]
+      }
 
       for (var p in rawpackets) {
         var payload = rawpackets[p];
         var devicepacket: any;
+        var t = {
+          meta: { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method },
+          id: payload.payload.id,
+          timestamp: payload.payload.timestamp
+        }
+        devicepacket = t;
 
-        if (payload.boundaryLayer != undefined || payload.boundaryLayer != null) {
-          devicepacket = payload.boundaryLayer;
-          devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-          devicepacket.id = payload.payload.id
-          devicepacket.timestamp = payload.payload.timestamp
-
-          if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-            devicepacket.data = payload.payload.data;
-          } else {
-            if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-              if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-                payload.meta.ipLoc = {
-                  ll:
-                    [
-                      0.01,
-                      0.01
-                    ]
-                }
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            }
+        if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
+          devicepacket.data = payload.payload.data;
+        } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
+          if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
+            payload.meta.ipLoc = latlng;
           }
+          devicepacket.ipLoc = payload.meta.ipLoc;
         } else {
           if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-            payload.meta.ipLoc = {
-              ll:
-                [
-                  0.01,
-                  0.01
-                ]
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-            if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else {
-            if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-              devicepacket = payload.payload;
-              devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            }
+            payload.meta.ipLoc = latlng;
+            devicepacket.ipLoc = payload.meta.ipLoc;
           }
         }
         packets.push(devicepacket)
@@ -502,8 +467,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             } else {
               res.json({ error: "state not found" })
             }
-
-
           })
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -536,6 +499,17 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 
 });
+
+app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
+  var scryptParameters = scrypt.paramsSync(0.1);
+
+  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
+    for (var i in result) {
+      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
+      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
+    }
+  })
+});
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
   if (req.body.username) {
@@ -551,6 +525,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
         });
       }
     }
+
 
 
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
@@ -622,7 +597,7 @@ app.post('/api/v3/unshare', (req: any, res: any) => {
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
-  if (req.body.username) {
+  if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
@@ -635,6 +610,22 @@ app.post("/api/v3/states", (req: any, res: any) => {
           })
         })
 
+      }
+      else if (req.user.level) {
+        db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+          if (e) { res.json({ error: "db error" }) }
+          if (user) {
+            db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
+              var cleanStates: any = []
+              for (var a in states) {
+                var cleanState = _.clone(states[a])
+                delete cleanState["apikey"]
+                cleanStates.push(cleanState);
+              }
+              res.json(cleanStates)
+            })
+          }
+        })
       }
     }
 
@@ -833,10 +824,9 @@ function handleState(req: any, res: any, next: any) {
           }
 
           db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            console.log("hello")
+            io.to(req.user).emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
-            io.to(req.user).emit("notification")
 
           })
         }

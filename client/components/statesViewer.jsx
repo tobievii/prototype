@@ -144,7 +144,8 @@ export class StatesViewer extends Component {
     selectAllState: null,
     view: "map",
     devicePressed: undefined,
-    boundary: undefined
+    boundary: undefined,
+    showB: false
   };
 
   socket = undefined;
@@ -419,11 +420,11 @@ export class StatesViewer extends Component {
       if (newDeviceList[dev].devid == device.e.devid) {
         if (!device.n) {
           newDeviceList[dev].selectedIcon = false;
-        } else if (device.n && newDeviceList[dev].payload.data.boundary == undefined) {
-          newDeviceList[dev].selectedIcon = true;
-        } else if (device.n && newDeviceList[dev].payload.data.boundary != undefined) {
+        } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
           newDeviceList[dev].selectedIcon = true;
           device.n = false;
+        } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
+          newDeviceList[dev].selectedIcon = true;
         }
       }
     }
@@ -456,6 +457,10 @@ export class StatesViewer extends Component {
     this.setState({ view: action })
   }
 
+  showBoundaryPath = (action) => {
+    this.setState({ showB: action })
+  }
+
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
@@ -471,13 +476,13 @@ export class StatesViewer extends Component {
       } else if (this.state.view == "map") {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
-            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <StatesViewerMenu showBoundary={this.showBoundaryPath} deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <div className="rowList">
               <div >
                 <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
               </div>
               <div style={{ height: "605px" }}>
-                <MapDevices widget={false} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
+                <MapDevices widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
               </div>
             </div>
           </div>

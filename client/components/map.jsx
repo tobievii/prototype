@@ -8,12 +8,13 @@ var details = {
   zoom: 3
 }
 
+var inBound = false;
+
 var circleColor = "#4c8ef7";
 
 const L = require('leaflet');
 var poly2tri = require('poly2tri');
-var test = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]];
-
+const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
 //   iconSize: [80, 96],
@@ -30,11 +31,14 @@ var test = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]];
 
 export class MapDevices extends Component {
   state = {
+    devicePathHistory: undefined
+  }
+
+  constructor(props) {
+    super(props)
   }
 
   setvalues = (device) => {
-
-
     if (device.meta.ipLoc == undefined || device.meta.ipLoc == null) {
       device.meta.ipLoc = {
         ll:
@@ -61,27 +65,65 @@ export class MapDevices extends Component {
     if (this.props.widget == true) {
       details.zoom = 13;
     } else {
-      details.zoom = 16.05;
+      details.zoom = 14;
     }
   };
+
+  checkBound = (marker) => {
+    var result = undefined;
+    var temp = [];
+
+    var contour = [];
+
+    for (var boundaryPoints in marker.boundaryLayer.boundaryPoints) {
+      var t = marker.boundaryLayer.boundaryPoints[boundaryPoints];
+      for (var points in t) {
+        if (points == 1) {
+          contour.push(new poly2tri.Point(t[0], t[1]));
+        }
+      }
+    }
+
+    var swctx = new poly2tri.SweepContext(contour);
+    swctx.triangulate();
+    var triangles = swctx.getTriangles();
+
+    for (var t in triangles) {
+      var trianglePoints = triangles[t].points_;
+      var triangle = [];
+      for (var j in trianglePoints) {
+        triangle.push(trianglePoints[j])
+      }
+      temp.push(this.PointInTriangle({ x: marker.meta.ipLoc.ll[0], y: marker.meta.ipLoc.ll[1] }, triangle[0], triangle[1], triangle[2]));
+    }
+
+    for (var t in temp) {
+      if (temp[t] == true) {
+        result = true;
+      }
+    }
+
+    if (result == undefined) {
+      result = false;
+    }
+    inBound = result;
+  }
 
   sign = (p1, p2, p3) => {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
   }
 
-  getHistory = (marker) => {
+  getHistory = (marker, action) => {
     fetch("/api/v3/boundaryPackets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ id: marker })
+      body: JSON.stringify({ id: marker, limit: 10 })
     })
       .then(response => response.json()).then(result => {
-        console.log(result)
-        var resultl = result;
         var last = [];
         var finalCoords = [];
 
         for (var count in result) {
-          if (result[count].ipLoc != undefined) {
+          if (result[count].ipLoc != undefined || result[count].ipLoc != null) {
             if (count == 0) {
               last = result[count].ipLoc.ll
               finalCoords.push(result[count].ipLoc.ll)
@@ -91,17 +133,25 @@ export class MapDevices extends Component {
                 finalCoords.push(result[count].ipLoc.ll)
               }
             }
-          } else if (result[count].data.gps != undefined) {
-            console.log("Inside the gps statement")
+          } else if (result[count].data != undefined || result[count].data != undefined) {
+            if (result[count].data.gps != undefined || result[count].data.gps != undefined) {
+              var latlng = [result[count].data.gps.lat, result[count].data.gps.lon];
+
+              if (count == 0) {
+                last = latlng
+                finalCoords.push(latlng)
+              } else {
+                last = [result[count - 1].data.gps.lat, result[count - 1].data.gps.lon]
+                if (last[0] != latlng[0] && last[1] != latlng[1]) {
+                  finalCoords.push(latlng)
+                }
+              }
+            }
           } else {
-            console.log("Something is wrong with server code")
+            console.error("Data From Packets doesn't have loaction information.")
           }
         }
-        console.log(finalCoords)
-        return (
-          <Polyline color="blue" positions={finalCoords} />
-        )
-
+        this.setState({ devicePathHistory: finalCoords })
       })
       .catch(err => {
         console.error(err.toString())
@@ -109,6 +159,15 @@ export class MapDevices extends Component {
           <div></div>
         )
       })
+    if (this.props.showBoundary == true) {
+      return (
+        <Polyline color="blue" positions={this.state.devicePathHistory} />
+      )
+    } else {
+      return (
+        <div></div>
+      )
+    }
   }
 
   PointInTriangle = (pt, v1, v2, v3) => {
@@ -217,8 +276,13 @@ export class MapDevices extends Component {
                           }
                         }
 
+                        var dev = marker;
+                        dev.boundaryLayer = { boundaryPoints: latlngs };
+                        { this.checkBound(dev); }
+
                         var b = {
-                          boundaryPoints: latlngs
+                          boundaryPoints: latlngs,
+                          inbound: inBound
                         }
 
                         fetch("/api/v3/boundaryLayer", {
@@ -253,48 +317,18 @@ export class MapDevices extends Component {
                 </div>
               )
             } else if (marker.selectedIcon == true && marker.boundaryLayer != undefined) {
-              var set;
-              var shapeColor = "";
-              var result = undefined;
-              var temp = [];
-
-              var contour = [];
-
-              for (var boundaryPoints in marker.boundaryLayer.boundaryPoints) {
-                var t = marker.boundaryLayer.boundaryPoints[boundaryPoints];
-                for (var points in t) {
-                  if (points == 1) {
-                    contour.push(new poly2tri.Point(t[0], t[1]));
-                  }
-                }
-              }
-
-              var swctx = new poly2tri.SweepContext(contour);
-              swctx.triangulate();
-              var triangles = swctx.getTriangles();
-
-              for (var t in triangles) {
-                var trianglePoints = triangles[t].points_;
-                var triangle = [];
-                for (var j in trianglePoints) {
-                  triangle.push(trianglePoints[j])
-                }
-                temp.push(this.PointInTriangle({ x: marker.meta.ipLoc.ll[0], y: marker.meta.ipLoc.ll[1] }, triangle[0], triangle[1], triangle[2]));
-              }
-
-              for (var t in temp) {
-                if (temp[t] == true) {
-                  result = true;
-                }
-              }
-
-              if (result == undefined) {
-                result = false;
-              }
-              if (result) {
+              { this.checkBound(marker); }
+              if (inBound) {
                 circleColor = "#4c8ef7";
               } else {
                 circleColor = "red";
+              }
+              var b = undefined;
+
+              if (this.props.showBoundary == true) {
+                b = true;
+              } else {
+                b = false;
               }
 
               return (
@@ -318,7 +352,8 @@ export class MapDevices extends Component {
                             }
                           }
                           var b = {
-                            boundaryPoints: p
+                            boundaryPoints: p,
+                            inbound: inBound
                           }
 
                           fetch("/api/v3/boundaryLayer", {
@@ -348,15 +383,10 @@ export class MapDevices extends Component {
                       }}
                     />
                     <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
-
                   </FeatureGroup>
-                  {this.getHistory(marker.devid)}
-
+                  {this.getHistory(marker.devid, b)}
                   <Marker
                     position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
-                    riseOnHover={true}
-                    zIndexOffset={100}
-                    openPopup={true}
                   >
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />

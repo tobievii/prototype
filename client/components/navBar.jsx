@@ -7,6 +7,7 @@ import { faCog, faTimes, faBell } from '@fortawesome/free-solid-svg-icons'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import moment from 'moment'
+import { array } from "prop-types";
 
 library.add(faCog)
 library.add(faTimes)
@@ -17,11 +18,13 @@ export class Notification extends Component {
 
   constructor(props) {
     super(props);
+
+
   }
 
   newDevice = () => {
 
-    if (this.props.notification.type == "New Device Added") {
+    if (this.props.notification.type === "New Device Added") {
 
     } return this.props.notification.type
   }
@@ -33,94 +36,45 @@ export class Notification extends Component {
   }
 
   render() {
-    return (
+    if (this.props.notification.type == "New Device Added") {
+      return (
 
-      <div className="newNotificationItem">
-        <i class="fas fa-exclamation-circle"></i>
-        <span class="newdevice" >{this.newDevice()}</span><br />
-        <span class="devicename" >{this.device()}</span><br />
-        <span class="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
-      </div>
+        <div className="newNotificationItem">
+          <i className="fas fa-exclamation-circle"></i>
+          <span className="newdevice" >{this.newDevice()}</span><br />
+          <span className="devicename" >{this.device()}</span><br />
+          <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+        </div>
 
-    )
-  }
-}
-
-export class Alarm extends Component {
-
-
-  constructor(props) {
-    super(props);
-  }
-
-  newDevice = () => {
-
+      )
+    }
     if (this.props.notification.type == "Alarm") {
-      return this.props.notification.type
+      return (
+
+        <div className="alarmNotificationItem">
+          <i className="fas fa-bullhorn"></i>
+          <span className="newdevice" >{this.newDevice()}</span><br />
+          <span className="devicename">{this.device()}</span><br />
+          <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+        </div>
+
+      )
     }
-    return this.props.notification.type
-  }
 
-  device = () => {
-    if (this.props.notification.type) {
-      return this.props.notification.device
+    if (this.props.notification.type == "Warning") {
+      return (
+
+        <div className="warningNotificationItem">
+          <i className="fas fa-exclamation-triangle"></i>
+          <span className="newdevice" >{this.newDevice()}</span><br />
+          <span className="devicename">{this.device()}</span><br />
+          <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+        </div>
+
+      )
     }
-  }
-
-  deviceDescription() {
-    return this.props.notification.desc
-  }
-
-  render() {
-    return (
-
-      <div className="alarmNotificationItem">
-        <i class="fas fa-bullhorn"></i>
-        <span class="newdevice" >{this.newDevice()}</span><br />
-        <span class="devicename">{this.device()}</span><br />
-        <span class="lastseen">{moment(this.props.notification.created).fromNow()}</span>
-      </div>
-
-    )
-  }
-}
-
-export class Connection extends Component {
 
 
-  constructor(props) {
-    super(props);
-  }
-
-  newDevice = () => {
-
-    if (this.props.notification.type == "Alarm") {
-      return this.props.notification.type
-    }
-    return this.props.notification.type
-  }
-
-  device = () => {
-    if (this.props.notification.type) {
-      return this.props.notification.device
-    }
-  }
-
-  deviceDescription() {
-    return this.props.notification.desc
-  }
-
-  render() {
-    return (
-
-      <div className="warningNotificationItem">
-        <i class="fas fa-exclamation-triangle"></i>
-        <span class="newdevice" >{this.newDevice()}</span><br />
-        <span class="devicename">{this.device()}</span><br />
-        <span class="lastseen">{moment(this.props.notification.created).fromNow()}</span>
-      </div>
-
-    )
   }
 }
 
@@ -174,11 +128,8 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div style={{ position: "absolute", color: "#ccc", background: "black", width: 400, right: "25px", top: 25, zIndex: 1000 }}>
+              <div style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
                 {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
-                {account.notifications.map((notification, i) => <Alarm key={i} notification={notification}></Alarm>)}
-                {account.notifications.map((notification, i) => <Connection key={i} notification={notification}></Connection>)}
-
               </div>
             )
             : (
@@ -197,16 +148,25 @@ export class NavBar extends Component {
     }
   }
 
+  countArray = () => {
+
+    //TODO Check if array has grown
+    return this.props.account.notifications.length
+
+  }
+
   account = (account) => {
     if (account) {
       if (account.level > 0) {
         return (
-          <div style={{ padding: "20px 10px 10px 10px 10px", float: "right", paddingRight: "20px" }}>
+          <div style={{ padding: "20px 10px 10px 10px 10px", float: "right", paddingRight: "20px", paddingTop: "18px" }}>
             <span style={{ fontSize: 14 }} title="email">{account.email}</span> &nbsp;
             <span style={{ fontSize: 14 }} title="username">{account.username}</span> &nbsp;
             <span style={{ fontSize: 14 }} title="level">{account.level}</span> &nbsp;
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
-            <div style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</div>
+            <span className="button__badge">{this.countArray()}</span>
+            <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
+
           </div>
         )
       } else {
@@ -229,7 +189,7 @@ export class NavBar extends Component {
     return (
       <div className="" style={{ margin: "0 5px" }} >
         <div className="row " style={{ paddingBottom: 10 }}>
-          <div className="col-md-12">
+          <div className="col-md-12" style={{ backgroundColor: "#0E1823" }}>
             <Link to="/">
               <div style={{ padding: "20px 10px 10px 10px", float: "left" }}>
                 <img

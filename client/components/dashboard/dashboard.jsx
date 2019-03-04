@@ -25,7 +25,8 @@ var mapDetails = {
   un: undefined,
   acc: undefined,
   dc: undefined,
-  ds: undefined
+  ds: undefined,
+  showB: false
 }
 
 export class Dashboard extends React.Component {
@@ -37,7 +38,8 @@ export class Dashboard extends React.Component {
       width: 4000,
       cols: 40,
       rowHeight: 30
-    }
+    },
+    showB: false
   }
 
   draggingUnique = "";
@@ -122,6 +124,7 @@ export class Dashboard extends React.Component {
 
   onDrop = (e, f) => {
     e.preventDefault();
+    var typel = undefined;
     // pixel location
     var droplocation = {
       x: e.pageX - e.target.getBoundingClientRect().x,
@@ -135,8 +138,16 @@ export class Dashboard extends React.Component {
     }
 
     // add widget to layout
+
+    if (e.dataname == "lat" || e.dataname == "lon" || e.dataname == "gps") {
+      typel = "map"
+    } else if (e.data == true || e.data == false) {
+      typel = "Blank"
+    } else {
+      typel = "Gauge"
+    }
     var layout = _.clone(this.state.layout)
-    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: "Gauge", datapath: e.datapath, dataname: e.dataname })
+    layout.push({ i: this.generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: typel, datapath: e.datapath, dataname: e.dataname })
     this.setState({ layout: layout }, () => { })
   }
 
@@ -198,17 +209,8 @@ export class Dashboard extends React.Component {
       .catch(err => console.error(err.toString()));
   }
 
-
-  showMap = () => {
-    mapDetails.un = this.props.username;
-    mapDetails.acc = this.props.acc;
-    mapDetails.dc = this.props.state;
-    mapDetails.ds = this.props.devices;
-  }
-
   widgetRemove = (id) => {
     return (e) => {
-
       var temp = this.state.layout.filter(item => { if (item.i != id) return item })
       this.setState({ layout: temp }, () => {
         this.updateServer();
@@ -230,6 +232,14 @@ export class Dashboard extends React.Component {
       this.setState({ layout }, () => {
         this.updateServer();
       })
+    }
+  }
+
+  showBoundary = (action) => {
+    if (action == true) {
+      this.setState({ showB: true })
+    } else if (action == false) {
+      this.setState({ showB: false })
     }
   }
 
@@ -259,25 +269,14 @@ export class Dashboard extends React.Component {
       return (<ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
     }
     if (data.type == "map") {
-      { this.showMap() }
-      return (<MapDevices username={mapDetails.un} acc={mapDetails.acc} deviceCall={mapDetails.dc} devices={this.props.devices} widget={true} />)
+      return (<MapDevices username={this.props.username} acc={this.props.acc} deviceCall={this.props.state} devices={this.props.devices} widget={true} showBoundary={this.state.showB} />)
     }
   }
 
   generateDashboard = () => {
-
-
     if (!this.props.state) {
       return (<div>loading..</div>)
     } else {
-      var draggble = true;
-      this.state.layout.map((data, i) => {
-        if (data.type == "map") {
-          draggble = false;
-        } else {
-          draggble = true;
-        }
-      })
       return (
         <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
           <div>
@@ -285,7 +284,6 @@ export class Dashboard extends React.Component {
             <div style={{ clear: "both" }} />
           </div>
           <GridLayout
-            isDraggable={draggble}
             onDragStart={this.gridOnDragStart}
             onDrag={this.gridOnDrag}
             onDragStop={this.gridOnDragStop}
@@ -304,7 +302,8 @@ export class Dashboard extends React.Component {
                   <div className="dashboardBlock" key={data.i} >
                     <Widget label={data.dataname}
                       change={this.widgetChange(data.i)}
-                      remove={this.widgetRemove(data.i)}>
+                      remove={this.widgetRemove(data.i)}
+                      showBoundary={this.showBoundary}>
                       {this.widgetType(data)}
                     </Widget>
                   </div>)
