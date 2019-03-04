@@ -7,7 +7,10 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
-var scrypt = require("scrypt");
+
+import * as scrypt from "scrypt"
+
+//var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
 import { configGen } from "./config"
