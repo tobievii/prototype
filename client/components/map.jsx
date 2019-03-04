@@ -12,6 +12,8 @@ var inBound = false;
 
 var circleColor = "#4c8ef7";
 
+var llprod = [0.012, 0.012]
+
 const L = require('leaflet');
 var poly2tri = require('poly2tri');
 const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
@@ -309,7 +311,7 @@ export class MapDevices extends Component {
                       }}
                     />
                   </FeatureGroup>
-                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
+                  <Marker position={[llprod[0], llprod[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
@@ -386,7 +388,7 @@ export class MapDevices extends Component {
                   </FeatureGroup>
                   {this.getHistory(marker.devid, b)}
                   <Marker
-                    position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
+                    position={[llprod[0], llprod[1]]}
                   >
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
@@ -404,7 +406,7 @@ export class MapDevices extends Component {
             } else if (marker.selectedIcon == false) {
               return (
                 <div key={marker.devid}>
-                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
+                  <Marker position={[llprod[0], llprod[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
