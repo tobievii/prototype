@@ -578,7 +578,9 @@ app.get('/api/v3/states', (req: any, res: any) => {
 app.post('/api/v3/shared', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
-    res.json(states)
+    if (states.access) {
+      res.json(states)
+    }
   })
 })
 //Share Device
