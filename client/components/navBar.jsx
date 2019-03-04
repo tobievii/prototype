@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes, faBell } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell, faUnderline } from '@fortawesome/free-solid-svg-icons'
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
@@ -118,12 +118,18 @@ export class NavBar extends Component {
   }
 
   showNotifications = (account) => {
-
-    return (
+    if (account.notifications == undefined) {
+      return (
+        <div style={{ position: "relative" }}>
+          <span>
+            <FontAwesomeIcon icon="bell" onClick={this.showMenu} className="navLink" />
+          </span>
+        </div>
+      )
+    } else return (
       <div style={{ position: "relative" }}>
         <span>
           <FontAwesomeIcon icon="bell" onClick={this.showMenu} className="navLink" />
-
         </span>
         {
           this.state.showMenu
@@ -150,9 +156,15 @@ export class NavBar extends Component {
 
   countArray = () => {
 
-    //TODO Check if array has grown
-    return this.props.account.notifications.length
+    if (this.props.account.notifications == undefined) {
+      return 0
+    } else {
+      return this.props.account.notifications.length
+    }
 
+
+
+    //TODO Check if array has grown
   }
 
   account = (account) => {
