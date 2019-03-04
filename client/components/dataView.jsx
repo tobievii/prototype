@@ -80,6 +80,9 @@ export class DataView extends React.Component {
     }
     if (typeof data == "object") {
 
+      if (data == null) {
+        return <span style={{ float: "right", color: "#f77" }}>null</span>
+      }
 
       if (Array.isArray(data)) {
         //Arrays
@@ -101,7 +104,6 @@ export class DataView extends React.Component {
   }
 
   renderObject = (data, level, path) => {
-
 
     return (
       <div style={{ overflowY: 'hidden' }}>
@@ -155,6 +157,7 @@ export class DataView extends React.Component {
   }
 
   render() {
+
     if (this.props.data) {
       if (this.props.data.payload) {
         return (
