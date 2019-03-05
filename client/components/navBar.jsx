@@ -137,21 +137,6 @@ export class NavBar extends Component {
     }
   }
 
-  // showAccount = (account) => {
-  //   if (this.props.account) {
-  //     return (
-  //       <div class="dropdown">
-  //         <span class="fas fa-user" onClick={this.goSettings()}></span>
-  //         <div class="dropdown-content">
-  //           <span style={{ fontSize: 10 }} title="email">EMAIL: {account.email}</span> &nbsp;
-  //           <span style={{ fontSize: 10 }} title="username">USERNAME: {account.username}</span> &nbsp;
-  //           <span style={{ fontSize: 10 }} title="level">LEVEL: {account.level}</span>
-  //         </div>
-  //       </div>
-  //     )
-  //   }
-  // }
-
   showNotifications = (account) => {
     if (account.notifications == undefined) {
       return (

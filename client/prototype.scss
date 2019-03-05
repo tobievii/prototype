@@ -411,7 +411,7 @@ td.react-bootstrap-table-editing-cell {
   background-color: #15B9E4;
 }
 
-.switchActive{
+.switchActive {
   background-color: #E4C315;
 }
 
@@ -1155,20 +1155,15 @@ input[type="checkbox"]:checked {
 
 .dropdown-content {
   display: none;
-  // position: absolute;
   color: #e1e1e1;
   background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
   border-left: 10px solid rgba(0, 0, 0, 0);
   border-top: 10px solid rgba(0, 0, 0, 0);
   border-bottom: 10px solid rgba(0, 0, 0, 0);
   border-right: 10px solid rgba(0, 0, 0, 0);
-  // opacity: 1.0;
-  // text-align: left;
   left: -1200%;
   font-size: 14px;
   position: absolute;
-  // left: 2%;
-
 }
 
 .dropdown:hover .dropdown-content {
