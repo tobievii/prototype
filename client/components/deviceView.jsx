@@ -27,7 +27,6 @@ import socketio from "socket.io-client";
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
 var loggedInUser = "";
-var currentDevice = "";
 const customStyles = {
   content: {
     top: '50%',
@@ -120,6 +119,11 @@ export class DeviceView extends Component {
     }
   }
   unshare = (remove) => {
+    for (let i in this.state.userSearched) {
+      if (remove == this.state.userSearched[i].uuid) {
+        this.state.userSearched[i].shared = "no";
+      }
+    }
     fetch("/api/v3/unshare", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
@@ -422,6 +426,11 @@ export class DeviceView extends Component {
   shareDevice = () => {
     this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
     for (let dev in this.state.EmailsharedDevice) {
+      for (let i in this.state.userSearched) {
+        if (this.state.EmailsharedDevice[dev].email == this.state.userSearched[i].email) {
+          this.state.userSearched[i].shared = "yes";
+        }
+      }
       fetch("/api/v3/admin/shareDevice", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -435,6 +444,7 @@ export class DeviceView extends Component {
       }).then(response => response.json()).then(serverresponse => {
       }).catch(err => console.error(err.toString()));
     }
+    this.setState({ SelectedUsers: [] })
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
