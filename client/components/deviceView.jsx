@@ -127,6 +127,7 @@ export class DeviceView extends Component {
       this.setState({ stats: stats })
     }).catch(err => console.error(err.toString()));
   }
+
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
       var temp = [];
@@ -147,7 +148,6 @@ export class DeviceView extends Component {
           }
         }
       }
-
       this.setState({ userSearched: temp })
     })
   }
@@ -158,12 +158,13 @@ export class DeviceView extends Component {
       return (<div>
         {
           this.state.SelectedUsers.map((user, i) => {
-            return <p style={{ float: "left", color: "rgb(127,255,0)", textOverflow: "ellipsis", overflow: "hidden", margin: 0, padding: 0 }}> |{user.email}| </p>
+            return <p id={user.email} style={{ float: "left", color: "rgb(127,255,0)", textOverflow: "ellipsis", overflow: "hidden", margin: 0, padding: 0 }}> |{user.email}| </p>
           })
         }
       </div>)
     } catch (err) { }
   }
+
   userNameList = () => {
 
     try {
@@ -171,10 +172,10 @@ export class DeviceView extends Component {
         {
           this.state.userSearched.map((user, i) => {
             if (user.shared == "no") {
-              return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
             }
             else {
-              return <div className="commanderBgPanel commanderBgPanelClickable" >{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" >{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
             }
           })
         }
@@ -187,7 +188,7 @@ export class DeviceView extends Component {
       return (<div>
         {
           this.state.EmailsharedDevice.map((user, i) => {
-            return <div className="" style={{ color: "rgb(127,255,0)" }}> |{user.email}|<input type="checkbox" style={{ float: "right" }} />  </div>
+            return <div id={user.email} className="" style={{ color: "rgb(127,255,0)" }}> |{user.email}|<input type="checkbox" style={{ float: "right" }} />  </div>
           })
         }
       </div>)
@@ -225,7 +226,6 @@ export class DeviceView extends Component {
   }
 
   componentDidMount = () => {
-    this.sharedList();
     this.updateTime();
     setInterval(() => {
       this.updateTime();
@@ -275,6 +275,7 @@ export class DeviceView extends Component {
     }).catch(err => console.error(err.toString()));
 
   }
+
   sharedList = () => {
     fetch("/api/v3/shared", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -437,6 +438,7 @@ export class DeviceView extends Component {
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
+    this.sharedList();
     this.setState({ isOpen: !this.state.isOpen })
   }
 
@@ -444,7 +446,6 @@ export class DeviceView extends Component {
     if (this.state.state) {
       return (
         <div style={{ maxWidth: "400px", overflow: "hidden", margin: 0, padding: 0 }}>
-
           <SyntaxHighlighter language="javascript" style={tomorrowNightBright} >{JSON.stringify(this.state.state.payload, null, 2)}</SyntaxHighlighter>
         </div>
       )
@@ -504,7 +505,6 @@ export class DeviceView extends Component {
       <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
         <center style={{ color: "white" }}>
           Search For users to share  with<br></br>
-
           <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
         <br></br><div>
           {this.ShareButton()}</div><hr></hr>

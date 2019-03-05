@@ -217,6 +217,7 @@ export class MapDevices extends Component {
             var gps = {
             }
             var bLayer = marker.boundaryLayer;
+
             if (bLayer == 0) {
               marker.boundaryLayer = undefined;
             }
@@ -229,8 +230,6 @@ export class MapDevices extends Component {
                 .then(response => response.json()).then(result => { console.log("Added Select Icon") })
                 .catch(err => console.error(err.toString()));
             }
-
-            marker.meta.ipLoc.ll = undefined;
 
             if (marker.payload.data.gps != undefined) {
               if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
@@ -251,7 +250,14 @@ export class MapDevices extends Component {
                       ]
                   }
                 } else {
-                  marker.meta.ipLoc = defaultLoc;
+                  if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                    marker.meta.ipLoc = defaultLoc
+                  } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                    if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                      marker.meta.ipLoc = defaultLoc
+                    }
+                    return marker.meta.ipLoc.ll;
+                  }
                 }
               }
             } else {
@@ -320,7 +326,7 @@ export class MapDevices extends Component {
                       }}
                     />
                   </FeatureGroup>
-                  <Marker position={[llprod[0], llprod[1]]}>
+                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
@@ -397,7 +403,7 @@ export class MapDevices extends Component {
                   </FeatureGroup>
                   {this.getHistory(marker.devid, b)}
                   <Marker
-                    position={[llprod[0], llprod[1]]}
+                    position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
                   >
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
@@ -415,7 +421,7 @@ export class MapDevices extends Component {
             } else if (marker.selectedIcon == false) {
               return (
                 <div key={marker.devid}>
-                  <Marker position={[llprod[0], llprod[1]]}>
+                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>
