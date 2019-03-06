@@ -14,6 +14,8 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 import { MapDevices } from "./map.jsx"
 
+import Media from "react-media";
+
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -470,7 +472,19 @@ export class StatesViewer extends Component {
           <div style={{ paddingTop: 25, margin: 30 }} >
             {/* <span>username: {this.props.username}</span> */}
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
-            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} />
+            <Media query="(max-width: 599px)">
+              {matches =>
+                matches ? (
+                  <div >
+                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={6} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+                  </div>
+                ) : (
+                    <div >
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+                    </div>
+                  )
+              }
+            </Media>
           </div>
         )
       } else if (this.state.view == "map") {
@@ -478,10 +492,21 @@ export class StatesViewer extends Component {
           <div style={{ paddingTop: 25, margin: 30 }} >
             <StatesViewerMenu showBoundary={this.showBoundaryPath} deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <div className="rowList">
-              <div >
-                <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
-              </div>
-              <div style={{ height: "605px" }}>
+              <Media query="(max-width: 599px)">
+                {matches =>
+                  matches ? (
+                    <div >
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={3} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+                    </div>
+                  ) : (
+                      <div >
+                        <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+                      </div>
+                    )
+                }
+              </Media>
+
+              <div className="mapContainer">
                 <MapDevices widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
               </div>
             </div>
