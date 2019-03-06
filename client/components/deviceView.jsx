@@ -27,7 +27,6 @@ import socketio from "socket.io-client";
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
 var loggedInUser = "";
-var currentDevice = "";
 const customStyles = {
   content: {
     top: '50%',
@@ -74,7 +73,9 @@ export class DeviceView extends Component {
     shareDisplay: "",
     editorChanged: false,
     devicesServer: undefined,
-    shared: []
+    shared: [],
+    Devicestate: "SHARE PUBLICLY",
+    DevicestateIcon: "fas fa-eye"
   };
 
   socket;
@@ -120,6 +121,11 @@ export class DeviceView extends Component {
     }
   }
   unshare = (remove) => {
+    for (let i in this.state.userSearched) {
+      if (remove == this.state.userSearched[i].uuid) {
+        this.state.userSearched[i].shared = "no";
+      }
+    }
     fetch("/api/v3/unshare", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
@@ -246,15 +252,15 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      loggedInUser = account;
-      if (this.state.state) {
-        currentDevice = this.state.state.apikey;
-        if (loggedInUser.apikey != this.state.state.apikey && this.state.state.level < 100) {
-          this.setState({ shareDisplay: "none" })
-        }
-        else {
-          this.setState({ shareDisplay: "" })
-        }
+
+      var loggedin = account.apikey
+      var owner = this.state.state.apikey
+
+      if (loggedin != owner && this.props.account.level < 100) {
+        this.setState({ shareDisplay: "none" })
+      }
+      else {
+        this.setState({ shareDisplay: "" })
       }
 
     }).catch(err => console.error(err.toString()));
@@ -351,7 +357,7 @@ export class DeviceView extends Component {
     if (this.state.SelectedUsers.length > 0) {
       return (
         <div className="protoButton"
-          onClick={this.shareDevice} style={{ float: "right" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
+          onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> {this.Devicestate}</div>
       )
     } else {
       return (
@@ -422,6 +428,11 @@ export class DeviceView extends Component {
   shareDevice = () => {
     this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
     for (let dev in this.state.EmailsharedDevice) {
+      for (let i in this.state.userSearched) {
+        if (this.state.EmailsharedDevice[dev].email == this.state.userSearched[i].email) {
+          this.state.userSearched[i].shared = "yes";
+        }
+      }
       fetch("/api/v3/admin/shareDevice", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -435,6 +446,7 @@ export class DeviceView extends Component {
       }).then(response => response.json()).then(serverresponse => {
       }).catch(err => console.error(err.toString()));
     }
+    this.setState({ SelectedUsers: [] })
     this.setState({ isOpen: !this.state.isOpen })
   }
   toggleModal = () => {
@@ -504,9 +516,9 @@ export class DeviceView extends Component {
     return (<div ><center>
       <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
         <center style={{ color: "white" }}>
-          Search For users to share  with<br></br>
+          <br></br> Search For users to share  with<br></br>
           <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-        <br></br><div>
+        <br></br><div style={{ float: "right", cursor: "pointer" }} className="protoButton"><i className={this.state.DevicestateIcon}></i> {this.state.Devicestate}</div><div>
           {this.ShareButton()}</div><hr></hr>
         <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
           {this.userNameList()}
@@ -556,8 +568,8 @@ export class DeviceView extends Component {
               <span className="faded" >{this.state.timeago}</span>
             </div>
 
-            <div className="col-6" >
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.shareDisplay, width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+            <div className="col-6" style={{ display: this.state.shareDisplay }}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
@@ -570,7 +582,7 @@ export class DeviceView extends Component {
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
 
-              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
 
@@ -604,7 +616,7 @@ export class DeviceView extends Component {
 
 
         </div>
-      </div>
+      </div >
     );
   }
 }
