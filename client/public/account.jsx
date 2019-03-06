@@ -193,7 +193,7 @@ export class Account extends Component {
           </div>
           <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
 
-          <a className="font-weight-bold spot" style={{ float: "right", marginRight: 120, marginLeft: 15, marginTop: 10, color: "#E02430" }} onClick={() => this.ForgotPassword()} ><u> {this.state.forgotButton} ? </u>  </a>
+          <a className="font-weight-bold spot" style={{ float: "right", marginRight: 120, marginLeft: 15, marginTop: 10, color: "#E02430", cursor: "pointer" }} onClick={() => this.ForgotPassword()} ><u> {this.state.forgotButton} ? </u>  </a>
         </div>
       )
     } else {

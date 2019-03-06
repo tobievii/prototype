@@ -73,7 +73,9 @@ export class DeviceView extends Component {
     shareDisplay: "",
     editorChanged: false,
     devicesServer: undefined,
-    shared: []
+    shared: [],
+    Devicestate: "SHARE PUBLICLY",
+    DevicestateIcon: "fas fa-eye"
   };
 
   socket;
@@ -355,7 +357,7 @@ export class DeviceView extends Component {
     if (this.state.SelectedUsers.length > 0) {
       return (
         <div className="protoButton"
-          onClick={this.shareDevice} style={{ float: "right" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
+          onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> {this.Devicestate}</div>
       )
     } else {
       return (
@@ -514,9 +516,9 @@ export class DeviceView extends Component {
     return (<div ><center>
       <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
         <center style={{ color: "white" }}>
-          Search For users to share  with<br></br>
+          <br></br> Search For users to share  with<br></br>
           <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-        <br></br><div>
+        <br></br><div style={{ float: "right", cursor: "pointer" }} className="protoButton"><i className={this.state.DevicestateIcon}></i> {this.state.Devicestate}</div><div>
           {this.ShareButton()}</div><hr></hr>
         <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
           {this.userNameList()}
