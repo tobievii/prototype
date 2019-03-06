@@ -252,15 +252,15 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      loggedInUser = account;
-      if (this.state.state) {
-        currentDevice = this.state.state.apikey;
-        if (loggedInUser.apikey != this.state.state.apikey && this.state.state.level < 100) {
-          this.setState({ shareDisplay: "none" })
-        }
-        else {
-          this.setState({ shareDisplay: "" })
-        }
+
+      var loggedin = account.apikey
+      var owner = this.state.state.apikey
+
+      if (loggedin != owner && this.props.account.level < 100) {
+        this.setState({ shareDisplay: "none" })
+      }
+      else {
+        this.setState({ shareDisplay: "" })
       }
 
     }).catch(err => console.error(err.toString()));
@@ -568,8 +568,8 @@ export class DeviceView extends Component {
               <span className="faded" >{this.state.timeago}</span>
             </div>
 
-            <div className="col-6" >
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.shareDisplay, width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+            <div className="col-6" style={{ display: this.state.shareDisplay }}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
                 <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
               </div>
 
@@ -582,7 +582,7 @@ export class DeviceView extends Component {
                 <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
               </div>
 
-              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, display: this.state.shareDisplay }} className="commanderBgPanel commanderBgPanelClickable"  >
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
               </div>
 
@@ -616,7 +616,7 @@ export class DeviceView extends Component {
 
 
         </div>
-      </div>
+      </div >
     );
   }
 }
