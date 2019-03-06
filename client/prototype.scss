@@ -284,7 +284,15 @@ td.react-bootstrap-table-editing-cell {
 .commanderBgPanel {
   background: rgba(3, 4, 5, 0.5);
   color: rgba(255, 246, 235, 0.959);
-  padding: 20px;
+  padding: 10px 20px 10px 20px;
+  border: 1px solid rgba(60, 19, 25, 0);
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+}
+
+.apidocsLinkUrl {
+  color: rgba(255, 246, 235, 0.959);
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
