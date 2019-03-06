@@ -45,7 +45,7 @@ export class Pagination extends Component {
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div style={{ marginLeft: "8px" }}>
+      return (<div style={{ marginLeft: "8px", marginBottom: "10px" }}>
         {
           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
@@ -473,6 +473,7 @@ export class StatesViewer extends Component {
             {/* <span>username: {this.props.username}</span> */}
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <Media query="(max-width: 599px)">
+
               {matches =>
                 matches ? (
                   <div >
@@ -495,8 +496,8 @@ export class StatesViewer extends Component {
               <Media query="(max-width: 599px)">
                 {matches =>
                   matches ? (
-                    <div >
-                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={3} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
+                    <div style={{ marginBottom: 10 }}>
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
                     </div>
                   ) : (
                       <div >

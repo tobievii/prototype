@@ -6,6 +6,10 @@ $break-large: 1200px;
       height: 350px;
     }
 
+    .map {
+        margin-top: 10px;
+      }
+
     .navHeading{
         display: none;
     }
@@ -47,13 +51,36 @@ $break-large: 1200px;
         right: 4px !important; 
         margin-right: 0px !important; 
     }
+
+    .rowList{
+        display: block;
+    }
+
+    .version{
+        color: #f3353a;
+        font-size: 13px;
+    }
+
+    .menuIcons{
+        display:none;
+    }
 }
 
 @media(max-width: 400px){
     .navHeading{
         display: none;
     }
-  
+
+    .map {
+        padding-top: 100;
+    }
+
+    .version{
+        color: #f3353a;
+        font-size: 13px;
+    }
+
+
     .menuTab {
         background: rgba(3, 4, 5, 0.5);
         color: rgba(255, 246, 235, 0.959);
@@ -114,6 +141,14 @@ $break-large: 1200px;
       .loginB{
           width: 100%;
           margin-right: 14px; 
+      }
+
+      .rowList{
+          display: block;
+      }
+
+      .menuIcons{
+          display:none;
       }
 
 }

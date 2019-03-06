@@ -13,6 +13,8 @@ library.add(faCog)
 library.add(faTimes)
 library.add(faBell);
 
+
+
 export class Notification extends Component {
 
 
@@ -233,7 +235,7 @@ export class NavBar extends Component {
                   className="font-weight-bold spot"
                   style={{ paddingLeft: 5, float: "left" }}
                 >
-                  <span className="navHeading">PR0T0TYP3</span> <span id="navDashboard" style={{ color: "#fff", fontSize: 15 }}>DASHBOARD <span id="version" />{this.props.version}</span>
+                  <span className="navHeading">PR0T0TYP3</span> <span id="navDashboard" style={{ color: "#fff", fontSize: 15 }}>DASHBOARD</span> <span className="version" id="version">{this.props.version}</span>
                 </div>
               </div>
             </Link>
