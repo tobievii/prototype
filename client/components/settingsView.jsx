@@ -65,7 +65,7 @@ export class SettingsView extends React.Component {
         return <SettingsPanel />
       } else {
         //default to 0 
-        this.setState({activeMenu:0})
+        this.setState({ activeMenu: 0 })
       }
 
     } else {
@@ -79,7 +79,7 @@ export class SettingsView extends React.Component {
       <div style={{ padding: 20 }}>
         {
           plugins.map((item, i) => {
-            return <div key={i} className={this.getMenuClasses(i)}  onClick={this.onClickMenuTab(i)}>{item.name}</div>
+            return <div key={i} className={this.getMenuClasses(i)} onClick={this.onClickMenuTab(i)}>{item.name}</div>
           })
         }
       </div>
@@ -88,7 +88,7 @@ export class SettingsView extends React.Component {
 
   render() {
     return (
-      <div style={{ background: "rgba(0,0,0,0.2)", margin: 20, overflow: "hidden" }}>
+      <div className="settingsPage" style={{ background: "rgba(0,0,0,0.2)", margin: 20, overflow: "hidden" }}>
         <div className="row">
           <div className="col-2" style={{ background: "rgba(0,0,0,0.2)", padding: 20 }} >
             {this.genMenu()}

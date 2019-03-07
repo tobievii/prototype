@@ -194,19 +194,21 @@ export class StatesViewerItem extends Component {
 
   selectbox = () => {
 
-    if (this.props.device.selected) {
+    if (this.props.public == false) {
+      if (this.props.device.selected) {
 
-      return (
-        <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-          <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
-        </div>
-      )
-    } else {
-      return (
-        <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-          <i className="statesViewerCheckBoxes fas fa-check" ></i>
-        </div>
-      )
+        return (
+          <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+            <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+          </div>
+        )
+      } else {
+        return (
+          <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
+            <i className="statesViewerCheckBoxes fas fa-check" ></i>
+          </div>
+        )
+      }
     }
   }
 

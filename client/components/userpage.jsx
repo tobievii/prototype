@@ -17,12 +17,11 @@ export class UserProfile extends Component {
         }
 
         return (
-            <div className="panel">
+            <div className="panel" style={{ paddingTop: "70px" }}>
                 <div className="avatarProfile"> <img src={avatar} /></div>
                 <h3> {this.props.user.username} </h3>
                 Created: {this.props.user["_created_on"]} ( {moment(this.props.user["_created_on"]).fromNow()}) <br />
                 Last Seen: {this.props.user["_last_seen"]} ( {moment(this.props.user["_last_seen"]).fromNow()}) <br />
-
                 Device Count: {this.props.user["devicecount"]}
             </div>)
     }

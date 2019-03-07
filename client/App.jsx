@@ -120,7 +120,7 @@ class App extends Component {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
@@ -130,7 +130,9 @@ class App extends Component {
                 return (
                     <div>
                         <Account account={this.state.account} />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
                         <Landing />
+                        <Footer />
                     </div>)
             }
         } else {
@@ -147,6 +149,7 @@ class App extends Component {
                     acc={test.acc}
                     deviceCall={test.dc}
                     devices={test.ds}
+                    account={this.state.account}
                 />
             </div>
         )
@@ -156,7 +159,8 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} />
+                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} />
+                <Footer />
             </div>
 
         )

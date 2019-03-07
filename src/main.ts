@@ -564,6 +564,14 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
 
 
+app.post('/api/v3/publicStates', (req: any, res: any) => {
+  if (req.user.level == 0) {
+    db.states.find({ public: true }, (err: Error, result: any) => {
+      res.json(result);
+    })
+  }
+})
+
 app.get('/api/v3/states', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -599,6 +607,14 @@ app.post('/api/v3/unshare', (req: any, res: any) => {
   })
 })
 //unshare device
+
+//preview devices
+app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
+  db.states.find({}, { devid: 1 }, (err: Error, states: any) => {
+    res.json(states)
+  })
+})
+//preview devices
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
