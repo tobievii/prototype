@@ -490,11 +490,10 @@ export class StatesViewer extends Component {
             {/* <span>username: {this.props.username}</span> */}
             <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <Media query="(max-width: 599px)">
-
               {matches =>
                 matches ? (
                   <div >
-                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={6} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={10} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
                   </div>
                 ) : (
                     <div >

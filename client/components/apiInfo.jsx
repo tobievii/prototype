@@ -46,10 +46,6 @@ export class ApiInfo extends Component {
   }
 
   render() {
-
-
-
-
     var apiCall = { path: window.location.origin }
 
     var samplePacket = { "id": "yourDevice001", "data": { "temperature": 24.54, "doorOpen": false, "gps": { "lat": 25.123, "lon": 28.125 } } }
@@ -85,9 +81,9 @@ export class ApiInfo extends Component {
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "' + this.props.apikey + '|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="" style={{ paddingTop: 0, margin: "0 37px", marginTop: "50px" }} >
+      <div className="apiInfo" style={{ paddingTop: 0, margin: "0 37px", marginTop: "50px" }} >
 
-        <div className="row">
+        <div className="row apiInfoMenu">
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1)} >APIKEY</div>
           <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)}>HTTP REST</div>
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3)}>SOCKET.IO</div>
@@ -188,7 +184,7 @@ export class ApiInfo extends Component {
             </div>
           </div>
 
-          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10 }} >
+          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10, overflow: "auto" }} >
             <h5>QUICK CURL SNIPPET:</h5>
             <p className="commanderBgPanel" id="postSample" >{curlStatesSample}</p>
           </div>

@@ -143,8 +143,8 @@ export class StatesViewerMenu extends Component {
         } else if (searchButton == "filter") {
             return (
                 <div style={{ padding: 0 }}>
-                    <i onClick={this.changeSearch} className="fas fa-search"></i>
-                    <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
+                    <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                    <form id="search" style={{ textAlign: "left" }} style={{ width: "92%", float: "right" }}>
                         <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
                     </form>
                 </div>

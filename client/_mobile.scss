@@ -4,6 +4,7 @@ $break-large: 1200px;
 @media(max-width: 600px){
     .mapContainer{
       height: 350px;
+      margin-top: 70px;
     }
 
     .map {
@@ -14,15 +15,20 @@ $break-large: 1200px;
         display: none;
     }
 
+    .apiInfo{
+        padding-top: 0px; 
+        margin: 60px 37px 0px !important;
+    }
+
     .menuTab {
         background: rgba(3, 4, 5, 0.5);
         color: rgba(255, 246, 235, 0.959);
-        padding: 15px 20px 10px 20px;
+        padding: 12px 0px 2px 8px !important;
         margin-top: 7px;
         border-top: 1px solid rgba(161, 200, 231, 0.151);
         border-left: 1px solid rgba(97, 115, 129, 0.151);
         border-right: 1px solid rgba(97, 115, 129, 0.151);
-        box-sizing: border-box;
+        box-sizing: content-box;
         font-weight: 100;
         font-size: 12px;
         -webkit-border-top-left-radius: 2px;
@@ -64,14 +70,70 @@ $break-large: 1200px;
     .menuIcons{
         display:none;
     }
+
+    .dataPreview{
+        display: none;
+    }
+
+    .statesViewerItem {
+        display: flex;
+    }
+
+    .changeTimeagoWidth{
+        flex: 0 0 130px !important;
+    }
+
+    .commanderBgPanel{
+        overflow: auto;
+    }
+
+    .apiInfoMenu{
+        display: grid;
+        grid-template-columns: 20% 20% 20% 20% 20%;
+    }
+    .menuSelectable {
+        background-image: linear-gradient(#101218, black);
+    }
+
+    .searchIcon{
+        padding-top: 5px; 
+    }
 }
 
 @media(max-width: 400px){
+    .searchIcon{
+        padding-top: 5px; 
+    }
+
+    .apiInfo{
+        padding-top: 0px; 
+        margin: 60px 37px 0px !important;
+    }
+
+    .apiInfoMenu{
+        display: grid;
+        grid-template-columns: 20% 20% 20% 20% 20%;
+        align-self: center;
+    }
+
+    .statesViewerItem {
+        display: flex;
+    }
+
+    .changeTimeagoWidth{
+        flex: 0 0 130px !important;
+    }
+
+    .dataPreview{
+        display: none;
+    }
+
     .navHeading{
         display: none;
     }
 
-    .map {
+    .mapContainer {
+        margin-top: 70px;
         padding-top: 100;
     }
 
@@ -80,16 +142,21 @@ $break-large: 1200px;
         font-size: 13px;
     }
 
+    .commanderBgPanel{
+        overflow: auto;
+    }
+
 
     .menuTab {
+        overflow: hidden;
         background: rgba(3, 4, 5, 0.5);
         color: rgba(255, 246, 235, 0.959);
-        padding: 15px 20px 10px 20px;
+        padding: 12px 0px 2px 8px !important;
         margin-top: 7px;
         border-top: 1px solid rgba(161, 200, 231, 0.151);
         border-left: 1px solid rgba(97, 115, 129, 0.151);
         border-right: 1px solid rgba(97, 115, 129, 0.151);
-        box-sizing: border-box;
+        box-sizing: content-box;
         font-weight: 100;
         font-size: 12px;
         -webkit-border-top-left-radius: 2px;
@@ -111,6 +178,10 @@ $break-large: 1200px;
         border-top: 1px solid #f3353a;
         background-image: linear-gradient(rgba(243, 53, 58, 0.1), rgba(0, 0, 0, 0));
     }
+
+    .menuSelectable {
+        background-image: linear-gradient(#101218, black);
+      }
 
     .navBar{
         position: absolute;
