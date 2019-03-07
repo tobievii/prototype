@@ -160,18 +160,6 @@ export class DeviceView extends Component {
     })
   }
 
-  selectedNameList = () => {
-
-    try {
-      return (<div>
-        {
-          this.state.SelectedUsers.map((user, i) => {
-            return <p id={user.email} style={{ float: "left", color: "rgb(127,255,0)", textOverflow: "ellipsis", overflow: "hidden", margin: 0, padding: 0 }}> |{user.email}| </p>
-          })
-        }
-      </div>)
-    } catch (err) { }
-  }
 
   userNameList = () => {
 
@@ -572,6 +560,19 @@ export class DeviceView extends Component {
     }
   }
 
+  selectedUserCount = () => {
+    if (this.state.SelectedUsers.length == 0) {
+      return (
+        <div></div>
+      )
+    }
+    else {
+      return (
+        <div>SELECTED USERS ({this.state.SelectedUsers.length})</div>
+      )
+    }
+  }
+
   shareWindow = () => {
     return (<div ><center>
       <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
@@ -580,7 +581,7 @@ export class DeviceView extends Component {
           <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
         <br></br>{this.DevicePublic()}<div>
           {this.ShareButton()}</div><hr></hr>
-        <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
+        <div >{this.selectedUserCount()}</div> <hr></hr><br></br>                <div >
           {this.userNameList()}
         </div>
         <center>
