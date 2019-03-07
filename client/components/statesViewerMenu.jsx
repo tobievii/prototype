@@ -61,22 +61,22 @@ export class StatesViewerMenu extends Component {
     }
 
     boundaryButton = () => {
-        if (this.props.public == false) {
-            if (this.state.view == "map") {
-                if (this.props.boundary == true) {
-                    if (this.state.boundaryVisible == true) {
-                        return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "white", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
-                    } else {
-                        return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "grey", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
-                    }
 
-                } else if (!this.state.boundary || this.state.boundary == undefined) {
-                    return <i className="viewButton fas fa-route" title="Select a device to view path" style={{ color: "grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed" }}></i>;
+        if (this.state.view == "map") {
+            if (this.props.boundary == true) {
+                if (this.state.boundaryVisible == true) {
+                    return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "white", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
+                } else {
+                    return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "grey", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
                 }
-            } else {
-                return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
+
+            } else if (!this.state.boundary || this.state.boundary == undefined) {
+                return <i className="viewButton fas fa-route" title="Select a device to view path" style={{ color: "grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed" }}></i>;
             }
+        } else {
+            return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
         }
+
     }
 
     boundaryButtonClicked = (device) => {
