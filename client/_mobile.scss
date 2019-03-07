@@ -98,9 +98,50 @@ $break-large: 1200px;
     .searchIcon{
         padding-top: 5px; 
     }
+    .settingsMenu{
+        display: inline;
+        font-size: 13px;
+    }
+
+    .settingsPage{
+        margin: 10px 2px 0px 2px !important;
+    }
+    
+    .settingsDetails{
+        color: grey;
+    }
+
+    .fullWidth{
+        width: 100% !important;
+    }
+
+    .floatLeft{
+        margin-top: 5px !important;
+        float: left !important;
+    }
+
+    .alignLeft{
+        text-align: left !important;
+    }
+
+    .smallButton{
+        font-size: 13px;
+      }
 }
 
 @media(max-width: 400px){
+    .fullWidth{
+        width: 100% !important;
+    }
+
+    .floatLeft{
+        margin-top: 5px !important;
+        float: left !important;
+    }
+    .settingsMenu{
+        display: inline;
+    }
+
     .searchIcon{
         padding-top: 5px; 
     }
@@ -220,6 +261,14 @@ $break-large: 1200px;
 
       .menuIcons{
           display:none;
+      }
+
+      .alignLeft{
+          text-align: left !important;
+      }
+
+      .smallButton{
+        font-size: 13px;
       }
 
 }

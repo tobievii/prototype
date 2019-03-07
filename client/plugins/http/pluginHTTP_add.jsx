@@ -22,7 +22,7 @@ export class AddRoute extends React.Component {
       route: "httpdevice",
       method: "get"
     },
-    message:"", messageOpacity: 0
+    message: "", messageOpacity: 0
   };
 
   changeInput = name => {
@@ -35,22 +35,22 @@ export class AddRoute extends React.Component {
 
   onSubmit = () => {
 
-    
+
     if (this.props.formSubmit) {
-      this.props.formSubmit(this.state.form, (err,result)=>{
+      this.props.formSubmit(this.state.form, (err, result) => {
 
         if (err) {
           console.log(err);
-          this.setState( { message: err, messageOpacity: 1.0 })
-          setTimeout(()=>{
-            this.setState( { messageOpacity: 0 })
-          },1000);
+          this.setState({ message: err, messageOpacity: 1.0 })
+          setTimeout(() => {
+            this.setState({ messageOpacity: 0 })
+          }, 1000);
         }
-        
+
 
       });
     }
-    
+
   }
 
   render() {
@@ -62,7 +62,7 @@ export class AddRoute extends React.Component {
         </p>
 
         <div className="row" style={formRowStyle}>
-          <div className="col-4" style={formLabelStyle}>
+          <div className="col-4 alignLeft" style={formLabelStyle}>
             ID
           </div>
           <div className="col-8" style={formInputStyle}>
@@ -76,7 +76,7 @@ export class AddRoute extends React.Component {
         </div>
 
         <div className="row" style={formRowStyle}>
-          <div className="col-4" style={formLabelStyle}>
+          <div className="col-4 alignLeft" style={formLabelStyle}>
             METHOD
           </div>
           <div className="col-8" style={formInputStyle}>
@@ -104,17 +104,18 @@ export class AddRoute extends React.Component {
           <div className="col-8" style={formInputStyle}>
 
             <div className="commanderBgPanel commanderBgPanelClickable"
-                    style={{ width: 100, float:"left" }}
-                    onClick={this.onSubmit}>
-                    <FontAwesomeIcon icon="hdd" /> ADD</div>
+              style={{ width: 100, float: "left" }}
+              onClick={this.onSubmit}>
+              <FontAwesomeIcon icon="hdd" /> ADD</div>
 
-            <div style={{ 
-              transition:"all 0.25s ease-out", 
-              opacity:this.state.messageOpacity, 
-              marginTop: 17, marginBottom: 20, float: "left", 
-              textAlign:"right", paddingLeft: 20 }}>
-              { this.state.message }
-             </div>
+            <div style={{
+              transition: "all 0.25s ease-out",
+              opacity: this.state.messageOpacity,
+              marginTop: 17, marginBottom: 20, float: "left",
+              textAlign: "right", paddingLeft: 20
+            }}>
+              {this.state.message}
+            </div>
 
           </div>
         </div>

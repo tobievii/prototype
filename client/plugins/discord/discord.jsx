@@ -53,10 +53,10 @@ export class SettingsPanel extends React.Component {
                     </p>
 
                     <div className="row" style={formRowStyle} >
-                        <div className="col-3" style={formLabelStyle} >
+                        <div className="col-4" style={formLabelStyle} >
                             CLIENT ID:
                     </div>
-                        <div className="col-7" style={formInputStyle}>
+                        <div className="col-8" style={formInputStyle}>
                             <input
                                 style={{ width: "100%" }}
                                 placeholder={this.state.form.clientid}
@@ -77,10 +77,10 @@ export class SettingsPanel extends React.Component {
                     <div className="row" style={{ marginTop: 30 }} ></div>
 
                     <div className="row" style={formRowStyle} >
-                        <div className="col-3" style={formLabelStyle} >
+                        <div className="col-4" style={formLabelStyle} >
                             Token:
                     </div>
-                        <div className="col-7" style={formInputStyle}>
+                        <div className="col-8" style={formInputStyle}>
                             <input
                                 style={{ width: "100%" }}
                                 placeholder={this.state.form.token}
@@ -110,8 +110,8 @@ export class SettingsPanel extends React.Component {
 
                 <div style={blockstyle}>
                     <div className="row" style={gridHeadingStyle}>
-                        <div className="col-12" style={{  }}>Token</div>
-                        
+                        <div className="col-12" style={{}}>Token</div>
+
                     </div>
                     {
                         this.state.bots.map((bot, i) => {
