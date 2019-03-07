@@ -452,7 +452,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
               res.json({ error: "must be level 100" }); return
             }
           })
-        });
+        })
       }
     }
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
@@ -519,10 +519,12 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
-        db.states.findOne({ devid: req.body.id }, { key: 1 }, (err: Error, give: any) => {
+        db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
-            if (found == null) {
-              res.json({ error: "must be level 100" }); return;
+            if (give.public == false || give.public == null || give.public == undefined || !give.public || give.public == "") {
+              if (found == null) {
+                res.json({ error: "must be level 100" }); return;
+              }
             }
           })
         });
@@ -671,7 +673,7 @@ app.post("/api/v3/states", (req: any, res: any) => {
           db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
             if (e) { res.json({ error: "db error" }) }
             if (user) {
-              db.states.find({ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, (er: Error, states: any[]) => {
+              db.states.find({ $or: [{ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, { public: true }] }, (er: Error, states: any[]) => {
                 var cleanStates: any = []
                 for (var a in states) {
                   var cleanState = _.clone(states[a])
