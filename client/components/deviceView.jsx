@@ -76,7 +76,8 @@ export class DeviceView extends Component {
     devicesServer: undefined,
     shared: [],
     Devicestate: "SHARE PUBLICLY",
-    DevicestateIcon: "fas fa-eye"
+    DevicestateIcon: "fas fa-globe-africa",
+    checkboxstate: ""
   };
 
   socket;
@@ -179,14 +180,14 @@ export class DeviceView extends Component {
         {
           this.state.userSearched.map((user, i) => {
             if (user.shared == "no") {
-              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" >{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
             }
             else {
-              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" >{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+              return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
             }
           })
         }
-      </div>)
+      </div >)
     } catch (err) { }
   }
 
@@ -358,7 +359,7 @@ export class DeviceView extends Component {
     if (this.state.SelectedUsers.length > 0) {
       return (
         <div className="protoButton"
-          onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> {this.Devicestate}</div>
+          onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
       )
     } else {
       return (
@@ -453,6 +454,11 @@ export class DeviceView extends Component {
   toggleModal = () => {
     this.sharedList();
     this.setState({ isOpen: !this.state.isOpen })
+    if (this.state.state.public == true) {
+      this.setState({ checkboxstate: "none" })
+      this.setState({ Devicestate: "UNSHARE PUBLICLY" })
+    }
+
   }
 
   drawState = () => {
@@ -508,18 +514,71 @@ export class DeviceView extends Component {
     }
   }
 
+  publicOrprivate = () => {
+    if (this.state.Devicestate == "SHARE PUBLICLY") {
+      confirmAlert({
+        customUI: ({ onClose }) => {
+          return (
+            <div className='protoPopup'>
+              <h1>Are you sure?</h1>
+              <p>This will make device visible to Anyone even unregistered vistors </p>
+              <button onClick={onClose}>No</button>
+              <button style={{ margin: "15px" }} onClick={() => {
+                {
+                  fetch("/api/v3/makedevPublic", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      devid: this.state.state.key
+                    })
+                  }).then(response => response.json()).then(serverresponse => {
+                    { onClose() }
+                    this.setState({ checkboxstate: "none" })
+                    this.setState({ Devicestate: "UNSHARE PUBLICLY" })
+                  }).catch(err => console.error(err.toString()));
+                }
+              }}>Yes,Share Publicly !</button>
+            </div>
+          )
+        }
+      })
+    }
+    else if (this.state.Devicestate == "UNSHARE PUBLICLY") {
+      fetch("/api/v3/makedevPrivate", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          devid: this.state.state.key
+        })
+      }).then(response => response.json()).then(serverresponse => {
+        this.setState({ checkboxstate: "" })
+        this.setState({ Devicestate: "SHARE PUBLICLY" })
+      }).catch(err => console.error(err.toString()));
+    }
+  }
 
   editorChanged = () => {
     this.state.editorChanged = true;
   }
 
+  DevicePublic = () => {
+    if (this.state.checkboxstate == "") {
+      return (
+        <div style={{ float: "right", cursor: "pointer" }} className="protoButton" onClick={this.publicOrprivate}><i className="fas fa-globe-africa" ></i> {this.state.Devicestate}</div>
+      )
+    }
+    if (this.state.checkboxstate == "none") {
+      return (
+        <div style={{ float: "right", cursor: "pointer" }} className="protoButton" onClick={this.publicOrprivate}><i className="fa fa-eye-slash" ></i> {this.state.Devicestate}</div>
+      )
+    }
+  }
+
   shareWindow = () => {
     return (<div ><center>
       <Modal style={customStyles} isOpen={this.state.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.toggleModal} style={{ color: "red" }}></i>
-        <center style={{ color: "white" }}>
+        <center style={{ color: "white", display: this.state.checkboxstate }}>
           <br></br> Search For users to share  with<br></br>
           <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
-        <br></br><div style={{ float: "right", cursor: "pointer" }} className="protoButton"><i className={this.state.DevicestateIcon}></i> {this.state.Devicestate}</div><div>
+        <br></br>{this.DevicePublic()}<div>
           {this.ShareButton()}</div><hr></hr>
         <div >{this.selectedNameList()}</div> <hr></hr><br></br>                <div >
           {this.userNameList()}
@@ -529,7 +588,7 @@ export class DeviceView extends Component {
         </center>
       </Modal>
     </center>
-    </div>)
+    </div >)
   }
 
   render() {

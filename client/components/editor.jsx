@@ -174,8 +174,8 @@ export class Editor extends React.Component {
 
         this.loadStates((err, resp) => {
             // extra libraries
-            console.log("==========")
-            console.log(JSON.stringify(this.props.state.payload))
+            // console.log("==========")
+            // console.log(JSON.stringify(this.props.state.payload))
 
             var definitions = [
                 "declare var packet = " + JSON.stringify(this.props.state.payload),

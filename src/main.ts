@@ -572,6 +572,20 @@ app.post('/api/v3/publicStates', (req: any, res: any) => {
   }
 })
 
+app.post('/api/v3/makedevPublic', (req: any, res: any) => {
+
+  db.states.update({ key: req.body.devid }, { $set: { public: true } }, (err: Error, result: any) => {
+    res.json(result);
+  })
+})
+
+app.post('/api/v3/makedevPrivate', (req: any, res: any) => {
+
+  db.states.update({ key: req.body.devid }, { $set: { public: false } }, (err: Error, result: any) => {
+    res.json(result);
+  })
+})
+
 app.get('/api/v3/states', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
