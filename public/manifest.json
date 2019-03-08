@@ -8,12 +8,12 @@
             "sizes": "192x192"
         },
         {
-            "src": "/iotnxtLogo.png",
+            "src": "/iotnxtlogo2.png",
             "type": "image/png",
             "sizes": "512x512"
         }
     ],
-    "start_url": "https://prototype.dev.iotnxt.io/",
+    "start_url": "/?utm_source=a2hs",
     "background_color": "#1b394d",
     "display": "standalone",
     "theme_color": "#1b394d"
