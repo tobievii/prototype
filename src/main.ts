@@ -45,7 +45,8 @@ const { VM } = require('vm2');
 
 var db = mongojs(config.mongoConnection, config.mongoCollections);
 
-
+import { logDb } from "./log"
+logDb(db);//pass db instance to logger
 
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
