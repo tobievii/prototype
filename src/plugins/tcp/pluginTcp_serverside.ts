@@ -3,6 +3,8 @@ import * as events from "events";
 
 export var serversMem: any = {};
 
+export const name = "tcp";
+
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
