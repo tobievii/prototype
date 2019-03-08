@@ -284,7 +284,15 @@ td.react-bootstrap-table-editing-cell {
 .commanderBgPanel {
   background: rgba(3, 4, 5, 0.5);
   color: rgba(255, 246, 235, 0.959);
-  padding: 20px;
+  padding: 10px 20px 10px 20px;
+  border: 1px solid rgba(60, 19, 25, 0);
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+}
+
+.apidocsLinkUrl {
+  color: rgba(255, 246, 235, 0.959);
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
@@ -392,7 +400,7 @@ td.react-bootstrap-table-editing-cell {
 
 .switch {
   position: relative;
-  width: 30px;
+  width: 80%;
   height: 17px;
   padding: 10px;
 }
@@ -404,14 +412,15 @@ td.react-bootstrap-table-editing-cell {
 /* The slider */
 .slider {
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.2);
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
+  background-color: #15B9E4;
+}
+
+.switchActive {
+  background-color: #E4C315;
 }
 
 .slider:before {
@@ -442,7 +451,7 @@ input:checked+.slider:before {
 
 /* Rounded sliders */
 .slider.round {
-  border-radius: 17px;
+  border-radius: 20px;
 }
 
 .slider.round:before {
@@ -744,15 +753,6 @@ input[type="checkbox"]:checked {
   background: $panelBg;
 }
 
-.widgetOptions {
-  // opacity: 0.25;
-  // transition: all 0.25s;
-}
-
-.widgetOptions:hover {
-  // opacity: 0.5;
-  // transition: all 0s;
-}
 
 .widgetOptionsButton {
   cursor: pointer;
@@ -1060,6 +1060,15 @@ input[type="checkbox"]:checked {
   z-index: 0;
 }
 
+.version{
+  color: #fff;
+  font-size: 15px;
+}
+
+.mapContainer{
+  height: 605px; 
+}
+
 .popup {
   color: red;
   font-family: 'Share Tech Mono';
@@ -1076,9 +1085,6 @@ input[type="checkbox"]:checked {
   filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35));
 }
 
-
-
-
 .dashboardBlock {
   background: $backgroundPanels;
 }
@@ -1090,6 +1096,7 @@ input[type="checkbox"]:checked {
 
 .deviceViewContainer {
   background: rgb(20, 34, 44);
+  padding-top: 60px;
 }
 
 .deviceViewBlock {
@@ -1144,3 +1151,33 @@ input[type="checkbox"]:checked {
   top: -10%;
   left: 7%;
 }
+
+.settingsPage{
+  padding-top: 40px;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  left: -100%;
+
+}
+
+.dropdown-content {
+  display: none;
+  color: #e1e1e1;
+  background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 10px solid rgba(0, 0, 0, 0);
+  border-top: 10px solid rgba(0, 0, 0, 0);
+  border-bottom: 10px solid rgba(0, 0, 0, 0);
+  border-right: 10px solid rgba(0, 0, 0, 0);
+  left: -1200%;
+  font-size: 14px;
+  position: absolute;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+@import 'mobile.scss'

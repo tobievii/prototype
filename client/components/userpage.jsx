@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-
 import moment from 'moment'
-
-
-
+import Media from "react-media";
 
 export class UserProfile extends Component {
     render() {
@@ -17,20 +14,31 @@ export class UserProfile extends Component {
         }
 
         return (
-            <div className="panel">
-                <div className="avatarProfile"> <img src={avatar} /></div>
+            <div className="panel" style={{ marginTop: "70px", overflow: "auto" }}>
+                <div className="avatarProfile" style={{ marginTop: "3px" }}> <img src={avatar} /></div>
                 <h3> {this.props.user.username} </h3>
-                Created: {this.props.user["_created_on"]} ( {moment(this.props.user["_created_on"]).fromNow()}) <br />
-                Last Seen: {this.props.user["_last_seen"]} ( {moment(this.props.user["_last_seen"]).fromNow()}) <br />
+                <Media query="(max-width: 599px)">
+                    {matches =>
+                        matches ? (
+                            <div>
+                                Created:  {moment(this.props.user["_created_on"]).fromNow()} <br />
+                                Last Seen: {moment(this.props.user["_last_seen"]).fromNow()} <br />
+                                Device Count: {this.props.user["devicecount"]}
+                            </div>
 
-                Device Count: {this.props.user["devicecount"]}
-            </div>)
+                        ) : (
+                                <div>
+                                    Created: {this.props.user["_created_on"]} ( {moment(this.props.user["_created_on"]).fromNow()}) <br />
+                                    Last Seen: {this.props.user["_last_seen"]} ( {moment(this.props.user["_last_seen"]).fromNow()}) <br />
+                                    Device Count: {this.props.user["devicecount"]}
+                                </div>
+                            )
+                    }
+                </Media>
+            </div>
+        )
     }
 }
-
-
-
-
 
 export class UserPage extends Component {
 

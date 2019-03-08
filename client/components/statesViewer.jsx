@@ -14,6 +14,8 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 import { MapDevices } from "./map.jsx"
 
+import Media from "react-media";
+
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -43,7 +45,7 @@ export class Pagination extends Component {
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div style={{ marginLeft: "8px" }}>
+      return (<div style={{ marginLeft: "8px", marginBottom: "10px" }}>
         {
           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
@@ -121,7 +123,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} />)}
+          {devicelist.map(device => <StatesViewerItem username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -198,22 +200,39 @@ export class StatesViewer extends Component {
       })
     });
 
-    p.statesByUsername(this.props.username, (states) => {
-      for (var s in states) {
-        states[s].selected = false
-      }
-      this.setState({ devicesServer: states }, () => {
-
-        for (var device in this.state.devicesServer) {
-          this.socket.emit("join", this.state.devicesServer[device].key);
+    if (this.props.public == true) {
+      p.publicStates((states) => {
+        for (var s in states) {
+          states[s].selected = false
         }
+        this.setState({ devicesServer: states }, () => {
 
-        this.setState({ devicesView: states }, () => {
-          //this.socketConnectDevices();
-          //this.sort();
+          for (var device in this.state.devicesServer) {
+            this.socket.emit("join", this.state.devicesServer[device].key);
+          }
+          this.setState({ devicesView: states }, () => {
+          })
         })
       })
-    })
+    }
+    else {
+      p.statesByUsername(this.props.username, (states) => {
+        for (var s in states) {
+          states[s].selected = false
+        }
+        this.setState({ devicesServer: states }, () => {
+
+          for (var device in this.state.devicesServer) {
+            this.socket.emit("join", this.state.devicesServer[device].key);
+          }
+
+          this.setState({ devicesView: states }, () => {
+            //this.socketConnectDevices();
+            //this.sort();
+          })
+        })
+      })
+    }
   }
 
   getNewDevice = () => {
@@ -469,20 +488,43 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
             {/* <span>username: {this.props.username}</span> */}
-            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
-            <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} actionCall={this.handleActionCall} />
+            <StatesViewerMenu search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <Media query="(max-width: 599px)">
+              {matches =>
+                matches ? (
+                  <div >
+                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={10} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                  </div>
+                ) : (
+                    <div >
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                    </div>
+                  )
+              }
+            </Media>
           </div>
         )
       } else if (this.state.view == "map") {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
-            <StatesViewerMenu showBoundary={this.showBoundaryPath} deviceCall={this.state.devicePressed} boundary={this.state.boundary} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
+            <StatesViewerMenu showBoundary={this.showBoundaryPath} deviceCall={this.state.devicePressed} boundary={this.state.boundary} public={this.props.public} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} />
             <div className="rowList">
-              <div >
-                <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} />
-              </div>
-              <div style={{ height: "605px" }}>
-                <MapDevices widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
+              <Media query="(max-width: 599px)">
+                {matches =>
+                  matches ? (
+                    <div style={{ marginBottom: 10 }}>
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                    </div>
+                  ) : (
+                      <div >
+                        <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                      </div>
+                    )
+                }
+              </Media>
+
+              <div className="mapContainer">
+                <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
               </div>
             </div>
           </div>

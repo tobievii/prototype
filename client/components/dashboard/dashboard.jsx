@@ -141,7 +141,13 @@ export class Dashboard extends React.Component {
 
     if (e.dataname == "lat" || e.dataname == "lon" || e.dataname == "gps") {
       typel = "map"
-    } else if (e.data == true || e.data == false) {
+    } else if (typeof e.data == "boolean") {
+      if (e.data == true) {
+        typel = "booleanButtonTrue"
+      } else {
+        typel = "booleanButtonFalse"
+      }
+    } else if (typeof e.data == "string") {
       typel = "Blank"
     } else {
       typel = "Gauge"
@@ -223,10 +229,18 @@ export class Dashboard extends React.Component {
       var layout = _.clone(this.state.layout);
       for (var w in layout) {
         if (layout[w].i == i) {
+          if (data == "button") {
+            if (this.objectByString(this.props.state.payload, layout[w].datapath.slice(5)).toString() == "true") {
+              data = "booleanButtonTrue";
+            } else if (this.objectByString(this.props.state.payload, layout[w].datapath.slice(5)).toString() == "false") {
+              data = "booleanButtonFalse";
+            } else {
+
+            }
+          }
           layout[w][option] = data;
         }
       }
-
       console.log("widgetChange");
       console.log({ option, data })
       this.setState({ layout }, () => {
@@ -259,6 +273,28 @@ export class Dashboard extends React.Component {
 
     if (data.type == "Blank") {
       return (<div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>)
+    }
+
+    if (data.type == "booleanButtonFalse") {
+      return (
+        <div align="center">
+          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+          <div className="switch">
+            <span className="slider round"></span>
+          </div>
+        </div>
+      )
+    }
+
+    if (data.type == "booleanButtonTrue") {
+      return (
+        <div align="center">
+          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+          <div className="switch">
+            <span className="slider round switchActive"></span>
+          </div>
+        </div>
+      )
     }
 
     if (data.type == "ThreeDWidget") {

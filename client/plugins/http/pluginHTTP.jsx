@@ -4,12 +4,12 @@ import { AddRoute } from "./pluginHTTP_add.jsx";
 import { PortList } from "./pluginHTTP_list.jsx";
 
 import socketio from 'socket.io-client';
-const  socket = socketio();
+const socket = socketio();
 
 export const name = "HTTP";
 
 export class SettingsPanel extends React.Component {
-  state = { routes : [], user : {} };
+  state = { routes: [], user: {} };
 
   getaccount = () => {
     fetch("/api/v3/account", { method: "GET" })
@@ -26,16 +26,17 @@ export class SettingsPanel extends React.Component {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json" },
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(form)
     }).then(response => response.json())
-      .then((data) => { 
-        if (data.err) { 
+      .then((data) => {
+        if (data.err) {
           cb(data.err, undefined)
         } else {
           cb(undefined, data);
         }
-        this.getroutes(); 
+        this.getroutes();
       })
       .catch(err => console.error(err.toString()));
   };
@@ -53,7 +54,7 @@ export class SettingsPanel extends React.Component {
     this.getaccount();
     this.getroutes();
 
-    socket.on("plugin",(data)=>{
+    socket.on("plugin", (data) => {
       console.log(data);
       this.getroutes();
     })
@@ -67,7 +68,6 @@ export class SettingsPanel extends React.Component {
   render() {
     return (
       <div>
-        
         <AddRoute formSubmit={this.addroute} />
         <PortList list={this.state.routes} update={this.update} />
       </div>
