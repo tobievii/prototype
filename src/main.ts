@@ -26,7 +26,7 @@ var version = config.version; //
 
 var compression = require('compression')
 
-import * as express from 'express'
+import express = require('express');
 
 const app = express()
 var http = require('http');
