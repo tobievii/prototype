@@ -218,9 +218,10 @@ export class NavBar extends Component {
       }
     }
     return (
-      <div className="" style={{ margin: "0 5px" }} >
-        <div className="row " style={{ paddingBottom: 10 }}>
-          <div className="col-md-12" style={{ backgroundColor: "#0E1823", position: "fixed", zIndex: 1000, right: "0%" }}>
+
+      <div className="row " style={{ paddingBottom: 30 }}>
+        <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }}>
+          <div className="navbarInsideWrap">
             <Link to="/">
               <div style={{ padding: "20px 10px 10px 10px", float: "left" }}>
                 <img
@@ -241,10 +242,12 @@ export class NavBar extends Component {
             </Link>
 
             {this.account(this.props.account)}
-
           </div>
+
+
         </div>
       </div>
+
     );
   }
 }

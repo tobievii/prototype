@@ -742,16 +742,16 @@ app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
     delete device["_last_seen"]
     delete device["selectedIcon"]
     delete device["layout"]
-    device["_created_on"] = new Date();
+    device.boundaryLayer["_created_on"] = new Date();
     db.packets.save(dev, (errSave: Error, resSave: any) => {
 
       dev["_last_seen"] = new Date();
+      dev.payload["timestamp"] = new Date();
       db.states.update({ key: req.body.key }, dev)
       // update user account activity timestamp
       db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
         user["_last_seen"] = new Date();
         db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
-          console.log(r2)
           if (e2) {
             res.json(e2)
           } else if (r2) {
