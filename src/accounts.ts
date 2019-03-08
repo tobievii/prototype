@@ -194,8 +194,11 @@ export function defaultAdminAccount(db: any) {
 export function createDefaultAdminAccount(db: any) {
   log("creating default admin account")
 
+  var scryptParameters = scrypt.paramsSync(0.1);
+  var kdfResult = scrypt.kdfSync("admin", scryptParameters);
+
   accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err: Error, user: any) => {
-  }, { password: "admin", level: 99 })
+  }, { password: kdfResult, level: 99, encrypted: true })
 }
 
 
@@ -297,6 +300,8 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
   } else {
     // auto created from cookies (no email data);
     db.users.save(user, cb);
+
+    // todo - add a dummy device
   }
 
 
