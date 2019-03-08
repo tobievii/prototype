@@ -1,14 +1,19 @@
 import React, { Component } from "react";
 import { confirmAlert } from 'react-confirm-alert';
+import Media from "react-media";
+
+var searchButton = "icon"
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll: false, sort: "", view: "map", boundary: undefined, boundaryVisible: false }
+    state = { selectAll: false, sort: "", view: "map", boundary: undefined, boundaryVisible: false, display: "" }
 
     selectBox = () => {
-        if (this.state.selectAll) {
-            return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
-        } else {
-            return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+        if (this.props.public == false) {
+            if (this.state.selectAll) {
+                return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
+            } else {
+                return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+            }
         }
     }
 
@@ -33,15 +38,17 @@ export class StatesViewerMenu extends Component {
     }
 
     menuDeleteButton = () => {
-        if (this.props.selectCount > 0) {
-            return (
-                <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
-                    onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
-            )
-        } else {
-            return (
-                <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed" }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
-            )
+        if (this.props.public == false) {
+            if (this.props.selectCount > 0) {
+                return (
+                    <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
+                        onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+                )
+            } else {
+                return (
+                    <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed" }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                )
+            }
         }
     }
 
@@ -54,6 +61,7 @@ export class StatesViewerMenu extends Component {
     }
 
     boundaryButton = () => {
+
         if (this.state.view == "map") {
             if (this.props.boundary == true) {
                 if (this.state.boundaryVisible == true) {
@@ -68,6 +76,7 @@ export class StatesViewerMenu extends Component {
         } else {
             return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
         }
+
     }
 
     boundaryButtonClicked = (device) => {
@@ -116,6 +125,33 @@ export class StatesViewerMenu extends Component {
         }
     }
 
+    changeSearch = () => {
+        if (searchButton == "icon") {
+            searchButton = "filter"
+            this.setState({ display: "menuIcons" })
+        } else if (searchButton == "filter") {
+            searchButton = "icon"
+            this.setState({ display: "" })
+        }
+    }
+
+    changeClass = () => {
+        if (searchButton == "icon") {
+            return (
+                <i onClick={this.changeSearch} className="fas fa-search"></i>
+            )
+        } else if (searchButton == "filter") {
+            return (
+                <div style={{ padding: 0 }}>
+                    <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                    <form id="search" style={{ textAlign: "left" }} style={{ width: "92%", float: "right" }}>
+                        <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
+                    </form>
+                </div>
+            )
+        }
+    }
+
     // setBoundary = (b) => {
     //     this.setState({ boundary: this.props.boundary });
     //     return(
@@ -126,36 +162,74 @@ export class StatesViewerMenu extends Component {
     render() {
 
         return (
-            <div className="container-fluid protoMenu" style={{}}>
-                <div className="row" style={{ padding: 5 }} >
-                    <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px" }}>
-                        {this.selectBox()}
-                    </div>
+            < div className="container-fluid protoMenu" style={{}}>
+                <Media query="(max-width: 599px)">
+                    {matches =>
+                        matches ? (
+                            <div className="row" style={{ padding: 5 }} >
+                                <span>
+                                    <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px" }}>
+                                        {this.selectBox()}
+                                    </div>
+                                </span>
 
-                    <div className="col" style={{ flex: "0 0 300px", padding: 0 }}>
-                        <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
-                            <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
-                        </form>
-                    </div>
+                                <span>
+                                    <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px" }}>
+                                        {/* <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
+                                                <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
+                                            </form> */}
+                                        {this.changeClass()}
+                                    </div >
+                                </span >
 
-                    <div className="col" style={{}}>
-                        {this.menuDeleteButton()}
-                        {/* { this.props.selectCount} */}
-                    </div>
+                                <span className={this.state.display}>
+                                    <span className="col" style={{}}>
+                                        {this.menuDeleteButton()}
+                                        {/* { this.props.selectCount} */}
+                                    </span>
 
-                    <div>
+                                    <span className="col" style={{ flex: "0 0 120px" }}>
+                                        {this.boundaryButton()}
+                                        {this.viewButton()}
+                                        <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
+                                            {this.sortButtons()}
+                                        </div>
+                                    </span>
+                                </span>
+                            </div >
+                        ) : (
+                                <div className="row" style={{ padding: 5 }} >
+                                    <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px" }}>
+                                        {this.selectBox()}
+                                    </div>
 
-                    </div>
+                                    <div className="col" style={{ flex: "0 0 300px", padding: 0 }}>
+                                        <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
+                                            <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
+                                        </form>
+                                    </div>
 
-                    <div className="col" style={{ flex: "0 0 120px" }}>
-                        {this.boundaryButton()}
-                        {this.viewButton()}
-                        <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
-                            {this.sortButtons()}
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                    <div className="col" style={{}}>
+                                        {this.menuDeleteButton()}
+                                        {/* { this.props.selectCount} */}
+                                    </div>
+
+                                    <div>
+
+                                    </div>
+
+                                    <div className="col" style={{ flex: "0 0 120px" }}>
+                                        {this.boundaryButton()}
+                                        {this.viewButton()}
+                                        <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
+                                            {this.sortButtons()}
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                    }
+                </Media>
+            </div >
         )
     }
 }

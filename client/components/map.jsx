@@ -13,7 +13,6 @@ var inBound = false;
 var circleColor = "#4c8ef7";
 
 var llprod = [0.012, 0.012]
-
 const L = require('leaflet');
 var poly2tri = require('poly2tri');
 const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
@@ -199,7 +198,13 @@ export class MapDevices extends Component {
     });
 
     var position = [details.lat, details.lng]
-
+    var defaultLoc = {
+      ll:
+        [
+          0.01,
+          0.01
+        ]
+    }
     return (
       <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
         <TileLayer
@@ -208,10 +213,12 @@ export class MapDevices extends Component {
 
         />
         {
-          allDevices.map((marker, index) => {
+
+          allDevices.map((marker) => {
             var gps = {
             }
             var bLayer = marker.boundaryLayer;
+
             if (bLayer == 0) {
               marker.boundaryLayer = undefined;
             }
@@ -226,176 +233,199 @@ export class MapDevices extends Component {
             }
 
             if (marker.payload.data.gps != undefined) {
-              marker.meta.ipLoc = {
-                ll:
-                  [
-                    marker.payload.data.gps.lat,
-                    marker.payload.data.gps.lon
-                  ]
-              }
-            } else {
-
-              if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+              if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
                 marker.meta.ipLoc = {
                   ll:
                     [
-                      0.01,
-                      0.01
+                      marker.payload.data.gps.lat,
+                      marker.payload.data.gps.lon
                     ]
                 }
-              } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
-                if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc == null) {
+              } else {
+                if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
                   marker.meta.ipLoc = {
                     ll:
                       [
-                        0.01,
-                        0.01
+                        marker.payload.data.gps.latitude,
+                        marker.payload.data.gps.longitude
                       ]
                   }
+                } else {
+                  if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                    marker.meta.ipLoc = defaultLoc
+                  } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                    if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                      marker.meta.ipLoc = defaultLoc
+                    }
+                  }
+                }
+              }
+            } else {
+              if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                marker.meta.ipLoc = defaultLoc
+              } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                  marker.meta.ipLoc = defaultLoc
                 }
               }
             }
 
-            if (marker.selectedIcon == true && marker.boundaryLayer == undefined) {
-              return (
-                <div key={marker.devid}>
-                  <FeatureGroup>
-                    <EditControl
-                      position='topleft'
-                      onCreated={e => {
-                        var latlngsArray = e.layer._latlngs;
-                        var latlngs = [];
-                        for (var x = 0; x < latlngsArray.length; x++) {
-                          if (x == 0) {
-                            var latlngsl = latlngsArray[x];
-                            for (var latlng in latlngsl) {
-                              var k = [
-                                latlngsl[latlng].lat,
-                                latlngsl[latlng].lng
-                              ]
-                              latlngs.push(k)
-                            }
-                          }
-                        }
-
-                        var dev = marker;
-                        dev.boundaryLayer = { boundaryPoints: latlngs };
-                        { this.checkBound(dev); }
-
-                        var b = {
-                          boundaryPoints: latlngs,
-                          inbound: inBound
-                        }
-
-                        fetch("/api/v3/boundaryLayer", {
-                          method: "POST",
-                          headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                          body: JSON.stringify({ key: marker.key, boundaryLayer: b })
-                        }).then(response => response.json()).then(result => {
-                        }).catch(err => console.error(err.toString()));
-
-                      }}
-                      onDeleted={e => {
-                        fetch("/api/v3/state/deleteBoundary", {
-                          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                          body: JSON.stringify({ id: marker.devid, username: this.props.username })
-                        }).then(response => response.json()).then(serverresponse => {
-                        }).catch(err => console.error(err.toString()));
-                      }}
-                      draw={{
-                        circlemarker: false,
-                        marker: false,
-                        rectangle: false,
-                        circle: false,
-                        polyline: false
-                      }}
-                    />
-                  </FeatureGroup>
-                  <Marker position={[llprod[0], llprod[1]]}>
-                    <Popup>
-                      <h5 className="popup">{marker.devid}</h5> <br />
-                    </Popup>
-                  </Marker>
-                </div>
-              )
-            } else if (marker.selectedIcon == true && marker.boundaryLayer != undefined) {
-              { this.checkBound(marker); }
-              if (inBound) {
-                circleColor = "#4c8ef7";
+            if (marker.selectedIcon == true) {
+              if (this.props.public == true) {
+                return (
+                  <div key={marker.devid}>
+                    <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
+                      <Popup>
+                        <h5 className="popup">{marker.devid}</h5> <br />
+                      </Popup>
+                    </Marker>
+                  </div>
+                )
               } else {
-                circleColor = "red";
-              }
-              var b = undefined;
-
-              if (this.props.showBoundary == true) {
-                b = true;
-              } else {
-                b = false;
-              }
-
-              return (
-                <div key={marker.devid}>
-                  <FeatureGroup >
-                    <EditControl
-                      position='topleft'
-                      onEdited={e => {
-                        e.layers.eachLayer(a => {
-                          var p = []
-                          for (var x in a._latlngs) {
-                            if (x == 0) {
-                              var f = a._latlngs[x];
-                              for (var d in f) {
-                                var k = [
-                                  f[d].lat,
-                                  f[d].lng
-                                ]
-                                p.push(k)
+                if (marker.boundaryLayer == undefined || marker.boundaryLayer == null) {
+                  return (
+                    <div key={marker.devid}>
+                      <FeatureGroup>
+                        <EditControl
+                          position='topleft'
+                          onCreated={e => {
+                            var latlngsArray = e.layer._latlngs;
+                            var latlngs = [];
+                            for (var x = 0; x < latlngsArray.length; x++) {
+                              if (x == 0) {
+                                var latlngsl = latlngsArray[x];
+                                for (var latlng in latlngsl) {
+                                  var k = [
+                                    latlngsl[latlng].lat,
+                                    latlngsl[latlng].lng
+                                  ]
+                                  latlngs.push(k)
+                                }
                               }
                             }
-                          }
-                          var b = {
-                            boundaryPoints: p,
-                            inbound: inBound
-                          }
 
-                          fetch("/api/v3/boundaryLayer", {
-                            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                            body: JSON.stringify({ key: marker.key, boundaryLayer: b })
-                          }).then(response => response.json()).then(result => {
-                            console.log(result);
-                          }).catch(err => console.error(err.toString()));
-                        });
-                      }}
+                            var dev = marker;
+                            dev.boundaryLayer = { boundaryPoints: latlngs };
+                            { this.checkBound(dev); }
 
-                      onDeleted={e => {
-                        fetch("/api/v3/state/deleteBoundary", {
-                          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                          body: JSON.stringify({ id: marker.devid })
-                        }).then(response => response.json()).then(serverresponse => {
-                          console.log(serverresponse)
-                        }).catch(err => console.error(err.toString()));
-                      }}
-                      draw={{
-                        circlemarker: false,
-                        marker: false,
-                        rectangle: false,
-                        circle: false,
-                        polyline: false,
-                        polygon: false
-                      }}
-                    />
-                    <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
-                  </FeatureGroup>
-                  {this.getHistory(marker.devid, b)}
-                  <Marker
-                    position={[llprod[0], llprod[1]]}
-                  >
-                    <Popup>
-                      <h5 className="popup">{marker.devid}</h5> <br />
-                    </Popup>
-                  </Marker>
-                </div>
-              )
+                            var b = {
+                              boundaryPoints: latlngs,
+                              inbound: inBound
+                            }
+
+                            fetch("/api/v3/boundaryLayer", {
+                              method: "POST",
+                              headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                              body: JSON.stringify({ key: marker.key, boundaryLayer: b })
+                            }).then(response => response.json()).then(result => {
+                            }).catch(err => console.error(err.toString()));
+
+                          }}
+
+                          onDeleted={e => {
+                            fetch("/api/v3/state/deleteBoundary", {
+                              method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                              body: JSON.stringify({ id: marker.devid, username: this.props.username })
+                            }).then(response => response.json()).then(serverresponse => {
+                            }).catch(err => console.error(err.toString()));
+                          }}
+
+                          draw={{
+                            circlemarker: false,
+                            marker: false,
+                            rectangle: false,
+                            circle: false,
+                            polyline: false
+                          }}
+                        />
+                      </FeatureGroup>
+                      <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
+                        <Popup>
+                          <h5 className="popup">{marker.devid}</h5> <br />
+                        </Popup>
+                      </Marker>
+                    </div>
+                  )
+                } else if (marker.boundaryLayer != undefined || marker.boundaryLayer != null) {
+                  { this.checkBound(marker); }
+                  if (inBound) {
+                    circleColor = "#4c8ef7";
+                  } else {
+                    circleColor = "red";
+                  }
+                  var b = undefined;
+
+                  if (this.props.showBoundary == true) {
+                    b = true;
+                  } else {
+                    b = false;
+                  }
+
+                  return (
+                    <div key={marker.devid}>
+                      <FeatureGroup >
+                        <EditControl
+                          position='topleft'
+                          onEdited={e => {
+                            e.layers.eachLayer(a => {
+                              var p = []
+                              for (var x in a._latlngs) {
+                                if (x == 0) {
+                                  var f = a._latlngs[x];
+                                  for (var d in f) {
+                                    var k = [
+                                      f[d].lat,
+                                      f[d].lng
+                                    ]
+                                    p.push(k)
+                                  }
+                                }
+                              }
+                              var b = {
+                                boundaryPoints: p,
+                                inbound: inBound
+                              }
+
+                              fetch("/api/v3/boundaryLayer", {
+                                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                body: JSON.stringify({ key: marker.key, boundaryLayer: b })
+                              }).then(response => response.json()).then(result => {
+                                console.log(result);
+                              }).catch(err => console.error(err.toString()));
+                            });
+                          }}
+
+                          onDeleted={e => {
+                            fetch("/api/v3/state/deleteBoundary", {
+                              method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                              body: JSON.stringify({ id: marker.devid })
+                            }).then(response => response.json()).then(serverresponse => {
+                              console.log(serverresponse)
+                            }).catch(err => console.error(err.toString()));
+                          }}
+                          draw={{
+                            circlemarker: false,
+                            marker: false,
+                            rectangle: false,
+                            circle: false,
+                            polyline: false,
+                            polygon: false
+                          }}
+                        />
+                        <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
+                      </FeatureGroup>
+                      {this.getHistory(marker.devid, b)}
+                      <Marker
+                        position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
+                      >
+                        <Popup>
+                          <h5 className="popup">{marker.devid}</h5> <br />
+                        </Popup>
+                      </Marker>
+                    </div>
+                  )
+                }
+              }
             }
 
             if (marker.selectedIcon == false && this.props.widget == true) {
@@ -406,7 +436,7 @@ export class MapDevices extends Component {
             } else if (marker.selectedIcon == false) {
               return (
                 <div key={marker.devid}>
-                  <Marker position={[llprod[0], llprod[1]]}>
+                  <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
                     <Popup>
                       <h5 className="popup">{marker.devid}</h5> <br />
                     </Popup>

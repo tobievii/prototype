@@ -8,20 +8,18 @@ export var deviceTrees: any = {};
 export var iotnxtqueues: any = {};
 
 import { version } from "../../config";
-import { userInfo } from "os";
-
 
 var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 
 var enablePackets = false;
-var person = "";
+
 export function handlePacket(db: any, packet: any, cb: any) {
 
-
+  log("handle packet")
 
   if (enablePackets) {
     iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
-      if (err) log(err);
+      if (err) console.log(err);
       if (result) {
         cb(packet);
       }
@@ -39,8 +37,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // INITIALIZE ROUTES
 
   app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-    addgateway(db, req.body, req.user, (err: Error, result: any, ) => {
-      person = req.user;
+    addgateway(db, req.body, (err: Error, result: any) => {
       if (err) res.json({ err: err.toString() });
       connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
       res.json(result);
@@ -56,7 +53,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   });
 
   app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
-    getgateways(db, req.user, (err: Error, gateways: any) => {
+    getgateways(db, (err: Error, gateways: any) => {
       if (err) res.json({ err: err.toString() });
 
       for (var g in gateways) {
@@ -90,7 +87,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   })
 
   app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
-    log("set gateway for device")
+    console.log("set gateway for device")
     var gateway = {
       GatewayId: req.body.GatewayId,
       HostAddress: req.body.HostAddress
@@ -114,8 +111,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
 
+
+  console.log("CONNECTING QUEUES")
   // CONNECT ALL GATEWAYS AT INIT
-  getgateways(db, person, (err: Error, gateways: any) => {
+  getgateways(db, (err: Error, gateways: any) => {
     if (gateways) {
       for (var g in gateways) {
         connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
@@ -125,9 +124,9 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   });
 
   setTimeout(() => {
-    log("IOTNXT\tEnabling packets.")
+    console.log("iotnxt enabling packets.")
     enablePackets = true;
-  }, 30000)
+  }, 5000)
 
 
 
@@ -147,9 +146,9 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
 function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) {
-  log("connecting to " + gatewayToconnect.GatewayId)
+  console.log("connecting to " + gatewayToconnect.GatewayId)
   calcDeviceTree(db, gatewayToconnect, (gateway: any, deviceTree: any) => {
-    //log("deviceTree done.")
+    //console.log("deviceTree done.")
     deviceTrees[gateway.GatewayId + "|" + gateway.HostAddress] = _.clone(deviceTree);
     connectIotnxt(deviceTree, gateway, (err: Error, iotnxtqueue: any) => {
       if (err) {
@@ -160,7 +159,7 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 
         var identifier = gateway.GatewayId + "|" + gateway.HostAddress
         iotnxtqueues[identifier] = iotnxtqueue;
-        log("IOTNXT CONNECTED [" + iotnxtqueue.GatewayId + "]");
+        console.log("IOTNXT CONNECTED [" + iotnxtqueue.GatewayId + "]");
         updategateway(db, gateway, { connected: true, error: "" }, () => { })
 
         eventHub.emit("plugin", {
@@ -224,51 +223,27 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 }
 
 
-function addgateway(db: any, gateway: any, user: any, cb: any) {
-  db.plugins_iotnxt.aggregate([
-    {
-      $addFields: { "userID": null }
-    }
-  ])
+function addgateway(db: any, gateway: any, cb: any) {
   gateway.default = false; // defaults to not the default
   gateway.connected = false;
   gateway.unique = generateDifficult(64);
-  gateway.type = "gateway";
-  gateway.userID = user._id
+  gateway.type = "gateway"
   db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result); });
 }
 
-function getgateways(db: any, user: any, cb: any) {
-  if (user.level >= 100) {
-    db.plugins_iotnxt.find({ type: "gateway" }, (err: Error, data: any) => {
-      if (err) {
-        console.error("iotnxt plugin cannot get gateways");
-        cb(err, undefined);
-      }
+function getgateways(db: any, cb: any) {
+  db.plugins_iotnxt.find({ type: "gateway" }, (err: Error, data: any) => {
+    if (err) {
+      console.error("iotnxt plugin cannot get gateways");
+      cb(err, undefined);
+    }
 
-      if (data == null) {
-        cb(undefined, []);
-      } else {
-        cb(undefined, data);
-      }
-    });
-  }
-
-  if (user.level < 100) {
-    db.plugins_iotnxt.find({ type: "gateway", userID: user._id }, (err: Error, data: any) => {
-      if (err) {
-        console.error("iotnxt plugin cannot get gateways");
-        cb(err, undefined);
-      }
-
-      if (data == null) {
-        cb(undefined, []);
-      } else {
-        cb(undefined, data);
-      }
-    });
-  }
-
+    if (data == null) {
+      cb(undefined, []);
+    } else {
+      cb(undefined, data);
+    }
+  });
 }
 
 function getserverdefaultgateway(db: any, cb: any) {
@@ -354,7 +329,7 @@ function updategateway(db: any, gateway: any, update: any, cb: any) {
 
 // Calculates the device object for iotnxt queue registration
 function calcDeviceTree(db: any, gateway: any, cb: any) {
-  getgateways(db, person, (err: Error, gateways: any) => {
+  getgateways(db, (err: Error, gateways: any) => {
     if (gateways) {
       var deviceTree: any = {};
       var results = 0;
@@ -394,7 +369,7 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
 
 
 
-              //log("results:"+results+" deviceStates.length:"+deviceStates.length)
+              //console.log("results:"+results+" deviceStates.length:"+deviceStates.length)
               if (results == deviceStates.length) {
                 cb(gateway, deviceTree);
               }
@@ -472,7 +447,7 @@ export function recursiveFlat(inObj: any) {
 }
 
 function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
-  log("IOTNXT CONNECTING GATEWAY: [" + gateway.GatewayId + "]");
+  console.log("IOTNXT CONNECTING GATEWAY: [" + gateway.GatewayId + "]");
 
   if (gateway.HostAddress == undefined) {
     console.error("ERROR gateway.HostAddress undefined");
@@ -496,7 +471,7 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
   );
 
   iotnxtqueue.on('error', (err) => {
-    log(err);
+    console.log(err);
   })
 
   iotnxtqueue.on("error", (err) => {
@@ -509,19 +484,19 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
 }
 
 function iotnxtUpdateDevice(db: any, packet: any, cb: any) {
-  //log(Date.now() + " " + packet.apikey + " " + packet.devid )
+  //console.log(Date.now() + " " + packet.apikey + " " + packet.devid )
 
   if (packet.apikey == undefined) {
-    log("---->")
-    log(packet)
+    console.log("---->")
+    console.log(packet)
     return;
   }
 
   findDeviceGateway(db, packet.apikey, packet.devid, (deviceState: any, gateway: any) => {
 
-    // log("----")
-    //  log(deviceState);
-    //  log(gateway);
+    // console.log("----")
+    //  console.log(deviceState);
+    //  console.log(gateway);
 
     if ((deviceState) && (gateway)) {
       calcDeviceTree(db, gateway, (gateway: any, deviceTree: any) => {
@@ -530,17 +505,17 @@ function iotnxtUpdateDevice(db: any, packet: any, cb: any) {
 
         if (deviceTrees[gatewayIdent]) {
 
-          //log(deviceTrees)
+          //console.log(deviceTrees)
 
           var diff = difference(deviceTree, deviceTrees[gatewayIdent])
           if (_.isEmpty(diff)) {
-            //log("no need to register new endpoints");
+            //console.log("no need to register new endpoints");
             iotnxtUpdateDevicePublish(gateway, packet, cb);
           } else {
-            //log("need to register new endpoints");
+            //console.log("need to register new endpoints");
             if (iotnxtqueues[gatewayIdent]) {
               iotnxtqueues[gatewayIdent].registerEndpoints(deviceTree, (err: Error, result: any) => {
-                if (err) log(err);
+                if (err) console.log(err);
 
                 if (result) {
                   deviceTrees[gatewayIdent] = _.clone(deviceTree);
@@ -549,7 +524,7 @@ function iotnxtUpdateDevice(db: any, packet: any, cb: any) {
               })
 
             } else {
-              log("queue not connected")
+              console.log("queue not connected")
             }
             /////////
           }
@@ -589,7 +564,7 @@ function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
     }
     iotnxtqueues[gateway.GatewayId + "|" + gateway.HostAddress].publishState(cb);
   } else {
-    //log("QUEUE UNDEFINED")
+    //console.log("QUEUE UNDEFINED")
   }
 }
 

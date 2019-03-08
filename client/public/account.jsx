@@ -4,6 +4,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHdd, faUserCheck, faUserPlus, faDice } from '@fortawesome/free-solid-svg-icons'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+import Media from "react-media";
+
 library.add(faUserCheck)
 library.add(faUserPlus)
 library.add(faDice)
@@ -174,7 +177,18 @@ export class Account extends Component {
   drawRegisterButton = () => {
     if (this.state.registration) {
       if (this.state.registration.userRegistration) {
-        return (<div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ width: "150", float: "right" }}>REGISTER</div>)
+
+        return (
+          <Media query="(max-width: 400px)">
+            {matches =>
+              matches ? (
+                <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ marginRight: "0", right: "0", width: "150", float: "right" }}>REGISTER</div>
+              ) : (
+                  <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ width: "150", float: "right" }}>REGISTER</div>
+                )
+            }
+          </Media>
+        )
       } else {
         return null;
       }
@@ -187,13 +201,14 @@ export class Account extends Component {
   showButton = () => {
     if (this.state.resetButton == "") {
       return (
-        <div>
+        <div className="row">
           <div className="col-7" style={{ textAlign: "right" }} >
             <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
           </div>
-          <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
-
-          <a className="font-weight-bold spot" style={{ float: "right", marginRight: 120, marginLeft: 15, marginTop: 10, color: "#E02430" }} onClick={() => this.ForgotPassword()} ><u> {this.state.forgotButton} ? </u>  </a>
+          <div className="loginB">
+            <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
+            <a className="font-weight-bold spot" style={{ float: "right", marginRight: 120, marginLeft: 15, marginTop: 12, color: "#E02430", cursor: "pointer" }} onClick={() => this.ForgotPassword()} ><u> {this.state.forgotButton} ? </u>  </a>
+          </div>
         </div>
       )
     } else {
@@ -207,7 +222,7 @@ export class Account extends Component {
 
   levelZero = () => {
     return (
-      <div className="" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }}>
+      <div className="navBar" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }}>
 
 
         <div className="row" >
@@ -235,10 +250,7 @@ export class Account extends Component {
               />
             </div>
           </div>
-
-          <div className="row">
-            {this.showButton()}
-          </div>
+          {this.showButton()}
         </div>
 
 

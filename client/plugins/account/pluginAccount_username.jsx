@@ -123,7 +123,7 @@ export class SetUsername extends React.Component {
 
         return (
             <div>
-                <h3> Username </h3>
+                <h3 style={{ marginTop: "5px" }}> Username </h3>
                 <p>Here you can change your public username. This must be unique across the system. It will affect your public url in the form of /u/username</p>
                 <input
                     style={{ width: "50%" }}
@@ -134,11 +134,11 @@ export class SetUsername extends React.Component {
                 {this.showButton()}<hr></hr>
                 <h3> CHANGE PASSWORD </h3>
 
-                <div >Current password: <br></br><input type="password" placeholder="current password" name="current" style={{ marginBottom: 5, width: "50%" }} onChange={this.currentpassword("current")} value={this.state.currentpassword} spellCheck="false" autoFocus /><br></br>
-                    New password: <br></br><input type="password" placeholder="new password" name="password" onChange={this.passwordInput("password")} value={this.state.password} style={{ marginBottom: 5, width: "50%" }} spellCheck="false" /><br></br>
-                    Confirm password: <br></br><input type="password" placeholder="confirm password" name="confirm" style={{ marginBottom: 5, width: "50%" }} onChange={this.confirmInput("confirm")} spellCheck="false" />
+                <div >Current password: <br></br><input className="fullWidth" type="password" placeholder="current password" name="current" style={{ marginBottom: 5, width: "50%" }} onChange={this.currentpassword("current")} value={this.state.currentpassword} spellCheck="false" /><br></br>
+                    New password: <br></br><input className="fullWidth" type="password" placeholder="new password" name="password" onChange={this.passwordInput("password")} value={this.state.password} style={{ marginBottom: 5, width: "50%" }} spellCheck="false" /><br></br>
+                    Confirm password: <br></br><input className="fullWidth" type="password" placeholder="confirm password" name="confirm" style={{ marginBottom: 5, width: "50%" }} onChange={this.confirmInput("confirm")} spellCheck="false" />
                     <br></br><span className="serverError" style={{ fontSize: "11px" }} >{this.state.message}</span>
-                    <button className="btn-spot" style={{ float: "right" }} onClick={this.checkpassword} >CHANGE PASSWORD</button></div>
+                    <button className="btn-spot floatLeft" style={{ float: "right" }} onClick={this.checkpassword} >CHANGE PASSWORD</button></div>
             </div>
         )
     }

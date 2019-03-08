@@ -4,8 +4,11 @@ import { generate, generateDifficult, log } from './utils';
 import * as _ from 'lodash';
 var scrypt = require("scrypt");
 var dbglobal: any;
+
 const Cryptr = require('cryptr');
+
 const cryptr = new Cryptr('prototype');
+
 export function midware(db: any) {
   dbglobal = db;
   return function (req: any, res: any, next: any) {

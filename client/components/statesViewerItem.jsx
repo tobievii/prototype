@@ -194,19 +194,21 @@ export class StatesViewerItem extends Component {
 
   selectbox = () => {
 
-    if (this.props.device.selected) {
+    if (this.props.public == false) {
+      if (this.props.device.selected) {
 
-      return (
-        <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-          <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
-        </div>
-      )
-    } else {
-      return (
-        <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-          <i className="statesViewerCheckBoxes fas fa-check" ></i>
-        </div>
-      )
+        return (
+          <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+            <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+          </div>
+        )
+      } else {
+        return (
+          <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
+            <i className="statesViewerCheckBoxes fas fa-check" ></i>
+          </div>
+        )
+      }
     }
   }
 
@@ -250,19 +252,19 @@ export class StatesViewerItem extends Component {
               <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
                   <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-                  <span className="faded" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+                  <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
                 </div>
               </Link>
 
-              <div className="col" style={{ flex: "0 0 120px", textAlign: "right" }}>
+              <div className="col dataPreview" style={{ flex: "0 0 120px", textAlign: "right" }}>
                 {/* <span className="trash" onClick={this.clickDeleteConfirmation(this.props.devID)}>{this.state.deleteButton}</span>
                   <span className="visibility" onClick={this.changeStatus(this.props.id)}>{this.state.publicButton}</span>
                   <span className="share" onClick={this.clickShare()}>{this.state.shareButton}</span> */}
               </div>
 
-              <div className="col" style={{ flex: "0 0 230px", textAlign: "right" }}>
+              <div className="col changeTimeagoWidth" style={{ flex: "0 0 230px", textAlign: "right" }}>
                 <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
-                <span className="faded" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
+                <span className="faded dataPreview" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
               </div>
 
             </div>

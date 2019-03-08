@@ -35,6 +35,7 @@ export class Widget extends React.Component {
             <option>ThreeDWidget</option>
             <option>Gauge</option>
             <option>map</option>
+            <option>button</option>
           </select></div>
       </div>)
     } else {

@@ -10,11 +10,11 @@ library.add(faHdd)
 
 export class AddGatewayPanel extends React.Component {
     presets = {
-        dev : {
+        dev: {
             HostAddress: "greenqueue.dev.iotnxt.io",
             PublicKey: "<RSAKeyValue><Exponent>AQAB</Exponent><Modulus>qblcqOI90QOdJk9pegGE+LDfXgMveZGpDBPpyIsSl8+Zkcp5zWxYj3k6BoWoL3U2z7l3wan6U9IhtAqaeTFatdwBOx0vOK8DWr4RIp1n6nAO7jEaHgsA1+FmFZTc8hQw6OEXVi+b31b7EFwLau0UA4TCj5862akf21ZqxaXmQUyyQA9Nl4JggY+TZDFL+hj+JdIm0V/yzq6o90E57s/70WYoDT6fZ5nDfdAgom/ZwjeUGTUh8V5HYJWuTZ33rRbKa8zYQ/HzAf5FZAVhndGI+CJFvorG8p53wXn2LP7NPhX6chCa++DVbFdru3OCLYMzdBqpohoVwHZnGGX1SGVi0Q==</Modulus></RSAKeyValue>"
         },
-        prod : {
+        prod: {
             HostAddress: "greenqueue.prod.iotnxt.io",
             PublicKey: "<RSAKeyValue><Exponent>AQAB</Exponent><Modulus>rbltknM3wO5/TAEigft0RDlI6R9yPttweDXtmXjmpxwcuVtqJgNbIQ3VduGVlG6sOg20iEbBWMCdwJ3HZTrtn7qpXRdJBqDUNye4Xbwp1Dp+zMFpgEsCklM7c6/iIq14nymhNo9Cn3eBBM3yZzUKJuPn9CTZSOtCenSbae9X9bnHSW2qB1qRSQ2M03VppBYAyMjZvP1wSDVNuvCtjU2Lg/8o/t231E/U+s1Jk0IvdD6rLdoi91c3Bmp00rVMPxOjvKmOjgPfE5LESRPMlUli4kJFWxBwbXuhFY+TK2I+BUpiYYKX+4YL3OFrn/EpO4bNcI0NHelbWGqZg57x7rNe9Q==</Modulus></RSAKeyValue>"
         }
@@ -39,10 +39,10 @@ export class AddGatewayPanel extends React.Component {
 
     choosePreset = (name) => {
         return (evt) => {
-             var addGatewayForm = { ...this.state.addGatewayForm }
-             addGatewayForm.HostAddress = this.presets[name].HostAddress
-             addGatewayForm.PublicKey = this.presets[name].PublicKey
-             this.setState({ addGatewayForm })             
+            var addGatewayForm = { ...this.state.addGatewayForm }
+            addGatewayForm.HostAddress = this.presets[name].HostAddress
+            addGatewayForm.PublicKey = this.presets[name].PublicKey
+            this.setState({ addGatewayForm })
         }
     }
 
@@ -57,23 +57,23 @@ export class AddGatewayPanel extends React.Component {
             },
             body: JSON.stringify(this.state.addGatewayForm)
         }).then(response => response.json()).then((data) => {
-             console.log(data);
-             if (this.props.update) { this.props.update(); }
+            console.log(data);
+            if (this.props.update) { this.props.update(); }
         }).catch(err => console.error(err.toString()))
 
     }
 
     render() {
         var formLabelStyle = { textAlign: "right", padding: "15px 3px 0 0" }
-        var formInputStyle = { padding: 4 }
-        var formRowStyle = {marginRight:20}
+        var formInputStyle = { padding: 4, marginTop: "10px" }
+        var formRowStyle = { marginRight: 20 }
         return (
             <div style={blockstyle}>
 
                 <h4>ADD GATEWAY</h4>
 
                 <div className="row" style={formRowStyle} >
-                    <div className="col-4" style={formLabelStyle} >
+                    <div className="col-4 alignLeft" style={formLabelStyle} >
                         GatewayId:
                     </div>
                     <div className="col-8" style={formInputStyle}>
@@ -87,7 +87,7 @@ export class AddGatewayPanel extends React.Component {
                 </div>
 
                 <div className="row" style={formRowStyle} >
-                    <div className="col-4" style={formLabelStyle} >
+                    <div className="col-4 alignLeft" style={formLabelStyle} >
                         Secret:
               </div>
                     <div className="col-8" style={formInputStyle}>
@@ -100,21 +100,19 @@ export class AddGatewayPanel extends React.Component {
                 </div>
 
                 <div className="row" style={formRowStyle} >
-                    <div className="col-4" style={formLabelStyle} >
-                        <div style={{ marginTop: 6}}>Presets: </div>
+                    <div className="col-4 alignLeft" style={formLabelStyle} >
+                        <div style={{ marginTop: 6 }}>Presets: </div>
                     </div>
                     <div className="col-4" style={formInputStyle}>
-                        <div className="smallButton" onClick={this.choosePreset("dev")} >DEVELOPMENT</div> 
-                        
+                        <div className="smallButton" onClick={this.choosePreset("dev")} >DEVELOPMENT</div>
                     </div>
                     <div className="col-4" style={formInputStyle}>
-                        
                         <div className="smallButton" onClick={this.choosePreset("prod")}>PRODUCTION</div>
                     </div>
                 </div>
 
                 <div className="row" style={formRowStyle} >
-                    <div className="col-4" style={formLabelStyle} >
+                    <div className="col-4 alignLeft" style={formLabelStyle} >
                         Host address:
                     </div>
                     <div className="col-8" style={formInputStyle}>
@@ -127,7 +125,7 @@ export class AddGatewayPanel extends React.Component {
                 </div>
 
                 <div className="row" style={formRowStyle} >
-                    <div className="col-4" style={formLabelStyle} >
+                    <div className="col-4 alignLeft" style={formLabelStyle} >
                         Public key:
                     </div>
                     <div className="col-8" style={formInputStyle}>
@@ -141,15 +139,15 @@ export class AddGatewayPanel extends React.Component {
 
 
                 <div className="row" style={formRowStyle} >
-                        <div className="col-4" style={formLabelStyle} ></div>
-                        <div className="col-8" style={formInputStyle}>
-                        
+                    <div className="col-4" style={formLabelStyle} ></div>
+                    <div className="col-8" style={formInputStyle}>
+
                         <div className="commanderBgPanel commanderBgPanelClickable"
-                            style={{ width: 160}}
+                            style={{ width: 160 }}
                             onClick={this.addGateway}>
                             <FontAwesomeIcon icon="hdd" /> ADD GATEWAY</div>
-                        
-                        </div>
+
+                    </div>
                 </div>
 
 

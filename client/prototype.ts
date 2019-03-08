@@ -8,7 +8,7 @@ export function getVersion(cb) {
 
 export function getAccount(cb) {
   fetch("/api/v3/account", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(account => {
-    
+
     cb(account);
   }).catch(err => console.error(err.toString()));
 }
@@ -28,10 +28,20 @@ export function getState(id, cb) {
 }
 
 
+export function publicStates(cb) {
+  fetch("/api/v3/publicStates", {
+    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+  }).then(response => response.json()).then(states => {
+    console.log(states);
+    cb(states);
+  })
+    .catch(err => console.error(err.toString()));
+}
+
 export function statesByUsername(username, cb) {
   fetch("/api/v3/states", {
     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify({ username : username })
+    body: JSON.stringify({ username: username })
   }).then(response => response.json()).then(states => { cb(states); })
     .catch(err => console.error(err.toString()));
 }
