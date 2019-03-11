@@ -22,7 +22,7 @@ export class NotificationsView extends Component {
     }
 
     render() {
-        var notify = this.state.notifications.map((notification, i) => {
+        var notify = this.state.notifications.reverse().map((notification, i) => {
             if (notification.type == "CONNECTION DOWN 24HR WARNING") {
                 return (
 
@@ -54,7 +54,7 @@ export class NotificationsView extends Component {
                         <i className="fas fa-exclamation-circle"></i>
                         <span className="newdevice" >{notification.type}</span><br />
                         <span className="devicename">{notification.device}</span><br />
-                        <span className="lastseen" style={{ textAlign: "right" }}>{moment(notification.created).fromNow()}</span>
+                        <span className="lastseen">{moment(notification.created).fromNow()}</span>
                     </div>
 
                 )
