@@ -274,7 +274,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   // find history by key
   if (req.body.key) {
     resolved = true;
-    console.log("key!")
     db.states.findOne({ key: req.body.key }, (e: Error, device: any) => {
       if (req.body.datapath) {
         var query: any = { apikey: device.apikey, devid: device.devid }

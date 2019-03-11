@@ -194,7 +194,6 @@ export class Dashboard extends React.Component {
 
     //if there are fewer or more widgets then we update the server
     if (layout.length != this.state.layout) {
-      console.log("widget count changed!")
       updated = true;
     }
 
@@ -207,11 +206,10 @@ export class Dashboard extends React.Component {
   }
 
   updateServer() {
-    console.log("dashboard update to server")
     fetch("/api/v3/dashboard", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-    }).then(response => response.json()).then(result => { console.log(result) })
+    }).then(response => response.json()).then(result => { })
       .catch(err => console.error(err.toString()));
   }
 
