@@ -20,6 +20,7 @@ import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
+import { NotificationsView } from "./components/notificationsView.jsx";
 
 
 import Stats from "./components/stats.jsx"
@@ -59,6 +60,7 @@ class App extends Component {
                     this.setState({ account });
                 })
             })
+
         });
 
         p.getStates((states) => { this.setState({ states }) })
@@ -186,6 +188,12 @@ class App extends Component {
         )
     }
 
+    notifications = ({ match }) => {
+        return (
+            <NotificationsView />
+        )
+    }
+
     render() {
         return (
             <div className="App">
@@ -200,6 +208,7 @@ class App extends Component {
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
+                        <Route path="/notifications" component={this.notifications} account={this.state.account} />
                     </div>
                 </Router>
             </div>

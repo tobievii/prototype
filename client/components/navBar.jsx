@@ -20,8 +20,6 @@ export class Notification extends Component {
 
   constructor(props) {
     super(props);
-
-
   }
 
   newDevice = () => {
@@ -63,7 +61,7 @@ export class Notification extends Component {
       )
     }
 
-    if (this.props.notification.type == "Warning") {
+    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
 
         <div className="warningNotificationItem">
@@ -75,8 +73,6 @@ export class Notification extends Component {
 
       )
     }
-
-
   }
 }
 
@@ -115,6 +111,14 @@ export class NavBar extends Component {
     if (this.props.account) {
       if (this.props.account.level > 0) {
         return (<Link to="/settings" className="navLink" title="Settings"><FontAwesomeIcon icon="cog" /></Link>)
+      }
+    }
+  }
+
+  showNotificationsView = () => {
+    if (this.props.account) {
+      if (this.props.account.level > 0) {
+        return (<Link to="/notifications" className="navLink" title="Notifications">View all Notifications</Link>)
       }
     }
   }
@@ -158,6 +162,8 @@ export class NavBar extends Component {
             ? (
               <div style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
                 {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+                <span>{this.showNotificationsView()}</span>
+
               </div>
             )
             : (
