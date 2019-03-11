@@ -98,7 +98,6 @@ export class SetUsername extends React.Component {
     }
 
     updateUsername = () => {
-        console.log("click!")
         fetch('/api/v3/account/updateusername', {
             method: 'POST',
             headers: {

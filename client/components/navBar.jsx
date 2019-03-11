@@ -160,8 +160,8 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+              <div className="notificationPanel" style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
+                {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
 
               </div>

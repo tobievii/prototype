@@ -7,6 +7,10 @@ $break-large: 1200px;
       margin-top: 70px;
     }
 
+    .notificationPanel{
+        width: 320px !important;
+    }
+
     .map {
         margin-top: 10px;
       }
@@ -71,9 +75,9 @@ $break-large: 1200px;
         display:none;
     }
 
-    .dataPreview{
-        display: none;
-    }
+    // .dataPreview{
+    //     display: none;
+    // }
 
     .statesViewerItem {
         display: flex;
@@ -132,6 +136,9 @@ $break-large: 1200px;
 @media(max-width: 400px){
     .fullWidth{
         width: 100% !important;
+    }
+    .notificationPanel{
+        width: 320px !important;
     }
 
     .floatLeft{

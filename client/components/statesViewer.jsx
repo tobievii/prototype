@@ -78,6 +78,12 @@ export class DeviceList extends Component {
     }
   }
 
+  shareDevice = (device) => {
+    return (e) => {
+      this.props.shareDevice({ device, e })
+    }
+  }
+
   render() {
 
     if (this.props.devices == undefined) {
@@ -123,7 +129,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} />)}
+          {devicelist.map(device => <StatesViewerItem shareDevice={this.shareDevice()} public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -409,6 +415,19 @@ export class StatesViewer extends Component {
     }
   }
 
+  shareDevice = (a) => {
+    var devices = _.clone(this.state.devicesView)
+
+    for (var x in devices) {
+      if (devices[x].key == a.e.key) {
+        devices[x] = a.e;
+      }
+    }
+    console.log(devices)
+    this.setState({ devicesView: devices })
+    this.setState({ devicesServer: devices })
+  }
+
   handleActionCall = (clickdata) => {
     var newDeviceList = _.clone(this.state.devicesView)
 
@@ -561,11 +580,11 @@ export class StatesViewer extends Component {
                 {matches =>
                   matches ? (
                     <div style={{ marginBottom: 10 }}>
-                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                      <DeviceList public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
                     </div>
                   ) : (
                       <div >
-                        <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                        <DeviceList shareDevice={this.shareDevice} public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
                       </div>
                     )
                 }
