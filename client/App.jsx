@@ -55,8 +55,6 @@ class App extends Component {
 
         socket.on("connect", a => {
             socket.on("post", a => {
-            })
-            socket.on("notification", (account) => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })
