@@ -255,6 +255,28 @@ export class Dashboard extends React.Component {
     }
   }
 
+  setOptions = (data) => {
+    return (options) => {
+      console.log("WIDGET OPTION CHANGE:")
+      console.log({ data, options })
+
+      // find and update
+      var layout = _.clone(this.state.layout);
+      for (var w in layout) {
+        if (layout[w].i == data.i) {
+          if (layout[w].options) {
+            layout[w].options = _.merge(layout[w].options, options);
+          } else {
+            layout[w].options = options;
+          }
+        }
+      }
+
+      //update server db
+      this.setState({ layout }, () => { this.updateServer(); })
+    }
+  }
+
   // Depending on type prop of widget, this returns correct React component
   widgetType = (data) => {
     if (data.type == "Calendar") {
@@ -300,8 +322,12 @@ export class Dashboard extends React.Component {
     }
 
     if (data.type == "Gauge") {
-      return (<ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
+      return (<ProtoGauge
+        data={data}
+        setOptions={this.setOptions(data)}
+        value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
     }
+
     if (data.type == "map") {
       return (<MapDevices username={this.props.username} acc={this.props.acc} deviceCall={this.props.state} devices={this.props.devices} widget={true} showBoundary={this.state.showB} />)
     }

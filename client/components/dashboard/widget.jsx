@@ -11,6 +11,11 @@ export class Widget extends React.Component {
     if (this.props.remove) { this.props.remove() }
   }
 
+  optionsPanel = () => {
+    console.log(this.props.children)
+    return (<div>OPTIONS</div>)
+  }
+
   menu() {
     if (this.state.menuVisible) {
       return (<div className="widgetMenu" style={{
@@ -37,6 +42,8 @@ export class Widget extends React.Component {
             <option>map</option>
             <option>button</option>
           </select></div>
+
+        <div className="widgetMenuItem">{this.optionsPanel()}</div>
       </div>)
     } else {
       return null;

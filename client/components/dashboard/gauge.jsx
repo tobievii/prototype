@@ -7,8 +7,8 @@ export class ProtoGauge extends React.Component {
 
     state = {
         value: 0,
-        min: -25,
-        max: 120,
+        min: 0,
+        max: 100,
         valueanim: 0,
         typeError: false
     }
@@ -31,6 +31,32 @@ export class ProtoGauge extends React.Component {
                     this.setState({ typeError: true })
                 } else {
                     //ANIMATE GAUGE
+
+                    // LOAD OPTIONS
+                    if (this.props.data) {
+                        if (this.props.data.options) {
+                            if (this.props.data.options.min) {
+                                this.state.min = this.props.data.options.min
+                            }
+                            if (this.props.data.options.max) {
+                                this.state.max = this.props.data.options.max
+                            }
+                        }
+                    }
+
+                    // ADJUST FOR MAX
+                    if (this.props.value > this.state.max) {
+                        var options = { max: this.props.value + 1 }
+                        this.setState(options)
+                        this.props.setOptions(options)
+                    }
+
+                    if (this.props.value < this.state.min) {
+                        var options = { min: this.props.value - 1 }
+                        this.setState(options)
+                        this.props.setOptions(options);
+                    }
+
                     if (this.state.valueanim != this.props.value) {
                         var difference = this.props.value - this.state.valueanim
                         var step = difference / 10;
@@ -133,9 +159,28 @@ export class ProtoGauge extends React.Component {
                         fontWeight="normal"
                         textAnchor="middle"
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{this.state.value.toFixed(3)}</text>
+                        dominantBaseline="central">{this.state.value}</text>
+
+                    <text x="0" y="80"
+                        fill="#aaa"
+                        className="value-text"
+                        fontSize="40%"
+                        fontWeight="normal"
+                        textAnchor="start"
+                        alignmentBaseline="top"
+                        dominantBaseline="central">MIN:{Math.round(this.state.min)}</text>
+
+                    <text x="100" y="80"
+                        fill="#aaa"
+                        className="value-text"
+                        fontSize="40%"
+                        fontWeight="normal"
+                        textAnchor="end"
+                        alignmentBaseline="top"
+                        dominantBaseline="central">MAX:{Math.round(this.state.max)}</text>
+
                     <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
-                    {this.drawguageSvg(-20, this.state.valueanim, 120)}
+                    {this.drawguageSvg(this.state.min, this.state.valueanim, this.state.max)}
                 </svg>
             </div >
         );
