@@ -112,19 +112,34 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
 
-  console.log("CONNECTING QUEUES")
+
   // CONNECT ALL GATEWAYS AT INIT
+  log("IOTNXT Connecting queues.")
   getgateways(db, (err: Error, gateways: any) => {
     if (gateways) {
       for (var g in gateways) {
         connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
       }
     }
-
   });
 
+  //retry every now and then
+  setInterval(() => {
+    log("IOTNXT auto retry gateways.")
+    getgateways(db, (err: Error, gateways: any) => {
+      if (gateways) {
+        for (var g in gateways) {
+          if (gateways[g].connected == false) {
+            connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
+          }
+        }
+      }
+    });
+  }, 60 * 1000 * 5) // 5minutes
+
+  // enable packets after 5 seconds.
   setTimeout(() => {
-    console.log("iotnxt enabling packets.")
+    log("IOTNXT Enabling packets.")
     enablePackets = true;
   }, 5000)
 
@@ -146,7 +161,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
 function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) {
-  console.log("connecting to " + gatewayToconnect.GatewayId)
+  log("IOTNXT Connecting to " + gatewayToconnect.GatewayId)
   calcDeviceTree(db, gatewayToconnect, (gateway: any, deviceTree: any) => {
     //console.log("deviceTree done.")
     deviceTrees[gateway.GatewayId + "|" + gateway.HostAddress] = _.clone(deviceTree);
@@ -159,7 +174,7 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 
         var identifier = gateway.GatewayId + "|" + gateway.HostAddress
         iotnxtqueues[identifier] = iotnxtqueue;
-        console.log("IOTNXT CONNECTED [" + iotnxtqueue.GatewayId + "]");
+        log("IOTNXT CONNECTED [" + iotnxtqueue.GatewayId + "]");
         updategateway(db, gateway, { connected: true, error: "" }, () => { })
 
         eventHub.emit("plugin", {
@@ -447,7 +462,7 @@ export function recursiveFlat(inObj: any) {
 }
 
 function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
-  console.log("IOTNXT CONNECTING GATEWAY: [" + gateway.GatewayId + "]");
+  log("IOTNXT CONNECTING GATEWAY: [" + gateway.GatewayId + "]");
 
   if (gateway.HostAddress == undefined) {
     console.error("ERROR gateway.HostAddress undefined");
@@ -475,7 +490,7 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
   })
 
   iotnxtqueue.on("error", (err) => {
-    cb(err, undefined)
+    log({ err, gateway })
   })
 
   iotnxtqueue.on("connect", () => { cb(undefined, iotnxtqueue); });
