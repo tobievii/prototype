@@ -72,6 +72,14 @@ export class MapDevices extends Component {
     }
   };
 
+  getPopup = (marker) => {
+    return (
+      <Popup>
+        <h5 className="popup">{marker.devid}</h5> <br />
+      </Popup>
+    )
+  }
+
   checkBound = (marker) => {
     var result = undefined;
     var temp = [];
@@ -231,9 +239,7 @@ export class MapDevices extends Component {
                 return (
                   <div key={marker.devid}>
                     <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                      <Popup>
-                        <h5 className="popup">{marker.devid}</h5> <br />
-                      </Popup>
+                      {this.getPopup(marker)}
                     </Marker>
                   </div>
                 )
@@ -296,9 +302,7 @@ export class MapDevices extends Component {
                         />
                       </FeatureGroup>
                       <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                        <Popup>
-                          <h5 className="popup">{marker.devid}</h5> <br />
-                        </Popup>
+                        {this.getPopup(marker)}
                       </Marker>
                     </div>
                   )
@@ -374,9 +378,7 @@ export class MapDevices extends Component {
                       <Marker
                         position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
                       >
-                        <Popup>
-                          <h5 className="popup">{marker.devid}</h5> <br />
-                        </Popup>
+                        {this.getPopup(marker)}
                       </Marker>
                     </div>
                   )
@@ -393,9 +395,7 @@ export class MapDevices extends Component {
               return (
                 <div key={marker.devid}>
                   <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                    <Popup>
-                      <h5 className="popup">{marker.devid}</h5> <br />
-                    </Popup>
+                    {this.getPopup(marker)}
                   </Marker>
                 </div>
               )
