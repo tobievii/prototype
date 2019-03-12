@@ -974,28 +974,6 @@ input[type="checkbox"]:checked {
   top: 12.5%;
 }
 
-// .notificationItem::after {
-//   position: absolute;
-//   width: 50px;
-//   height: 50px;
-//   color: #e1e1e1;
-//   box-sizing: border-box;
-//   background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
-//   border-left: 0px solid rgba(0, 0, 0, 0);
-//   border-top: 0px solid rgba(0, 0, 0, 0);
-//   border-bottom: 1px solid rgba(0, 0, 0, 0);
-//   border-right: 2px solid rgba(0, 0, 0, 0);
-//   box-sizing: border-box;
-//   opacity: 0.9;
-//   top: 100%;
-//   left: 50%;
-//   margin-left: -25px;
-//   content: '';
-//   transform: rotate(45deg);
-//   margin-top: -25px;
-//   background-color: rgb(44, 44, 44);
-// }
-
 .alarm {
   position: relative;
   color: crimson;
