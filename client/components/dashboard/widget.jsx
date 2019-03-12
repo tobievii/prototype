@@ -1,5 +1,32 @@
 import React, { Component } from "react";
 
+export class OptionsInput extends React.Component {
+
+  state = {
+  }
+
+  changeValue(e) {
+    console.log("onchange!")
+  }
+
+  noDrag(e) {
+    console.log("no drag!")
+    //e.preventDefault(); e.stopPropagation()
+  }
+
+  render() {
+    return (<div className="widgetMenuItem" onDrag={this.noDrag}
+      onDragStart={this.noDrag} >
+      {this.props.option.name}:
+      <input type="value" defaultValue={this.props.option.value}
+        onDrag={this.noDrag}
+        onDragStart={this.noDrag}
+        onSelect={evt => { console.log(evt) }}
+        onChange={(evt) => this.changeValue(evt)}  ></input>
+    </div>)
+  }
+}
+
 export class Widget extends React.Component {
 
   state = {
@@ -7,13 +34,33 @@ export class Widget extends React.Component {
     boundaryVisible: false
   }
 
+  componentDidMount() {
+    console.log(this.props)
+  }
+
   removeWidget = () => {
     if (this.props.remove) { this.props.remove() }
   }
 
   optionsPanel = () => {
-    console.log(this.props.children)
-    return (<div>OPTIONS</div>)
+    // console.log(this.props.children)
+    // if (this.props.children.props.options) {
+    //   console.log(this.props.children.props.options())
+    // }
+    if (this.state.options) {
+      return (<div>{this.state.options.map((option, i) => {
+
+        if (option.type == "input") {
+          return (<OptionsInput key={i} option={option} />)
+        }
+
+        return (<div key={i}></div>)
+
+      })}</div>)
+    } else {
+      return (<div className="widgetMenuItem">Widget has no options.</div>)
+    }
+
   }
 
   menu() {
@@ -43,7 +90,7 @@ export class Widget extends React.Component {
             <option>button</option>
           </select></div>
 
-        <div className="widgetMenuItem">{this.optionsPanel()}</div>
+        {this.optionsPanel()}
       </div>)
     } else {
       return null;
@@ -97,31 +144,49 @@ export class Widget extends React.Component {
     }
   }
 
-  render() {
-    return (
-      <div style={{ overflow: "hidden" }} style={{ height: "100%", position: "relative", paddingTop: 30 }}>
-        <div className="widgetLabel" style={{ position: "absolute", top: 0, width: "100%" }}>
+  getWidgetOptions = (options) => {
+    this.setState({ options })
+  }
 
-          <div style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
+  render = () => {
+    if (this.props.children) {
+      var children = this.props.children;
 
-          <div className="widgetOptions" style={{ float: "right" }}>
-            <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag()} onClick={this.showMenu()}></i></div>
-            {this.menu()}
+      var childrenWithProps = React.Children.map(children, (child) => {
+        return React.cloneElement(child, { getWidgetOptions: this.getWidgetOptions })
+      })
+
+      return (
+        < div style={{ overflow: "hidden" }
+        } style={{ height: "100%", position: "relative", paddingTop: 30 }}>
+          <div className="widgetLabel" style={{ position: "absolute", top: 0, width: "100%" }}>
+
+            <div style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
+
+            <div className="widgetOptions" style={{ float: "right" }}>
+              <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag()} onClick={this.showMenu()}></i></div>
+              {this.menu()}
+            </div>
+
+            <div className="widgetOptions" style={{ float: "right" }}>
+              {this.mapWidget()}
+            </div>
+
           </div>
 
-          <div className="widgetOptions" style={{ float: "right" }}>
-            {this.mapWidget()}
+          <div className="widgetContents" style={{ height: "100%" }}>
+            {/* {this.props.children} */}
+            {childrenWithProps}
           </div>
 
-        </div>
+          <div style={{ clear: "both" }}></div>
+        </div >
+      )
+    } else {
+      return (<div>loading..</div>)
+    }
 
-        <div className="widgetContents" style={{ height: "100%" }}>
-          {this.props.children}
-        </div>
 
-        <div style={{ clear: "both" }}></div>
-      </div>
-    )
   }
 
 }

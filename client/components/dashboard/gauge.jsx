@@ -15,7 +15,21 @@ export class ProtoGauge extends React.Component {
 
     animtimer;
 
+
+
+    // options panel layout
+    updatedOptions = () => {
+        var options = [
+            { name: "min", type: "input", default: -50, value: this.state.min },
+            { name: "max", type: "input", default: 120, value: this.state.max }
+        ]
+        if (this.props.getWidgetOptions) { this.props.getWidgetOptions(options); }
+    }
+
     componentDidMount() {
+        // send parent how to configure this widget
+        this.updatedOptions();
+
         this.animtimer = setInterval(() => {
             // var targetval = this.state.value + 5
 
@@ -41,6 +55,7 @@ export class ProtoGauge extends React.Component {
                             if (this.props.data.options.max) {
                                 this.state.max = this.props.data.options.max
                             }
+                            this.updatedOptions();
                         }
                     }
 
