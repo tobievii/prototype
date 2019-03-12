@@ -1118,6 +1118,24 @@ input[type="checkbox"]:checked {
   font-family: 'Share Tech Mono';
 }
 
+
+.leaflet-popup-content-wrapper{
+  box-shadow: 3px 3px grey;
+  color:red;
+  background:#1b394d;
+  width:100%;
+}
+  
+
+.leaflet-container a.leaflet-popup-close-button{
+  color:red;
+}
+
+.leaflet-popup-tip{
+  background:#1b394d;
+ box-shadow: 3px 3px grey;
+}
+
 .rowList {
   display: grid;
   grid-template-columns: 30% 70%;
