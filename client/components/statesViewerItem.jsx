@@ -4,6 +4,7 @@ import moment from 'moment'
 import { control } from "leaflet";
 import { convertCompilerOptionsFromJson } from "typescript";
 import { confirmAlert } from 'react-confirm-alert';
+import { ShareList } from './ShareList.jsx'
 
 export class StatesViewerItem extends Component {
   state = {
@@ -19,7 +20,8 @@ export class StatesViewerItem extends Component {
     mapIcon: <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>,
     device: undefined,
     deviceShare: undefined,
-    opacity: "1"
+    opacity: "1",
+    isOpen: false
   };
 
   intervalUpdator = undefined;
@@ -35,21 +37,32 @@ export class StatesViewerItem extends Component {
       this.updateTime();
     }, 1000 / 10)
 
-    this.setState({ device: this.props.device })
 
-    if (this.props.device.public != undefined) {
-      if (this.props.device.public == true) {
-        this.setState({ opacity: "1" })
-      } else {
-        this.setState({ opacity: "0.4" })
-      }
-    } else {
-      this.setState({ opacity: "0.4" })
-    }
+    this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
   }
 
   componentDidUpdate = () => {
     //console.log("update "+this.props.device.devid)
+  }
+
+  setDevice = (device) => {
+    if (device.public != undefined) {
+      if (device.public == true) {
+        this.setState({ opacity: "1" })
+      } else {
+        if (device.access != undefined) {
+          if (device.access.length > 0) {
+            this.setState({ opacity: "1" })
+          } else {
+            this.setState({ opacity: "0.2" })
+          }
+        } else {
+          this.setState({ opacity: "0.2" })
+        }
+      }
+    } else {
+      this.setState({ opacity: "0.2" })
+    }
   }
 
   componentWillUnmount = () => {
@@ -154,9 +167,9 @@ export class StatesViewerItem extends Component {
           })
         }).then(response => response.json()).then(serverresponse => {
           if (serverresponse.nModified == 1) {
-            this.props.shareDevice(device)
             device.public = false;
             this.setState({ device: device })
+            this.setDevice(device)
           }
         }).catch(err => console.error(err.toString()));
       } else {
@@ -177,8 +190,8 @@ export class StatesViewerItem extends Component {
                     }).then(response => response.json()).then(serverresponse => {
                       device.public = true;
                       this.setState({ device: device })
-                      this.props.shareDevice(device)
-                      onClose;
+                      this.setDevice(device)
+                      { onClose() }
                     }).catch(err => console.error(err.toString()));
                   }
                 }}>Yes,Share Publicly !</button>
@@ -205,8 +218,8 @@ export class StatesViewerItem extends Component {
                   }).then(response => response.json()).then(serverresponse => {
                     device.public = true;
                     this.setState({ device: device })
-                    this.props.shareDevice(device)
-                    onClose;
+                    this.setDevice(device)
+                    { onClose() }
                   }).catch(err => console.error(err.toString()));
                 }
               }}>Yes,Share Publicly !</button>
@@ -299,10 +312,14 @@ export class StatesViewerItem extends Component {
     }
   }
 
+  toggleModal = () => {
+    this.setState({ isOpen: !this.state.isOpen })
+  }
+
   stateListIcons = (viewUsed, device) => {
     var icon = "";
     var columSize = "";
-    var opacity = "0.3";
+    var opacity = "0.2";
 
     if (viewUsed == "map") {
       icon = "iconSmall";
@@ -316,7 +333,7 @@ export class StatesViewerItem extends Component {
       <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
         <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
         <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px" }}></i></span>
-        <span className={"share " + icon}><i onClick={() => this.props.shareDevice(device)} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px" }}></i></span>
+        <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
         <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
         {this.mapIcon(viewUsed)}
       </div>
@@ -324,7 +341,6 @@ export class StatesViewerItem extends Component {
   }
 
   render() {
-
     if (this.props.device == undefined) {
       return (<div></div>)
     }
@@ -355,8 +371,12 @@ export class StatesViewerItem extends Component {
                 <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
                 <span className="faded dataPreview" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
               </div>
+              <div style={{ paddingTop: "7px" }}>
+                {this.stateListIcons(viewUsed, this.props.device)}
+              </div>
 
-              {this.stateListIcons(viewUsed, this.props.device)}
+              {/* <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} /> */}
+
             </div>
           </div>
         );
@@ -376,6 +396,7 @@ export class StatesViewerItem extends Component {
               {this.stateListIcons(viewUsed, this.state.device)}
               {/* {this.mapIcon()}
               </div> */}
+              {/* <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} /> */}
             </div>
           </div>
         )
