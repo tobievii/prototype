@@ -20,6 +20,7 @@ import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
+import { NotificationsView } from "./components/notificationsView.jsx";
 
 
 import Stats from "./components/stats.jsx"
@@ -55,12 +56,11 @@ class App extends Component {
 
         socket.on("connect", a => {
             socket.on("post", a => {
-            })
-            socket.on("notification", (account) => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })
             })
+
         });
 
         p.getStates((states) => { this.setState({ states }) })
@@ -114,13 +114,17 @@ class App extends Component {
         test.ds = a.ds;
     }
 
+    setSharedDevice = (device) => {
+        console.log(device)
+    }
+
     home = ({ match }) => {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
+                        <StatesViewer shareActionCall={this.setSharedDevice} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
@@ -130,7 +134,7 @@ class App extends Component {
                 return (
                     <div>
                         <Account account={this.state.account} />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
+                        <StatesViewer shareActionCall={this.setSharedDevice} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
                         <Landing />
                         <Footer />
                     </div>)
@@ -159,7 +163,7 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} />
+                <StatesViewer shareActionCall={this.setSharedDevice} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} />
                 <Footer />
             </div>
 
@@ -188,6 +192,12 @@ class App extends Component {
         )
     }
 
+    notifications = ({ match }) => {
+        return (
+            <NotificationsView />
+        )
+    }
+
     render() {
         return (
             <div className="App">
@@ -202,6 +212,7 @@ class App extends Component {
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
+                        <Route path="/notifications" component={this.notifications} account={this.state.account} />
                     </div>
                 </Router>
             </div>

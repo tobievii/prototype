@@ -990,6 +990,12 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
 
 })
 
+app.get("/api/v3/u/notifications", (req: any, res: any) => {
+  db.users.findOne({ apikey: req.user.apikey, notifications: req.user.notifications }, (err: Error, state: any) => {
+    res.json(state.notifications);
+  })
+});
+
 app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
   log("account registration")
   log(req.body)
