@@ -21,6 +21,7 @@ const customStyles = {
         background: "rgba(27, 57, 77,0.9)",
     }
 };
+var count = 0;
 export class ShareList extends Component {
     state = {
 
@@ -57,34 +58,12 @@ export class ShareList extends Component {
 
 
     componentWillMount = () => {
-        fetch("/api/v3/stats", {
-            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-        }).then(response => response.json()).then(stats => {
-            this.setState({ stats: stats })
-        }).catch(err => console.error(err.toString()));
-
-
 
     }
+
     componentDidMount = () => {
-        Modal.setAppElement('body');
-        fetch("/api/v3/state", {
-            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ id: this.props.devid, username: this.props.username })
-        }).then(response => response.json()).then(state => {
-            this.setState({ state })
-
-            if (this.state.state.public == true) {
-                this.setState({ checkboxstate: "none" })
-                this.setState({ Devicestate: "UNSHARE PUBLICLY" })
-            }
-
-        }).catch(err => console.error(err.toString()));
-
-        this.sharedList();
-        this.setState({ devid: this.props.devid })
-
     }
+
     handleActionCall = (clickdata) => {
         var newEmailList = _.clone(this.state.userSearched)
         var temp = [];
@@ -101,6 +80,7 @@ export class ShareList extends Component {
             }
         }
     }
+
     unshare = (remove) => {
         for (let i in this.state.userSearched) {
             if (remove == this.state.userSearched[i].uuid) {
@@ -115,11 +95,38 @@ export class ShareList extends Component {
         }).catch(err => console.error(err.toString()));
     }
 
+    setValues = (isOpen) => {
+        if (isOpen == true && count == 0) {
+            count++;
+            fetch("/api/v3/stats", {
+                method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
+            }).then(response => response.json()).then(stats => {
+                this.setState({ stats: stats })
+
+                Modal.setAppElement('body');
+                fetch("/api/v3/state", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: this.props.devid, username: this.props.username })
+                }).then(response => response.json()).then(state => {
+                    this.setState({ state })
+
+                    if (this.state.state.public == true) {
+                        this.setState({ checkboxstate: "none" })
+                        this.setState({ Devicestate: "UNSHARE PUBLICLY" })
+                    }
+                    this.sharedList();
+                    this.setState({ devid: this.props.devid })
+                }).catch(err => console.error(err.toString()));
+            }).catch(err => console.error(err.toString()));
+        }
+    }
+
     search = evt => {
         this.setState({ search: evt.target.value.toString() }, () => {
             var temp = [];
             var newDeviceList = [];
-            this.state.stats.userList.map((person, i) => {
+            var statsl = this.state.stats.userList;
+            statsl.map((person, i) => {
                 temp = [...temp, person.email]
                 if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
                     newDeviceList.push(person);
@@ -138,6 +145,7 @@ export class ShareList extends Component {
             this.setState({ userSearched: temp })
         })
     }
+
     userNameList = () => {
 
         try {
@@ -265,9 +273,6 @@ export class ShareList extends Component {
 
 
     DevicePublic = () => {
-
-
-
         if (this.state.checkboxstate == "") {
             return (
                 <div style={{ float: "right", cursor: "pointer" }} className="protoButton" onClick={this.publicOrprivate}><i className="fas fa-globe-africa" ></i> {this.state.Devicestate}</div>
@@ -297,8 +302,8 @@ export class ShareList extends Component {
 
     render() {
         return (<div ><center>
-
-            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={this.props.closeModel} style={{ color: "red" }}></i>
+            {this.setValues(this.props.isOpen)}
+            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={() => { this.props.closeModel(); count = 0; }} style={{ color: "red" }}></i>
                 <center style={{ color: "white", display: this.state.checkboxstate }}>
                     <br></br> Search For users to share  with<br></br>
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>

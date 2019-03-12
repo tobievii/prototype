@@ -451,7 +451,7 @@ export class StatesViewer extends Component {
       }
     }
 
-    fetch("/api/v3/boundaryPackets", {
+    fetch("/api/v3/devicePathPackets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: device.device.devid, limit: 10 })
     })
@@ -491,7 +491,6 @@ export class StatesViewer extends Component {
         device.device["devicePathHistory"] = finalCoords;
       })
       .catch(err => {
-        console.error(err.toString())
         device.n = false;
       })
 
