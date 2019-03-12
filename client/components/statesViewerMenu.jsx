@@ -189,7 +189,6 @@ export class StatesViewerMenu extends Component {
                                     </span>
 
                                     <span className="col" style={{ flex: "0 0 120px" }}>
-                                        {this.boundaryButton()}
                                         {this.viewButton()}
                                         <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
                                             {this.sortButtons()}
@@ -219,7 +218,6 @@ export class StatesViewerMenu extends Component {
                                     </div>
 
                                     <div className="col" style={{ flex: "0 0 120px" }}>
-                                        {this.boundaryButton()}
                                         {this.viewButton()}
                                         <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
                                             {this.sortButtons()}

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Polyline, Polygon, Map, TileLayer, Marker, Popup, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
+import Control from 'react-leaflet-control';
 
 var details = {
   lat: -25.864170,
@@ -13,11 +14,8 @@ var allDevices = undefined;
 var deviceSelected = undefined;
 
 var circleColor = "#4c8ef7";
-
-var llprod = [0.012, 0.012]
-const L = require('leaflet');
 var poly2tri = require('poly2tri');
-const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
+var b = undefined;
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
 //   iconSize: [80, 96],
@@ -34,7 +32,9 @@ const testp = [[51.505, -0.09], [51.51, -0.1], [51.51, -0.12]]
 
 export class MapDevices extends Component {
   state = {
-    devicePathHistory: undefined
+    devicePathHistory: undefined,
+    boundaryVisible: false,
+    showBoundary: false
   }
 
   constructor(props) {
@@ -125,7 +125,7 @@ export class MapDevices extends Component {
   }
 
   getHistory = (marker, action) => {
-    if (this.props.showBoundary == true) {
+    if (b == true) {
       return (
         <Polyline color="blue" positions={marker.devicePathHistory} />
       )
@@ -148,6 +148,29 @@ export class MapDevices extends Component {
     has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
 
     return !(has_neg && has_pos);
+  }
+
+  boundaryButton = (device) => {
+    if (device != undefined || device != null) {
+      return (
+        <button><i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "black", fontSize: "20px", padding: 10 }} onClick={() => { this.boundaryButtonClicked() }}></i></button>
+      )
+    } else {
+      return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
+    }
+
+  }
+
+  boundaryButtonClicked = () => {
+    if (this.state.boundaryVisible == false) {
+      this.setState({ boundaryVisible: true })
+      this.setState({ showBoundary: true })
+      b = true;
+    } else if (this.state.boundaryVisible == true) {
+      this.setState({ showBoundary: false })
+      this.setState({ boundaryVisible: false })
+      b = false;
+    }
   }
 
   render() {
@@ -176,6 +199,9 @@ export class MapDevices extends Component {
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <Control position="topright" >
+          {this.boundaryButton(deviceSelected)}
+        </Control>
         {
 
           allDevices.map((marker) => {
@@ -313,9 +339,9 @@ export class MapDevices extends Component {
                   } else {
                     circleColor = "red";
                   }
-                  var b = undefined;
 
-                  if (this.props.showBoundary == true) {
+
+                  if (this.state.showBoundary == true) {
                     b = true;
                   } else {
                     b = false;
