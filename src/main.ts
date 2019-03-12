@@ -251,6 +251,14 @@ app.get('/api/v3/account', (req: any, res: any) => {
   res.json(cleanUser);
 })
 
+app.get('/api/v3/account/stats', (req: any, res: any) => {
+  stats.accountStats(req.user, (err: Error, stats: any) => {
+    if (err) { res.json(err); }
+    res.json(stats)
+  })
+})
+
+
 // This is to update the workflow on a device.
 app.post("/api/v3/workflow", (req: any, res: any) => {
   if (req.body) {

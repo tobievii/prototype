@@ -75,7 +75,7 @@ export class MapDevices extends Component {
   getPopup = (marker) => {
     return (
       <Popup>
-        <h5 className="popup">{marker.devid}</h5> <br />
+        <h5 className="popup" style={{ marginTop: "50%", position: "center" }} >{marker.devid}</h5>
       </Popup>
     )
   }

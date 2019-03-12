@@ -1,5 +1,83 @@
-export function init(app: any, db: any) {
 
+import { log } from "./utils"
+
+var dbStats: any;
+
+export async function accountStats(user: any, cb: Function) {
+  var db = dbStats;
+
+  var stats = {
+    packetsMonth: await accountPacketsThisMonth(),
+    packetsTotal: await accountPacketsTotal(),
+    packetsToday: await accountPacketsToday(),
+    statesTotal: await accountStatesTotal(),
+    statesActive: await accountStatesActive24h()
+  }
+
+  cb(undefined, stats);
+
+  // ---------------------------------------------------------
+  function accountPacketsTotal(): Promise<any> {
+    return new Promise<any>(resolve => {
+      db.packets.find({ apikey: user.apikey, }).count((err: Error, packetCount: any) => {
+        resolve(packetCount)
+      })
+    })
+  }
+  // ---------------------------------------------------------
+  function accountPacketsThisMonth(): Promise<number> {
+    return new Promise<any>(resolve => {
+      //var time = (24 * 60 * 60 * 1000) * days;
+      var now = new Date();
+      var startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, now.getTimezoneOffset() / -60);
+      db.packets.find({ apikey: user.apikey, "_created_on": { $gt: startOfMonth } }).count((err: Error, packetsCount: any) => {
+        var data = {
+          packetsCount: packetsCount,
+          startOfMonth: startOfMonth
+        }
+        resolve(data)
+      })
+    })
+  }
+  // ---------------------------------------------------------
+  function accountPacketsToday(): Promise<number> {
+    return new Promise<number>(resolve => {
+      var time = (24 * 60 * 60 * 1000) * 1;
+      db.packets.find({ apikey: user.apikey, "_created_on": { $gt: new Date(Date.now() - time) } }).count((err: Error, packetsCount: any) => {
+        resolve(packetsCount)
+      })
+    })
+  }
+  // ---------------------------------------------------------
+  function accountStatesTotal(): Promise<any> {
+    return new Promise<any>(resolve => {
+      db.states.find({ apikey: user.apikey, }).count((err: Error, statesCount: any) => {
+        resolve(statesCount)
+      })
+    })
+  }
+  // ---------------------------------------------------------
+  function accountStatesActive24h(): Promise<number> {
+    return new Promise<number>(resolve => {
+      var time = (24 * 60 * 60 * 1000) * 1;
+      db.states.find({ apikey: user.apikey, "_last_seen": { $gt: new Date(Date.now() - time) } }).count((err: Error, statesCount: any) => {
+        resolve(statesCount)
+      })
+    })
+  }
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+  // ---------------------------------------------------------
+}
+////// END ACCOUNT STATS
+
+
+
+///////////////////////////////// SYSTEM WIDE
+
+export function init(app: any, db: any) {
+  log("STATS INIT")
+  dbStats = db;
   //const person =this.props.username;
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   // returns array of days device had activity and counts the amount of packets for each day

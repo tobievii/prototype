@@ -698,7 +698,8 @@ input:focus {
   font-weight: 100;
   font-size: 15px;
   margin: 22px;
-  margin-top: 5px;
+  margin-top: 11px;
+  margin-bottom: 11px;
 }
 
 input[type="checkbox"] {
@@ -1115,6 +1116,24 @@ input[type="checkbox"]:checked {
 .popup {
   color: red;
   font-family: 'Share Tech Mono';
+}
+
+
+.leaflet-popup-content-wrapper{
+  box-shadow: 3px 3px grey;
+  color:red;
+  background:#1b394d;
+  width:100%;
+}
+  
+
+.leaflet-container a.leaflet-popup-close-button{
+  color:red;
+}
+
+.leaflet-popup-tip{
+  background:#1b394d;
+ box-shadow: 3px 3px grey;
 }
 
 .rowList {
