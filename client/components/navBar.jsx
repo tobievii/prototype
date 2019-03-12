@@ -38,6 +38,10 @@ export class Notification extends Component {
   }
 
   render() {
+    if (this.props.notification.type == "New Device Added") {
+      this.props.notification.type = "NEW DEVICE ADDED"
+    }
+
     if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
@@ -50,6 +54,7 @@ export class Notification extends Component {
 
       )
     }
+
     if (this.props.notification.type == "ALARM") {
       return (
 
@@ -294,10 +299,8 @@ export class NavBar extends Component {
                 </div>
               </div>
             </Link>
-
             {this.account(this.props.account)}
           </div>
-
 
         </div>
       </div>

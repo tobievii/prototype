@@ -47,13 +47,16 @@ export class NotificationsView extends Component {
 
                 )
             }
+            if (notification.type == "New Device Added") {
+                notification.type = "NEW DEVICE ADDED"
+            }
             if (notification.type == "NEW DEVICE ADDED") {
                 return (
 
                     <div className="newNotificationItem">
                         <i className="fas fa-exclamation-circle"></i>
                         <span className="newdevice" >{notification.type}</span><br />
-                        <span className="devicename">{notification.device}</span><br />
+                        <span className="devicename">{notification.device} has been added</span><br />
                         <span className="lastseen">{moment(notification.created).fromNow()}</span>
                     </div>
 
