@@ -35,7 +35,7 @@ export class NotificationsView extends Component {
 
                 )
             }
-            if (notification.type == "Alarm") {
+            if (notification.type == "ALARM") {
                 return (
 
                     <div className="alarmNotificationItem">
@@ -47,7 +47,7 @@ export class NotificationsView extends Component {
 
                 )
             }
-            if (notification.type == "New Device Added") {
+            if (notification.type == "NEW DEVICE ADDED") {
                 return (
 
                     <div className="newNotificationItem">

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes, faBell, faUnderline } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
@@ -12,6 +12,8 @@ import { array } from "prop-types";
 library.add(faCog)
 library.add(faTimes)
 library.add(faBell);
+library.add(faSignOutAlt)
+library.add(faUserEdit)
 
 
 
@@ -36,7 +38,7 @@ export class Notification extends Component {
   }
 
   render() {
-    if (this.props.notification.type == "New Device Added") {
+    if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
         <div className="newNotificationItem">
@@ -48,7 +50,7 @@ export class Notification extends Component {
 
       )
     }
-    if (this.props.notification.type == "Alarm") {
+    if (this.props.notification.type == "ALARM") {
       return (
 
         <div className="alarmNotificationItem">
@@ -70,7 +72,21 @@ export class Notification extends Component {
           <span className="devicename">{this.device()}</span><br />
           <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
         </div>
+      )
+    }
 
+    if (!this.props.notification.type == "NEW DEVICE ADDED" ||
+      !this.props.notification.type == "ALARM" ||
+      !this.props.notification.type == "CONNECTION DOWN 24HR WARNING" ||
+      this.props.notification.type == undefined ||
+      this.props.notification.type == null
+    ) {
+      return (
+
+        <div className="warningNotificationItem">
+          <i className="fas fa-exclamation-triangle"></i>
+          YOU HAVE NO NOTIFICATIONS
+        </div>
       )
     }
   }
@@ -87,12 +103,16 @@ export class NavBar extends Component {
       devid: undefined,
       error: null,
       isLoaded: false,
-      notification: [{}]
+      notification: [{}],
+      displayMenu: false,
     }
 
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
+    this.showDropdownMenu = this.showDropdownMenu.bind(this);
+    this.hideDropdownMenu = this.hideDropdownMenu.bind(this);
   }
+
   showMenu(event) {
     event.preventDefault();
 
@@ -107,6 +127,20 @@ export class NavBar extends Component {
     });
   }
 
+  showDropdownMenu(event) {
+    event.preventDefault();
+    this.setState({ displayMenu: true }, () => {
+      document.addEventListener('click', this.hideDropdownMenu);
+    });
+  }
+
+  hideDropdownMenu() {
+    this.setState({ displayMenu: false }, () => {
+      document.removeEventListener('click', this.hideDropdownMenu);
+    });
+
+  }
+
   showSettings = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
@@ -118,29 +152,46 @@ export class NavBar extends Component {
   showNotificationsView = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
-        return (<Link to="/notifications" className="navLink" title="Notifications">View all Notifications</Link>)
+        return (<Link style={{ position: "right" }} to="/notifications" className="navLink" title="Notifications">View all Notifications</Link>)
       }
     }
   }
 
   goSettings = (account) => {
-    if (this.props.account) {
-      if (this.props.account.level > 0) {
-        return (
-          <Link to="/settings" className="navLink">
-            <div className="dropdown">
-              <span className="fas fa-user" title="Account settings"></span>
-              <div className="dropdown-content">
-                <span style={{ fontSize: 10 }} title="email">EMAIL: {account.email}</span>&nbsp;
-                <br></br>
-                <span style={{ fontSize: 10 }} title="username">USERNAME: {account.username}</span>&nbsp;
-                <br></br>
-                <span style={{ fontSize: 10 }} title="level">LEVEL: {account.level}</span>&nbsp;
-              </div>
+
+    return (
+      <div className="dropdown">
+        <div className="fas fa-user" onClick={this.showDropdownMenu}></div>
+
+        {this.state.displayMenu ? (
+          <div className="dropdown-content" style={{ width: "max-content" }}>
+            <span style={{ fontSize: 13 }} title="email">EMAIL: {account.email}</span>
+            <br></br>
+            <span style={{ fontSize: 13 }} title="username">USERNAME: {account.username}</span>
+            <br></br>
+            <span style={{ fontSize: 13 }} title="level">LEVEL: {account.level}</span>
+            <br></br>
+            <br></br>
+            <div style={{ backgroundColor: "#131e27", padding: "10px", opacity: "0.6" }}>
+              <a href="/settings">
+                <span className="navLink" style={{ paddingRight: "25px" }}>
+                  <FontAwesomeIcon icon="user-edit" /> EDIT ACCOUNT
+              </span>
+              </a>
+              <a href="/signout">
+                <span className="navLink"  >
+                  <FontAwesomeIcon icon="sign-out-alt" />  SIGN OUT
+            </span>
+              </a>
             </div>
-          </Link>)
-      }
-    }
+          </div>
+        ) :
+          (
+            null
+          )
+        }
+      </div>
+    );
   }
 
   showNotifications = (account) => {
@@ -160,7 +211,7 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div className="notificationPanel" style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
+              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
                 {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
