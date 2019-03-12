@@ -327,7 +327,7 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   }
 });
 
-app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
+app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
 
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -351,7 +351,6 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
         var payload = rawpackets[p];
         var devicepacket: any;
         var t = {
-          meta: { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method },
           id: payload.payload.id,
           timestamp: payload.payload.timestamp
         }

@@ -20,6 +20,7 @@ export class StatesViewerItem extends Component {
     mapIcon: <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>,
     device: undefined,
     deviceShare: undefined,
+    opacityp: "1",
     opacity: "1",
     isOpen: false
   };
@@ -48,17 +49,19 @@ export class StatesViewerItem extends Component {
   setDevice = (device) => {
     if (device.public != undefined) {
       if (device.public == true) {
+        this.setState({ opacityp: "1" })
+      } else {
+        this.setState({ opacityp: "0.2" })
+      }
+    } else {
+      this.setState({ opacityp: "0.2" })
+    }
+
+    if (device.access != undefined) {
+      if (device.access.length > 0) {
         this.setState({ opacity: "1" })
       } else {
-        if (device.access != undefined) {
-          if (device.access.length > 0) {
-            this.setState({ opacity: "1" })
-          } else {
-            this.setState({ opacity: "0.2" })
-          }
-        } else {
-          this.setState({ opacity: "0.2" })
-        }
+        this.setState({ opacity: "0.2" })
       }
     } else {
       this.setState({ opacity: "0.2" })
@@ -334,7 +337,7 @@ export class StatesViewerItem extends Component {
         <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
         <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px" }}></i></span>
         <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
-        <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
+        <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
         {this.mapIcon(viewUsed)}
       </div>
     )
@@ -375,7 +378,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              {/* <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} /> */}
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
 
             </div>
           </div>
@@ -396,7 +399,7 @@ export class StatesViewerItem extends Component {
               {this.stateListIcons(viewUsed, this.state.device)}
               {/* {this.mapIcon()}
               </div> */}
-              {/* <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} /> */}
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
             </div>
           </div>
         )
