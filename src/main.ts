@@ -28,6 +28,8 @@ var compression = require('compression')
 
 import express = require('express');
 
+var sprintf = require("sprintf-js").sprintf;
+
 const app = express()
 var http = require('http');
 var https = require('https');
@@ -837,6 +839,8 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
+    var hrstart = process.hrtime()
+
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
@@ -879,6 +883,10 @@ function handleState(req: any, res: any, next: any) {
         // }); 
 
         res.json({ result: "success" });
+
+        var hrend = process.hrtime(hrstart)
+
+        log(sprintf('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000))
       })
     })
   } else {
