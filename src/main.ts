@@ -859,7 +859,7 @@ function handleState(req: any, res: any, next: any) {
         if (info.newdevice) {
 
           var newDeviceNotification = {
-            type: "New Device Added",
+            type: "NEW DEVICE ADDED",
             device: req.body.id,
             created: packet._created_on
           }
