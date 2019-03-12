@@ -161,9 +161,8 @@ export class NavBar extends Component {
           this.state.showMenu
             ? (
               <div className="notificationPanel" style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+                {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
-
               </div>
             )
             : (
@@ -189,8 +188,6 @@ export class NavBar extends Component {
     } else {
       return this.props.account.notifications.length
     }
-
-
 
     //TODO Check if array has grown
   }
