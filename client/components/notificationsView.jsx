@@ -62,6 +62,19 @@ export class NotificationsView extends Component {
 
                 )
             }
+            if (notification.type == "A DEVICE WAS SHARED WITH YOU") {
+                return (
+
+                    <div className="newNotificationItem">
+                        <i className="fas fa-exclamation-circle"></i>
+                        <span className="newdevice" >{notification.type}</span><br />
+                        <span className="devicename">{notification.device} has been added</span><br />
+                        <span className="lastseen">{moment(notification.created).fromNow()}</span>
+                    </div>
+
+                )
+            }
+
         }
 
         );

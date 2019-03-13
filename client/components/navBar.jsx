@@ -54,6 +54,17 @@ export class Notification extends Component {
 
       )
     }
+    if (this.props.notification.type == "A DEVICE WAS SHARED WITH YOU") {
+      return (
+
+        <div className="newNotificationItem">
+          <i className="fas fa-exclamation-circle"></i>
+          <span className="newdevice" >{this.newDevice()}</span><br />
+          <span className="devicename" >{this.device()}</span><br />
+          <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+        </div>
+      )
+    }
 
     if (this.props.notification.type == "ALARM") {
       return (
