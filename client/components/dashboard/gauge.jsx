@@ -10,6 +10,7 @@ export class ProtoGauge extends React.Component {
         max: 100,
         valueanim: 0,
         typeError: false,
+        color: "#ff0"
     }
 
     animtimer;
@@ -23,7 +24,8 @@ export class ProtoGauge extends React.Component {
     updatedOptions = () => {
         var options = [
             { name: "min", type: "input", default: -50, value: this.state.min },
-            { name: "max", type: "input", default: 120, value: this.state.max }
+            { name: "max", type: "input", default: 120, value: this.state.max },
+            { name: "color", type: "input", default: "#ff0", value: this.state.color }
         ]
         this.options = options;
     }
@@ -128,7 +130,7 @@ export class ProtoGauge extends React.Component {
             var ratio = valr / range;
 
             var graphdegree = ((180 + 35 + 35) * ratio) - 35
-            return (<path className="value" fill="none" stroke="#0ff" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+            return (<path className="value" fill="none" stroke={this.state.color} strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
         }
 
     }
