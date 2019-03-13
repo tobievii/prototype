@@ -21,6 +21,7 @@ import { MapDevices } from "../map.jsx"
 
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
+import { WidgetBlank } from "./widget_blank.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -297,15 +298,17 @@ export class Dashboard extends React.Component {
     }
 
     if (data.type == "NivoLine") {
-      return (<NivoLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+      return (<NivoLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "ChartLine") {
-      return (<ChartLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
-    }
-
-    if (data.type == "Blank") {
-      return (<div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>)
+      return (<ChartLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "booleanButtonFalse") {
@@ -331,7 +334,10 @@ export class Dashboard extends React.Component {
     }
 
     if (data.type == "ThreeDWidget") {
-      return (<ThreeDWidget />)
+      return (<ThreeDWidget
+        dash={dash}
+        data={data}
+      />)
     }
 
     if (data.type == "Gauge") {
@@ -342,7 +348,15 @@ export class Dashboard extends React.Component {
     }
 
     if (data.type == "map") {
-      return (<MapDevices username={this.props.username} acc={this.props.acc} deviceCall={this.props.state} devices={this.props.devices} widget={true} showBoundary={this.state.showB} />)
+      return (<MapDevices
+        dash={dash}
+        data={data}
+        username={this.props.username}
+        acc={this.props.acc}
+        deviceCall={this.props.state}
+        devices={this.props.devices}
+        widget={true}
+        showBoundary={this.state.showB} />)
     }
 
     if (data.type == "widgetButton") {
@@ -352,6 +366,20 @@ export class Dashboard extends React.Component {
         setOptions={this.setOptions(data)}
       />)
     }
+    //////////
+
+    if (data.type.toUpperCase() == "BLANK") {
+      var a;
+      try {
+        a = JSON.stringify(this.objectByString(this.props.state.payload, data.datapath.slice(5))).toString()
+      } catch (err) { a = "" }
+      return (<WidgetBlank
+        dash={dash}
+        data={data}
+        value={a} />)
+    }
+
+    //////////
   }
 
   addWidget = () => {

@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
-//import Gauge from 'react-svg-gauge';
-
 import { Vector } from "../../../src/utils/vector"
-
-
 import { Widget } from "./widget.jsx"
-
 
 export class ProtoGauge extends React.Component {
 
@@ -139,7 +134,7 @@ export class ProtoGauge extends React.Component {
 
     render() {
         return (
-            <Widget label="test" options={this.options} dash={this.props.dash} >
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >
                 <svg viewBox="0 0 100 100" className="gauge">
                     <text
                         x="50"

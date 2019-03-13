@@ -778,13 +778,30 @@ input[type="checkbox"]:checked {
   height: 100%;
 }
 
-.widgetLabel {
-  background: $panelBg;  
+.widgetTitleBar {
+  background-color: $panelBg;  
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 
-.widgetGrab {
+.widgetGrab {  
+  background: $panelBg;  
   cursor: grab;
+  height: 100%;
+  padding: 5px 5px 5px 8px;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.1s linear;
 }
+
+.widgetGrab:hover {
+  background-color: lighten($panelBg,15%);  
+} 
 
 .widgetGrab:active {
   cursor: grabbing;

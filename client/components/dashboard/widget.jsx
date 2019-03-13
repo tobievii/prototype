@@ -5,12 +5,22 @@ export class OptionsInput extends React.Component {
   state = {
   }
 
-  changeValue(e) {
-    console.log("onchange!")
+  apply() {
+    console.log("apply")
+  }
+
+  onKeyPress = (e) => {
+    if (e.key == "Enter") {
+      this.apply();
+    }
+  }
+
+  changeValue = (e) => {
+    //console.log("onchange!")
   }
 
   noDrag(e) {
-    console.log("no drag!")
+    //console.log("no drag!")
     //e.preventDefault(); e.stopPropagation()
   }
 
@@ -18,15 +28,12 @@ export class OptionsInput extends React.Component {
     return (<div className="widgetMenuItem" onDrag={this.noDrag}
       onDragStart={this.noDrag} >
       {this.props.option.name}:
-      <input type="value" defaultValue={this.props.option.value}
-        onDrag={this.noDrag}
-        onDragStart={this.noDrag}
-        onSelect={evt => {
-          evt.stopPropagation();
-          evt.preventDefault();
-          console.log(evt)
-        }}
-        onChange={(evt) => this.changeValue(evt)}  ></input>
+      <input
+        type="value"
+        defaultValue={this.props.option.value}
+        onKeyPress={this.onKeyPress}
+        onChange={this.changeValue} >
+      </input>
     </div>)
   }
 }
@@ -128,23 +135,25 @@ export class Widget extends React.Component {
     }
   }
 
-  mapWidget = () => {
-    var p = this.props.children.type;
-    var color = "";
+  // This must move into the map widget!
+  //
+  // mapWidget = () => {
+  //   var p = this.props.children.type;
+  //   var color = "";
 
-    if (this.props.children.type.name == "MapDevices") {
-      if (this.state.boundaryVisible == true) {
-        color = "white";
-      } else {
-        color = "grey";
-      }
-      return (
-        <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px", color: color }} ><i className="fas fa-route" title="Show Boundary" onClick={this.showBoundary}></i></div>
-      )
-    } else {
-      return;
-    }
-  }
+  //   if (this.props.children.type.name == "MapDevices") {
+  //     if (this.state.boundaryVisible == true) {
+  //       color = "white";
+  //     } else {
+  //       color = "grey";
+  //     }
+  //     return (
+  //       <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px", color: color }} ><i className="fas fa-route" title="Show Boundary" onClick={this.showBoundary}></i></div>
+  //     )
+  //   } else {
+  //     return;
+  //   }
+  // }
 
   getwidgetoptions = (options) => {
     this.setState({ options })
@@ -161,19 +170,13 @@ export class Widget extends React.Component {
       return (
         < div style={{ overflow: "hidden" }
         } style={{ height: "100%", position: "relative", paddingTop: 30 }}>
-          <div className="widgetLabel" style={{ position: "absolute", top: 0, width: "100%" }}>
 
-            <div className="widgetGrab" style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
-
-            <div className="widgetOptions" style={{ float: "right" }}>
+          <div className="widgetTitleBar" >
+            <div className="widgetGrab" >{this.props.label} </div>
+            <div className="widgetOptions">
               <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
               {this.menu()}
             </div>
-
-            <div className="widgetOptions" style={{ float: "right" }}>
-              {this.mapWidget()}
-            </div>
-
           </div>
 
           <div className="widgetContents" style={{ height: "100%" }}>
