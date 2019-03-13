@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Polyline, Polygon, Map, TileLayer, Marker, Popup, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
 import Control from 'react-leaflet-control';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 var details = {
   lat: -25.864170,
@@ -75,8 +76,8 @@ export class MapDevices extends Component {
   getPopup = (marker) => {
     return (
       <Popup>
-        <h5 className="popup" style={{ marginTop: "50%", position: "center" }} >{marker.devid}</h5>
-      </Popup>
+        <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.acc.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
+      </Popup >
     )
   }
 

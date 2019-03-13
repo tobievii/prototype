@@ -34,9 +34,7 @@ export class Widget extends React.Component {
     boundaryVisible: false
   }
 
-  componentDidMount() {
-    console.log(this.props)
-  }
+
 
   removeWidget = () => {
     if (this.props.remove) { this.props.remove() }
