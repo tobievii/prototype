@@ -133,6 +133,7 @@ export class ProtoGauge extends React.Component {
 
 
     render() {
+
         return (
             <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >
                 <svg viewBox="0 0 100 100" className="gauge">
@@ -170,6 +171,7 @@ export class ProtoGauge extends React.Component {
                 </svg>
             </Widget >
         );
+
     }
 };
 
