@@ -21,7 +21,11 @@ export class OptionsInput extends React.Component {
       <input type="value" defaultValue={this.props.option.value}
         onDrag={this.noDrag}
         onDragStart={this.noDrag}
-        onSelect={evt => { console.log(evt) }}
+        onSelect={evt => {
+          evt.stopPropagation();
+          evt.preventDefault();
+          console.log(evt)
+        }}
         onChange={(evt) => this.changeValue(evt)}  ></input>
     </div>)
   }
@@ -37,16 +41,12 @@ export class Widget extends React.Component {
 
 
   removeWidget = () => {
-    if (this.props.remove) { this.props.remove() }
+    if (this.props.dash.remove) { this.props.dash.remove() }
   }
 
   optionsPanel = () => {
-    // console.log(this.props.children)
-    // if (this.props.children.props.options) {
-    //   console.log(this.props.children.props.options())
-    // }
-    if (this.state.options) {
-      return (<div>{this.state.options.map((option, i) => {
+    if (this.props.options) {
+      return (<div>{this.props.options.map((option, i) => {
 
         if (option.type == "input") {
           return (<OptionsInput key={i} option={option} />)
@@ -75,8 +75,11 @@ export class Widget extends React.Component {
         <div className="widgetMenuItem" >Change Type:
           <select onChange={(e) => {
             // console.log(e.target.value);
-            this.props.change("type", e.target.value)
+            this.props.dash.change("type", e.target.value)
           }}>
+
+            {/* You can add widgets to the dropdown below:
+                Please keep the below names the same as the .jsx file for the widget for sanity. */}
             <option unselectable="true">select</option>
             <option>Calendar</option>
             <option>NivoLine</option>
@@ -86,6 +89,7 @@ export class Widget extends React.Component {
             <option>Gauge</option>
             <option>map</option>
             <option>button</option>
+            <option>widgetButton</option>
           </select></div>
 
         {this.optionsPanel()}
@@ -107,11 +111,11 @@ export class Widget extends React.Component {
     }
   }
 
-  onDrag = () => {
-    return (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  onDrag = (e) => {
+
+    e.preventDefault();
+    e.stopPropagation();
+
   }
 
   showBoundary = () => {
@@ -142,7 +146,7 @@ export class Widget extends React.Component {
     }
   }
 
-  getWidgetOptions = (options) => {
+  getwidgetoptions = (options) => {
     this.setState({ options })
   }
 
@@ -151,7 +155,7 @@ export class Widget extends React.Component {
       var children = this.props.children;
 
       var childrenWithProps = React.Children.map(children, (child) => {
-        return React.cloneElement(child, { getWidgetOptions: this.getWidgetOptions })
+        return React.cloneElement(child, { getwidgetoptions: this.getwidgetoptions })
       })
 
       return (
@@ -159,10 +163,10 @@ export class Widget extends React.Component {
         } style={{ height: "100%", position: "relative", paddingTop: 30 }}>
           <div className="widgetLabel" style={{ position: "absolute", top: 0, width: "100%" }}>
 
-            <div style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
+            <div className="widgetGrab" style={{ float: "left", padding: "5px" }}>{this.props.label} </div>
 
             <div className="widgetOptions" style={{ float: "right" }}>
-              <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag()} onClick={this.showMenu()}></i></div>
+              <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
               {this.menu()}
             </div>
 
@@ -173,15 +177,14 @@ export class Widget extends React.Component {
           </div>
 
           <div className="widgetContents" style={{ height: "100%" }}>
-            {/* {this.props.children} */}
-            {childrenWithProps}
+            {this.props.children}
           </div>
 
           <div style={{ clear: "both" }}></div>
         </div >
       )
     } else {
-      return (<div>loading..</div>)
+      return (<div></div>)
     }
 
 

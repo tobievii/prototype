@@ -74,11 +74,16 @@ export class MapDevices extends Component {
   };
 
   getPopup = (marker) => {
-    return (
-      <Popup>
-        <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.acc.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
-      </Popup >
-    )
+    if (this.props.acc) {
+      if (this.props.acc.username) {
+        return (
+          <Popup>
+            <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.acc.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
+          </Popup >
+        )
+      }
+    }
+
   }
 
   checkBound = (marker) => {

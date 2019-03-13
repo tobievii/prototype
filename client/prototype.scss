@@ -778,12 +778,17 @@ input[type="checkbox"]:checked {
   height: 100%;
 }
 
-
-
 .widgetLabel {
-  background: $panelBg;
+  background: $panelBg;  
 }
 
+.widgetGrab {
+  cursor: grab;
+}
+
+.widgetGrab:active {
+  cursor: grabbing;
+}
 
 .widgetOptionsButton {
   cursor: pointer;

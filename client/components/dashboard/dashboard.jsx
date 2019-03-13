@@ -20,6 +20,7 @@ import { ProtoGauge } from "./gauge.jsx"
 import { MapDevices } from "../map.jsx"
 
 import { ChartLine } from "./chart_line.jsx"
+import { WidgetButton } from "./widgetButton.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -157,11 +158,15 @@ export class Dashboard extends React.Component {
     this.setState({ layout: layout }, () => { })
   }
 
-  gridOnDragStart = () => {
-    //console.log("drag start"); 
+  gridOnDragStart = (evt) => {
+    //console.log(evt)
+    //evt.preventDefault();
+    //evt.stopPropagation();
   }
-  gridOnDrag = () => {
-    //console.log("drag"); 
+  gridOnDrag = (evt) => {
+    //console.log("drag start"); 
+    //evt.preventDefault();
+    //evt.stopPropagation();
   }
   gridOnDragStop = () => {
     //console.log("drag stop"); 
@@ -279,6 +284,14 @@ export class Dashboard extends React.Component {
 
   // Depending on type prop of widget, this returns correct React component
   widgetType = (data) => {
+
+    var dash = {
+      change: this.widgetChange(data.i),
+      remove: this.widgetRemove(data.i),
+      setOptions: this.setOptions(data)
+    }
+
+
     if (data.type == "Calendar") {
       return (<Calendar state={this.props.state} />)
     }
@@ -323,14 +336,40 @@ export class Dashboard extends React.Component {
 
     if (data.type == "Gauge") {
       return (<ProtoGauge
+        dash={dash}
         data={data}
-        setOptions={this.setOptions(data)}
         value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
     }
 
     if (data.type == "map") {
       return (<MapDevices username={this.props.username} acc={this.props.acc} deviceCall={this.props.state} devices={this.props.devices} widget={true} showBoundary={this.state.showB} />)
     }
+
+    if (data.type == "widgetButton") {
+      return (<WidgetButton
+        state={this.props.state}
+        data={data}
+        setOptions={this.setOptions(data)}
+      />)
+    }
+  }
+
+  addWidget = () => {
+    var layout = _.clone(this.state.layout)
+    layout.push({ i: this.generateDifficult(32), x: 0, y: 0, w: 2, h: 5, type: "blank", datapath: "", dataname: "" })
+    this.setState({ layout: layout }, () => { })
+  }
+
+  titlebarButtons = () => {
+    return (
+      <div>
+        <div className="deviceViewButton" style={{ float: "right" }} title="Save layout [CTRL+S]" >
+          <i className="fas fa-save"></i>
+        </div>
+        <div className="deviceViewButton" onClick={this.addWidget} style={{ float: "right" }} title="Add widget [CTRL+A]" >
+          <i className="fas fa-plus-square"></i>
+        </div>
+      </div>)
   }
 
   generateDashboard = () => {
@@ -341,6 +380,7 @@ export class Dashboard extends React.Component {
         <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
           <div>
             <div className="deviceViewTitle">dashboard</div>
+            {this.titlebarButtons()}
             <div style={{ clear: "both" }} />
           </div>
           <GridLayout
@@ -354,24 +394,24 @@ export class Dashboard extends React.Component {
             onResizeStop={this.gridOnResizeStop}
             layout={this.state.layout}
             cols={this.state.grid.cols}
+            draggableHandle=".widgetGrab"   // drag handle class
             rowHeight={this.state.grid.rowHeight}
             width={this.state.grid.width}>
             {
               this.state.layout.map((data, i) => {
                 return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname}
+                  <div className="dashboardBlock" key={data.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }} >
+                    {this.widgetType(data)}
+                    {/* <Widget label={data.dataname}
                       change={this.widgetChange(data.i)}
                       remove={this.widgetRemove(data.i)}
-                      showBoundary={this.showBoundary}>
-                      {this.widgetType(data)}
-                    </Widget>
+                      showBoundary={this.showBoundary}>  
+                    </Widget> */}
                   </div>)
               })
             }
           </GridLayout>
         </div>
-
       )
     }
   }
@@ -409,8 +449,12 @@ export class Dashboard extends React.Component {
 
   render() {
     if (this.state.layout) {
+
       return (
-        <div style={{ minHeight: 50, textAlign: "center" }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
+        <div
+          style={{ minHeight: 50, textAlign: "center" }}
+          onDragOver={(e) => this.onDragOver(e)}
+          onDrop={(e) => this.onDrop(e, "complete")} >
           {this.generateDashboard()}
         </div>
       )
