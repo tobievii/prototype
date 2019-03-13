@@ -367,8 +367,8 @@ export class Dashboard extends React.Component {
     if (data.type == "widgetButton") {
       return (<WidgetButton
         state={this.props.state}
+        dash={dash}
         data={data}
-        setOptions={this.setOptions(data)}
       />)
     }
     //////////
