@@ -19,6 +19,7 @@ export class ProtoGauge extends React.Component {
 
     setOptions = (options) => {
         this.setState(_.merge(this.state, options))
+        this.props.dash.setOptions(options);
     }
 
     updatedOptions = () => {
