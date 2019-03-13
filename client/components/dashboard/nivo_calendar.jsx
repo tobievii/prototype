@@ -4,7 +4,7 @@ import protoGraphTheme from './theme.jsx'
 // Nivo calendar http://nivo.rocks/calendar
 
 import { ResponsiveCalendar } from '@nivo/calendar'
-//import "./index.scss"
+import { Widget } from "./widget.jsx"
 
 export class Calendar extends React.Component {
   state = { activity: [], from: "2018-01-01", to: "2018-11-22" }
@@ -33,7 +33,7 @@ export class Calendar extends React.Component {
   }
 
   render() {
-    return (
+    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >
       <ResponsiveCalendar
         data={this.state.activity}
         from={this.state.from}
@@ -61,6 +61,7 @@ export class Calendar extends React.Component {
         dayBorderColor="rgba(247, 57, 67,0)"
         theme={protoGraphTheme}
       />
+    </Widget>
     )
   }
 }

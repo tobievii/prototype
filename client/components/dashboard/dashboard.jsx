@@ -294,7 +294,8 @@ export class Dashboard extends React.Component {
 
 
     if (data.type == "Calendar") {
-      return (<Calendar state={this.props.state} />)
+      return (<Calendar dash={dash}
+        data={data} state={this.props.state} />)
     }
 
     if (data.type == "NivoLine") {
