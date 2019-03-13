@@ -10,7 +10,7 @@ export class ProtoGauge extends React.Component {
         max: 100,
         valueanim: 0,
         typeError: false,
-        color: "#ff0"
+        color: "#1c8"
     }
 
     animtimer;
@@ -24,9 +24,9 @@ export class ProtoGauge extends React.Component {
 
     updatedOptions = () => {
         var options = [
-            { name: "min", type: "input", default: -50, value: this.state.min },
-            { name: "max", type: "input", default: 120, value: this.state.max },
-            { name: "color", type: "input", default: "#ff0", value: this.state.color }
+            { name: "min", type: "input", value: this.state.min },
+            { name: "max", type: "input", value: this.state.max },
+            { name: "color", type: "input", value: this.state.color }
         ]
         this.options = options;
     }
@@ -152,7 +152,7 @@ export class ProtoGauge extends React.Component {
                         fontWeight="normal"
                         textAnchor="middle"
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{this.state.value}</text>
+                        dominantBaseline="central">{this.state.value.toFixed(2)}</text>
 
                     <text x="0" y="80"
                         fill="#aaa"
