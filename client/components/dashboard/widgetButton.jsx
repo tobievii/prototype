@@ -6,7 +6,7 @@ export class WidgetButton extends React.Component {
   state = {
     color: "#111",
     background: "#1c8",
-    command: JSON.stringify({ "foo": 10 }),
+    command: JSON.stringify({ "foo": true }),
     buttonText: "SEND"
   }
 

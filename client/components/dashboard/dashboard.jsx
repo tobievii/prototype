@@ -389,7 +389,7 @@ export class Dashboard extends React.Component {
 
   addWidget = () => {
     var layout = _.clone(this.state.layout)
-    layout.push({ i: this.generateDifficult(32), x: 0, y: 0, w: 2, h: 5, type: "blank", datapath: "", dataname: "" })
+    layout.push({ i: this.generateDifficult(32), x: 0, y: 0, w: 2, h: 5, type: "widgetButton", datapath: "", dataname: "" })
     this.setState({ layout: layout }, () => { })
   }
 
