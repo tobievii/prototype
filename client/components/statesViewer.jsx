@@ -451,49 +451,6 @@ export class StatesViewer extends Component {
       }
     }
 
-    fetch("/api/v3/devicePathPackets", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ id: device.device.devid, limit: 10 })
-    })
-      .then(response => response.json()).then(result => {
-        var last = [];
-        var finalCoords = [];
-
-        for (var count in result) {
-          if (result[count].ipLoc != undefined || result[count].ipLoc != null) {
-            if (count == 0) {
-              last = result[count].ipLoc.ll
-              finalCoords.push(result[count].ipLoc.ll)
-            } else {
-              last = result[count - 1].ipLoc.ll
-              if (last[0] != result[count].ipLoc.ll[0] && last[1] != result[count].ipLoc.ll[1]) {
-                finalCoords.push(result[count].ipLoc.ll)
-              }
-            }
-          } else if (result[count].data != undefined || result[count].data != undefined) {
-            if (result[count].data.gps != undefined || result[count].data.gps != undefined) {
-              var latlng = [result[count].data.gps.lat, result[count].data.gps.lon];
-
-              if (count == 0) {
-                last = latlng
-                finalCoords.push(latlng)
-              } else {
-                last = [result[count - 1].data.gps.lat, result[count - 1].data.gps.lon]
-                if (last[0] != latlng[0] && last[1] != latlng[1]) {
-                  finalCoords.push(latlng)
-                }
-              }
-            }
-          } else {
-            console.error("Data From Packets doesn't have loaction information.")
-          }
-        }
-        device.device["devicePathHistory"] = finalCoords;
-      })
-      .catch(err => {
-        device.n = false;
-      })
-
     this.setState({ devicesView: newDeviceList });
     this.setState({ devicePressed: device.device });
     this.setState({ boundary: device.n });
@@ -512,7 +469,6 @@ export class StatesViewer extends Component {
         }).catch(err => console.error(err.toString()));
       }
     }
-
     // -------------------------------
     var devicesServerTemp = this.state.devicesServer.filter((device) => { return device.selected == false; })
     var devicesViewTemp = this.state.devicesView.filter((device) => { return device.selected == false; })
