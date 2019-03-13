@@ -19,6 +19,8 @@ var deviceSelected = undefined;
 var circleColor = "#4c8ef7";
 var poly2tri = require('poly2tri');
 var b = undefined;
+var deviceSelected = false;
+
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
 //   iconSize: [80, 96],
@@ -133,15 +135,11 @@ export class MapDevices extends Component {
   }
 
   getHistory = (marker, action) => {
-    if (b == true) {
-      return (
-        <Polyline color="blue" positions={marker.devicePathHistory} />
-      )
-    } else {
-      return (
-        <div></div>
-      )
-    }
+    deviceSelected = true;
+
+    return (
+      <Polyline color="blue" positions={marker.devicePathHistory} />
+    )
   }
 
   PointInTriangle = (pt, v1, v2, v3) => {
@@ -158,26 +156,63 @@ export class MapDevices extends Component {
     return !(has_neg && has_pos);
   }
 
-  boundaryButton = (device) => {
-    if (device != undefined || device != null) {
-      return (
-        <button><i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "black", fontSize: "20px", padding: 10 }} onClick={() => { this.boundaryButtonClicked() }}></i></button>
-      )
-    } else {
-      return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
-    }
+  boundaryButtonClicked = (marker) => {
 
-  }
+    var device = _.clone(marker)
+    if (marker != undefined && marker != true && marker != false) {
+      fetch("/api/v3/devicePathPackets", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: device.devid, limit: 10 })
+      })
+        .then(response => response.json()).then(result => {
+          var last = [];
+          var finalCoords = [];
 
-  boundaryButtonClicked = () => {
-    if (this.state.boundaryVisible == false) {
-      this.setState({ boundaryVisible: true })
-      this.setState({ showBoundary: true })
-      b = true;
-    } else if (this.state.boundaryVisible == true) {
-      this.setState({ showBoundary: false })
-      this.setState({ boundaryVisible: false })
-      b = false;
+          for (var count in result) {
+            if (result[count].ipLoc != undefined || result[count].ipLoc != null) {
+              if (count == 0) {
+                last = result[count].ipLoc.ll
+                finalCoords.push(result[count].ipLoc.ll)
+              } else {
+                last = result[count - 1].ipLoc.ll
+                if (last[0] != result[count].ipLoc.ll[0] && last[1] != result[count].ipLoc.ll[1]) {
+                  finalCoords.push(result[count].ipLoc.ll)
+                }
+              }
+            } else if (result[count].data != undefined || result[count].data != undefined) {
+              if (result[count].data.gps != undefined || result[count].data.gps != undefined) {
+                var latlng = [result[count].data.gps.lat, result[count].data.gps.lon];
+
+                if (count == 0) {
+                  last = latlng
+                  finalCoords.push(latlng)
+                } else {
+                  last = [result[count - 1].data.gps.lat, result[count - 1].data.gps.lon]
+                  if (last[0] != latlng[0] && last[1] != latlng[1]) {
+                    finalCoords.push(latlng)
+                  }
+                }
+              }
+            } else {
+              console.error("Data From Packets doesn't have loaction information.")
+            }
+          }
+          device["devicePathHistory"] = finalCoords;
+          marker = device;
+          if (this.state.boundaryVisible == false) {
+            this.setState({ boundaryVisible: true })
+            this.setState({ showBoundary: true })
+            b = true;
+            this.getHistory(device)
+          } else if (this.state.boundaryVisible == true) {
+            this.setState({ showBoundary: false })
+            this.setState({ boundaryVisible: false })
+            b = false;
+          }
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   }
 
@@ -202,15 +237,12 @@ export class MapDevices extends Component {
         ]
     }
     return (
-      <Widget label="map" options={this.options} dash={this.props.dash}>
+      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.boundaryButtonClicked(deviceSelected)} deviceSelected={deviceSelected}>
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <Control position="topright" >
-            {this.boundaryButton(deviceSelected)}
-          </Control>
           {
 
             allDevices.map((marker) => {
@@ -349,13 +381,6 @@ export class MapDevices extends Component {
                       circleColor = "red";
                     }
 
-
-                    if (this.state.showBoundary == true) {
-                      b = true;
-                    } else {
-                      b = false;
-                    }
-
                     return (
                       <div key={marker.devid}>
                         <FeatureGroup >
@@ -409,7 +434,6 @@ export class MapDevices extends Component {
                           />
                           <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
                         </FeatureGroup>
-                        {this.getHistory(marker, b)}
                         <Marker
                           position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
                         >

@@ -60,34 +60,6 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    boundaryButton = () => {
-
-        if (this.state.view == "map") {
-            if (this.props.boundary == true) {
-                if (this.state.boundaryVisible == true) {
-                    return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "white", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
-                } else {
-                    return <i className="viewButton fas fa-route" title="Show Boundary" style={{ color: "grey", marginTop: "10px", marginRight: "22px" }} onClick={() => this.boundaryButtonClicked(this.props.devid)}></i>;
-                }
-
-            } else if (!this.state.boundary || this.state.boundary == undefined) {
-                return <i className="viewButton fas fa-route" title="Select a device to view path" style={{ color: "grey", marginTop: "10px", marginRight: "22px", opacity: 0.3, cursor: "not-allowed" }}></i>;
-            }
-        } else {
-            return <span style={{ marginTop: "10px", marginRight: "22px" }}></span>;
-        }
-
-    }
-
-    boundaryButtonClicked = (device) => {
-        if (this.state.boundaryVisible == false) {
-            this.props.showBoundary(true);
-            this.setState({ boundaryVisible: true })
-        } else if (this.state.boundaryVisible == true) {
-            this.props.showBoundary(false);
-            this.setState({ boundaryVisible: false })
-        }
-    }
 
     viewButtonClicked = (action) => {
         return (e) => {
@@ -151,13 +123,6 @@ export class StatesViewerMenu extends Component {
             )
         }
     }
-
-    // setBoundary = (b) => {
-    //     this.setState({ boundary: this.props.boundary });
-    //     return(
-    //         <div></div>
-    //     )
-    // }
 
     render() {
 

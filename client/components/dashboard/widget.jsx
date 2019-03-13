@@ -9,8 +9,6 @@ export class Widget extends React.Component {
     boundaryVisible: false
   }
 
-
-
   removeWidget = () => {
     if (this.props.dash.remove) { this.props.dash.remove() }
   }
@@ -89,12 +87,30 @@ export class Widget extends React.Component {
 
   }
 
+  devicePathButton = (name) => {
+    if (name == "map") {
+      if (this.props.deviceSelected == false) {
+        return (
+          <div style={{ padding: "4px 6px 4px 6px", color: "grey", opacity: "0.1", cursor: "not-allowed" }}><i className="fas fa-route" title="Select a device"></i></div>
+        )
+      } else {
+        return (
+          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }}><i className="viewButton fas fa-route" title="Show Boundary" onClick={() => { this.showBoundary() }}></i></div>
+        )
+      }
+    } else {
+      return (
+        <div style={{ display: "none" }}></div>
+      )
+    }
+  }
+
   showBoundary = () => {
     if (this.state.boundaryVisible == false) {
-      this.props.showBoundary(true);
+      this.props.showBoundary();
       this.setState({ boundaryVisible: true })
     } else if (this.state.boundaryVisible == true) {
-      this.props.showBoundary(false);
+      this.props.showBoundary();
       this.setState({ boundaryVisible: false })
     }
   }
@@ -130,6 +146,7 @@ export class Widget extends React.Component {
 
         <div className="widgetTitleBar" >
           <div className="widgetGrab" >{this.props.label} </div>
+          {this.devicePathButton(this.props.label)}
           <div className="widgetOptions">
             <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
             {this.menu()}
