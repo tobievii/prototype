@@ -4,9 +4,10 @@ import { Widget } from "./widget.jsx"
 export class WidgetButton extends React.Component {
 
   state = {
-    color: "#fff",
-    background: "#0ff",
-    command: JSON.stringify({ "foo": "bar" })
+    color: "#111",
+    background: "#1c8",
+    command: JSON.stringify({ "foo": 10 }),
+    buttonText: "SEND"
   }
 
   options;
@@ -18,9 +19,10 @@ export class WidgetButton extends React.Component {
 
   updatedOptions = () => {
     var options = [
-      { name: "color", type: "input", default: "#fff", value: this.state.color },
-      { name: "background", type: "input", default: "#0ff", value: this.state.background },
-      { name: "command", type: "input", default: JSON.stringify({ "foo": "bar" }), value: this.state.command }
+      { name: "color", type: "input", value: this.state.color },
+      { name: "background", type: "input", value: this.state.background },
+      { name: "command", type: "input", value: this.state.command },
+      { name: "buttonText", type: "input", value: this.state.buttonText }
     ]
     this.options = options;
   }
@@ -44,7 +46,8 @@ export class WidgetButton extends React.Component {
 
   render() {
     return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} >
-      <button style={{ width: "100%", height: "100%", color: this.state.color, background: this.state.background, border: "none" }} onClick={this.onClick}>SEND</button>
+      <button style={{ width: "100%", height: "100%", color: this.state.color, background: this.state.background, border: "none" }}
+        onClick={this.onClick} >{this.state.buttonText}</button>
     </Widget>
     );
   }
