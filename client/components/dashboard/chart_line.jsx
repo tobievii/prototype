@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Line } from 'react-chartjs-2';
+import { Widget } from "./widget.jsx"
 
 export class ChartLine extends React.Component {
   state = {}
@@ -74,9 +75,9 @@ export class ChartLine extends React.Component {
 
   render() {
     if (this.state.linedata) {
-      return (this.renderLine())
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>{this.renderLine()}</Widget>)
     } else {
-      return (<div>loading..</div>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}></Widget>)
     }
   }
 }

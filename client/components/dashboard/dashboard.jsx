@@ -344,7 +344,7 @@ export class Dashboard extends React.Component {
     if (data.type == "Gauge") {
       var value;
       try {
-        this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
+        value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
       } catch (e) { }
       return (<ProtoGauge
         dash={dash}

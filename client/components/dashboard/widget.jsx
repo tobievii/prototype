@@ -15,15 +15,6 @@ export class OptionsInput extends React.Component {
     }
   }
 
-  changeValue = (e) => {
-    //console.log("onchange!")
-  }
-
-  noDrag(e) {
-    //console.log("no drag!")
-    //e.preventDefault(); e.stopPropagation()
-  }
-
   render() {
     return (<div className="widgetMenuItem" onDrag={this.noDrag}
       onDragStart={this.noDrag} >
@@ -160,37 +151,25 @@ export class Widget extends React.Component {
   }
 
   render = () => {
-    if (this.props.children) {
-      var children = this.props.children;
+    return (
+      < div style={{ overflow: "hidden" }
+      } style={{ height: "100%", position: "relative", paddingTop: 30 }}>
 
-      var childrenWithProps = React.Children.map(children, (child) => {
-        return React.cloneElement(child, { getwidgetoptions: this.getwidgetoptions })
-      })
-
-      return (
-        < div style={{ overflow: "hidden" }
-        } style={{ height: "100%", position: "relative", paddingTop: 30 }}>
-
-          <div className="widgetTitleBar" >
-            <div className="widgetGrab" >{this.props.label} </div>
-            <div className="widgetOptions">
-              <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
-              {this.menu()}
-            </div>
+        <div className="widgetTitleBar" >
+          <div className="widgetGrab" >{this.props.label} </div>
+          <div className="widgetOptions">
+            <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
+            {this.menu()}
           </div>
+        </div>
 
-          <div className="widgetContents" style={{ height: "100%" }}>
-            {this.props.children}
-          </div>
+        <div className="widgetContents" style={{ height: "100%" }}>
+          {this.props.children}
+        </div>
 
-          <div style={{ clear: "both" }}></div>
-        </div >
-      )
-    } else {
-      return (<div></div>)
-    }
-
-
+        <div style={{ clear: "both" }}></div>
+      </div >
+    )
   }
 
 }
