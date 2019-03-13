@@ -1,33 +1,6 @@
 import React, { Component } from "react";
 
-export class OptionsInput extends React.Component {
-
-  state = {
-  }
-
-  apply() {
-    console.log("apply")
-  }
-
-  onKeyPress = (e) => {
-    if (e.key == "Enter") {
-      this.apply();
-    }
-  }
-
-  render() {
-    return (<div className="widgetMenuItem" onDrag={this.noDrag}
-      onDragStart={this.noDrag} >
-      {this.props.option.name}:
-      <input
-        type="value"
-        defaultValue={this.props.option.value}
-        onKeyPress={this.onKeyPress}
-        onChange={this.changeValue} >
-      </input>
-    </div>)
-  }
-}
+import { OptionsInput } from "./options/options_input.jsx"
 
 export class Widget extends React.Component {
 
@@ -47,7 +20,7 @@ export class Widget extends React.Component {
       return (<div>{this.props.options.map((option, i) => {
 
         if (option.type == "input") {
-          return (<OptionsInput key={i} option={option} />)
+          return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />)
         }
 
         return (<div key={i}></div>)

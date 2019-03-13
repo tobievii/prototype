@@ -16,6 +16,9 @@ export class ProtoGauge extends React.Component {
 
     options;
 
+    setOptions = (options) => {
+        this.setState(_.merge(this.state, options))
+    }
 
     updatedOptions = () => {
         var options = [
@@ -135,7 +138,7 @@ export class ProtoGauge extends React.Component {
     render() {
 
         return (
-            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} >
                 <svg viewBox="0 0 100 100" className="gauge">
                     <text
                         x="50"
