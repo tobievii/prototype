@@ -75,6 +75,8 @@ export class DeviceView extends Component {
     shareDisplay: "",
     editorChanged: false,
     devicesServer: undefined,
+    loggedin: "",
+    owner: ""
   };
 
   socket;
@@ -127,7 +129,6 @@ export class DeviceView extends Component {
 
   componentWillMount() {
     // should not get stats here? i think it should be /api/v3/users
-    //Modal.setAppElement('body');
     fetch("/api/v3/stats", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(stats => {
@@ -156,11 +157,9 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-
-      var loggedin = account.apikey
-      var owner = this.state.state.apikey
-
-      if (loggedin != owner && this.props.account.level < 100) {
+      this.setState({ loggedin: this.props.account.apikey })
+      this.setState({ owner: this.state.state.apikey })
+      if (this.state.loggedin != this.state.owner && this.props.account.level < 100) {
         this.setState({ shareDisplay: "none" })
       }
       else {
