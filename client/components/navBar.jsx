@@ -18,8 +18,6 @@ library.add(faUserEdit)
 
 
 export class Notification extends Component {
-
-
   constructor(props) {
     super(props);
   }
@@ -85,7 +83,7 @@ export class Notification extends Component {
         <div className="warningNotificationItem">
           <i className="fas fa-exclamation-triangle"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename">{this.device()}</span><br />
+          <span className="devicename textOverFLow">{this.device()}</span><br />
           <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
         </div>
       )

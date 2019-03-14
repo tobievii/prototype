@@ -17,7 +17,7 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-import { MapDevices } from "../map.jsx"
+import { MapDevices } from "./map.jsx"
 
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"

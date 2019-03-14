@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import moment from 'moment'
 
-
-
 export class NotificationsView extends Component {
     constructor(props) {
         super(props);
@@ -26,7 +24,7 @@ export class NotificationsView extends Component {
             if (notification.type == "CONNECTION DOWN 24HR WARNING") {
                 return (
 
-                    <div className="warningNotificationItem">
+                    <div className="warningNotificationItem" key={notification.device}>
                         <i className="fas fa-bullhorn"></i>
                         <span className="newdevice" >{notification.type}</span><br />
                         <span className="devicename">{notification.device}</span><br />
@@ -38,7 +36,7 @@ export class NotificationsView extends Component {
             if (notification.type == "ALARM") {
                 return (
 
-                    <div className="alarmNotificationItem">
+                    <div className="alarmNotificationItem" key={notification.device}>
                         <i className="fas fa-bullhorn"></i>
                         <span className="newdevice" >{notification.type}</span><br />
                         <span className="devicename">{notification.device}</span><br />
@@ -53,7 +51,7 @@ export class NotificationsView extends Component {
             if (notification.type == "NEW DEVICE ADDED") {
                 return (
 
-                    <div className="newNotificationItem">
+                    <div className="newNotificationItem" key={notification.device}>
                         <i className="fas fa-exclamation-circle"></i>
                         <span className="newdevice" >{notification.type}</span><br />
                         <span className="devicename">{notification.device} has been added</span><br />
@@ -65,7 +63,7 @@ export class NotificationsView extends Component {
             if (notification.type == "A DEVICE WAS SHARED WITH YOU") {
                 return (
 
-                    <div className="newNotificationItem">
+                    <div className="newNotificationItem" key={notification.device}>
                         <i className="fas fa-exclamation-circle"></i>
                         <span className="newdevice" >{notification.type}</span><br />
                         <span className="devicename">{notification.device} has been added</span><br />

@@ -115,6 +115,20 @@ export class Widget extends React.Component {
     }
   }
 
+  getWrench = () => {
+    if (this.props.widget == undefined || this.props.widget == false) {
+      return (
+        <div></div>
+      )
+    } else if (this.props.widget == true) {
+      return (
+        <div>
+          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
+          {this.menu()}
+        </div>
+      )
+    }
+  }
   // This must move into the map widget!
   //
   // mapWidget = () => {
@@ -148,8 +162,8 @@ export class Widget extends React.Component {
           <div className="widgetGrab" >{this.props.label} </div>
           {this.devicePathButton(this.props.label)}
           <div className="widgetOptions">
-            <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
-            {this.menu()}
+            {this.getWrench()}
+
           </div>
         </div>
 
