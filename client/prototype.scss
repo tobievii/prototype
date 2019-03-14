@@ -565,6 +565,10 @@ input:focus {
   outline: none;
 }
 
+.textOverFLow{
+  text-overflow: ellipsis !important;
+}
+
 /* width */
 ::-webkit-scrollbar {
   width: 5px;

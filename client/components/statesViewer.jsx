@@ -12,7 +12,7 @@ import * as p from "../prototype.ts"
 
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
-import { MapDevices } from "./map.jsx"
+import { MapDevices } from "./dashboard/map.jsx"
 
 import Media from "react-media";
 

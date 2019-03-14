@@ -4,7 +4,7 @@ import { EditControl } from "react-leaflet-draw";
 import Control from 'react-leaflet-control';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-import { Widget } from "./dashboard/widget.jsx"
+import { Widget } from "./widget.jsx"
 
 var details = {
   lat: -25.864170,
@@ -243,7 +243,7 @@ export class MapDevices extends Component {
         ]
     }
     return (
-      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(deviceSelected)} deviceSelected={deviceSelected}>
+      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(deviceSelected)} deviceSelected={deviceSelected} widget={this.props.widget}>
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
