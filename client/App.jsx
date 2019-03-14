@@ -130,8 +130,8 @@ class App extends Component {
                 return (
                     <div>
                         <Account account={this.state.account} />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
                         <Landing />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
                         <Footer />
                     </div>)
             }
