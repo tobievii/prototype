@@ -22,7 +22,8 @@ export class StatesViewerItem extends Component {
     deviceShare: undefined,
     opacityp: "1",
     opacity: "1",
-    isOpen: false
+    isOpen: false,
+    User: ""
   };
 
   intervalUpdator = undefined;
@@ -37,7 +38,13 @@ export class StatesViewerItem extends Component {
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
+    if (this.props.account.level < 100) {
+      this.setState({ User: this.props.username })
+    }
+    else if (this.props.account.level >= 100) {
+      this.setState({ User: this.props.device.fromUsers.username })
 
+    }
 
     this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
   }
@@ -265,7 +272,7 @@ export class StatesViewerItem extends Component {
       )
     } else {
       return (
-        <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} title="View Device Data">
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
           <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
             <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
           </div>
@@ -375,7 +382,7 @@ export class StatesViewerItem extends Component {
 
               {this.selectbox()}
 
-              <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
+              <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
                   <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>

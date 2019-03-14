@@ -123,7 +123,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} />)}
+          {devicelist.map(device => <StatesViewerItem public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -164,8 +164,6 @@ export class StatesViewer extends Component {
     this.socket = socketio();
 
     this.socket.on("connect", a => {
-      console.log("socket connected")
-      //this.loadList();
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
         console.log(info);
@@ -205,14 +203,33 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        this.setState({ devicesServer: states }, () => {
+        if (this.props.account.level >= 100) {
+          fetch("/api/v3/states/usernameToDevice", {
+            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
+          }).then(response => response.json()).then(serverresponse => {
 
-          for (var device in this.state.devicesServer) {
-            this.socket.emit("join", this.state.devicesServer[device].key);
-          }
-          this.setState({ devicesView: states }, () => {
+            this.setState({ devicesServer: serverresponse }, () => {
+              for (var device in this.state.devicesServer) {
+                this.socket.emit("join", this.state.devicesServer[device].key);
+              }
+
+              this.setState({ devicesView: serverresponse }, () => {
+                //this.socketConnectDevices();
+                //this.sort();
+              })
+            })
+          }).catch(err => console.error(err.toString()));
+        }
+        else {
+          this.setState({ devicesServer: states }, () => {
+
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
+            this.setState({ devicesView: states }, () => {
+            })
           })
-        })
+        }
       })
     }
     else {
@@ -220,17 +237,34 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        this.setState({ devicesServer: states }, () => {
+        if (this.props.account.level >= 100) {
+          fetch("/api/v3/states/usernameToDevice", {
+            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
+          }).then(response => response.json()).then(serverresponse => {
+            this.setState({ devicesServer: serverresponse }, () => {
+              for (var device in this.state.devicesServer) {
+                this.socket.emit("join", this.state.devicesServer[device].key);
+              }
+              this.setState({ devicesView: serverresponse }, () => {
+                //this.socketConnectDevices();
+                //this.sort();
+              })
+            })
+          }).catch(err => console.error(err.toString()));
+        }
+        else {
+          this.setState({ devicesServer: states }, () => {
 
-          for (var device in this.state.devicesServer) {
-            this.socket.emit("join", this.state.devicesServer[device].key);
-          }
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
 
-          this.setState({ devicesView: states }, () => {
-            //this.socketConnectDevices();
-            //this.sort();
+            this.setState({ devicesView: states }, () => {
+              //this.socketConnectDevices();
+              //this.sort();
+            })
           })
-        })
+        }
       })
     }
   }
@@ -496,11 +530,11 @@ export class StatesViewer extends Component {
               {matches =>
                 matches ? (
                   <div >
-                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={10} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                    <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={10} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} />
                   </div>
                 ) : (
                     <div >
-                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                      <DeviceList username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={15} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} />
                     </div>
                   )
               }
@@ -516,11 +550,11 @@ export class StatesViewer extends Component {
                 {matches =>
                   matches ? (
                     <div style={{ marginBottom: 10 }}>
-                      <DeviceList public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                      <DeviceList public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={5} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} />
                     </div>
                   ) : (
                       <div >
-                        <DeviceList public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} />
+                        <DeviceList public={this.props.public} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={14} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} />
                       </div>
                     )
                 }
