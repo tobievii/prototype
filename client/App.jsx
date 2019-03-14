@@ -123,7 +123,7 @@ class App extends Component {
                         <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
-                        <Footer />
+                        <Footer loggedIn={true} />
                     </div>
                 )
             } else {
@@ -132,7 +132,7 @@ class App extends Component {
                         <Account account={this.state.account} />
                         <Landing />
                         <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
-                        <Footer />
+                        <Footer loggedIn={false} />
                     </div>)
             }
         } else {
