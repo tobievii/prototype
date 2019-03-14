@@ -89,13 +89,13 @@ export class Widget extends React.Component {
 
   devicePathButton = (name) => {
     if (name == "map") {
-      if (this.props.deviceSelected == false) {
+      if (this.props.deviceSelected == false || this.props.deviceSelected == undefined) {
         return (
-          <div style={{ padding: "4px 6px 4px 6px", color: "grey", opacity: "0.1", cursor: "not-allowed" }}><i className="fas fa-route" title="Select a device"></i></div>
+          <div style={{ padding: "4px 6px 4px 6px", color: "grey", opacity: "0.3", cursor: "not-allowed" }}><i className="fas fa-route" title="Select a device"></i></div>
         )
       } else {
         return (
-          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }}><i className="viewButton fas fa-route" title="Show Boundary" onClick={() => { this.showBoundary() }}></i></div>
+          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }}><i className="viewButton fas fa-route" title="Show Boundary" onClick={() => { this.showPathHistory() }}></i></div>
         )
       }
     } else {
@@ -105,7 +105,7 @@ export class Widget extends React.Component {
     }
   }
 
-  showBoundary = () => {
+  showPathHistory = () => {
     if (this.state.boundaryVisible == false) {
       this.props.showBoundary();
       this.setState({ boundaryVisible: true })

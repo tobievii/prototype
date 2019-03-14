@@ -87,7 +87,6 @@ export class MapDevices extends Component {
         )
       }
     }
-
   }
 
   checkBound = (marker) => {
@@ -136,7 +135,6 @@ export class MapDevices extends Component {
 
   getHistory = (marker, action) => {
     deviceSelected = true;
-
     return (
       <Polyline color="blue" positions={marker.devicePathHistory} />
     )
@@ -156,7 +154,7 @@ export class MapDevices extends Component {
     return !(has_neg && has_pos);
   }
 
-  boundaryButtonClicked = (marker) => {
+  pathButtonClicked = (marker) => {
 
     var device = _.clone(marker)
     if (marker != undefined && marker != true && marker != false) {
@@ -216,6 +214,14 @@ export class MapDevices extends Component {
     }
   }
 
+  getMarker = (marker) => {
+    return (
+      <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
+        {this.getPopup(marker)}
+      </Marker>
+    )
+  }
+
   render() {
     allDevices = this.props.devices;
     deviceSelected = this.props.deviceCall;
@@ -237,7 +243,7 @@ export class MapDevices extends Component {
         ]
     }
     return (
-      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.boundaryButtonClicked(deviceSelected)} deviceSelected={deviceSelected}>
+      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(deviceSelected)} deviceSelected={deviceSelected}>
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -304,16 +310,14 @@ export class MapDevices extends Component {
               if (marker.selectedIcon == true) {
                 if (this.props.public == true) {
                   return (
-                    <div key={marker.devid}>
-                      <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                        {this.getPopup(marker)}
-                      </Marker>
+                    <div key={marker.key}>
+                      {this.getMarker(marker)}
                     </div>
                   )
                 } else {
                   if (marker.boundaryLayer == undefined || marker.boundaryLayer == null) {
                     return (
-                      <div key={marker.devid}>
+                      <div key={marker.key}>
                         <FeatureGroup>
                           <EditControl
                             position='topleft'
@@ -368,9 +372,7 @@ export class MapDevices extends Component {
                             }}
                           />
                         </FeatureGroup>
-                        <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                          {this.getPopup(marker)}
-                        </Marker>
+                        {this.getMarker(marker)}
                       </div>
                     )
                   } else if (marker.boundaryLayer != undefined || marker.boundaryLayer != null) {
@@ -382,7 +384,7 @@ export class MapDevices extends Component {
                     }
 
                     return (
-                      <div key={marker.devid}>
+                      <div key={marker.key}>
                         <FeatureGroup >
                           <EditControl
                             position='topleft'
@@ -434,11 +436,7 @@ export class MapDevices extends Component {
                           />
                           <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
                         </FeatureGroup>
-                        <Marker
-                          position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}
-                        >
-                          {this.getPopup(marker)}
-                        </Marker>
+                        {this.getMarker(marker)}
                       </div>
                     )
                   }
@@ -447,15 +445,13 @@ export class MapDevices extends Component {
 
               if (marker.selectedIcon == false && this.props.widget == true) {
                 return (
-                  <div key={marker.devid}>
+                  <div key={marker.key}>
                   </div>
                 )
               } else if (marker.selectedIcon == false) {
                 return (
-                  <div key={marker.devid}>
-                    <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-                      {this.getPopup(marker)}
-                    </Marker>
+                  <div key={marker.key}>
+                    {this.getMarker(marker)}
                   </div>
                 )
               }
