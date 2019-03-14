@@ -4,8 +4,8 @@ import { Widget } from "./widget.jsx"
 export class WidgetButton extends React.Component {
 
   state = {
-    color: "#111",
-    background: "#1c8",
+    color: "#111111",
+    background: "#11cc88",
     command: JSON.stringify({ "foo": true }),
     buttonText: "SEND"
   }

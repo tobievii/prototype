@@ -10,7 +10,7 @@ export class ProtoGauge extends React.Component {
         max: 100,
         valueanim: 0,
         typeError: false,
-        color: "#1c8"
+        color: "#11cc88"
     }
 
     animtimer;
