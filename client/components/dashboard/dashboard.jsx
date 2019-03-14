@@ -143,13 +143,13 @@ export class Dashboard extends React.Component {
 
     if (e.dataname == "lat" || e.dataname == "lon" || e.dataname == "gps") {
       typel = "map"
-    } else if (typeof e.data == "boolean") {
-      if (e.data == true) {
-        typel = "booleanButtonTrue"
-      } else {
-        typel = "booleanButtonFalse"
-      }
-    } else if (typeof e.data == "string") {
+      // } else if (typeof e.data == "boolean") {
+      //   if (e.data == true) {
+      //     typel = "booleanButtonTrue"
+      //   } else {
+      //     typel = "booleanButtonFalse"
+      //   }
+    } else if (typeof e.data == "string" || typeof e.data == "boolean") {
       typel = "Blank"
     } else {
       typel = "Gauge"
@@ -312,27 +312,29 @@ export class Dashboard extends React.Component {
         state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
-    if (data.type == "booleanButtonFalse") {
-      return (
-        <div align="center">
-          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-          <div className="switch">
-            <span className="slider round"></span>
-          </div>
-        </div>
-      )
-    }
+    // if (data.type == "booleanButtonFalse") {
+    //   return (
+    //     <div align="center">
+    //       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+    //       <label class="switch">
+    //         <input type="checkbox" />
+    //         <span class="slider round"></span>
+    //       </label>
+    //     </div>
+    //   )
+    // }
 
-    if (data.type == "booleanButtonTrue") {
-      return (
-        <div align="center">
-          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-          <div className="switch">
-            <span className="slider round switchActive"></span>
-          </div>
-        </div>
-      )
-    }
+    // if (data.type == "booleanButtonTrue") {
+    //   return (
+    //     <div align="center">
+    //       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+    //       <label class="switch">
+    //         <input type="checkbox" />
+    //         <span class="slider round"></span>
+    //       </label>
+    //     </div>
+    //   )
+    // }
 
     if (data.type == "ThreeDWidget") {
       return (<ThreeDWidget
