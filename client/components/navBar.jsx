@@ -9,6 +9,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import moment from 'moment'
 import { array } from "prop-types";
 
+
 library.add(faCog)
 library.add(faTimes)
 library.add(faBell);
@@ -21,6 +22,11 @@ export class Notification extends Component {
   constructor(props) {
     super(props);
   }
+
+  // componentDidMount = () => {
+
+  //   this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
+  // }
 
   newDevice = () => {
 
@@ -43,15 +49,18 @@ export class Notification extends Component {
     if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
-        <div className="newNotificationItem">
-          <i className="fas fa-exclamation-circle"></i>
-          <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename" >{this.device()}</span><br />
-          <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
-        </div>
+        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="newNotificationItem">
+            <i className="fas fa-exclamation-circle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename" >{this.device()}</span><br />
+            <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
 
       )
     }
+
     if (this.props.notification.type == "A DEVICE WAS SHARED WITH YOU") {
       return (
 
@@ -80,12 +89,14 @@ export class Notification extends Component {
     if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
 
-        <div className="warningNotificationItem">
-          <i className="fas fa-exclamation-triangle"></i>
-          <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename textOverFLow">{this.device()}</span><br />
-          <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
-        </div>
+        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="warningNotificationItem">
+            <i className="fas fa-exclamation-triangle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">{this.device()}</span><br />
+            <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
       )
     }
 
@@ -208,6 +219,10 @@ export class NavBar extends Component {
     );
   }
 
+  goAccountName = (account) => {
+    return account.username
+  }
+
   showNotifications = (account) => {
     if (account.notifications == undefined) {
       return (
@@ -226,7 +241,7 @@ export class NavBar extends Component {
           this.state.showMenu
             ? (
               <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+                {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification} account={account}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
             )
