@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import { OptionsInput } from "./options/options_input.jsx"
+import { OptionsColor } from "./options/options_color.jsx"
 
 export class Widget extends React.Component {
 
@@ -17,9 +18,8 @@ export class Widget extends React.Component {
     if (this.props.options) {
       return (<div>{this.props.options.map((option, i) => {
 
-        if (option.type == "input") {
-          return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />)
-        }
+        if (option.type == "input") { return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "color") { return (<OptionsColor key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 

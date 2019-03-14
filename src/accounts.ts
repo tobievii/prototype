@@ -98,9 +98,9 @@ export function signInFromWeb(db: any) {
           db.users.findOne(
             { email: req.body.email },
             (err: Error, user: any | undefined) => {
-              if (user == null || user == "") {
-                res.json({ error: "wrong email and/or password" });
-              }
+              // if (user == null || user == "") {
+              //   res.json({ error: "wrong email and/or password" });
+              // }
               scrypt.verifyKdf(user.password.buffer, decryptedString, function (err: Error, result: any) {
                 if (result == true) {
                   req.user = user;
@@ -212,7 +212,7 @@ export function registerExistingAccount(db: any, user: any, cb: any) {
 
       if (usersEmailExists.length == 0) {
         db.users.update({ uuid: user.uuid }, user, { upsert: true }, cb);
-        cb("Registration Succcesful", undefined)
+        //cb("Registration Succcesful", undefined)
       } else {
         cb("that email is taken", undefined)
       }

@@ -19,8 +19,8 @@ export class WidgetButton extends React.Component {
 
   updatedOptions = () => {
     var options = [
-      { name: "color", type: "input", value: this.state.color },
-      { name: "background", type: "input", value: this.state.background },
+      { name: "color", type: "color", value: this.state.color },
+      { name: "background", type: "color", value: this.state.background },
       { name: "command", type: "input", value: this.state.command },
       { name: "buttonText", type: "input", value: this.state.buttonText }
     ]

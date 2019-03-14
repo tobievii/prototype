@@ -26,7 +26,7 @@ export class ProtoGauge extends React.Component {
         var options = [
             { name: "min", type: "input", value: this.state.min },
             { name: "max", type: "input", value: this.state.max },
-            { name: "color", type: "input", value: this.state.color }
+            { name: "color", type: "color", value: this.state.color }
         ]
         this.options = options;
     }

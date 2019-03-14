@@ -565,6 +565,10 @@ input:focus {
   outline: none;
 }
 
+input[type="color"] {
+  padding: 0;
+}
+
 .textOverFLow{
   text-overflow: ellipsis !important;
 }
