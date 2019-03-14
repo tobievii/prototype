@@ -139,6 +139,9 @@ export class Account extends Component {
     }).then(response => response.json()).then(data => {
       if (data.error) {
         this.setState({ serverError: data.error })
+        if (data.error == "Registration Succcesful") {
+          location.reload();
+        }
       }
     }).catch(err => console.error(err.toString()));
 
