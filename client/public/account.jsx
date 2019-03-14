@@ -4,10 +4,14 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHdd, faUserCheck, faUserPlus, faDice } from '@fortawesome/free-solid-svg-icons'
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+
+import Media from "react-media";
+
 library.add(faUserCheck)
 library.add(faUserPlus)
 library.add(faDice)
-
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('prototype');
 export class Account extends Component {
   state = {
     menu: 0,
@@ -37,7 +41,7 @@ export class Account extends Component {
     this.getServerRegistrationOptions();
   }
 
-generateRandomPass = () => {
+  generateRandomPass = () => {
     var form = { ...this.state.form }
     form["passwordSignup"] = this.generateDifficult(16);
     this.setState({ form })
@@ -108,7 +112,7 @@ generateRandomPass = () => {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
         email: this.state.form.email,
-        pass: this.state.form.passwordSignin
+        pass: cryptr.encrypt(this.state.form.passwordSignin)
       })
     }).then(response => response.json()).then(data => {
       if (data.signedin) {
@@ -130,7 +134,7 @@ generateRandomPass = () => {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
         email: this.state.form.email,
-        pass: this.state.form.passwordSignup
+        pass: cryptr.encrypt(this.state.form.passwordSignup)
       })
     }).then(response => response.json()).then(data => {
       if (data.error) {
@@ -140,8 +144,8 @@ generateRandomPass = () => {
 
   }
 
-  ForgotPassword = () =>{
-    
+  ForgotPassword = () => {
+
     fetch("/api/v3/account/recoveraccount", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -152,15 +156,15 @@ generateRandomPass = () => {
       if (data.result) {
         this.setState({ resetButton: "RESET PASSWORD" })
         fetch("/api/v3/admin/recoverEmailLink", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: this.state.form.email,
-        })
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: this.state.form.email,
+          })
         }).then(response => response.json()).then(data => {
-          fetch("/api/v3/admin/expire", {
-            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({person:this.state.form.email, button:true })
-          }).then(response => response.json()).then(data => {})
+          // fetch("/api/v3/admin/expire", {
+          //   method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          //   body: JSON.stringify({ person: this.state.form.email, button: true })
+          // }).then(response => response.json()).then(data => { })
         })
       }
 
@@ -173,7 +177,18 @@ generateRandomPass = () => {
   drawRegisterButton = () => {
     if (this.state.registration) {
       if (this.state.registration.userRegistration) {
-        return (<div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ width: "150", float: "right" }}>REGISTER</div>)
+
+        return (
+          <Media query="(max-width: 400px)">
+            {matches =>
+              matches ? (
+                <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ marginRight: "0", right: "0", width: "150", float: "right" }}>REGISTER</div>
+              ) : (
+                  <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)} style={{ width: "150", float: "right" }}>REGISTER</div>
+                )
+            }
+          </Media>
+        )
       } else {
         return null;
       }
@@ -184,29 +199,30 @@ generateRandomPass = () => {
   }
 
   showButton = () => {
-    if(this.state.resetButton == ""){
+    if (this.state.resetButton == "") {
       return (
-        <div>
+        <div className="row">
           <div className="col-7" style={{ textAlign: "right" }} >
-              <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
+            <span className="serverError" style={{ fontSize: "11px" }} >{this.state.serverError}</span>
           </div>
+          <div className="loginB">
             <button className="btn-spot" style={{ float: "right" }} onClick={this.signIn} ><FontAwesomeIcon icon="user-check" /> Login </button>
-
-            <a  className="font-weight-bold spot" style={{ float: "right",marginRight: 120,marginLeft: 15,marginTop: 10, color:"#E02430"}} onClick={()=> this.ForgotPassword()} ><u> { this.state.forgotButton } ? </u>  </a>
-        </div>             
+            <a className="font-weight-bold spot" style={{ float: "right", marginRight: 120, marginLeft: 15, marginTop: 12, color: "#E02430", cursor: "pointer" }} onClick={() => this.ForgotPassword()} ><u> {this.state.forgotButton} ? </u>  </a>
+          </div>
+        </div>
       )
-    }else{
-      return(
+    } else {
+      return (
         <div className="col-10" style={{ textAlign: "right" }} >
- <span className="serverError" style={{ fontSize: "auto" }} >Check email for Password recovery link(Valid only for 10 minutes)</span> 
-            </div>
+          <span className="serverError" style={{ fontSize: "auto" }} >Check email for Password recovery link(Valid only for 10 minutes)</span>
+        </div>
       )
     }
   }
 
   levelZero = () => {
     return (
-      <div className="" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }}>
+      <div className="navBar" style={{ position: "absolute", width: 400, right: 20, top: 0, zIndex: 2000 }}>
 
 
         <div className="row" >
@@ -234,10 +250,7 @@ generateRandomPass = () => {
               />
             </div>
           </div>
-
-          <div className="row">
-          { this.showButton() }
-          </div>
+          {this.showButton()}
         </div>
 
 
@@ -279,7 +292,7 @@ generateRandomPass = () => {
             </div>
 
             <div className="col-5">
-            
+
               <button className="btn-spot" style={{ float: "right" }} onClick={this.register} ><FontAwesomeIcon icon="user-plus" /> Register</button>
             </div>
           </div>

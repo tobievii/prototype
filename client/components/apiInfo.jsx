@@ -46,10 +46,6 @@ export class ApiInfo extends Component {
   }
 
   render() {
-
-
-
-
     var apiCall = { path: window.location.origin }
 
     var samplePacket = { "id": "yourDevice001", "data": { "temperature": 24.54, "doorOpen": false, "gps": { "lat": 25.123, "lon": 28.125 } } }
@@ -64,6 +60,13 @@ export class ApiInfo extends Component {
       window.location.origin +
       "/api/v3/data/post";
 
+    var curlStatesSample =
+      "curl --user 'api:key-" +
+      this.props.apikey +
+      '\' -X GET -H "Content-Type: application/json" ' +
+      window.location.origin +
+      "/api/v3/states";
+
     var curlViewSample =
       "curl --user 'api:key-" +
       this.props.apikey +
@@ -71,14 +74,16 @@ export class ApiInfo extends Component {
       window.location.origin +
       "/api/v3/view";
 
+
+
     var codeStringRealtimeSocketIo = 'var socket = require("socket.io-client")("' + apiCall.path + '");\n\nsocket.on("connect", function(data) {\n\tconsole.log("connected.");\n\tsocket.emit("join", "' + this.props.apikey + '"); // your api key\n\n\tsocket.on("post", data => {\n\t\tconsole.log(data);\n\t});\n});';
     var codeStringRealtimeSocketIoResult = '{ id: \'yourDevice001\',\n  data:\n    { temperature: 24.54,\n      doorOpen: false,\n      gps: { lat: 25.123, lon: 28.125 } },\n  timestamp: \'2018-08-27T08:42:30.512Z\' }';
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "' + this.props.apikey + '|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="" style={{ paddingTop: 0, margin: "0 37px", marginTop: "50px" }} >
+      <div className="apiInfo" style={{ paddingTop: 0, margin: "0 37px", marginTop: "50px" }} >
 
-        <div className="row">
+        <div className="row apiInfoMenu">
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1)} >APIKEY</div>
           <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)}>HTTP REST</div>
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3)}>SOCKET.IO</div>
@@ -124,37 +129,69 @@ export class ApiInfo extends Component {
 
 
         <div className="row" style={this.getMenuPageStyle(2)}>
-          <div className="col-md-12 commanderBgPanel" >
-            <h4 className="spot">HOW TO CREATE AN ENDPOINT AND UPDATE ITS DATA</h4>
-            <p>To create a new device and update it is quite simple.</p>
-            <p>The API call to send the data as a device is identical to update the server. The data will be merged in the current state. Changes will be stored as packets and these packets will represents the history of a device. Each device has an id and the device id only needs to be unique to your own account. The recommended method to start integration is through our HTTPS REST API, although sockets.io is also available.</p>
-            <h6>METHOD PATH</h6>
-            <pre className="commanderBgPanel">POST {apiCall.path + "/api/v3/data/post"}</pre>
-            <h6>BODY DATA ("application/json")</h6>
 
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
-            <p>You can make the "id" anything you want as long as it is unique to your account and api key. When sending data you <span className="spot">MUST</span> have a "data" parameter.</p>
-            <h4>HOST AND PATH</h4>
-            <p>Finally we have to send the query in the right direction.</p>
-            <h6>CURL EXAMPLE</h6>
+          <div className="col-xl-6 commanderBgPanel" >
+            <h4 className="spot" style={{ padding: "30px 0 0 0" }}>ADD AND UPDATE DATA</h4>
+
+            <p>The API call to add a device and update a device is identical. The data will be merged in the current state. Changes will be stored as packets and these packets will represents the history of a device.</p>
+
+            <p>You can make the "id" anything you want as long as it is unique to your account. </p>
+
+            <p>The "data" section of the packet can contain anything you'd like as long as it is valid JSON.</p>
+          </div>
+
+          <div className="col-xl-6 commanderBgPanel" >
+            <div className="row" style={{ paddingTop: 30 }}>
+              <div className="col-md-3">
+                <h6>METHOD:</h6>
+                <pre className="commanderBgPanel">POST</pre>
+              </div>
+              <div className="col-md-9">
+                <h6>URL</h6>
+                <pre className="commanderBgPanel">{apiCall.path + "/api/v3/data/post"}</pre>
+              </div>
+              <div className="col-md-12">
+                <h6>BODY ( Content-Type: "application/json" )</h6>
+                <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
+              </div>
+            </div>
+          </div>
+
+
+          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10 }} >
+            <h5>QUICK CURL SNIPPET:</h5>
             <p className="commanderBgPanel" id="postSample" >{curlPostSample}</p>
           </div>
-          <div className="col-md-12 commanderBgPanel" >
-            <h4 className="spot">HOW TO RETRIEVE AN ENDPOINTS STATE</h4>
-            <p>This call sends the ID you are interested in, and the server responds with that ID's latest state.</p>
-            <h6>METHOD PATH</h6>
-            <pre className="commanderBgPanel">POST {apiCall.path + "/api/v3/view"}</pre>
-            <h6>BODY DATA ("application/json")</h6>
 
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket2)}</SyntaxHighlighter>
-            <p>The id must already exist on your account.</p>
+          {/* 2) GET STATES */}
 
-            <h6>CURL EXAMPLE</h6>
-            <p className="commanderBgPanel" >{curlViewSample}</p>
-            <h4>RESPONSE</h4>
-            <p>The server response will include the data about the latest state of the device. Here is an example:</p>
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(JSON.parse('{"_id":"5b80078bd6033ba3181c1a51",\n"apikey":"' + this.props.apikey + '",\n"devid":"yourDevice001",\n"payload":{"id":"yourDevice001","data":{"temperature":24.54,"doorOpen":false,"gps":{"lat":25.123,"lon":28.125}},"timestamp":"2018-08-27T08:41:31.719Z"},\n"meta":{"user":{},\n"created":{"unix":1535359291719,"jsonTime":"2018-08-27T08:41:31.719Z"},"ip":"::ffff:127.0.0.1","ipLoc":null,"userAgent":"curl/7.58.0","method":"POST"}}'), null, 2)}</SyntaxHighlighter>
+
+          <div className="col-md-6 commanderBgPanel" >
+            <h4 className="spot" style={{ paddingTop: 10 }}>GET DATA</h4>
+            <p>To get all the current device state data is simple. Just click on the url on the right.</p>
           </div>
+
+          <div className="col-md-6 commanderBgPanel" >
+            <div className="row" style={{ paddingTop: 30 }}>
+              <div className="col-md-3">
+                <h6>METHOD:</h6>
+                <pre className="commanderBgPanel">GET</pre>
+              </div>
+              <div className="col-md-9">
+                <h6>URL</h6>
+                <div className="commanderBgPanel"><a className="apidocsLinkUrl" href={apiCall.path + "/api/v3/states"}>{apiCall.path + "/api/v3/states"}</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10, overflow: "auto" }} >
+            <h5>QUICK CURL SNIPPET:</h5>
+            <p className="commanderBgPanel" id="postSample" >{curlStatesSample}</p>
+          </div>
+
+
+
+
         </div>
 
 
@@ -227,7 +264,7 @@ export class ApiInfo extends Component {
             </SyntaxHighlighter>
           </div>
         </div>
-      </div>
+      </div >
     );
   }
 }

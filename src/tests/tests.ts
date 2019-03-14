@@ -3,10 +3,11 @@
 import { log } from "../utils"
 import { describe, it } from "mocha";
 import * as trex from "../utils";
-
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('prototype');
 var testAccount = {
   email: "",
-  password: "newUser",
+  password: cryptr.encrypt("newUser"),
   apikey: "",
   server: "http://localhost",
   port: 8080,
@@ -564,6 +565,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("MQTT + /api/v3/data/post + SOCKETS", function (done: any) {
+      this.timeout(4000)
       log("-------- start")
       var mqtt = require('mqtt');
 
@@ -656,6 +658,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("SOCKETS  +  MQTT + /api/v3/data/post", function (done: any) {
+      this.timeout(4000)
       var mqtt = require('mqtt');
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
 

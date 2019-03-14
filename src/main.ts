@@ -8,6 +8,9 @@ import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
 
+import * as scrypt from "scrypt"
+
+//var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
 import { configGen } from "./config"
@@ -23,7 +26,9 @@ var version = config.version; //
 
 var compression = require('compression')
 
-import * as express from 'express'
+import express = require('express');
+
+var sprintf = require("sprintf-js").sprintf;
 
 const app = express()
 var http = require('http');
@@ -42,14 +47,14 @@ const { VM } = require('vm2');
 
 var db = mongojs(config.mongoConnection, config.mongoCollections);
 
-
-
+import { logDb } from "./log"
+logDb(db);//pass db instance to logger
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import { userInfo } from 'os';
-
 import * as stats from "./stats"
 import { utils } from 'mocha';
+import { isNullOrUndefined } from "util";
 
 
 
@@ -176,6 +181,12 @@ app.get("/recover/:recoverToken", (req: any, res: any) => {
   })
 })
 
+app.get("/accounts/secure", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
+
 app.get('/signout', (req: any, res: any) => {
   res.clearCookie("uuid");
   res.redirect('/');
@@ -190,6 +201,12 @@ app.get("/u/:username", (req: any, res: any) => {
 })
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err: Error, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/notifications", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
@@ -216,17 +233,12 @@ app.get('/view/:id/:mode', (req: express.Request | any, res: express.Response | 
   })
 })
 
-
-
 app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
   trex.log("fbp:");
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
   })
 })
-
-
-
 
 app.get('/api/v3/version', (req: any, res: any) => {
   res.json(version);
@@ -238,6 +250,14 @@ app.get('/api/v3/account', (req: any, res: any) => {
   delete cleanUser.password;
   res.json(cleanUser);
 })
+
+app.get('/api/v3/account/stats', (req: any, res: any) => {
+  stats.accountStats(req.user, (err: Error, stats: any) => {
+    if (err) { res.json(err); }
+    res.json(stats)
+  })
+})
+
 
 // This is to update the workflow on a device.
 app.post("/api/v3/workflow", (req: any, res: any) => {
@@ -254,8 +274,6 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
   }
 })
 
-
-
 app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -264,7 +282,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   // find history by key
   if (req.body.key) {
     resolved = true;
-    console.log("key!")
     db.states.findOne({ key: req.body.key }, (e: Error, device: any) => {
       if (req.body.datapath) {
         var query: any = { apikey: device.apikey, devid: device.devid }
@@ -303,14 +320,12 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   }
-
-
   if (resolved == false) {
     res.json({ error: "We require either an id or device key for this query" })
   }
 });
 
-app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
+app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
 
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -318,78 +333,38 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
   if (req.body.limit) { limit = req.body.limit }
 
   if (req.body.id) {
-    db.packets.find({ apikey: req.user.apikey, devid: req.body.id, boundaryLayer: { $exists: true } }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+    db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       // db.packets.find({ apikey: req.user.apikey, devid: req.body.id }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
       rawpackets = rawpackets.reverse();
       var packets = []
+      var latlng = {
+        ll:
+          [
+            0.01,
+            0.01
+          ]
+      }
 
       for (var p in rawpackets) {
         var payload = rawpackets[p];
         var devicepacket: any;
+        var t = {
+          id: payload.payload.id,
+          timestamp: payload.payload.timestamp
+        }
+        devicepacket = t;
 
-        if (payload.boundaryLayer != undefined || payload.boundaryLayer != null) {
-          devicepacket = payload.boundaryLayer;
-          devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-          devicepacket.id = payload.payload.id
-          devicepacket.timestamp = payload.payload.timestamp
-
-          if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-            devicepacket.data = payload.payload.data;
-          } else {
-            if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-              if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-                payload.meta.ipLoc = {
-                  ll:
-                    [
-                      0.01,
-                      0.01
-                    ]
-                }
-              }
-              devicepacket.ipLoc = payload.meta.ipLoc;
-            }
+        if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
+          devicepacket.data = payload.payload.data;
+        } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
+          if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
+            payload.meta.ipLoc = latlng;
           }
+          devicepacket.ipLoc = payload.meta.ipLoc;
         } else {
           if (payload.meta.ipLoc == undefined || payload.meta.ipLoc == null) {
-            payload.meta.ipLoc = {
-              ll:
-                [
-                  0.01,
-                  0.01
-                ]
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else if (payload.meta.ipLoc != undefined || payload.meta.ipLoc != null) {
-            if (payload.meta.ipLoc.ll == undefined || payload.meta.ipLoc == null) {
-              payload.meta.ipLoc = {
-                ll:
-                  [
-                    0.01,
-                    0.01
-                  ]
-              }
-            }
-            devicepacket = payload.meta.ipLoc;
-            devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            devicepacket.id = payload.payload.id
-            devicepacket.timestamp = payload.payload.timestamp
-          } else {
-            if (payload.payload.data.gps != undefined || payload.payload.data.gps != null) {
-              devicepacket = payload.payload;
-              devicepacket.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-            }
+            payload.meta.ipLoc = latlng;
+            devicepacket.ipLoc = payload.meta.ipLoc;
           }
         }
         packets.push(devicepacket)
@@ -467,8 +442,6 @@ app.get("/admin/processstates", (req: any, res: any) => {
   })
 })
 
-
-
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -484,7 +457,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
               res.json({ error: "must be level 100" }); return
             }
           })
-        });
+        })
       }
     }
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
@@ -502,8 +475,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             } else {
               res.json({ error: "state not found" })
             }
-
-
           })
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -536,22 +507,34 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 
 });
+
+app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
+  var scryptParameters = scrypt.paramsSync(0.1);
+
+  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
+    for (var i in result) {
+      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
+      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
+    }
+  })
+});
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
   if (req.body.username) {
 
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
-        db.states.findOne({ devid: req.body.id }, { key: 1 }, (err: Error, give: any) => {
+        db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
-            if (found == null) {
-              res.json({ error: "must be level 100" }); return;
+            if (give.public == false || give.public == null || give.public == undefined || !give.public || give.public == "") {
+              if (found == null) {
+                res.json({ error: "must be level 100" }); return;
+              }
             }
           })
         });
       }
     }
-
 
     db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
@@ -576,15 +559,30 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
     } else {
       res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
     }
-
   }
-
-
-
-
 });
 
+app.post('/api/v3/publicStates', (req: any, res: any) => {
+  if (req.user.level == 0) {
+    db.states.find({ public: true }, (err: Error, result: any) => {
+      res.json(result);
+    })
+  }
+})
 
+app.post('/api/v3/makedevPublic', (req: any, res: any) => {
+
+  db.states.update({ key: req.body.devid }, { $set: { public: true } }, (err: Error, result: any) => {
+    res.json(result);
+  })
+})
+
+app.post('/api/v3/makedevPrivate', (req: any, res: any) => {
+
+  db.states.update({ key: req.body.devid }, { $set: { public: false } }, (err: Error, result: any) => {
+    res.json(result);
+  })
+})
 
 app.get('/api/v3/states', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
@@ -600,7 +598,9 @@ app.get('/api/v3/states', (req: any, res: any) => {
 app.post('/api/v3/shared', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
-    res.json(states)
+    if (states.access) {
+      res.json(states)
+    }
   })
 })
 //Share Device
@@ -620,9 +620,17 @@ app.post('/api/v3/unshare', (req: any, res: any) => {
 })
 //unshare device
 
+//preview devices
+app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
+  db.states.find({}, { devid: 1 }, (err: Error, states: any) => {
+    res.json(states)
+  })
+})
+//preview devices
+
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any) => {
-  if (req.body.username) {
+  if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
@@ -636,6 +644,22 @@ app.post("/api/v3/states", (req: any, res: any) => {
         })
 
       }
+      else if (req.user.level) {
+        db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
+          if (e) { res.json({ error: "db error" }) }
+          if (user) {
+            db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
+              var cleanStates: any = []
+              for (var a in states) {
+                var cleanState = _.clone(states[a])
+                delete cleanState["apikey"]
+                cleanStates.push(cleanState);
+              }
+              res.json(cleanStates)
+            })
+          }
+        })
+      }
     }
 
     // todo filter by permission/level
@@ -645,7 +669,7 @@ app.post("/api/v3/states", (req: any, res: any) => {
           db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
             if (e) { res.json({ error: "db error" }) }
             if (user) {
-              db.states.find({ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, (er: Error, states: any[]) => {
+              db.states.find({ $or: [{ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, { public: true }] }, (er: Error, states: any[]) => {
                 var cleanStates: any = []
                 for (var a in states) {
                   var cleanState = _.clone(states[a])
@@ -713,16 +737,16 @@ app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
     delete device["_last_seen"]
     delete device["selectedIcon"]
     delete device["layout"]
-    device["_created_on"] = new Date();
+    device.boundaryLayer["_created_on"] = new Date();
     db.packets.save(dev, (errSave: Error, resSave: any) => {
 
       dev["_last_seen"] = new Date();
+      dev.payload["timestamp"] = new Date();
       db.states.update({ key: req.body.key }, dev)
       // update user account activity timestamp
       db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
         user["_last_seen"] = new Date();
         db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
-          console.log(r2)
           if (e2) {
             res.json(e2)
           } else if (r2) {
@@ -793,6 +817,54 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
   handleState(req, res, next);
 });
 
+function checkExsisting(req: any, res: any) {
+  db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
+
+    function findNotified(array: any) {
+      var t = [];
+      for (var i = 0; i < array.length; i++) {
+        if (array[i].notified == undefined || array[i].notified == null) {
+
+          array[i].notified = false;
+
+          io.to(req.user.username).emit("info", info)
+
+          db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+            io.to(req.user).emit("notification")
+            if (err) res.json(err);
+            if (updated) res.json(updated);
+          })
+        }
+        t.push(array[i]);
+      }
+    }
+
+    function findSeen(array: any) {
+      var t = [];
+      for (var i = 0; i < array.length; i++) {
+        if (array[i].seen == undefined || array[i].seen == null) {
+
+          array[i].seen = false;
+
+          io.to(req.user.username).emit("info", info)
+
+          db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+            io.to(req.user).emit("notification")
+            if (err) res.json(err);
+            if (updated) res.json(updated);
+          })
+        }
+        t.push(array[i]);
+      }
+    }
+
+    findNotified(state.notifications);
+    findSeen(state.notifications);
+
+  })
+
+}
+
 function handleState(req: any, res: any, next: any) {
   if (req.body === undefined) { return; }
 
@@ -809,6 +881,8 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
+    var hrstart = process.hrtime()
+
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
@@ -816,12 +890,16 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
 
+        checkExsisting(req, res)
+
         if (info.newdevice) {
 
           var newDeviceNotification = {
-            type: "New Device Added",
+            type: "NEW DEVICE ADDED",
             device: req.body.id,
-            created: packet._created_on
+            created: packet._created_on,
+            notified: true,
+            seen: false
           }
 
           io.to(req.user.username).emit("info", info)
@@ -833,11 +911,9 @@ function handleState(req: any, res: any, next: any) {
           }
 
           db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            console.log("hello")
+            io.to(req.user).emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
-            io.to(req.user).emit("notification")
-
           })
         }
 
@@ -847,11 +923,12 @@ function handleState(req: any, res: any, next: any) {
             });
           }
         }
-        // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-        //   if (err) log("couldnt publish")
-        // }); 
 
         res.json({ result: "success" });
+
+        var hrend = process.hrtime(hrstart)
+
+        log(sprintf('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000))
       })
     })
   } else {
@@ -862,8 +939,6 @@ function handleState(req: any, res: any, next: any) {
 /* ----------------------------------------------------------------------------- 
     DB QUERY
 */
-
-
 
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
 
@@ -907,11 +982,15 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
 
 }
 
-
-
 app.get("/api/v3/state", (req: any, res: any) => {
   db.states.find({ "payload.id": req.body.id }, (err: Error, state: any) => {
     res.json(state);
+  })
+});
+
+app.get("/api/v3/u/notifications", (req: any, res: any) => {
+  db.users.findOne({ apikey: req.user.apikey, notifications: req.user.notifications }, (err: Error, state: any) => {
+    res.json(state.notifications);
   })
 });
 
@@ -974,7 +1053,6 @@ app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
   })
 
 })
-
 
 app.post("/api/v3/state/clear", (req: any, res: any) => {
 
@@ -1043,10 +1121,6 @@ app.post("/api/v3/state/query", (req: any, res: any) => {
 
 });
 
-
-
-
-
 app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   var definitions: any = [];
@@ -1060,13 +1134,6 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   res.json({ definitions })
 })
-
-
-
-
-
-
-
 
 export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
 
@@ -1117,8 +1184,6 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           sandbox: sandbox
         });
 
-
-
         // Sync
         try {
           vm.run(state.workflowCode);
@@ -1141,37 +1206,8 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
       // NO DEVICE YET
       cb(undefined, packet);
     }
-
-
   })
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// app.use((req,res,next)=>{
-//   res.json({error:"invalid_route"})
-// })
 
 var server;
 
@@ -1180,7 +1216,6 @@ if (config.ssl) {
 } else {
   server = http.createServer(app);
 }
-
 
 /* ############################################################################## */
 
@@ -1196,14 +1231,12 @@ io.on('connection', function (socket: any) {
     socket.emit("connect", { hello: "world" })
   }, 5000)
 
+
   socket.on('join', function (path: string) {
     socket.join(path);
   });
 
   socket.on('post', (data: any) => {
-    //trex.log("socket posted");
-    //log(data);
-
     for (var key in socket.rooms) {
       if (socket.rooms.hasOwnProperty(key)) {
 
@@ -1245,13 +1278,8 @@ io.on('connection', function (socket: any) {
       }
     }
   })
-
-
   socket.on('disconnect', function () { })
 });
-
-
-
 
 if (config.ssl) {
   server.listen(443);
@@ -1280,12 +1308,7 @@ server.on('error', (e: any) => {
   } else {
     trex.log(e);
   }
-
 })
-
-
-
-
 
 process.on('unhandledRejection', log);
 process.on("uncaughtException", log);

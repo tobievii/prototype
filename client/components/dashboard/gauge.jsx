@@ -1,21 +1,40 @@
 import React, { Component } from 'react';
-//import Gauge from 'react-svg-gauge';
-
 import { Vector } from "../../../src/utils/vector"
+import { Widget } from "./widget.jsx"
 
 export class ProtoGauge extends React.Component {
 
     state = {
         value: 0,
-        min: -25,
-        max: 120,
+        min: 0,
+        max: 100,
         valueanim: 0,
-        typeError: false
+        typeError: false,
+        color: "#1c8"
     }
 
     animtimer;
 
+    options;
+
+    setOptions = (options) => {
+        this.setState(_.merge(this.state, options))
+        this.props.dash.setOptions(options);
+    }
+
+    updatedOptions = () => {
+        var options = [
+            { name: "min", type: "input", value: this.state.min },
+            { name: "max", type: "input", value: this.state.max },
+            { name: "color", type: "input", value: this.state.color }
+        ]
+        this.options = options;
+    }
+
     componentDidMount() {
+        // send parent how to configure this widget
+        this.updatedOptions();
+
         this.animtimer = setInterval(() => {
             // var targetval = this.state.value + 5
 
@@ -31,6 +50,33 @@ export class ProtoGauge extends React.Component {
                     this.setState({ typeError: true })
                 } else {
                     //ANIMATE GAUGE
+
+                    // LOAD OPTIONS
+                    if (this.props.data) {
+                        if (this.props.data.options) {
+                            if (this.props.data.options.min) {
+                                this.state.min = this.props.data.options.min
+                            }
+                            if (this.props.data.options.max) {
+                                this.state.max = this.props.data.options.max
+                            }
+                            this.updatedOptions();
+                        }
+                    }
+
+                    // ADJUST FOR MAX
+                    if (this.props.value > this.state.max) {
+                        var options = { max: this.props.value + 1 }
+                        this.setState(options)
+                        this.props.setOptions(options)
+                    }
+
+                    if (this.props.value < this.state.min) {
+                        var options = { min: this.props.value - 1 }
+                        this.setState(options)
+                        this.props.setOptions(options);
+                    }
+
                     if (this.state.valueanim != this.props.value) {
                         var difference = this.props.value - this.state.valueanim
                         var step = difference / 10;
@@ -69,9 +115,6 @@ export class ProtoGauge extends React.Component {
             largeArcFlag = "1"
         }
 
-        // console.log(start)
-        // start_xy = this.polar_to_cartesian(x, y, radius, end_angle);
-        // end_xy = this.polar_to_cartesian(x, y, radius, start_angle);
         return "M " + (start.x + center.x).toFixed(3) + " " + (start.y + center.y).toFixed(3) + " A " + radius + " " + radius + " 0 " + largeArcFlag + " 1 " + (end.x + center.x) + " " + (end.y + center.y);
     };
 
@@ -88,7 +131,7 @@ export class ProtoGauge extends React.Component {
             var ratio = valr / range;
 
             var graphdegree = ((180 + 35 + 35) * ratio) - 35
-            return (<path className="value" fill="none" stroke="#0ff" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+            return (<path className="value" fill="none" stroke={this.state.color} strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
         }
 
     }
@@ -96,33 +139,9 @@ export class ProtoGauge extends React.Component {
 
 
     render() {
-        // see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d#Path_commands
-
-
 
         return (
-            <div>
-                {/* <Gauge value={this.props.value} width={150} height={125} topLabelStyle={{ display: "none" }} color="#fff" /> */}
-                {/* <svg viewBox="0 0 100 100" className="gauge">
-                    <path
-                        className="dial"
-                        fill="none"
-                        stroke="#eee"
-                        strokeWidth="2"
-                        d="M 21.716 78.284 A 40 40 0 1 1 78.284 78.284"></path>
-                    <text
-                        x="50"
-                        y="50"
-                        fill="#999"
-                        className="value-text"
-                        fontSize="100%"
-                        fontFamily="sans-serif"
-                        fontWeight="normal"
-                        textAnchor="middle"
-                        alignmentBaseline="middle"
-                        dominantBaseline="central">35</text>
-                    <path className="value" fill="none" stroke="#666" strokeWidth="2.5" d="M 21.716 78.284 A 40 40 0 0 1 23.634 19.92"></path>
-                </svg> */}
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} widget={true}>
                 <svg viewBox="0 0 100 100" className="gauge">
                     <text
                         x="50"
@@ -133,12 +152,32 @@ export class ProtoGauge extends React.Component {
                         fontWeight="normal"
                         textAnchor="middle"
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{this.state.value.toFixed(3)}</text>
+                        dominantBaseline="central">{this.state.value.toFixed(2)}</text>
+
+                    <text x="0" y="80"
+                        fill="#aaa"
+                        className="value-text"
+                        fontSize="40%"
+                        fontWeight="normal"
+                        textAnchor="start"
+                        alignmentBaseline="top"
+                        dominantBaseline="central">MIN:{Math.round(this.state.min)}</text>
+
+                    <text x="100" y="80"
+                        fill="#aaa"
+                        className="value-text"
+                        fontSize="40%"
+                        fontWeight="normal"
+                        textAnchor="end"
+                        alignmentBaseline="top"
+                        dominantBaseline="central">MAX:{Math.round(this.state.max)}</text>
+
                     <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
-                    {this.drawguageSvg(-20, this.state.valueanim, 120)}
+                    {this.drawguageSvg(this.state.min, this.state.valueanim, this.state.max)}
                 </svg>
-            </div >
+            </Widget >
         );
+
     }
 };
 

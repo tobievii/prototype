@@ -4,12 +4,15 @@ var nodemailer = require("nodemailer")
 var randomString = require('random-string');
 var mongojs = require('mongojs')
 var ObjectId = mongojs.ObjectId;
+var io = require('socket.io')(server);
+var server;
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
-
 export var name = "admin";
-
+var scrypt = require("scrypt");
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr('prototype');
 
 export function handlePacket(db: any, packet: any, cb: any) {
 }
@@ -92,19 +95,23 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
     var today = new Date();
     today.setHours(today.getHours() + 2);
-    db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { "password": req.body.pass } }, (err: Error, response: any) => {
+    const decryptedString = cryptr.decrypt(req.body.pass);
+    var scryptParameters = scrypt.paramsSync(0.1);
+    var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+    db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { "password": kdfResult } }, (err: Error, response: any) => {
       if (response) {
         if (response.nModified == 0) {
           res.json(response)
         } else {
+          var changeToken = randomString({ length: 128 });
+          db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { recover: { "recoverToken": changeToken, "recoverTime": today } } })
           res.json(response)
         }
       } else if (err) {
         res.json(err)
       }
     })
-    var changeToken = randomString({ length: 128 });
-    db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { recover: { "recoverToken": changeToken, "recoverTime": today } } })
+
   })
 
   app.post("/api/v3/admin/expire", (req: any, res: any) => {
@@ -123,16 +130,30 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   //Changing password while logged in
   app.post("/api/v3/admin/userpassword", (req: any, res: any) => {
-    db.users.update({ $and: [{ username: req.body.user }, { password: req.body.current }] }, { $set: { "password": req.body.pass } }, (err: Error, response: any) => {
-      if (response) {
-        if (response.nModified == 0) {
-          res.json(response)
-        } else {
-          res.json(response)
+    const decryptedString = cryptr.decrypt(req.body.current);
+    const decryptedString2 = cryptr.decrypt(req.body.pass);
+    var scryptParameters = scrypt.paramsSync(0.1);
+    db.users.findOne({ username: req.body.user }, (err: Error, found: any) => {
+
+      scrypt.verifyKdf(found.password.buffer, decryptedString, function (err: Error, result: any) {
+        if (result == true) {
+          var newpass = scrypt.kdfSync(decryptedString2, scryptParameters);
+          db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass } }, (err: Error, response: any) => {
+            if (response) {
+              if (response.nModified == 0) {
+                res.json(response)
+              } else {
+                res.json(response)
+              }
+            } else if (err) {
+              res.json(err)
+            }
+          })
         }
-      } else if (err) {
-        res.json(err)
-      }
+        else if (result == false) {
+          res.json(result)
+        }
+      });
     })
   })
   //Changing password while logged in
@@ -185,6 +206,14 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //Shared Device email
   app.post("/api/v3/admin/shareDevice", (req: any, res: any) => {
     var today = new Date();
+    var shareDeviceNotification = {
+      type: "A DEVICE WAS SHARED WITH YOU", //req.body.email
+      device: req.body.dev,
+      created: today,
+      notified: true,
+      seen: false
+    }
+
     today.setHours(today.getHours() + 2);
     try {
       getRegistration(db, (err: Error, result: any) => {
@@ -209,12 +238,28 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
           html: req.body.html
         }
 
-        smtpTransport.sendMail(mail, (err: any, info: any) => {
+        smtpTransport.sendMail(mail, (err: any, info: any, packet: any) => {
           if (err) { log(err); return; }
           if (info) {
 
             res.json({ err: {}, result: { mail: "sent" } })
             db.users.findOne({ email: req.body.email }, { _id: 1 }, (err: Error, result: any) => {
+              db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
+                var t = result.notifications;
+                if (result.notifications) {
+                  t.push(shareDeviceNotification)
+                } else {
+                  t = [shareDeviceNotification]
+                }
+                db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+                  console.log(updated)
+                  io.to(req.body.email).emit("info", info)
+                  if (err) res.json(err);
+                  if (updated) res.json(updated);
+                })
+              })
+
+
               db.users.findOne({ email: req.body.email }, { uuid: 1, _id: 0 }, (err: Error, visitor: any) => {
 
                 db.states.update({ devid: req.body.dev, apikey: req.user.apikey }, { $push: { access: visitor.uuid } })
@@ -279,15 +324,16 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // handle incoming account registrations (new with optional email verification)
   app.post("/api/v3/admin/register", (req: any, res: any) => {
     log("ADMIN\tNew Account registration: email: " + req.body.email)
-    // accounts.registerExistingAccount(db, req.body.email, req.get('User-Agent'), req.ip, (err:Error,user:any)=>{
-    //   res.json({err, user})
-    // }, {password:req.user.pass})
 
     req.user.email = req.body.email
-    req.user.password = req.body.pass
     req.user.level = 1
-
+    const decryptedString = cryptr.decrypt(req.body.pass);
+    var scryptParameters = scrypt.paramsSync(0.1);
+    //encrypts password
+    var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+    req.user.password = kdfResult;
     accounts.registerExistingAccount(db, req.user, (error: Error, result: any) => {
+      db.users.update({ email: req.user.email }, { $set: { encrypted: true } })
       res.json({ error, result, account: req.user })
     })
 

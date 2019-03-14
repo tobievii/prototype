@@ -15,7 +15,6 @@ export class SettingsPanel extends React.Component {
 
   getAccount = () => {
     fetch("/api/v3/account", { method: "GET" }).then(resp => resp.json()).then((data) => {
-      //console.log(data);
       if (data.level) {
         this.setState({ level: data.level })
       }
@@ -24,7 +23,6 @@ export class SettingsPanel extends React.Component {
   }
 
   usernameUpdated = () => {
-    console.log("updated!")
     this.getAccount();
   }
 
@@ -32,17 +30,17 @@ export class SettingsPanel extends React.Component {
     return (
       <div>
         <div className="adminBlocks" >
-          <h4>ACCOUNT</h4>
           <a href="/signout"><button className="btn-spot" style={{ float: "right" }} > SIGN OUT</button></a>
-          email: {this.state.account.email}<br />
-          level: {this.state.account.level}<br />
-          username: {this.state.account.username}<br />
+          <h4>ACCOUNT</h4>
+          email:<span className="settingsDetails"> {this.state.account.email}</span><br />
+          level:<span className="settingsDetails"> {this.state.account.level}</span><br />
+          username:<span className="settingsDetails"> {this.state.account.username}</span><br />
 
           <SetUsername username={this.state.account.username} usernameUpdated={this.usernameUpdated} />
           <div style={{ clear: "both" }} />
-          
+
         </div>
-        
+
       </div>
     )
   }

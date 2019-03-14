@@ -13,12 +13,14 @@ import { Landing } from "./public/landing.jsx"
 
 import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
+import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
 import { Verify } from "./components/verify.jsx";
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
+import { NotificationsView } from "./components/notificationsView.jsx";
 
 
 import Stats from "./components/stats.jsx"
@@ -27,8 +29,9 @@ import * as p from "./prototype.ts"
 
 import { Dashboard } from "./components/dashboard/dashboard.jsx"
 
-//import socketio from "socket.io-client";
-//const socket = socketio();
+import socketio from "socket.io-client";
+var socket = socketio();
+
 const test = {
     un: undefined,
     acc: undefined,
@@ -37,22 +40,28 @@ const test = {
 }
 
 class App extends Component {
-
     state = {};
 
     constructor(props) {
         super(props);
-
-        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
-
         p.getAccount(account => {
             this.setState({ account });
             if (account.level > 0) {
-                //socket.emit("join", account.apikey);
+                socket.emit("join", account.apikey);
                 this.setState({ loggedIn: true })
-                // if its a real user (level >0 ) then we get device data.
             }
         })
+
+        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
+
+        socket.on("connect", a => {
+            socket.on("post", a => {
+                p.getAccount(account => {
+                    this.setState({ account });
+                })
+            })
+
+        });
 
         p.getStates((states) => { this.setState({ states }) })
 
@@ -111,7 +120,7 @@ class App extends Component {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account}/>
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer />
@@ -122,6 +131,8 @@ class App extends Component {
                     <div>
                         <Account account={this.state.account} />
                         <Landing />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
+                        <Footer />
                     </div>)
             }
         } else {
@@ -132,12 +143,13 @@ class App extends Component {
     deviceView = ({ match }) => {
         return (
             <div>
-                <DeviceView 
-                    devid={match.params.devid} 
+                <DeviceView
+                    devid={match.params.devid}
                     username={match.params.username}
-                    acc={test.acc} 
-                    deviceCall={test.dc} 
-                    devices={test.ds} 
+                    acc={test.acc}
+                    deviceCall={test.dc}
+                    devices={test.ds}
+                    account={this.state.account}
                 />
             </div>
         )
@@ -147,8 +159,8 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account}/>
+                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} />
+                <Footer />
             </div>
 
         )
@@ -157,7 +169,15 @@ class App extends Component {
     recoverPassword = ({ match }) => {
         return (
             <div>
-                <Recovery recoverToken={match.params.recoverToken}/>
+                <Recovery recoverToken={match.params.recoverToken} />
+            </div>
+        )
+    }
+
+    secure = ({ match }) => {
+        return (
+            <div>
+                <Encrypt />
             </div>
         )
     }
@@ -165,6 +185,12 @@ class App extends Component {
     settings = ({ match }) => {
         return (
             <SettingsView />
+        )
+    }
+
+    notifications = ({ match }) => {
+        return (
+            <NotificationsView />
         )
     }
 
@@ -181,6 +207,8 @@ class App extends Component {
                         <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
+                        <Route exact path="/accounts/secure" component={this.secure} />
+                        <Route path="/notifications" component={this.notifications} account={this.state.account} />
                     </div>
                 </Router>
             </div>

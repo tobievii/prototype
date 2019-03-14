@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import * as THREE from 'three';
-
-
-
+import { Widget } from "./widget.jsx"
 export class ThreeDWidget extends Component {
+    autofit;
 
     componentDidMount() {
-        
 
-        setInterval( ()=>{
+
+        this.autofit = setInterval(() => {
             this.fitToDiv();
-        },100)
+        }, 100)
 
         const width = this.mount.offsetWidth
         const height = this.mount.offsetHeight
-        console.log({width, height})
+        console.log({ width, height })
         //ADD SCENE
         this.scene = new THREE.Scene()
         //ADD CAMERA
@@ -28,7 +27,7 @@ export class ThreeDWidget extends Component {
         //ADD RENDERER
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         this.renderer.setClearColor('#000000')
-        
+
         //this.renderer.setSize(width, height)
         this.fitToDiv();
 
@@ -41,23 +40,23 @@ export class ThreeDWidget extends Component {
         this.start()
     }
 
-    fitToDiv () {
-        var detectedSize = { width: this.mount.offsetWidth, height: this.mount.offsetHeight}
-        
+    fitToDiv() {
+        var detectedSize = { width: this.mount.offsetWidth, height: this.mount.offsetHeight }
+
         if (this.camera) {
-            this.camera.aspect = detectedSize.width/detectedSize.height
+            this.camera.aspect = detectedSize.width / detectedSize.height
             this.camera.updateProjectionMatrix();
         }
-        
+
         this.renderer.setSize(detectedSize.width, detectedSize.height)
     }
 
     componentWillUnmount() {
         this.stop()
         this.mount.removeChild(this.renderer.domElement)
-
-
+        clearInterval(this.autofit);
     }
+
     start = () => {
         if (!this.frameId) {
             this.frameId = requestAnimationFrame(this.animate)
@@ -77,12 +76,17 @@ export class ThreeDWidget extends Component {
     }
     render() {
         return (
-            <div
-                style={{ width: "100%", height: '100%', 
-                    //background: "#ff0"
-                }}
-                ref={(mount) => { this.mount = mount }}
-            />
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>
+                <div
+                    style={{
+                        width: "100%", height: '100%',
+                        //background: "#ff0"
+                    }}
+                    ref={(mount) => { this.mount = mount }}
+                />
+            </Widget>
+
+
         )
     }
 }

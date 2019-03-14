@@ -7,6 +7,8 @@ import * as _ from 'lodash';
 
 import * as accounts from "./accounts"
 
+import * as logger from "./log"
+
 // Tests to see if we are online.
 export function online(): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
@@ -100,15 +102,7 @@ export function getGUID() {
 
 /* ------------------------------------------------------------------------- */
 
-export function log(a: any) {
-
-    var now = new Date();
-    if (typeof a == "object") {
-        console.log(now.toISOString() + "\t" + JSON.stringify(a))
-    } else {
-        console.log(now.toISOString() + "\t" + a)
-    }
-}
+export function log(a: any) { logger.log(a); }
 
 /**
  * Deep diff between two object, using lodash
