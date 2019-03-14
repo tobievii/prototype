@@ -37,21 +37,46 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // MQTT
 void handleMessages(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message");
-  Serial.print(topic);
-  Serial.print("] ");
+  //Serial.print("Message");
+  //Serial.print(topic);
+  //Serial.print("] ");
 
-  StaticJsonDocument<200> doc;
-  DeserializationError error = deserializeJson(doc, payload);
+  //StaticJsonDocument<200> doc;
+
+  //Serial.println(payload);
+  Serial.println("MQTT recv");
 
   
-  // TODO
-  // led = doc["led"];
+  //DeserializationError error = deserializeJson(doc, payload);
+  
 
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
+
+
+  // if (foo.isNull() == false) {
+  //   const char* fooval = doc.getMember("foo");
+  //   Serial.println(fooval);
+  //   log(fooval);
+  // }
+  
+
+  StaticJsonDocument<200> requestDoc;
+  DeserializationError error = deserializeJson(requestDoc, payload);
+  JsonObject request = requestDoc.as<JsonObject>();
+
+
+  String jsontemp; 
+  serializeJson(request,jsontemp);
+	Serial.println("api call:");
+	Serial.println(jsontemp);
+	Serial.println("-----");
+
+  String foo = request["data"]["foo"];
+  Serial.println(foo);
+  if (foo) { log(foo); }
+  
+    
+  
+    
 }
 
 void setup() {
@@ -77,13 +102,15 @@ void setup() {
 
   Serial.begin(115200);
   WiFi.begin(ssid, password);
+  
  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.println("Connecting to WiFi..");
-    wifi = true;
+    log(WiFi.status());
+    
   }
  
+  wifi = true;
   Serial.println("Connected to the WiFi network"); 
   client.setServer(mqttServer, mqttPort);
   client.setCallback(handleMessages);
@@ -95,7 +122,7 @@ void setup() {
 }
  
 void loop() {
-    dashboard();
+  //dashboard();
 
   digitalWrite(LED_BUILTIN, led);
 
@@ -106,14 +133,14 @@ void loop() {
     connectMqtt();
   }
 
-  if (millis() - lastupdate > 5000) {
+  if (millis() - lastupdate > 15000) {
     lastupdate = millis();
     publishUpdate();
   }
 }
 
 void publishUpdate() {
-  Serial.print("publishing!\n");
+  //Serial.print("publishing!\n");
   String msg = "{\"id\":\""+deviceid+"\",\"data\":{\"button\":false}}";
   client.publish(apikey.c_str(), msg.c_str());
 }
@@ -137,7 +164,15 @@ void connectMqtt() {
   }
 }
 
-
+void log(String msg) {
+  Serial.println(msg);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);  
+  display.setCursor(32,0);   
+  display.println(msg);
+  display.display();  
+}
 
 
 void dashboard(void) {
