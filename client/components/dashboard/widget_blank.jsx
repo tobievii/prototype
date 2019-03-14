@@ -21,7 +21,7 @@ export class WidgetBlank extends React.Component {
 
   render() {
     return (
-      <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >
+      <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>
         <div>{this.props.value}</div>
       </Widget>
     );

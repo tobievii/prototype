@@ -104,9 +104,9 @@ export class NivoLine extends React.Component {
   render() {
 
     if (this.state.linedata) {
-      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >{this.renderLine()}</Widget>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>{this.renderLine()}</Widget>)
     } else {
-      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} >Need data source.</Widget>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true} >Need data source.</Widget>)
     }
 
   }

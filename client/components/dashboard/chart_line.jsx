@@ -75,9 +75,9 @@ export class ChartLine extends React.Component {
 
   render() {
     if (this.state.linedata) {
-      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>{this.renderLine()}</Widget>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>{this.renderLine()}</Widget>)
     } else {
-      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}></Widget>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}></Widget>)
     }
   }
 }

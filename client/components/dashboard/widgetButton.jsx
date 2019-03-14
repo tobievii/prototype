@@ -45,7 +45,7 @@ export class WidgetButton extends React.Component {
   }
 
   render() {
-    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} >
+    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} widget={true}>
       <button style={{ width: "100%", height: "100%", color: this.state.color, background: this.state.background, border: "none" }}
         onClick={this.onClick} >{this.state.buttonText}</button>
     </Widget>
