@@ -14,12 +14,11 @@ var details = {
 
 var inBound = false;
 var allDevices = undefined;
-var deviceSelected = undefined;
 
 var circleColor = "#4c8ef7";
 var poly2tri = require('poly2tri');
 var b = undefined;
-var deviceSelected = false;
+var deviceSelected = undefined;
 
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
@@ -154,9 +153,19 @@ export class MapDevices extends Component {
 
   getHistory = (marker, action) => {
     deviceSelected = true;
-    return (
-      <Polyline color="blue" positions={marker.devicePathHistory} />
-    )
+    console.log(action)
+    if (action != undefined && action != null) {
+      console.log("number 1")
+      return (
+        <Polyline color="blue" positions={action.devicePathHistory} />
+      )
+    } else {
+      console.log("number 2")
+      return (
+        <div style={{ display: "none" }}></div>
+      )
+    }
+
   }
 
   PointInTriangle = (pt, v1, v2, v3) => {
@@ -174,7 +183,6 @@ export class MapDevices extends Component {
   }
 
   pathButtonClicked = (marker) => {
-
     var device = _.clone(marker)
     if (marker != undefined && marker != true && marker != false) {
       fetch("/api/v3/devicePathPackets", {
@@ -215,12 +223,12 @@ export class MapDevices extends Component {
             }
           }
           device["devicePathHistory"] = finalCoords;
-          marker = device;
           if (this.state.boundaryVisible == false) {
+
             this.setState({ boundaryVisible: true })
             this.setState({ showBoundary: true })
             b = true;
-            this.getHistory(device)
+            this.getHistory(marker, device)
           } else if (this.state.boundaryVisible == true) {
             this.setState({ showBoundary: false })
             this.setState({ boundaryVisible: false })
@@ -262,7 +270,7 @@ export class MapDevices extends Component {
         ]
     }
     return (
-      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(deviceSelected)} deviceSelected={deviceSelected} widget={this.props.widget}>
+      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(this.props.deviceCall)} deviceSelected={deviceSelected} widget={this.props.widget} >
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -391,6 +399,7 @@ export class MapDevices extends Component {
                             }}
                           />
                         </FeatureGroup>
+                        {this.getHistory()}
                         {this.getMarker(marker)}
                       </div>
                     )
@@ -455,6 +464,7 @@ export class MapDevices extends Component {
                           />
                           <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
                         </FeatureGroup>
+                        {this.getHistory(marker)}
                         {this.getMarker(marker)}
                       </div>
                     )

@@ -488,7 +488,7 @@ export class StatesViewer extends Component {
     }
 
     for (var dev in newDeviceList) {
-      if (newDeviceList[dev].devid == device.e.devid) {
+      if (newDeviceList[dev].key == device.e.key) {
         if (!device.n) {
           newDeviceList[dev].selectedIcon = false;
         } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
