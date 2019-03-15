@@ -49,7 +49,7 @@ export class Notification extends Component {
     if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
-        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="newNotificationItem">
             <i className="fas fa-exclamation-circle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
@@ -89,7 +89,7 @@ export class Notification extends Component {
     if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
 
-        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="warningNotificationItem">
             <i className="fas fa-exclamation-triangle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
