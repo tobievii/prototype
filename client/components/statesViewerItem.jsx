@@ -264,21 +264,13 @@ export class StatesViewerItem extends Component {
   }
 
   displayDeviceInfo = () => {
-    if (this.props.public == true) {
-      return (
-        <div className="col" style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+    return (
+      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
+        <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
           <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
         </div>
-      )
-    } else {
-      return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
+      </Link>
+    )
   }
 
   selectbox = () => {

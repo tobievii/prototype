@@ -561,7 +561,7 @@ export class StatesViewer extends Component {
               </Media>
 
               <div className="mapContainer">
-                <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} />
+                <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} />
               </div>
             </div>
           </div>
