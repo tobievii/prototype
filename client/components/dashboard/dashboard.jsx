@@ -363,7 +363,8 @@ export class Dashboard extends React.Component {
         deviceCall={this.props.state}
         devices={this.props.devices}
         widget={true}
-        showBoundary={this.state.showB} />)
+        showBoundary={this.state.showB}
+        PopUpLink={false} />)
     }
 
     if (data.type == "widgetButton") {
