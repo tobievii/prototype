@@ -303,8 +303,12 @@ export class DeviceView extends Component {
   };
 
   toggleModal = () => {
-
-    this.setState({ isOpen: !this.state.isOpen })
+    if (this.props.account.email == this.state.state.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
+    else {
+      this.setState({ isOpen: this.state.isOpen })
+    }
   }
 
   drawState = () => {

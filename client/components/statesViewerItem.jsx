@@ -22,6 +22,7 @@ export class StatesViewerItem extends Component {
     deviceShare: undefined,
     opacityp: "1",
     opacity: "1",
+    opacityw: "1",
     isOpen: false,
     User: ""
   };
@@ -72,6 +73,19 @@ export class StatesViewerItem extends Component {
       }
     } else {
       this.setState({ opacity: "0.2" })
+    }
+
+    if (device.notification24 != undefined) {
+      var notifications = this.props.account.notifications;
+      for (var s in notifications) {
+        if (notifications[s].type == "CONNECTION DOWN 24HR WARNING") {
+          // console.log(device.devid + " has been down for  a day or more.")
+
+        }
+      }
+      this.setState({ opacityw: "1" })
+    } else {
+      this.setState({ opacityw: "0.2" })
     }
   }
 
@@ -241,8 +255,7 @@ export class StatesViewerItem extends Component {
   }
 
   clickShare = (device) => {
-    return () => {
-    }
+    this.setState({ isOpen: false })
   }
 
   selectBoxClickHandler = (action) => {
@@ -337,7 +350,7 @@ export class StatesViewerItem extends Component {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
             <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
             <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             {this.mapIcon(viewUsed)}
@@ -348,7 +361,7 @@ export class StatesViewerItem extends Component {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
             <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
-            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px" }}></i></span>
+            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
             <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
             <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
             {this.mapIcon(viewUsed)}
@@ -361,7 +374,7 @@ export class StatesViewerItem extends Component {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
           <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
@@ -405,7 +418,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.clickShare() }} />
 
             </div>
           </div>
