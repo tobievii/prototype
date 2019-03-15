@@ -35,6 +35,11 @@ export class Notification extends Component {
     } return this.props.notification.type
   }
 
+  message = () => {
+
+    return this.props.notification.message
+  }
+
   device = () => {
     if (this.props.notification.type) {
       return this.props.notification.device
@@ -80,6 +85,7 @@ export class Notification extends Component {
           <i className="fas fa-bullhorn"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
           <span className="devicename">{this.device()}</span><br />
+          <span>{this.message()}</span><br />
           <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
         </div>
 

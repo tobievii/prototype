@@ -894,7 +894,7 @@ setInterval(() => {
 
 function getWarningNotification() {
 
-  log("NOTIFICATIONS checking for devices that went offline")
+  // log("NOTIFICATIONS checking for devices that went offline")
   var now: any = new Date();
   var dayago = new Date(now - (1000 * 60 * 60 * 24));
   db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
