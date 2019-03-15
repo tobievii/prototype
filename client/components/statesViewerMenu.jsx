@@ -9,10 +9,12 @@ export class StatesViewerMenu extends Component {
 
     selectBox = () => {
         if (this.props.public == false) {
-            if (this.state.selectAll) {
-                return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
-            } else {
-                return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+            if (this.props.visiting == false) {
+                if (this.state.selectAll) {
+                    return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
+                } else {
+                    return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+                }
             }
         }
     }
@@ -39,15 +41,17 @@ export class StatesViewerMenu extends Component {
 
     menuDeleteButton = () => {
         if (this.props.public == false) {
-            if (this.props.selectCount > 0) {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
-                        onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
-                )
-            } else {
-                return (
-                    <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed" }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
-                )
+            if (this.props.visiting == false) {
+                if (this.props.selectCount > 0) {
+                    return (
+                        <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
+                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+                    )
+                } else {
+                    return (
+                        <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed" }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                    )
+                }
             }
         }
     }

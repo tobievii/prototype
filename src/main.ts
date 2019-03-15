@@ -117,6 +117,7 @@ db.on('connect', function () {
 //####################################################################
 // USERS LAST SEEN / ACTIVE
 app.use((req: any, res: any, next: any) => {
+
   if (req.user) {
 
     if (req.user.level == 0) {
@@ -141,8 +142,6 @@ app.use((req: any, res: any, next: any) => {
 app.get('/', (req: any, res: any) => {
 
   //redirect main page people to https.
-
-
   if (req.protocol == "http") {
     trex.log("HTTP VISITOR")
     if (config.ssl) {
@@ -518,6 +517,7 @@ app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
     }
   })
 });
+
 app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
   if (req.body.username) {
@@ -629,7 +629,9 @@ app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
 //preview devices
 
 // new in 5.0.34:
-app.post("/api/v3/states", (req: any, res: any) => {
+app.post("/api/v3/states", (req: any, res: any, packet: any) => {
+  checkExsisting(req, res)
+
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
@@ -708,6 +710,27 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
   db.states.find({ apikey: req.user.apikey }, (err: Error, states: any[]) => {
     res.json(states);
   })
+})
+
+app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
+  if (req.user.level == 100) {
+    db.states.aggregate([{
+      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+    },
+    { $unwind: '$fromUsers' },
+    ], (err: Error, result: any) => {
+      res.json(result)
+    })
+  }
+  else if (req.user.level == 0) {
+    db.states.aggregate([{
+      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+    },
+    { $unwind: '$fromUsers' }, { $match: { public: true } },
+    ], (err: Error, result: any) => {
+      res.json(result)
+    })
+  }
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
@@ -865,6 +888,42 @@ function checkExsisting(req: any, res: any) {
 
 }
 
+setInterval(() => {
+  getWarningNotification();
+}, 5000)
+
+function getWarningNotification() {
+
+  // log("NOTIFICATIONS checking for devices that went offline")
+  var now: any = new Date();
+  var dayago = new Date(now - (1000 * 60 * 60 * 24));
+  db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
+
+    for (var s in listDevices) {
+      var device = listDevices[s]
+      db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
+
+        // db.states.findOne({ key: device.key }, (err: any, result: any) => {
+        //   io.to(result.key).emit('post', result)
+        // })
+
+        var WarningNotificationL = {
+          type: "CONNECTION DOWN 24HR WARNING",
+          device: device.devid,
+          created: new Date(),
+          notified: true,
+          seen: false
+        };
+
+        db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
+
+        })
+      })
+    }
+  })
+
+}
+
 function handleState(req: any, res: any, next: any) {
   if (req.body === undefined) { return; }
 
@@ -889,8 +948,6 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
-
-        checkExsisting(req, res)
 
         if (info.newdevice) {
 
@@ -982,7 +1039,8 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
 
 }
 
-app.get("/api/v3/state", (req: any, res: any) => {
+app.get("/api/v3/state", (req: any, res: any, packet: any) => {
+
   db.states.find({ "payload.id": req.body.id }, (err: Error, state: any) => {
     res.json(state);
   })
@@ -1222,11 +1280,6 @@ if (config.ssl) {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket: any) {
-  //trex.log(socket);
-
-  //utilsLib.log(socket.id)
-  //trex.log(socket.handshake)
-  //trex.log('socket connected...');
   setTimeout(function () {
     socket.emit("connect", { hello: "world" })
   }, 5000)
@@ -1251,29 +1304,6 @@ io.on('connection', function (socket: any) {
         }
 
         handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
-
-
-
-        // state.validApiKey(db, testkey, (err: Error, result: any) => {
-        //   if (err) { log(err); return; }
-        //   if (result) {
-
-        //     if (result.valid) {
-        //       /*--------------------------------------------------------*/
-        //       var meta = {}
-
-        //       state.postState(db, result.user, data, meta, (packet: any) => { })
-        //       /*--------------------------------------------------------*/
-        //     } else {
-
-        //     }
-
-        //   }
-
-
-
-
-        // })
 
       }
     }

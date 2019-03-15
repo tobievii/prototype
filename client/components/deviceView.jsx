@@ -172,8 +172,6 @@ export class DeviceView extends Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
     }).then(response => response.json()).then(state => {
-
-
       this.setState({ state }, () => {
         if (state.error) {
           console.log(state.error)
@@ -305,8 +303,12 @@ export class DeviceView extends Component {
   };
 
   toggleModal = () => {
-
-    this.setState({ isOpen: !this.state.isOpen })
+    if (this.props.account.email == this.state.state.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
+    else {
+      this.setState({ isOpen: this.state.isOpen })
+    }
   }
 
   drawState = () => {

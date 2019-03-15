@@ -14,12 +14,11 @@ var details = {
 
 var inBound = false;
 var allDevices = undefined;
-var deviceSelected = undefined;
 
 var circleColor = "#4c8ef7";
 var poly2tri = require('poly2tri');
 var b = undefined;
-var deviceSelected = false;
+var deviceSelected = undefined;
 
 // const myIcon = L.icon({
 //   iconUrl: '../markers/marker_Blue.png',
@@ -39,7 +38,8 @@ export class MapDevices extends Component {
   state = {
     devicePathHistory: undefined,
     boundaryVisible: false,
-    showBoundary: false
+    showBoundary: false,
+
   }
 
   constructor(props) {
@@ -80,11 +80,29 @@ export class MapDevices extends Component {
   getPopup = (marker) => {
     if (this.props.acc) {
       if (this.props.acc.username) {
-        return (
-          <Popup>
-            <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.acc.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
-          </Popup >
-        )
+        if (this.props.PopUpLink == false) {
+          return (
+            <Popup>
+              <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} >{marker.devid}</h5>
+            </Popup >
+          )
+        }
+        else {
+          if (this.props.acc.level < 100 && this.props.acc.level > 0) {
+            return (
+              <Popup>
+                <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
+              </Popup >
+            )
+          }
+          else if (this.props.acc.level >= 100 || this.props.acc.level == 0) {
+            return (
+              <Popup>
+                <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + marker.fromUsers.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
+              </Popup >
+            )
+          }
+        }
       }
     }
   }
@@ -133,11 +151,65 @@ export class MapDevices extends Component {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
   }
 
-  getHistory = (marker, action) => {
-    deviceSelected = true;
-    return (
-      <Polyline color="blue" positions={marker.devicePathHistory} />
-    )
+  getHistory = (device) => {
+    fetch("/api/v3/devicePathPackets", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ id: device.devid, limit: 10 })
+    })
+      .then(response => response.json()).then(result => {
+        var last = [];
+        var finalCoords = [];
+
+        for (var count in result) {
+          if (result[count].ipLoc != undefined || result[count].ipLoc != null) {
+            if (count == 0) {
+              last = result[count].ipLoc.ll
+              finalCoords.push(result[count].ipLoc.ll)
+            } else {
+              last = result[count - 1].ipLoc.ll
+              if (last[0] != result[count].ipLoc.ll[0] && last[1] != result[count].ipLoc.ll[1]) {
+                finalCoords.push(result[count].ipLoc.ll)
+              }
+            }
+          } else if (result[count].data != undefined || result[count].data != undefined) {
+            if (result[count].data.gps != undefined || result[count].data.gps != undefined) {
+              var latlng = [result[count].data.gps.lat, result[count].data.gps.lon];
+
+              if (count == 0) {
+                last = latlng
+                finalCoords.push(latlng)
+              } else {
+                last = [result[count - 1].data.gps.lat, result[count - 1].data.gps.lon]
+                if (last[0] != latlng[0] && last[1] != latlng[1]) {
+                  finalCoords.push(latlng)
+                }
+              }
+            }
+          } else {
+            console.error("Data From Packets doesn't have loaction information.")
+          }
+        }
+        device["devicePathHistory"] = finalCoords;
+      })
+      .catch(err => {
+        console.error(err)
+      })
+
+    if (device.devicePathHistory != undefined && device.devicePathHistory != null) {
+      if (device.devicePathHistory.length == 1) {
+        return (
+          <div style={{ display: "none" }}></div>
+        )
+      } else {
+        return (
+          <Polyline color="blue" positions={device.devicePathHistory} />
+        )
+      }
+    } else {
+      return (
+        <div style={{ display: "none" }}></div>
+      )
+    }
   }
 
   PointInTriangle = (pt, v1, v2, v3) => {
@@ -155,62 +227,14 @@ export class MapDevices extends Component {
   }
 
   pathButtonClicked = (marker) => {
-
-    var device = _.clone(marker)
-    if (marker != undefined && marker != true && marker != false) {
-      fetch("/api/v3/devicePathPackets", {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ id: device.devid, limit: 10 })
-      })
-        .then(response => response.json()).then(result => {
-          var last = [];
-          var finalCoords = [];
-
-          for (var count in result) {
-            if (result[count].ipLoc != undefined || result[count].ipLoc != null) {
-              if (count == 0) {
-                last = result[count].ipLoc.ll
-                finalCoords.push(result[count].ipLoc.ll)
-              } else {
-                last = result[count - 1].ipLoc.ll
-                if (last[0] != result[count].ipLoc.ll[0] && last[1] != result[count].ipLoc.ll[1]) {
-                  finalCoords.push(result[count].ipLoc.ll)
-                }
-              }
-            } else if (result[count].data != undefined || result[count].data != undefined) {
-              if (result[count].data.gps != undefined || result[count].data.gps != undefined) {
-                var latlng = [result[count].data.gps.lat, result[count].data.gps.lon];
-
-                if (count == 0) {
-                  last = latlng
-                  finalCoords.push(latlng)
-                } else {
-                  last = [result[count - 1].data.gps.lat, result[count - 1].data.gps.lon]
-                  if (last[0] != latlng[0] && last[1] != latlng[1]) {
-                    finalCoords.push(latlng)
-                  }
-                }
-              }
-            } else {
-              console.error("Data From Packets doesn't have loaction information.")
-            }
-          }
-          device["devicePathHistory"] = finalCoords;
-          marker = device;
-          if (this.state.boundaryVisible == false) {
-            this.setState({ boundaryVisible: true })
-            this.setState({ showBoundary: true })
-            b = true;
-            this.getHistory(device)
-          } else if (this.state.boundaryVisible == true) {
-            this.setState({ showBoundary: false })
-            this.setState({ boundaryVisible: false })
-            b = false;
-          }
-        })
-        .catch(err => {
-          console.error(err)
-        })
+    if (this.state.boundaryVisible == false) {
+      this.setState({ boundaryVisible: true })
+      this.setState({ showBoundary: true })
+      b = true;
+    } else if (this.state.boundaryVisible == true) {
+      this.setState({ showBoundary: false })
+      this.setState({ boundaryVisible: false })
+      b = false;
     }
   }
 
@@ -243,7 +267,7 @@ export class MapDevices extends Component {
         ]
     }
     return (
-      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(deviceSelected)} deviceSelected={deviceSelected} widget={this.props.widget}>
+      <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(this.props.deviceCall)} deviceSelected={deviceSelected} widget={this.props.widget} >
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -372,6 +396,7 @@ export class MapDevices extends Component {
                             }}
                           />
                         </FeatureGroup>
+                        {this.getHistory(marker)}
                         {this.getMarker(marker)}
                       </div>
                     )
@@ -436,6 +461,7 @@ export class MapDevices extends Component {
                           />
                           <Polygon positions={marker.boundaryLayer.boundaryPoints} color={circleColor} />
                         </FeatureGroup>
+                        {this.getHistory(marker)}
                         {this.getMarker(marker)}
                       </div>
                     )

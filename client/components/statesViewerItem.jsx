@@ -22,7 +22,9 @@ export class StatesViewerItem extends Component {
     deviceShare: undefined,
     opacityp: "1",
     opacity: "1",
-    isOpen: false
+    opacityw: "1",
+    isOpen: false,
+    User: ""
   };
 
   intervalUpdator = undefined;
@@ -37,7 +39,13 @@ export class StatesViewerItem extends Component {
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
+    if (this.props.account.level < 100 && this.props.account.level > 0) {
+      this.setState({ User: this.props.username })
+    }
+    else if (this.props.account.level >= 100 || this.props.account.level == 0) {
+      this.setState({ User: this.props.device.fromUsers.username })
 
+    }
 
     this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
   }
@@ -65,6 +73,19 @@ export class StatesViewerItem extends Component {
       }
     } else {
       this.setState({ opacity: "0.2" })
+    }
+
+    if (device.notification24 != undefined) {
+      var notifications = this.props.account.notifications;
+      for (var s in notifications) {
+        if (notifications[s].type == "CONNECTION DOWN 24HR WARNING") {
+          // console.log(device.devid + " has been down for  a day or more.")
+
+        }
+      }
+      this.setState({ opacityw: "1" })
+    } else {
+      this.setState({ opacityw: "0.2" })
     }
   }
 
@@ -234,8 +255,7 @@ export class StatesViewerItem extends Component {
   }
 
   clickShare = (device) => {
-    return () => {
-    }
+    this.setState({ isOpen: false })
   }
 
   selectBoxClickHandler = (action) => {
@@ -257,38 +277,32 @@ export class StatesViewerItem extends Component {
   }
 
   displayDeviceInfo = () => {
-    if (this.props.public == true) {
-      return (
-        <div className="col" style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+    return (
+      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
+        <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
           <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
         </div>
-      )
-    } else {
-      return (
-        <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
+      </Link>
+    )
   }
 
   selectbox = () => {
     if (this.props.public == false) {
-      if (this.props.device.selected) {
+      if (this.props.visiting == false) {
+        if (this.props.device.selected) {
 
-        return (
-          <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-            <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
-          </div>
-        )
-      } else {
-        return (
-          <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-            <i className="statesViewerCheckBoxes fas fa-check" ></i>
-          </div>
-        )
+          return (
+            <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+            </div>
+          )
+        } else {
+          return (
+            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
+              <i className="statesViewerCheckBoxes fas fa-check" ></i>
+            </div>
+          )
+        }
       }
     }
   }
@@ -332,21 +346,35 @@ export class StatesViewerItem extends Component {
       columSize = "200px"
     }
     if (this.props.public == false) {
-      return (
-        <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px" }}></i></span>
-          <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
-          <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
-          {this.mapIcon(viewUsed)}
-        </div>
-      )
+      if (this.props.visiting == true) {
+        return (
+          <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            {this.mapIcon(viewUsed)}
+          </div>
+        )
+      }
+      else {
+        return (
+          <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
+            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+            <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
+            <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
+            {this.mapIcon(viewUsed)}
+          </div>
+        )
+      }
     }
+
     else if (this.props.public == true) {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
           <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
@@ -375,7 +403,7 @@ export class StatesViewerItem extends Component {
 
               {this.selectbox()}
 
-              <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
+              <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
                   <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
                   <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
@@ -390,7 +418,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.clickShare() }} />
 
             </div>
           </div>

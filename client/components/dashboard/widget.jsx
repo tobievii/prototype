@@ -4,7 +4,6 @@ import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
 
 export class Widget extends React.Component {
-
   state = {
     menuVisible: false,
     boundaryVisible: false
@@ -130,11 +129,9 @@ export class Widget extends React.Component {
     }
   }
   // This must move into the map widget!
-  //
   // mapWidget = () => {
   //   var p = this.props.children.type;
   //   var color = "";
-
   //   if (this.props.children.type.name == "MapDevices") {
   //     if (this.state.boundaryVisible == true) {
   //       color = "white";

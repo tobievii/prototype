@@ -35,6 +35,11 @@ export class Notification extends Component {
     } return this.props.notification.type
   }
 
+  message = () => {
+
+    return this.props.notification.message
+  }
+
   device = () => {
     if (this.props.notification.type) {
       return this.props.notification.device
@@ -49,7 +54,7 @@ export class Notification extends Component {
     if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
-        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="newNotificationItem">
             <i className="fas fa-exclamation-circle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
@@ -80,6 +85,7 @@ export class Notification extends Component {
           <i className="fas fa-bullhorn"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
           <span className="devicename">{this.device()}</span><br />
+          <span>{this.message()}</span><br />
           <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
         </div>
 
@@ -89,7 +95,7 @@ export class Notification extends Component {
     if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
 
-        <Link className="col" to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="warningNotificationItem">
             <i className="fas fa-exclamation-triangle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
@@ -241,7 +247,7 @@ export class NavBar extends Component {
           this.state.showMenu
             ? (
               <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.reverse().map((notification, i) => <Notification key={i} notification={notification} account={account}></Notification>)}
+                {account.notifications.slice(4).reverse().map((notification, i) => <Notification key={i} notification={notification} account={account}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
             )
