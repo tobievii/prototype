@@ -70,9 +70,15 @@ void handleMessages(char* topic, byte* payload, unsigned int length) {
 	Serial.println(jsontemp);
 	Serial.println("-----");
 
-  String foo = request["data"]["foo"];
-  Serial.println(foo);
-  if (foo) { log(foo); }
+  String display = request["data"]["display"];
+  
+  Serial.println(display);
+  if (display) { log(display); }
+  
+  if (request["data"]["digitalWrite"]) {
+    pinMode(request["data"]["pin"], OUTPUT);
+    digitalWrite(request["data"]["pin"], request["data"]["level"]);
+  }
   
     
   
@@ -90,13 +96,7 @@ void setup() {
   display.clearDisplay();
   bootlogo();
 
-  pinMode(LED_BUILTIN, OUTPUT);
-//   digitalWrite(LED_BUILTIN, LOW); // HIGH = OFF on esp8266
-//   delay(1000);
-//   digitalWrite(LED_BUILTIN, HIGH); // HIGH = OFF on esp8266
-//   delay(1000);
-//   digitalWrite(LED_BUILTIN, LOW); // HIGH = OFF on esp8266
-//   delay(1000);
+  
   
   randomSeed(micros());
 
@@ -106,8 +106,7 @@ void setup() {
  
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    log(WiFi.status());
-    
+    log(WiFi.status());    
   }
  
   wifi = true;
@@ -258,5 +257,5 @@ void bootlogo(void) {
   display.clearDisplay();
   display.drawBitmap(0, 0, myBitmap, 128, 48, WHITE);
   display.display();
-  delay(2000);
+  delay(500);
 }
