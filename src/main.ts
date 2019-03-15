@@ -883,7 +883,6 @@ setInterval(() => {
 
 function getWarningNotification() {
 
-  var now = new Date();
   var dayago = new Date().getDate() - 24 * 60 * 60 * 1000
   db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
 
