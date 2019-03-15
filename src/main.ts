@@ -902,7 +902,10 @@ function getWarningNotification() {
     for (var s in listDevices) {
       var device = listDevices[s]
       db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
-        console.log(result)
+
+        // db.states.findOne({ key: device.key }, (err: any, result: any) => {
+        //   io.to(result.key).emit('post', result)
+        // })
 
         var WarningNotificationL = {
           type: "CONNECTION DOWN 24HR WARNING",
@@ -915,7 +918,6 @@ function getWarningNotification() {
         db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
 
         })
-
       })
     }
   })

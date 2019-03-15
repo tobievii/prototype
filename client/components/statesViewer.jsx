@@ -204,6 +204,8 @@ export class StatesViewer extends Component {
       })
 
       this.socket.on("post", (packet) => {
+        // console.log("caught post")
+        // console.log(packet)
         this.handleDevicePacket(packet)
       })
 
@@ -318,6 +320,10 @@ export class StatesViewer extends Component {
     var devices = _.clone(this.state.devicesServer)
     var found = 0;
     for (var dev in devices) {
+      // if (devices[dev].devid == packet.devid && packet.notification24) {
+      //   devices[dev]["notification24"] = packet.notification24;
+      // }
+
       if (devices[dev].devid == packet.id) {
         found = 1;
         devices[dev]["_last_seen"] = packet.timestamp;
