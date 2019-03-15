@@ -131,7 +131,7 @@ class App extends Component {
                     <div>
                         <Account account={this.state.account} />
                         <Landing />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={true} />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} />
                         <Footer loggedIn={false} />
                     </div>)
             }
