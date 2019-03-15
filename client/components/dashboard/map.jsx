@@ -89,14 +89,14 @@ export class MapDevices extends Component {
           )
         }
         else {
-          if (this.props.acc.level < 100) {
+          if (this.props.acc.level < 100 && this.props.acc.level > 0) {
             return (
               <Popup>
                 <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + this.props.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>
               </Popup >
             )
           }
-          else if (this.props.acc.level >= 100) {
+          else if (this.props.acc.level >= 100 || this.props.acc.level == 0) {
             return (
               <Popup>
                 <h5 className="popup" style={{ marginTop: "50%", position: "center", color: "red" }} ><u><Link to={"/u/" + marker.fromUsers.username + "/view/" + marker.devid} >{marker.devid}</Link></u></h5>

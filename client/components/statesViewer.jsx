@@ -217,7 +217,7 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        if (this.props.account.level >= 100) {
+        if (this.props.account.level >= 100 || this.props.account.level == 0) {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
@@ -234,7 +234,7 @@ export class StatesViewer extends Component {
             })
           }).catch(err => console.error(err.toString()));
         }
-        else if (this.props.account.level < 100) {
+        else if (this.props.account.level < 100 && this.props.account.level > 0) {
           this.setState({ devicesServer: states }, () => {
 
             for (var device in this.state.devicesServer) {
@@ -251,7 +251,7 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        if (this.props.account.level >= 100) {
+        if (this.props.account.level >= 100 || this.props.account.level == 0) {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
@@ -266,7 +266,7 @@ export class StatesViewer extends Component {
             })
           }).catch(err => console.error(err.toString()));
         }
-        else if (this.props.account.level < 100) {
+        else if (this.props.account.level < 100 && this.props.account.level > 0) {
           this.setState({ devicesServer: states }, () => {
 
             for (var device in this.state.devicesServer) {

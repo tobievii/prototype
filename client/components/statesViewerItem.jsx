@@ -38,10 +38,10 @@ export class StatesViewerItem extends Component {
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
-    if (this.props.account.level < 100) {
+    if (this.props.account.level < 100 && this.props.account.level > 0) {
       this.setState({ User: this.props.username })
     }
-    else if (this.props.account.level >= 100) {
+    else if (this.props.account.level >= 100 || this.props.account.level == 0) {
       this.setState({ User: this.props.device.fromUsers.username })
 
     }
