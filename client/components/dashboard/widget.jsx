@@ -79,12 +79,6 @@ export class Widget extends React.Component {
     }
   }
 
-  onDrag = (e) => {
-
-    e.preventDefault();
-    e.stopPropagation();
-
-  }
 
   devicePathButton = (name) => {
     if (name == "map") {
@@ -122,7 +116,10 @@ export class Widget extends React.Component {
     } else if (this.props.widget == true) {
       return (
         <div>
-          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
+          <div className="widgetOptionsButton"
+            onClick={this.showMenu()}
+            style={{ padding: "4px 6px 4px 6px" }} >
+            <i className="fas fa-wrench"  ></i></div>
           {this.menu()}
         </div>
       )
