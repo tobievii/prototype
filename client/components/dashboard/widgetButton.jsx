@@ -13,7 +13,9 @@ export class WidgetButton extends React.Component {
   options;
 
   setOptions = (options) => {
-    this.setState(_.merge(this.state, options))
+    this.setState(_.merge(this.state, options), () => {
+      this.updatedOptions();
+    })
     this.props.dash.setOptions(options);
   }
 
