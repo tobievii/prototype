@@ -32,8 +32,14 @@ export class ProtoGauge extends React.Component {
     }
 
     componentDidMount() {
-        // send parent how to configure this widget
-        this.updatedOptions();
+
+        if (this.props.data.options) {
+            this.setState(_.merge(this.state, this.props.data.options), () => {
+                this.updatedOptions();
+            });
+        } else {
+            this.updatedOptions();
+        }
 
         this.animtimer = setInterval(() => {
             // var targetval = this.state.value + 5
@@ -50,19 +56,6 @@ export class ProtoGauge extends React.Component {
                     this.setState({ typeError: true })
                 } else {
                     //ANIMATE GAUGE
-
-                    // LOAD OPTIONS
-                    if (this.props.data) {
-                        if (this.props.data.options) {
-                            if (this.props.data.options.min) {
-                                this.state.min = this.props.data.options.min
-                            }
-                            if (this.props.data.options.max) {
-                                this.state.max = this.props.data.options.max
-                            }
-                            this.updatedOptions();
-                        }
-                    }
 
                     // ADJUST FOR MAX
                     if (this.props.value > this.state.max) {
