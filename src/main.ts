@@ -825,10 +825,10 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 ///////// END
 
 app.get("/api/v3/getlocation", (req: any, res: any) => {
-  console.log("-------")
-  console.log(req.ip)
+  //console.log("-------")
+  //console.log(req.ip)
   var geoIPLoc = geoip.lookup(req.ip);
-  console.log(geoIPLoc)
+  // console.log(geoIPLoc)
   res.json(geoIPLoc)
 });
 
@@ -1065,14 +1065,26 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
           userAgent: req.get('User-Agent'),
           method: req.method
         }
+        if (req.user.level < 100 && req.user.level > 0) {
 
-        if (req.body.id) {
-          db.states.remove({ apikey: user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
-            if (err) res.json(err);
-            if (removed) res.json(removed);
-          })
-        } else {
-          res.json({ result: "auth failed" });
+          if (req.body.id) {
+            db.states.remove({ apikey: user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+              if (err) res.json(err);
+              if (removed) res.json(removed);
+            })
+          } else {
+            res.json({ result: "auth failed" });
+          }
+        }
+        else if (req.user.level >= 100) {
+          if (req.body.id) {
+            db.states.remove({ key: req.body.key, devid: req.body.id }, (err: Error, removed: any) => {
+              if (err) res.json(err);
+              if (removed) res.json(removed);
+            })
+          } else {
+            res.json({ result: "auth failed" });
+          }
         }
       }
     })
@@ -1086,18 +1098,30 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
         userAgent: req.get('User-Agent'),
         method: req.method
       }
-
-      if (req.body.id) {
-        db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
-          if (err) res.json(err);
-          if (removed) res.json(removed);
-        })
+      if (req.user.level < 100 && req.user.level > 0) {
+        if (req.body.id) {
+          db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+            if (err) res.json(err);
+            if (removed) res.json(removed);
+          })
+        }
+        else {
+          res.json({ result: "auth failed" });
+        }
       }
-    } else {
-      res.json({ result: "auth failed" });
+      else if (req.user.level >= 100) {
+        if (req.body.id) {
+          db.states.remove({ key: req.body.key, devid: req.body.id }, (err: Error, removed: any) => {
+            if (err) res.json(err);
+            if (removed) res.json(removed);
+          })
+        }
+        else {
+          res.json({ result: "auth failed" });
+        }
+      }
     }
   }
-
 })
 
 app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
@@ -1250,7 +1274,7 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
           //if (alreadyExitScript == false) { 
           log("VM WORKFLOW ERROR!")
-          console.error(err);
+          //console.error(err);
           alreadyExitScript = true;
           packet.err = err.toString();
           cb(undefined, packet);

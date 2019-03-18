@@ -123,7 +123,7 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.devid)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />)}
+          {devicelist.map(device => <StatesViewerItem public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.key)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />)}
           <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
         </div>
       )
@@ -467,7 +467,7 @@ export class StatesViewer extends Component {
     var newDeviceList = _.clone(this.state.devicesView)
 
     for (var dev in newDeviceList) {
-      if (newDeviceList[dev].devid == clickdata.a) {
+      if (newDeviceList[dev].key == clickdata.a) {
         if (clickdata.e == "deselect") {
           if (this.state.selectAllState === true) {
             this.setState({ selectAllState: false });
@@ -517,9 +517,8 @@ export class StatesViewer extends Component {
       if (devicesToDelete[dev].selected === true) {
         fetch("/api/v3/state/delete", {
           method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({ id: devicesToDelete[dev].devid })
+          body: JSON.stringify({ id: devicesToDelete[dev].devid, key: devicesToDelete[dev].key })
         }).then(response => response.json()).then(serverresponse => {
-          console.log(serverresponse)
         }).catch(err => console.error(err.toString()));
       }
     }

@@ -157,14 +157,6 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      this.setState({ loggedin: this.props.account.apikey })
-      this.setState({ owner: this.state.state.apikey })
-      if (this.state.loggedin != this.state.owner && this.props.account.level < 100) {
-        this.setState({ shareDisplay: "none" })
-      }
-      else {
-        this.setState({ shareDisplay: "" })
-      }
 
     }).catch(err => console.error(err.toString()));
 
@@ -211,7 +203,7 @@ export class DeviceView extends Component {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id, username: this.props.username })
+                    body: JSON.stringify({ id: id, username: this.props.username, key: this.state.state.key })
                   }).then(response => response.json()).then(serverresponse => {
                     window.location.href = "/"
                   }).catch(err => console.error(err.toString()));
