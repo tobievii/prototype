@@ -289,13 +289,25 @@ export class StatesViewerItem extends Component {
   }
 
   displayDeviceInfo = () => {
-    return (
-      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-        <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-          <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-        </div>
-      </Link>
-    )
+    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
+      return (
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
+          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
+          </div>
+        </Link>
+      )
+    }
+    else {
+
+      return (
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
+          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+          </div>
+        </Link>
+      )
+    }
   }
 
   selectbox = () => {
@@ -351,6 +363,18 @@ export class StatesViewerItem extends Component {
     } else {
       return (
         <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+      )
+    }
+  }
+  adminDevices = () => {
+    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
+      return (
+        <span style={{ color: "red" }}>*</span>
+      )
+    }
+    else {
+      return (
+        <span ></span>
       )
     }
   }
@@ -430,7 +454,7 @@ export class StatesViewerItem extends Component {
 
               <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+                  <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
                   <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
                 </div>
               </Link>

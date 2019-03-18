@@ -166,7 +166,6 @@ export class StatesViewer extends Component {
     this.socket.on("connect", a => {
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
-        console.log(info);
         if (info.newdevice) {
           p.statesByUsername(this.props.username, (states) => {
             for (var s in states) {
@@ -204,8 +203,6 @@ export class StatesViewer extends Component {
       })
 
       this.socket.on("post", (packet) => {
-        // console.log("caught post")
-        // console.log(packet)
         this.handleDevicePacket(packet)
       })
 
