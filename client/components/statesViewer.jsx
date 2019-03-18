@@ -389,10 +389,9 @@ export class StatesViewer extends Component {
   search = evt => {
     this.setState({ search: evt.target.value.toString() }, () => {
       var newDeviceList = []
-      //filter
       for (var device of this.state.devicesServer) {
         if (this.state.search.length > 0) {
-          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
             newDeviceList.push(device)
           }
         } else {

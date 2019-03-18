@@ -121,7 +121,7 @@ export class StatesViewerMenu extends Component {
                 <div style={{ padding: 0 }}>
                     <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
                     <form id="search" style={{ textAlign: "left" }} style={{ width: "92%", float: "right" }}>
-                        <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
+                        <input name="query" onChange={this.props.search} style={{ width: "100%" }} />
                     </form>
                 </div>
             )
@@ -173,7 +173,7 @@ export class StatesViewerMenu extends Component {
 
                                     <div className="col" style={{ flex: "0 0 300px", padding: 0 }}>
                                         <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
-                                            <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
+                                            <input name="query" onChange={this.props.search} placeholder="by device name or email..." style={{ width: "100%" }} />
                                         </form>
                                     </div>
 
