@@ -144,6 +144,23 @@ export class MapDevices extends Component {
     if (result == undefined) {
       result = false;
     }
+
+    if (marker.boundaryLayer != null || marker.boundaryLayer != undefined) {
+      if (marker.boundaryLayer.inbound != result) {
+        var b = {
+          boundaryPoints: marker.boundaryLayer.boundaryPoints,
+          inbound: result
+        }
+
+        fetch("/api/v3/boundaryLayer", {
+          method: "POST",
+          headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ key: marker.key, boundaryLayer: b })
+        }).then(response => response.json()).then(result => {
+        }).catch(err => console.error(err.toString()));
+      }
+    }
+
     inBound = result;
   }
 

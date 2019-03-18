@@ -23,8 +23,10 @@ export class StatesViewerItem extends Component {
     opacityp: "1",
     opacity: "1",
     opacityw: "1",
+    opacitya: "1",
     isOpen: false,
-    User: ""
+    User: "",
+    warningNotification: ""
   };
 
   intervalUpdator = undefined;
@@ -33,7 +35,7 @@ export class StatesViewerItem extends Component {
     super(props)
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     // console.log("mounted " + this.props.device.devid)
 
     this.intervalUpdator = setInterval(() => {
@@ -75,16 +77,26 @@ export class StatesViewerItem extends Component {
       this.setState({ opacity: "0.2" })
     }
 
+    if (device.boundaryLayer != undefined || device.boundaryLayer != null) {
+      if (device.boundaryLayer.inbound != true) {
+        this.setState({ opacitya: "1" })
+      } else {
+        this.setState({ opacitya: "0.2" })
+      }
+    } else {
+      this.setState({ opacitya: "0.2" })
+    }
+
     if (device.notification24 != undefined) {
       var notifications = this.props.account.notifications;
       for (var s in notifications) {
-        if (notifications[s].type == "CONNECTION DOWN 24HR WARNING") {
-          // console.log(device.devid + " has been down for  a day or more.")
-
+        if (notifications[s].type == "CONNECTION DOWN 24HR WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
+          this.setState({ warningNotification: notifications[s] });
         }
       }
       this.setState({ opacityw: "1" })
     } else {
+      this.setState({ warningNotification: { type: "Device has no warnings" } });
       this.setState({ opacityw: "0.2" })
     }
   }
@@ -329,6 +341,20 @@ export class StatesViewerItem extends Component {
     }
   }
 
+  notifications = (icon, device) => {
+    if (this.props.account.level > 0 && device.notification24) {
+      return (
+        <Link style={{ position: "right" }} to="/notifications" className="navLink" title="Notifications">
+          <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+        </Link>
+      )
+    } else {
+      return (
+        <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+      )
+    }
+  }
+
   toggleModal = () => {
     this.setState({ isOpen: !this.state.isOpen })
   }
@@ -336,7 +362,6 @@ export class StatesViewerItem extends Component {
   stateListIcons = (viewUsed, device) => {
     var icon = "";
     var columSize = "";
-    var opacity = "0.2";
 
     if (viewUsed == "map") {
       icon = "iconSmall";
@@ -349,8 +374,8 @@ export class StatesViewerItem extends Component {
       if (this.props.visiting == true) {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
             <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             {this.mapIcon(viewUsed)}
@@ -360,8 +385,8 @@ export class StatesViewerItem extends Component {
       else {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
-            <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
+            {this.notifications(icon, device)}
             <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
             <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
             {this.mapIcon(viewUsed)}
@@ -373,8 +398,8 @@ export class StatesViewerItem extends Component {
     else if (this.props.public == true) {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
