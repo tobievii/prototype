@@ -98,9 +98,9 @@ export function signInFromWeb(db: any) {
           db.users.findOne(
             { email: req.body.email },
             (err: Error, user: any | undefined) => {
-              // if (user == null || user == "") {
-              //   res.json({ error: "wrong email and/or password" });
-              // }
+              if (user == null) {
+                res.json({ error: "Account not registered" });
+              }
               scrypt.verifyKdf(user.password.buffer, decryptedString, function (err: Error, result: any) {
                 if (result == true) {
                   req.user = user;

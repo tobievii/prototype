@@ -105,9 +105,6 @@ export class Account extends Component {
 
   signIn = () => {
     this.setState({ serverError: "" })
-
-    console.log("signin..")
-
     fetch("/signin", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -139,9 +136,10 @@ export class Account extends Component {
     }).then(response => response.json()).then(data => {
       if (data.error) {
         this.setState({ serverError: data.error })
-
+      }
+      else {
         location.reload();
-
+        this.setState({ serverError: "Registration Successful" })
       }
     }).catch(err => console.error(err.toString()));
 
