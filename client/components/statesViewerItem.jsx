@@ -44,9 +44,12 @@ export class StatesViewerItem extends Component {
     if (this.props.account.level < 100 && this.props.account.level > 0) {
       this.setState({ User: this.props.username })
     }
-    else if (this.props.account.level >= 100 || this.props.account.level == 0) {
+    else if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
       this.setState({ User: this.props.device.fromUsers.username })
 
+    }
+    else if (this.props.account.level >= 100 && this.props.visiting == true) {
+      this.setState({ User: this.props.username })
     }
 
     this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))

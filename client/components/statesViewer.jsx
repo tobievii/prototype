@@ -216,7 +216,7 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        if (this.props.account.level >= 100 || this.props.account.level == 0) {
+        if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
@@ -243,6 +243,16 @@ export class StatesViewer extends Component {
             })
           })
         }
+        else if (this.props.account.level >= 100 && this.props.visiting == true) {
+          this.setState({ devicesServer: states }, () => {
+
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
+            this.setState({ devicesView: states }, () => {
+            })
+          })
+        }
       })
     }
     else {
@@ -250,7 +260,7 @@ export class StatesViewer extends Component {
         for (var s in states) {
           states[s].selected = false
         }
-        if (this.props.account.level >= 100 || this.props.account.level == 0) {
+        if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
@@ -272,6 +282,15 @@ export class StatesViewer extends Component {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
 
+            this.setState({ devicesView: states }, () => {
+            })
+          })
+        }
+        else if (this.props.account.level >= 100 && this.props.visiting == true) {
+          this.setState({ devicesServer: states }, () => {
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
             this.setState({ devicesView: states }, () => {
               //this.socketConnectDevices();
               //this.sort();
@@ -577,7 +596,7 @@ export class StatesViewer extends Component {
               </Media>
 
               <div className="mapContainer">
-                <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} />
+                <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
               </div>
             </div>
           </div>
