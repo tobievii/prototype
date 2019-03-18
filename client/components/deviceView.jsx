@@ -442,7 +442,7 @@ export class DeviceView extends Component {
               <i className="fas fa-edit"></i> {this.state.EditorButton}
             </div>
 
-            <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+            <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
           </div>
         </div>
 

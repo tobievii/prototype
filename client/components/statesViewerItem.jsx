@@ -197,20 +197,49 @@ export class StatesViewerItem extends Component {
   }
 
   publicShare = (device) => {
-    if (device.public != undefined || device.public != null) {
-      if (device.public == true) {
-        fetch("/api/v3/makedevPrivate", {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({
-            devid: device.key
+    if (this.props.account.email == this.props.device.meta.user.email){
+      if (device.public != undefined || device.public != null) {
+        if (device.public == true) {
+          fetch("/api/v3/makedevPrivate", {
+            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            body: JSON.stringify({
+              devid: device.key
+            })
+          }).then(response => response.json()).then(serverresponse => {
+            if (serverresponse.nModified == 1) {
+              device.public = false;
+              this.setState({ device: device })
+              this.setDevice(device)
+            }
+          }).catch(err => console.error(err.toString()));
+        } else {
+          confirmAlert({
+            customUI: ({ onClose }) => {
+              return (
+                <div className='protoPopup'>
+                  <h1>Are you sure?</h1>
+                  <p>This will make device visible to Anyone even unregistered vistors </p>
+                  <button onClick={onClose}>No</button>
+                  <button style={{ margin: "15px" }} onClick={() => {
+                    {
+                      fetch("/api/v3/makedevPublic", {
+                        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          devid: device.key
+                        })
+                      }).then(response => response.json()).then(serverresponse => {
+                        device.public = true;
+                        this.setState({ device: device })
+                        this.setDevice(device)
+                        { onClose() }
+                      }).catch(err => console.error(err.toString()));
+                    }
+                  }}>Yes,Share Publicly !</button>
+                </div>
+              )
+            }
           })
-        }).then(response => response.json()).then(serverresponse => {
-          if (serverresponse.nModified == 1) {
-            device.public = false;
-            this.setState({ device: device })
-            this.setDevice(device)
-          }
-        }).catch(err => console.error(err.toString()));
+        }
       } else {
         confirmAlert({
           customUI: ({ onClose }) => {
@@ -239,33 +268,6 @@ export class StatesViewerItem extends Component {
           }
         })
       }
-    } else {
-      confirmAlert({
-        customUI: ({ onClose }) => {
-          return (
-            <div className='protoPopup'>
-              <h1>Are you sure?</h1>
-              <p>This will make device visible to Anyone even unregistered vistors </p>
-              <button onClick={onClose}>No</button>
-              <button style={{ margin: "15px" }} onClick={() => {
-                {
-                  fetch("/api/v3/makedevPublic", {
-                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      devid: device.key
-                    })
-                  }).then(response => response.json()).then(serverresponse => {
-                    device.public = true;
-                    this.setState({ device: device })
-                    this.setDevice(device)
-                    { onClose() }
-                  }).catch(err => console.error(err.toString()));
-                }
-              }}>Yes,Share Publicly !</button>
-            </div>
-          )
-        }
-      })
     }
   }
 
@@ -383,7 +385,12 @@ export class StatesViewerItem extends Component {
   }
 
   toggleModal = () => {
-    this.setState({ isOpen: !this.state.isOpen })
+    if (this.props.account.email == this.props.device.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
+    else if (this.props.account.email == this.props.device.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
   }
 
   stateListIcons = (viewUsed, device) => {
@@ -410,6 +417,7 @@ export class StatesViewerItem extends Component {
         )
       }
       else {
+
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
             <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
@@ -470,7 +478,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.clickShare() }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.clickShare() }} />
 
             </div>
           </div>
@@ -491,7 +499,7 @@ export class StatesViewerItem extends Component {
               {this.stateListIcons(viewUsed, this.state.device)}
               {/* {this.mapIcon()}
               </div> */}
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
             </div>
           </div>
         )

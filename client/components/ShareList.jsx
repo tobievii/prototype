@@ -134,7 +134,7 @@ export class ShareList extends Component {
                     newDeviceList.push("|");
                 }
             });
-            temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== loggedInUser.email })
+            temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email })
             for (var look in this.state.shared) {
                 for (var i in temp) {
                     if (temp[i].uuid == this.state.shared[look]) {
