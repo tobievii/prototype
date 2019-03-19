@@ -396,23 +396,23 @@ export class DeviceView extends Component {
   }
 
   orderScreenSize = () => {
-    if (window.innerWidth < 960) {
+    if (window.innerWidth < 667) {
       return (<div className="row">
-        <div className="col-6" style={{ display: this.state.shareDisplay, marginTop: 12, float: "right" }}>
-          <div className="" style={{ width: "auto", float: "right", fontSize: 20, marginRight: 15, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+        <div className="col-12" style={{ display: this.state.shareDisplay, marginTop: 12 }}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
             <FontAwesomeIcon icon="trash" />
           </div>
 
-          <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20 }} onClick={this.clearState}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
             <FontAwesomeIcon icon="eraser" />
           </div>
 
-          <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20, }} onClick={this.toggleModal}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
 
             <i className="fas fa-share-alt"></i>
           </div>
 
-          <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20 }} className=""  >
+          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }}   >
             <i className="fas fa-edit"></i>
           </div>
         </div>
@@ -435,37 +435,35 @@ export class DeviceView extends Component {
 
       <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 50 }} >
         <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
-
           <div className="col-6">
             <h3>{this.state.devid}</h3>
-            <span className="faded" >{this.state.timeago}</span>
+            <span className="faded" >{this.state.timeago}</span><br></br>
           </div>
+          <div className="col-6 noDisplay" >
+            <div className="" style={{ display: this.state.shareDisplay }}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+                <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+              </div>
 
-          <div className="col-6 noDisplay" style={{ display: this.state.shareDisplay }}>
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
-              <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
+                <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
+              </div>
+
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
+
+                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              </div>
+
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i className="fas fa-edit"></i> {this.state.EditorButton}
+              </div>
+
+              <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
             </div>
-
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
-              <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
-            </div>
-
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
-
-              <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
-            </div>
-
-            <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
-              <i className="fas fa-edit"></i> {this.state.EditorButton}
-            </div>
-
-            <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
           </div>
         </div>
-
         {this.orderScreenSize()}
-
-      </div>
+      </div >
 
 
     );
