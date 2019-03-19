@@ -951,6 +951,24 @@ input[type="checkbox"]:checked {
   padding-right: 6px;
 }
 
+.newNotificationItem:hover {
+  position: relative;
+  color: #6feaab;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(24, 47, 53, 0.9), rgba(24, 47, 53, 0.9));
+  border-left: 5px solid rgba(111, 234, 171, 0.6);
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  border-right: 2px solid rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 5px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+  opacity: 0.5;
+}
+
 .warningNotificationItem {
   position: relative;
   color: #ffc72d;
@@ -968,6 +986,24 @@ input[type="checkbox"]:checked {
   padding-right: 6px;
 }
 
+.warningNotificationItem:hover {
+  position: relative;
+  color: #ffc72d;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(36, 42, 42, 0.9), rgba(36, 42, 42, 0.9));
+  border-left: 5px solid rgba(255, 199, 45, 0.6);
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  border-right: 2px solid rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 5px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+  opacity: 0.5;
+}
+
 .alarmNotificationItem {
   position: relative;
   color: #f62636;
@@ -983,6 +1019,24 @@ input[type="checkbox"]:checked {
   padding-left: 6px;
   padding-bottom: 16px;
   padding-right: 6px;
+}
+
+.alarmNotificationItem:hover {
+  position: relative;
+  color: #f62636;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(33, 30, 41, 0.9), rgba(33, 30, 41, 0.9));
+  border-left: 5px solid rgba(246, 38, 54, 0.6);
+  border-top: 1px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  border-right: 2px solid rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  opacity: 0.9;
+  padding-top: 5px;
+  padding-left: 6px;
+  padding-bottom: 16px;
+  padding-right: 6px;
+  opacity: 0.5;
 }
 
 .newdevice {
