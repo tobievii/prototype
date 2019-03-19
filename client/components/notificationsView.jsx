@@ -27,7 +27,7 @@ export class NotificationsView extends Component {
                     <div className="warningNotificationItem" key={notification.device + i}>
                         <i className="fas fa-bullhorn"></i>
                         <span className="newdevice" >{notification.type}</span><br />
-                        <span className="devicename">{notification.device}</span><br />
+                        <span className="devicename">{notification.device} has not sent any data for more than 24 hours</span><br />
                         <span className="lastseen">{moment(notification.created).fromNow()}</span>
                     </div>
 
