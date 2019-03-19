@@ -252,7 +252,6 @@ export class DeviceView extends Component {
       var apiMenu = num;
       this.setState({ apiMenu });
 
-
     }
   }
 
@@ -399,6 +398,24 @@ export class DeviceView extends Component {
   orderScreenSize = () => {
     if (window.innerWidth < 960) {
       return (<div className="row">
+        <div className="col-6" style={{ display: this.state.shareDisplay, marginTop: 12, float: "right" }}>
+          <div className="" style={{ width: "auto", float: "right", fontSize: 20, marginRight: 15, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+            <FontAwesomeIcon icon="trash" />
+          </div>
+
+          <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20 }} onClick={this.clearState}>
+            <FontAwesomeIcon icon="eraser" />
+          </div>
+
+          <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20, }} onClick={this.toggleModal}>
+
+            <i className="fas fa-share-alt"></i>
+          </div>
+
+          <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 15, fontSize: 20 }} className=""  >
+            <i className="fas fa-edit"></i>
+          </div>
+        </div>
         {this.dashboardColumn()}
         {this.dataColumn()}
       </div>)
@@ -424,7 +441,7 @@ export class DeviceView extends Component {
             <span className="faded" >{this.state.timeago}</span>
           </div>
 
-          <div className="col-6" style={{ display: this.state.shareDisplay }}>
+          <div className="col-6 noDisplay" style={{ display: this.state.shareDisplay }}>
             <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
               <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
             </div>
@@ -445,7 +462,6 @@ export class DeviceView extends Component {
             <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
           </div>
         </div>
-
 
         {this.orderScreenSize()}
 
