@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import moment from 'moment'
-import { control } from "leaflet";
 import { convertCompilerOptionsFromJson } from "typescript";
 import { confirmAlert } from 'react-confirm-alert';
 import { ShareList } from './ShareList.jsx'
