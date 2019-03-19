@@ -70,6 +70,12 @@ export function postState(
 
   db.states.findOne({ apikey: user.apikey, devid: request.id },
     (findErr: Error, findResult: any) => {
+      // if (findResult.notification24 == true) {
+      //   db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+      //     console.log(result)
+      //     console.log(err)
+      //   })
+      // }
       var packetToUpsert: any = {};
 
       var info: any = {}

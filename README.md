@@ -1,6 +1,6 @@
-# Prototype
+![alt text](https://i.imgur.com/FpnXB3n.png)
 
-Live: https://prototype.iotnxt.io
+Live: https://prototype.iotnxt.io   
 Discord: https://discord.gg/rTQmvbT
 
 IoT framework for general purpose remote monitoring/control.   
@@ -16,17 +16,63 @@ Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://web
 - Extendable plugin architecture.
 - Edit code in the browser using the VSCode editor with intellisense autocompletion and deploy custom code instantly.
 
+See a live realtime list of your devices, when they were last active and a summary of the raw data state.
+
+You can set javascript code to process the device JSON data server side (using sandboxed VM) to make REST calls or perform different actions depending on the state of other devices.
+
+# Install instructions
+
+Clone the repo.
+
+```bash
+git clone https://github.com/IoT-nxt/prototype.git
+```
+
+## Install runtime, database etc..
+
+You'll need to install [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/download-center/community) as a minimum.
+
+Useful additional tools include [Visual Studio Code](https://code.visualstudio.com/), 
+[Robo 3T](https://robomongo.org/), 
+
+## _Step 1_ **_Build the client side app_**
+
+```sh
+cd prototype/client # client folder
+npm i               # install node_modules for client side
+npm run buildwatch  # build automatically on file changes
+npm run build       # or just build once
+```
+
+## _Step 2_ **_Build and run the backend server_**
+
+```sh
+cd prototype        # main server folder
+npm i               # install node_modules for server side
+
+# if you're installing on Windows, you'll need to install webpack dependencies
+npm install webpack-dev-server
+
+npm run buildwatch  # build automatically on server file changes for development
+npm run build       # or build for production
+```
+
+## _Step 3_ **_Run the backend server_**
+
+```sh
+cd build
+node main.js        # runs the server
+
+# or even better, auto restart on file changes:
+nodemon main.js     # npm i nodemon -g
+```
+
+Go to [http://localhost:8080/](http://localhost:8080/) and log in with the default account:
+
+       email: admin@localhost.com
+    password: admin
+
 # Roadmap
-
-Preliminary roadmap for future development:
-
-## Planning (Continuous)
-
-* User Stories - Discuss/plan various use cases. Find similarities and often used functionality to focus on by streamlining and polishing user experience.
-
-* Market research - Request feedback from current users on their experience, feature wishlist and use cases.
-
-* UI design mockups - Wireframe + photoshop mockups of user interface. Must be minimalist, minimal viable product design that is powerful and revolutionary for managing and extracting value from data streams.
 
 ## Phase 1 (Proof of concept) - 100% Done
 
@@ -40,20 +86,22 @@ This was the stealth phase. It has been built and is being used on a daily basis
 * Users can reprogram how the platform handles and propagates data. (Workflow/processing functionality)
 
 
-## Phase 2 (Foundation) - 5% - In progress 
+## Phase 2 (Foundation) - 50% - In progress 
 
 During this phase we focus on building the foundation strong and elegantly.
 With our end goals in sight there will be basic functionality or structure we'd need to refine to be able to build the functionality we plan to meet.
 
 * Dashboard - Basic widgets for viewing historical data. As well as the api/db calls needed to make this happen.
 
-      * Calendar (100% done)
-      * Line graphs (20% in progress)
-      * Dials
+      * Calendar (DONE)
+      * Line graphs (DONE)
+      * Gauge widget (DONE)
+      * UI Button widget (DONE)
+
 
 * 3D capability - Built to handle current and future demand on spacial awareness. (Factory/Space/City) This includes VR interface to view data as well as set up areas for triggers.   
 
-      * 3D Widget (35% done)
+      * 3D Widget (80%)
       * VR compatible   
       * Vector math functions in workflows
       * 3D area triggers   
@@ -71,7 +119,7 @@ With our end goals in sight there will be basic functionality or structure we'd 
       * Simplification/optimization of style classes
       * Cleanup of hardcoded react html code 
 
-* Streamling adding devices - Prototype/develop some IoT devices that are SUPER easy to add to the platform.
+* Streamlining adding devices - Prototype/develop some IoT devices that are SUPER easy to add to the platform.
 
       * ESP32 + LDR light sensor. Software flashes a block of pixels to transfer connection information.
       * Arduino temperature sensor.
@@ -89,70 +137,9 @@ Investigate possibility of converting React app to apple/android app.
 * Integrations - At this stage we should have a large amount of devices/individuals/companies using the platform. We need to enable deep integration between these and develop the components that are missing. Integrations from home assistant and other IoT platforms can enable rapid growth and increased capability.
 
 
+# DOCUMENTATION
 
-## Screenshots
-
-![alt text](https://i.imgur.com/GPRoU1h.png)
-
-See a live realtime list of your devices, when they were last active and a summary of the raw data state.
-
-![alt text](https://i.imgur.com/rpgVIff.png)
-
-You can set javascript code to process the device JSON data server side (using sandboxed VM) to make REST calls or perform different actions depending on the state of other devices.
-
-# Install instructions
-
-Clone the repo.
-
-## _Step 1_ **_Build the client side app_**
-
-```sh
-cd prototype/client
-
-# install node_modules for client side
-npm install
-
-# build development optimized automatically on client file changes
-npm run buildwatch
-
-# or build production optimized
-npm run build
-```
-
-## _Step 2_ **_Build and run the backend server_**
-
-```sh
-cd prototype
-
-# install node_modules for server side
-npm install
-
-# if you're installing on Windows, you'll need to install webpack dependencies
-npm install webpack-dev-server
-
-# build automatically on server file changes for development
-npm run buildwatch
-
-# or build for production
-npm run build
-```
-
-## _Step 3_ **_Run the backend server_**
-
-```sh
-cd build
-node main.js
-
-# or use nodemon to automatically reload the server on file changes
-nodemon main.js
-```
-
-Go to [http://localhost:8080/](http://localhost:8080/) and log in with the default account:
-
-       email: admin@localhost.com
-    password: admin
-
-# HTTP REST API
+## HTTP REST API
 
 To get started we recommend using the HTTP REST api at first. After you've logged into your account using the web interface you will find your api key and pregenerated HTTP Authorization headers at the bottom of the screen:
 
@@ -379,18 +366,6 @@ Returns your account's full device states. Includes additional meta data as well
 
 # PLUGINS
 
-## Plugin: Discord
-
-Enables logging to discord when events occur on the server.
-
-![discord](https://i.imgur.com/rPMvLfR.png)
-
-![alt text](https://i.imgur.com/8UtpHRp.png)
-
-Todo: Expose the discord bot in process scripts so the bot would be able to notify a chatroom when some event occurs.
-
----
-
 ## Plugin: Iot.nxt
 
 Enables linking device state bidirectionally to the [Iot.nxt](https://www.iotnxt.com/) cloud.
@@ -405,41 +380,3 @@ Enables linking device state bidirectionally to the [Iot.nxt](https://www.iotnxt
 
 The serialports plugin enables autodetection of arduino or similar serialport devices. Also enables the serialports object in process scripts that enables listing of devices and writing to ports.
 
-![serialport device](https://i.imgur.com/8n1spaY.png)
-
-# Changelog
-
-**26 Oct 2018 Fri at 19:41 SAST**  
-Rouan van der Ende - Initial public release v5.0.30
-
-# Developers
-
-## Keep your forked repository up-to-date
-
-```sh
-# Add the remote and call it 'upstream'.
-
-git remote add upstream https://github.com/IoT-prototype/prototype.git
-
-# Fetch all the branches of that remote into remote-tracking branches
-
-git fetch upstream
-
-# Merge upstream changes in to your downstream repository.
-
-git merge upstream/master
-
-# Create a new branch of where you want to work. or use the exsisting Dev branch.
-
-git checkout -b 'branch_name' # Without the single quotes
-
-# Perform your work locally using standard local repo workflow.
-
-# Then push your changes in to your Downstream remote repository.
-
-git push origin branch_name
-
-# Repeat above steps whenever you need to update your repository with the work that has occurred upstream since the last merge was performed.
-
-```
-[https://medium.com/sweetmeat/how-to-keep-a-downstream-git-repository-current-with-upstream-repository-changes-10b76fad6d97](https://medium.com/sweetmeat/how-to-keep-a-downstream-git-repository-current-with-upstream-repository-changes-10b76fad6d97)

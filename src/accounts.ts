@@ -98,6 +98,9 @@ export function signInFromWeb(db: any) {
           db.users.findOne(
             { email: req.body.email },
             (err: Error, user: any | undefined) => {
+              if (user == null) {
+                res.json({ error: "Account not registered" });
+              }
               scrypt.verifyKdf(user.password.buffer, decryptedString, function (err: Error, result: any) {
                 if (result == true) {
                   req.user = user;
@@ -194,8 +197,11 @@ export function defaultAdminAccount(db: any) {
 export function createDefaultAdminAccount(db: any) {
   log("creating default admin account")
 
+  var scryptParameters = scrypt.paramsSync(0.1);
+  var kdfResult = scrypt.kdfSync("admin", scryptParameters);
+
   accountCreate(db, "admin@localhost.com", "defaultAdmin", "", (err: Error, user: any) => {
-  }, { password: "admin", level: 99 })
+  }, { password: kdfResult, level: 99, encrypted: true })
 }
 
 
@@ -206,7 +212,7 @@ export function registerExistingAccount(db: any, user: any, cb: any) {
 
       if (usersEmailExists.length == 0) {
         db.users.update({ uuid: user.uuid }, user, { upsert: true }, cb);
-
+        //cb("Registration Succcesful", undefined)
       } else {
         cb("that email is taken", undefined)
       }
@@ -297,6 +303,8 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
   } else {
     // auto created from cookies (no email data);
     db.users.save(user, cb);
+
+    // todo - add a dummy device
   }
 
 

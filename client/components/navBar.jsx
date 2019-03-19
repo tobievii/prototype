@@ -2,33 +2,42 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes, faBell, faUnderline } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import moment from 'moment'
 import { array } from "prop-types";
 
+
 library.add(faCog)
 library.add(faTimes)
 library.add(faBell);
+library.add(faSignOutAlt)
+library.add(faUserEdit)
 
 
 
 export class Notification extends Component {
-
-
   constructor(props) {
     super(props);
-
-
   }
+
+  // componentDidMount = () => {
+
+  //   this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
+  // }
 
   newDevice = () => {
 
     if (this.props.notification.type === "New Device Added") {
 
     } return this.props.notification.type
+  }
+
+  message = () => {
+
+    return this.props.notification.message
   }
 
   device = () => {
@@ -39,6 +48,25 @@ export class Notification extends Component {
 
   render() {
     if (this.props.notification.type == "New Device Added") {
+      this.props.notification.type = "NEW DEVICE ADDED"
+    }
+
+    if (this.props.notification.type == "NEW DEVICE ADDED") {
+      return (
+
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="newNotificationItem">
+            <i className="fas fa-exclamation-circle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename" >{this.device()}</span><br />
+            <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
+
+      )
+    }
+
+    if (this.props.notification.type == "A DEVICE WAS SHARED WITH YOU") {
       return (
 
         <div className="newNotificationItem">
@@ -47,36 +75,51 @@ export class Notification extends Component {
           <span className="devicename" >{this.device()}</span><br />
           <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
         </div>
-
       )
     }
-    if (this.props.notification.type == "Alarm") {
+
+    if (this.props.notification.type == "ALARM") {
       return (
 
         <div className="alarmNotificationItem">
           <i className="fas fa-bullhorn"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
           <span className="devicename">{this.device()}</span><br />
+          <span>{this.message()}</span><br />
           <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
         </div>
 
       )
     }
 
-    if (this.props.notification.type == "Warning") {
+    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
+      return (
+
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="warningNotificationItem">
+            <i className="fas fa-exclamation-triangle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">{this.device()}</span><br />
+            <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
+      )
+    }
+
+    if (!this.props.notification.type == "NEW DEVICE ADDED" ||
+      !this.props.notification.type == "ALARM" ||
+      !this.props.notification.type == "CONNECTION DOWN 24HR WARNING" ||
+      this.props.notification.type == undefined ||
+      this.props.notification.type == null
+    ) {
       return (
 
         <div className="warningNotificationItem">
           <i className="fas fa-exclamation-triangle"></i>
-          <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename">{this.device()}</span><br />
-          <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          YOU HAVE NO NOTIFICATIONS
         </div>
-
       )
     }
-
-
   }
 }
 
@@ -91,12 +134,16 @@ export class NavBar extends Component {
       devid: undefined,
       error: null,
       isLoaded: false,
-      notification: [{}]
+      notification: [{}],
+      displayMenu: false,
     }
 
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
+    this.showDropdownMenu = this.showDropdownMenu.bind(this);
+    this.hideDropdownMenu = this.hideDropdownMenu.bind(this);
   }
+
   showMenu(event) {
     event.preventDefault();
 
@@ -111,6 +158,20 @@ export class NavBar extends Component {
     });
   }
 
+  showDropdownMenu(event) {
+    event.preventDefault();
+    this.setState({ displayMenu: true }, () => {
+      document.addEventListener('click', this.hideDropdownMenu);
+    });
+  }
+
+  hideDropdownMenu() {
+    this.setState({ displayMenu: false }, () => {
+      document.removeEventListener('click', this.hideDropdownMenu);
+    });
+
+  }
+
   showSettings = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
@@ -119,24 +180,53 @@ export class NavBar extends Component {
     }
   }
 
-  goSettings = (account) => {
+  showNotificationsView = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
-        return (
-          <Link to="/settings" className="navLink">
-            <div className="dropdown">
-              <span className="fas fa-user" title="Account settings"></span>
-              <div className="dropdown-content">
-                <span style={{ fontSize: 10 }} title="email">EMAIL: {account.email}</span>&nbsp;
-                <br></br>
-                <span style={{ fontSize: 10 }} title="username">USERNAME: {account.username}</span>&nbsp;
-                <br></br>
-                <span style={{ fontSize: 10 }} title="level">LEVEL: {account.level}</span>&nbsp;
-              </div>
-            </div>
-          </Link>)
+        return (<Link style={{ position: "right" }} to="/notifications" className="navLink" title="Notifications">View all Notifications</Link>)
       }
     }
+  }
+
+  goSettings = (account) => {
+
+    return (
+      <div className="dropdown">
+        <div className="fas fa-user" onClick={this.showDropdownMenu}></div>
+
+        {this.state.displayMenu ? (
+          <div className="dropdown-content" style={{ width: "max-content" }}>
+            <span style={{ fontSize: 13 }} title="email">EMAIL: {account.email}</span>
+            <br></br>
+            <span style={{ fontSize: 13 }} title="username">USERNAME: {account.username}</span>
+            <br></br>
+            <span style={{ fontSize: 13 }} title="level">LEVEL: {account.level}</span>
+            <br></br>
+            <br></br>
+            <div style={{ backgroundColor: "#131e27", padding: "10px", opacity: "0.6" }}>
+              <a href="/settings">
+                <span className="navLink" style={{ paddingRight: "25px" }}>
+                  <FontAwesomeIcon icon="user-edit" /> EDIT ACCOUNT
+              </span>
+              </a>
+              <a href="/signout">
+                <span className="navLink"  >
+                  <FontAwesomeIcon icon="sign-out-alt" />  SIGN OUT
+            </span>
+              </a>
+            </div>
+          </div>
+        ) :
+          (
+            null
+          )
+        }
+      </div>
+    );
+  }
+
+  goAccountName = (account) => {
+    return account.username
   }
 
   showNotifications = (account) => {
@@ -156,8 +246,9 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div style={{ position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.map((notification, i) => <Notification key={i} notification={notification}></Notification>)}
+              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
+                {account.notifications.slice(4).reverse().map((notification, i) => <Notification key={notification.device + i} notification={notification} account={account}></Notification>)}
+                <span>{this.showNotificationsView()}</span>
               </div>
             )
             : (
@@ -183,8 +274,6 @@ export class NavBar extends Component {
     } else {
       return this.props.account.notifications.length
     }
-
-
 
     //TODO Check if array has grown
   }
@@ -218,9 +307,10 @@ export class NavBar extends Component {
       }
     }
     return (
-      <div className="" style={{ margin: "0 5px" }} >
-        <div className="row " style={{ paddingBottom: 10 }}>
-          <div className="col-md-12" style={{ backgroundColor: "#0E1823", position: "fixed", zIndex: 1000, right: "0%" }}>
+
+      <div className="row " style={{ paddingBottom: 30 }}>
+        <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }}>
+          <div className="navbarInsideWrap">
             <Link to="/">
               <div style={{ padding: "20px 10px 10px 10px", float: "left" }}>
                 <img
@@ -239,12 +329,12 @@ export class NavBar extends Component {
                 </div>
               </div>
             </Link>
-
             {this.account(this.props.account)}
-
           </div>
+
         </div>
       </div>
+
     );
   }
 }

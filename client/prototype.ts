@@ -32,7 +32,6 @@ export function publicStates(cb) {
   fetch("/api/v3/publicStates", {
     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
   }).then(response => response.json()).then(states => {
-    console.log(states);
     cb(states);
   })
     .catch(err => console.error(err.toString()));
