@@ -210,7 +210,6 @@ export class MapDevices extends Component {
           <div style={{ display: "none" }}></div>
         )
       } else if (this.state.boundaryVisible == true) {
-        console.log(device.devicePathHistory)
         return (
           <Polyline color="blue" positions={device.devicePathHistory} />
         )
