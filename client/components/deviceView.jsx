@@ -76,7 +76,10 @@ export class DeviceView extends Component {
     editorChanged: false,
     devicesServer: undefined,
     loggedin: "",
-    owner: ""
+    owner: "",
+    dataButton: "HIDE DATA",
+    dataview: "",
+    dashboard: "col-lg-9"
   };
 
   socket;
@@ -375,14 +378,14 @@ export class DeviceView extends Component {
       }
     }
 
-    return (<div className="col-lg-3">
+    return (<div className="col-lg-3" style={{ overflowY: "auto", height: "600px", display: this.state.dataview }}>
       <DataView data={this.state.state} />
       {plugins}
     </div>)
   }
 
   dashboardColumn = () => {
-    return (<div className="col-lg-9" >
+    return (<div className={this.state.dashboard} >
       {this.editorBlock()}
 
       <Dashboard
@@ -395,25 +398,41 @@ export class DeviceView extends Component {
     </div>)
   }
 
+  hideData = () => {
+    if (this.state.dataButton == "HIDE DATA") {
+      this.setState({ dataview: "none" })
+      this.setState({ dataButton: "SHOW DATA" })
+      this.setState({ dashboard: "col-lg-12" })
+    }
+    else if ((this.state.dataButton == "SHOW DATA")) {
+      this.setState({ dataview: "" })
+      this.setState({ dataButton: "HIDE DATA" })
+      this.setState({ dashboard: "col-lg-9" })
+    }
+  }
+
   orderScreenSize = () => {
     if (window.innerWidth < 667) {
-      return (<div className="row">
+      return (<div className="row" >
         <div className="col-12" style={{ display: this.state.shareDisplay, marginTop: 12 }}>
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
             <FontAwesomeIcon icon="trash" />
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
             <FontAwesomeIcon icon="eraser" />
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
 
             <i className="fas fa-share-alt"></i>
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "24%", fontSize: 15, float: "right", textAlign: "center" }}   >
+          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }}   >
             <i className="fas fa-edit"></i>
+          </div>
+          <div onClick={this.hideData} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} className="commanderBgPanel commanderBgPanelClickable"  >
+            <i className="fas fa-database"></i>
           </div>
         </div>
         {this.dashboardColumn()}
@@ -456,6 +475,9 @@ export class DeviceView extends Component {
 
               <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
                 <i className="fas fa-edit"></i> {this.state.EditorButton}
+              </div>
+              <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i className="fas fa-database"></i> {this.state.dataButton}
               </div>
 
               <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
