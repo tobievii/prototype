@@ -894,7 +894,6 @@ setInterval(() => {
 
 function getWarningNotification() {
 
-  // log("NOTIFICATIONS checking for devices that went offline")
   var now: any = new Date();
   var dayago = new Date(now - (1000 * 60 * 60 * 24));
   db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
@@ -902,10 +901,6 @@ function getWarningNotification() {
     for (var s in listDevices) {
       var device = listDevices[s]
       db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
-
-        // db.states.findOne({ key: device.key }, (err: any, result: any) => {
-        //   io.to(result.key).emit('post', result)
-        // })
 
         var WarningNotificationL = {
           type: "CONNECTION DOWN 24HR WARNING",
