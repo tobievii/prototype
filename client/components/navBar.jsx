@@ -269,13 +269,12 @@ export class NavBar extends Component {
 
   countArray = () => {
 
-    if (this.props.account.notifications == undefined) {
-      return 0
-    } else {
-      return this.props.account.notifications.length
+    if (this.props.account.notifications.length == 0 || this.props.account.notifications == undefined) {
+      return <span />;
     }
-
-    //TODO Check if array has grown
+    else {
+      return <span className="button__badge">{this.props.account.notifications.length}</span>
+    }
   }
 
   account = (account) => {
@@ -286,7 +285,7 @@ export class NavBar extends Component {
             <span className="navLink" style={{ float: "left" }}>{this.goSettings(account)}</span>
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
             <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
-            <span className="button__badge">{this.countArray()}</span>
+            {this.countArray()}
           </div>
         )
       } else {
