@@ -269,12 +269,15 @@ export class NavBar extends Component {
 
   countArray = () => {
 
-    if (this.props.account.notifications.length == 0 || this.props.account.notifications == undefined) {
-      return <span />;
+    if (this.props.account.notifications) {
+      if (this.props.account.notifications.length == 0 || this.props.account.notifications == undefined) {
+        return <span />;
+      }
+      else {
+        return <span className="button__badge">{this.props.account.notifications.length}</span>
+      }
     }
-    else {
-      return <span className="button__badge">{this.props.account.notifications.length}</span>
-    }
+    return
   }
 
   account = (account) => {
