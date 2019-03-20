@@ -238,7 +238,7 @@ const unsigned char myBitmap[] PROGMEM = {
 void bootlogo(void)
 {
   display.clearDisplay();
-  display.drawBitmap(0, 0, myBitmap, 128, 48, WHITE);
+  display.drawBitmap(35, 0, myBitmap, 10, 10, WHITE);
   display.drawBitmap(50, 0, myBitmapWificon, 15, 10, WHITE);
   display.display();
   delay(500);
