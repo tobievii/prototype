@@ -1096,6 +1096,17 @@ app.get("/api/v3/u/notifications", (req: any, res: any) => {
   })
 });
 
+app.post("/api/v3/u/notifications/delete", (req: any, res: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $unset: { notifications: 1 } }, (err: Error, state: any) => {
+    if (err != null) {
+      console.log(err)
+    } else if (state) {
+      console.log(state)
+    }
+    res.json(state.notifications);
+  })
+});
+
 app.post("/api/v3/state/delete", (req: any, res: any) => {
   if (req.body.username) {
     if (req.body.username != req.user.username) {
