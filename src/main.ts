@@ -967,10 +967,11 @@ function handleState(req: any, res: any, next: any) {
 
               for (var a of result.notifications) {
                 if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                  console.log("something")
                   db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                    console.log(err)
-                    console.log(updated)
+                    if (err !== null) {
+                      console.log(err)
+                    } else if (updated)
+                      console.log(updated)
                   })
                 }
               }
