@@ -5,15 +5,21 @@ This file handles all that relates to the unique identifier for this device. In 
 */
 
 byte devuuid[8];
+String lib_id_uuid;
 
 void lib_id_init() {
   randomSeed(analogRead(0));
-  lib_id_uuid(); 
+  lib_id_checkuuid(); 
+  lib_id_uuid = lib_id_getUuidString();
+}
+
+String lib_id_getuuid() {
+  return lib_id_uuid;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void lib_id_uuid() {
+void lib_id_checkuuid() {
   
   bool uuidset = 0;
 
@@ -48,7 +54,7 @@ void lib_id_genuuid() {
     EEPROM.write(a, random(256));
   }
   EEPROM.commit();
-  lib_id_uuid();
+  lib_id_checkuuid();
 }
 
 
