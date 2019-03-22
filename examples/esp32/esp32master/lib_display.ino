@@ -34,43 +34,59 @@ long lastUpdate = 0;
 long count = 0;
 
 void lib_display_loop() {
-  if (millis() - lastUpdate > 1000/12) { // frames per second (millis per frame)
+  if (millis() - lastUpdate > 1000/60) { // frames per second (millis per frame)
     count++;
-    lib_display_newFrame();
+    lib_display_update();
+    lastUpdate = millis();
+  }
+}
+
+
+void lib_display_update() {
+  lib_display_newFrame();
 
 
     //if (millis() < 3000) {
       //first 3 seconds display uuid;
-      lib_display_uuid(lib_id_getuuid());
+    
+    
+
     //}
 
     // // number count
     // if ((millis() > 3000)&&(millis()<6000)) {
     //   lib_display_log(String(count) );
     // }
+
+    //lib_display_log("rouan" );
     
+    // status icons
+    lib_display_wifi(lib_wifi_status_get());
+    lib_display_cloud(lib_mqtt_status_get());
 
-    //battery
-    lib_display_drawBattery(8 - (count % 8));
+    // dashboards
+    // lib_display_uuid(lib_id_getuuid());
+    //lib_display_uuid("abcdefghijklmnop");
 
-    //wifi
-    lib_display_drawWifi((count/3) % 4);
+    // //battery
+    // lib_display_drawBattery(8 - (count % 8));
 
-    //heart
-    lib_display_heart((count/12)%2);
+    // //wifi
+    // lib_display_drawWifi((count/3) % 4);
 
-    //warning
-    lib_display_warning();
+    // //heart
+    // lib_display_heart((count/12)%2);
 
-    //alarm
-    lib_display_alarm();
+    // //warning
+    // lib_display_warning();
 
-    //cloud
-    lib_display_cloud((count/3) % 5);
+    // //alarm
+    // lib_display_alarm();
+
+    // //cloud
+    // 
 
     display.display(); // update display
-    lastUpdate = millis();
-  }
 }
 
 void lib_display_newFrame() {
@@ -80,32 +96,47 @@ void lib_display_newFrame() {
 
 void lib_display_log(String msg) {  
   int y = 7; //text start pixel from top
-  display.setTextSize(0);
-  display.setTextColor(WHITE);  
-  display.setCursor(32,y+lib_display_line);   
-  display.println(msg);  
-  lib_display_line+=10;
+
+  while (msg.length()>0) {
+    display.setTextSize(0);
+    display.setTextColor(WHITE);  
+    display.setCursor(32,y+lib_display_line);   
+    display.println(msg.substring(0,11));  
+    lib_display_line+=10;
+    msg = msg.substring(11);
+  }
+
+
+  display.display();
+
 }
+
+
 
 // ----------------------------------------------------------------------------
 
 void lib_display_uuid(String uuid) {
   int y = 7; //text start pixel from top
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setTextColor(WHITE);  
 
-  display.setCursor(32,y+lib_display_line);   
-  display.println("UUID:");  
-  lib_display_line+=18;
+  // display.setCursor(32,y+lib_display_line);   
+  // display.println("UUID:");  
+  // lib_display_line+=18;
 
-  display.setTextSize(1);
-  display.setCursor(32,y+lib_display_line );   
-  display.println(uuid.substring(0,8));  
-  lib_display_line+=10;
+  if (uuid.length() > 8) {
+    String lineA = uuid.substring(0,8);
+    display.setCursor(32,y+lib_display_line );   
+    display.println(lineA);  
+    lib_display_line+=10;
 
-  display.setCursor(32,y+lib_display_line);   
-  display.println(uuid.substring(8,16));  
-  lib_display_line+=10;
+    String lineB = uuid.substring(8,16);
+    display.setCursor(32,y+lib_display_line);   
+    display.println(lineB);  
+    lib_display_line+=10;  
+  }
+
+  
 
 }
 
@@ -250,9 +281,6 @@ void lib_display_alarm(void) {
 
 // ----------------------------------------------------------------------------
 
-
-
-
 const unsigned char bitmap_cloud_outline[] PROGMEM = {
   0x38, 0x00, 0x47, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x7f, 0x00
 };
@@ -261,20 +289,101 @@ const unsigned char bitmap_cloud[] PROGMEM = {
   0x38, 0x00, 0x7e, 0x00, 0xfb, 0x00, 0xd7, 0x80, 0xef, 0x80, 0x7f, 0x00
 };
 
+
+const unsigned char bitmap_cloud_none[] PROGMEM = {
+  0x38, 0x00, 0x7c, 0x00, 0xd7, 0x00, 0xef, 0x80, 0xd7, 0x80, 0x7f, 0x00
+};
+
 void lib_display_cloud(int state) {
-  int x = 59;
+  int x = 42;
   int y = 0;
 
-  if (state < 4) {
+  if (state == 0) {
+    display.drawBitmap(x, y, bitmap_cloud_outline, 9, 6, WHITE); 
+    return;
+  }
+
+  if (state == 0) {
+    display.drawBitmap(x, y, bitmap_cloud_outline, 9, 6, WHITE); 
+    return;
+  }
+
+  if (state == 1) {
     display.drawBitmap(x, y, bitmap_cloud_outline, 9, 6, WHITE); 
 
-    if (state > 0) {
-      for (int b=0; b < state; b++) { 
-        display.drawPixel(x+2 + (b*2),3,WHITE); 
-      }   
-    }
-  } else {
+    
+    for (int b=0; b < 2; b++) { 
+      display.drawPixel(x+2 + (b*2),3,WHITE); 
+    }   
+    
+  }
+
+  if (state == 2) {
+    display.drawBitmap(x, y, bitmap_cloud_none, 9, 6, WHITE); 
+  }
+
+  if (state == 3) {
+    // success
     display.drawBitmap(x, y, bitmap_cloud, 9, 6, WHITE);   
   }
   
 }
+
+// ----------------------------------------------------------------------------
+
+const unsigned char bitmap_wifi[] PROGMEM = {
+  0x7e, 0x81, 0x3c, 0x42, 0x18, 0x18
+};
+
+// wifi with one circle
+const unsigned char bitmap_wifi_half[] PROGMEM = {
+  0x00, 0x00, 0x3c, 0x42, 0x18, 0x18
+};
+
+
+// wifi dot circle
+const unsigned char bitmap_wifi_dotcircle[] PROGMEM = {
+  0x00, 0x00, 0x18, 0x24, 0x24, 0x18
+};
+
+// wifi dot
+const unsigned char bitmap_wifi_dot[] PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x18, 0x18
+};
+
+
+
+
+void lib_display_wifi(int state) {
+  int x = 32;
+  int y = 0;
+
+// WL_IDLE_STATUS     // 0
+// WL_NO_SSID_AVAIL   // 1
+// WL_SCAN_COMPLETED  // 2
+// WL_CONNECTED       // 3
+// WL_CONNECT_FAILED  // 4
+// WL_CONNECTION_LOST // 5
+// WL_DISCONNECTED    // 6
+// WL_NO_SHIELD       // 255
+
+  if (state == 0) {
+    display.drawBitmap(x, y, bitmap_wifi_half, 8, 6, WHITE);   
+  }
+
+  if (state == 3) {
+    //connected
+    display.drawBitmap(x, y, bitmap_wifi, 8, 6, WHITE);   
+  }
+
+  if (state == 4) {
+    display.drawBitmap(x, y, bitmap_wifi_dot, 8, 6, WHITE);   
+  }
+
+  if (state == 6) {
+    display.drawBitmap(x, y, bitmap_wifi_dotcircle, 8, 6, WHITE);   
+  }
+
+}
+
+// ----------------------------------------------------------------------------

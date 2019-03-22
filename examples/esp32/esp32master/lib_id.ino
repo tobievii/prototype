@@ -5,7 +5,7 @@ This file handles all that relates to the unique identifier for this device. In 
 */
 
 byte devuuid[8];
-String lib_id_uuid;
+String lib_id_uuid = "                ";
 
 void lib_id_init() {
   randomSeed(analogRead(0));
