@@ -55,6 +55,7 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 import { isNullOrUndefined } from "util";
+import { Socket } from "net";
 
 
 
@@ -939,6 +940,43 @@ function handleState(req: any, res: any, next: any) {
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
+
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+          if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+
+            var message = Result.workflowCode.substring(
+              Result.workflowCode.lastIndexOf('alarm1("') + 8,
+              Result.workflowCode.lastIndexOf('")')
+            )
+
+            var AlarmNotification = {
+              type: "ALARM",
+              device: req.body.id,
+              created: Date.now(),
+              message: message,
+              notified: true,
+              seen: false
+            }
+
+            if (req.user.notifications) {
+              req.user.notifications.push(AlarmNotification)
+            } else {
+              req.user.notifications = [AlarmNotification]
+            }
+            db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+
+              for (var a of result.notifications) {
+                if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
+                  console.log("something")
+                  db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+                    console.log(err)
+                    console.log(updated)
+                  })
+                }
+              }
+            })
+          } else return
+        })
 
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
