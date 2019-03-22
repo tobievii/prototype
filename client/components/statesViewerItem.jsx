@@ -25,7 +25,8 @@ export class StatesViewerItem extends Component {
     opacitya: "1",
     isOpen: false,
     User: "",
-    warningNotification: ""
+    warningNotification: "",
+    alarmNotification: ""
   };
 
   intervalUpdator = undefined;
@@ -90,16 +91,22 @@ export class StatesViewerItem extends Component {
     }
 
     if (device.notification24 != undefined) {
-      var notifications = this.props.account.notifications;
-      for (var s in notifications) {
-        if (notifications[s].type == "CONNECTION DOWN 24HR WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
-          this.setState({ warningNotification: notifications[s] });
-        }
-      }
       this.setState({ opacityw: "1" })
     } else {
       this.setState({ warningNotification: { type: "Device has no warnings" } });
       this.setState({ opacityw: "0.2" })
+    }
+
+    var notifications = this.props.account.notifications;
+    for (var s in notifications) {
+      if (notifications[s].type == "CONNECTION DOWN 24HR WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
+        this.setState({ warningNotification: notifications[s] });
+      }
+
+      if (notifications[s].type == "ALARM" && device.devid == notifications[s].device && notifications[s].seen == false) {
+        this.setState({ opacitya: "1" })
+        this.setState({ alarmNotification: notifications[s] });
+      }
     }
   }
 
@@ -196,7 +203,7 @@ export class StatesViewerItem extends Component {
   }
 
   publicShare = (device) => {
-    if (this.props.account.email == this.props.device.meta.user.email){
+    if (this.props.account.email == this.props.device.meta.user.email) {
       if (device.public != undefined || device.public != null) {
         if (device.public == true) {
           fetch("/api/v3/makedevPrivate", {
