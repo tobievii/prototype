@@ -62,8 +62,11 @@ void lib_display_loop() {
     //warning
     lib_display_warning();
 
-    //warning
+    //alarm
     lib_display_alarm();
+
+    //cloud
+    lib_display_cloud((count/3) % 5);
 
     display.display(); // update display
     lastUpdate = millis();
@@ -246,3 +249,32 @@ void lib_display_alarm(void) {
 }
 
 // ----------------------------------------------------------------------------
+
+
+
+
+const unsigned char bitmap_cloud_outline[] PROGMEM = {
+  0x38, 0x00, 0x47, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x7f, 0x00
+};
+
+const unsigned char bitmap_cloud[] PROGMEM = {
+  0x38, 0x00, 0x7e, 0x00, 0xfb, 0x00, 0xd7, 0x80, 0xef, 0x80, 0x7f, 0x00
+};
+
+void lib_display_cloud(int state) {
+  int x = 59;
+  int y = 0;
+
+  if (state < 4) {
+    display.drawBitmap(x, y, bitmap_cloud_outline, 9, 6, WHITE); 
+
+    if (state > 0) {
+      for (int b=0; b < state; b++) { 
+        display.drawPixel(x+2 + (b*2),3,WHITE); 
+      }   
+    }
+  } else {
+    display.drawBitmap(x, y, bitmap_cloud, 9, 6, WHITE);   
+  }
+  
+}
