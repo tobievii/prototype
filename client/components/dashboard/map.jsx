@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Polyline, Polygon, Map, TileLayer, Marker, Popup, FeatureGroup } from 'react-leaflet';
 import { EditControl } from "react-leaflet-draw";
-import Control from 'react-leaflet-control';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import { Widget } from "./widget.jsx"
@@ -20,26 +19,11 @@ var poly2tri = require('poly2tri');
 var b = undefined;
 var deviceSelected = undefined;
 
-// const myIcon = L.icon({
-//   iconUrl: '../markers/marker_Blue.png',
-//   iconSize: [80, 96],
-//   iconAnchor: [65, 96],
-//   popupAnchor: [0, -96]
-// });
-
-// const selectedIcon = L.icon({
-//   iconUrl: '../markers/marker_Red.svg',
-//   iconSize: [80, 96],
-//   iconAnchor: [40, 96],
-//   popupAnchor: [0, -96]
-// });
-
 export class MapDevices extends Component {
   state = {
     devicePathHistory: undefined,
     boundaryVisible: false,
     showBoundary: false,
-
   }
 
   constructor(props) {
@@ -210,13 +194,14 @@ export class MapDevices extends Component {
               }
             }
           } else {
-            console.error("Data From Packets doesn't have loaction information.")
+            console.error("Data From Packets doesn't have location information.")
+            finalCoords.push([result[count].ipLoc.ll])
           }
         }
         device["devicePathHistory"] = finalCoords;
       })
       .catch(err => {
-        console.error(err)
+        //console.error(err)
       })
 
     if (device.devicePathHistory != undefined && device.devicePathHistory != null) {
@@ -224,7 +209,7 @@ export class MapDevices extends Component {
         return (
           <div style={{ display: "none" }}></div>
         )
-      } else {
+      } else if (this.state.boundaryVisible == true) {
         return (
           <Polyline color="blue" positions={device.devicePathHistory} />
         )
@@ -253,10 +238,8 @@ export class MapDevices extends Component {
   pathButtonClicked = (marker) => {
     if (this.state.boundaryVisible == false) {
       this.setState({ boundaryVisible: true })
-      this.setState({ showBoundary: true })
       b = true;
     } else if (this.state.boundaryVisible == true) {
-      this.setState({ showBoundary: false })
       this.setState({ boundaryVisible: false })
       b = false;
     }

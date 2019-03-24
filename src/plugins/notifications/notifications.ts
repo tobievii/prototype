@@ -6,18 +6,18 @@ export const name = "notifications"
 export const workflowDefinitions = [
   "var " + name + " = { ",
   "warning: (message:string)",
-  "alarm: (message:string)",
+  "alarm1: (message:string)",
   "info: (message:string)",
   "}"
 ];
 
-export const workflow = { warning, alarm, info }
+export const workflow = { warning, alarm1, info }
 
 export function warning(message: string) {
   console.log(message);
 }
 
-export function alarm(message: string) {
+export function alarm1(message: string) {
   console.log(message);
 }
 
@@ -28,7 +28,5 @@ export function info(message: string) {
 export var bot: any;
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
-
-
 
 }

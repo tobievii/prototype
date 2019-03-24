@@ -109,11 +109,11 @@ export class Widget extends React.Component {
   }
 
   getWrench = () => {
-    if (this.props.widget == undefined || this.props.widget == false) {
+    if (this.props.widget == false && this.props.label == "map") {
       return (
         <div></div>
       )
-    } else if (this.props.widget == true) {
+    } else {
       return (
         <div>
           <div className="widgetOptionsButton"
@@ -157,7 +157,6 @@ export class Widget extends React.Component {
           {this.devicePathButton(this.props.label)}
           <div className="widgetOptions">
             {this.getWrench()}
-
           </div>
         </div>
 

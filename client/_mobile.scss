@@ -107,6 +107,10 @@ $break-large: 1200px;
         font-size: 13px;
     }
 
+    .noDisplay{
+       display: none !important; 
+    }
+    
     .settingsPage{
         margin: 10px 2px 0px 2px !important;
     }

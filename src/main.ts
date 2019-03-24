@@ -55,6 +55,7 @@ import { userInfo } from 'os';
 import * as stats from "./stats"
 import { utils } from 'mocha';
 import { isNullOrUndefined } from "util";
+import { Socket } from "net";
 
 
 
@@ -894,7 +895,6 @@ setInterval(() => {
 
 function getWarningNotification() {
 
-  // log("NOTIFICATIONS checking for devices that went offline")
   var now: any = new Date();
   var dayago = new Date(now - (1000 * 60 * 60 * 24));
   db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
@@ -902,10 +902,6 @@ function getWarningNotification() {
     for (var s in listDevices) {
       var device = listDevices[s]
       db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
-
-        // db.states.findOne({ key: device.key }, (err: any, result: any) => {
-        //   io.to(result.key).emit('post', result)
-        // })
 
         var WarningNotificationL = {
           type: "CONNECTION DOWN 24HR WARNING",
@@ -945,9 +941,57 @@ function handleState(req: any, res: any, next: any) {
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+          if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+
+            var message = Result.workflowCode.substring(
+              Result.workflowCode.lastIndexOf('alarm1("') + 8,
+              Result.workflowCode.lastIndexOf('")')
+            )
+
+            var AlarmNotification = {
+              type: "ALARM",
+              device: req.body.id,
+              created: Date.now(),
+              message: message,
+              notified: true,
+              seen: false
+            }
+
+            if (req.user.notifications) {
+              req.user.notifications.push(AlarmNotification)
+            } else {
+              req.user.notifications = [AlarmNotification]
+            }
+            db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+
+              for (var a of result.notifications) {
+                if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
+                  db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+                    if (err !== null) {
+                      console.log(err)
+                    } else if (updated)
+                      console.log(updated)
+                  })
+                }
+              }
+            })
+          } else return
+        })
+
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
+
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id },
+          (findErr: Error, findResult: any) => {
+            if (findResult.notification24 == true) {
+              db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+                console.log(result)
+                console.log(err)
+              })
+            }
+          })
 
         if (info.newdevice) {
 
@@ -1048,6 +1092,17 @@ app.get("/api/v3/state", (req: any, res: any, packet: any) => {
 
 app.get("/api/v3/u/notifications", (req: any, res: any) => {
   db.users.findOne({ apikey: req.user.apikey, notifications: req.user.notifications }, (err: Error, state: any) => {
+    res.json(state.notifications);
+  })
+});
+
+app.post("/api/v3/u/notifications/delete", (req: any, res: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $unset: { notifications: 1 } }, (err: Error, state: any) => {
+    if (err != null) {
+      console.log(err)
+    } else if (state) {
+      console.log(state)
+    }
     res.json(state.notifications);
   })
 });

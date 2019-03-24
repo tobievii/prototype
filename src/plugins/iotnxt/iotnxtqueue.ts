@@ -292,6 +292,10 @@ export class IotnxtQueue extends events.EventEmitter {
 
   /* ################################################################################## */
 
+  public clearState() {
+    this.state = {};
+  }
+
   public updateState(route: any, property: any, data: any) {
 
     //iotnxt.updateState(this.state, route, property, data );

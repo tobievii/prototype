@@ -81,13 +81,14 @@ export class Notification extends Component {
     if (this.props.notification.type == "ALARM") {
       return (
 
-        <div className="alarmNotificationItem">
-          <i className="fas fa-bullhorn"></i>
-          <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename">{this.device()}</span><br />
-          <span>{this.message()}</span><br />
-          <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
-        </div>
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="alarmNotificationItem">
+            <i className="fas fa-bullhorn"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
 
       )
     }
@@ -247,7 +248,7 @@ export class NavBar extends Component {
           this.state.showMenu
             ? (
               <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
-                {account.notifications.slice(4).reverse().map((notification, i) => <Notification key={notification.device + i} notification={notification} account={account}></Notification>)}
+                {account.notifications.slice(Math.max(account.notifications.length - 5, 1)).reverse().map((notification, i) => <Notification key={notification.device + i} notification={notification} account={account}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
             )
@@ -269,13 +270,15 @@ export class NavBar extends Component {
 
   countArray = () => {
 
-    if (this.props.account.notifications == undefined) {
-      return 0
-    } else {
-      return this.props.account.notifications.length
+    if (this.props.account.notifications) {
+      if (this.props.account.notifications.length == 0 || this.props.account.notifications == undefined) {
+        return <span />;
+      }
+      else {
+        return <span className="button__badge">{this.props.account.notifications.length}</span>
+      }
     }
-
-    //TODO Check if array has grown
+    return
   }
 
   account = (account) => {
@@ -286,7 +289,7 @@ export class NavBar extends Component {
             <span className="navLink" style={{ float: "left" }}>{this.goSettings(account)}</span>
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
             <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
-            <span className="button__badge">{this.countArray()}</span>
+            {this.countArray()}
           </div>
         )
       } else {
