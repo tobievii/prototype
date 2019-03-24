@@ -559,6 +559,7 @@ function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
   var gatewayIdent = gateway.GatewayId + "|" + gateway.HostAddress;
 
   if (iotnxtqueues[gatewayIdent]) {
+    iotnxtqueues[gatewayIdent].clearState();
     for (var propertyName in flatdata) {
       if (flatdata.hasOwnProperty(propertyName)) {
 
