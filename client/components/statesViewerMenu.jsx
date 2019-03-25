@@ -177,20 +177,15 @@ export class StatesViewerMenu extends Component {
                                         </form>
                                     </div>
 
-                                    <div className="col" style={{}}>
-                                        {this.menuDeleteButton()}
-                                        {/* { this.props.selectCount} */}
-                                    </div>
-
-                                    <div>
-
-                                    </div>
-
-                                    <div className="col" style={{ flex: "0 0 120px" }}>
+                                    <div className="col" style={{ flex: "0 0 70px" }}>
                                         {this.viewButton()}
-                                        <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
+                                        <div style={{ float: "left", marginTop: "7px", textAlign: "left", width: "20px" }}>
                                             {this.sortButtons()}
                                         </div>
+                                    </div>
+
+                                    <div className="col">
+                                        {this.menuDeleteButton()}
                                     </div>
                                 </div>
                             )
