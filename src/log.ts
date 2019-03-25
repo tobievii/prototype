@@ -24,7 +24,7 @@ export class Logger extends EventEmitter {
       var logentry: any = {}
       logentry["_created_on"] = new Date();
       logentry.data = a;
-      this.db.log.save(logentry);
+      //this.db.log.save(logentry);
     } else {
       console.log(now.toISOString() + "\t" + "LOGGER DB NOT CONNECTED YET")
     }

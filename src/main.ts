@@ -890,7 +890,7 @@ function checkExsisting(req: any, res: any) {
 }
 
 setInterval(() => {
-  getWarningNotification();
+  //getWarningNotification();     //disable till we find out cause of lag
 }, 600000)
 
 function getWarningNotification() {
