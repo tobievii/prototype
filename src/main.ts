@@ -891,7 +891,7 @@ function checkExsisting(req: any, res: any) {
 
 setInterval(() => {
   getWarningNotification();
-}, 5000)
+}, 600000)
 
 function getWarningNotification() {
 
