@@ -4,7 +4,6 @@ import moment from 'moment'
 export class NotificationsView extends Component {
     constructor(props) {
         super(props);
-
         this.state = { notifications: [] };
     }
 
@@ -28,7 +27,6 @@ export class NotificationsView extends Component {
                 'Content-Type': 'application/json',
             }
         })
-            // .then(response => response.json())
             .then(data => this.setState({ notifications: data }));
         window.location.reload();
     }
@@ -37,8 +35,7 @@ export class NotificationsView extends Component {
         if (this.state.notifications === undefined || this.state.notifications.length == 0) {
             return (<span style={{ textAlign: "center" }}>You have no notifications</span>)
         } else {
-            console.log("Reached here")
-            return (<span style={{ position: "right" }} onClick={this.ClearNotificationsList} className="navLink" title="Notifications">clear all notifications</span>)
+            return (<span style={{ position: "right" }} onClick={this.ClearNotificationsList} className="navLink" title="clear all notifications">clear all notifications</span>)
         }
     }
 
