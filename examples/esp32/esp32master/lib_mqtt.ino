@@ -1,5 +1,6 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include <ArduinoJson.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -15,7 +16,6 @@ int mqttStatus = 0;
 const char* mqttServer = "prototype.dev.iotnxt.io";
 const int mqttPort = 1883;
 String apikey = "dnjskllzve6xzv47l1mw72p74jqbjjz4p";
-String deviceid = "microRaptor2";
 
 unsigned long lastupdate = 0;
 
@@ -88,7 +88,7 @@ void connectMqtt() {
 
 void publishUpdate() {
   //Serial.print("publishing!\n");
-  String msg = "{\"id\":\""+deviceid+"_"+lib_id_getuuid()+"\",\"data\":{\"button\":false}}";
+  String msg = lib_state_packet(); //"{\"id\":\""+lib_state_deviceid()+"_"+lib_id_getuuid()+"\",\"data\":{\"version\":\""+lib_state_version()+"\",\"button\":false}}";
   client.publish(apikey.c_str(), msg.c_str());
 }
 
@@ -96,23 +96,23 @@ void handleMessages(char* topic, byte* payload, unsigned int length) {
   //Serial.println(payload);
   Serial.println("MQTT recv");
 
-  // StaticJsonDocument<200> requestDoc;
-  // DeserializationError error = deserializeJson(requestDoc, payload);
-  // JsonObject request = requestDoc.as<JsonObject>();
+  StaticJsonDocument<200> requestDoc;
+  DeserializationError error = deserializeJson(requestDoc, payload);
+  JsonObject request = requestDoc.as<JsonObject>();
 
-  // String jsontemp; 
-  // serializeJson(request,jsontemp);
-  // Serial.println("api call:");
-  // Serial.println(jsontemp);
-  // Serial.println("-----");
+  String jsontemp; 
+  serializeJson(request,jsontemp);
+  Serial.println("api call:");
+  Serial.println(jsontemp);
+  Serial.println("-----");
 
-  // String display = request["data"]["display"];
+  String display = request["data"]["display"];
   
-  // Serial.println(display);
-  // if (display) { log(display); }
+  Serial.println(display);
+  if (display) { lib_display_log(display); }
   
-  // if (request["data"]["digitalWrite"]) {
-  //   pinMode(request["data"]["pin"], OUTPUT);
-  //   digitalWrite(request["data"]["pin"], request["data"]["level"]);
-  // }   
+  if (request["data"]["digitalWrite"]) {
+    pinMode(request["data"]["pin"], OUTPUT);
+    digitalWrite(request["data"]["pin"], request["data"]["level"]);
+  }   
 }

@@ -18,6 +18,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 int lib_display_line_default = 5;
 int lib_display_line = lib_display_line_default; //offset
 
+String lastMsg = "";
+
 void lib_display_init() {
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
@@ -64,6 +66,10 @@ void lib_display_update() {
     lib_display_wifi(lib_wifi_status_get());
     lib_display_cloud(lib_mqtt_status_get());
 
+    if (lastMsg != "") {
+      lib_display_showLastMsg();
+    }
+
     // dashboards
     // lib_display_uuid(lib_id_getuuid());
     //lib_display_uuid("abcdefghijklmnop");
@@ -95,6 +101,11 @@ void lib_display_newFrame() {
 }
 
 void lib_display_log(String msg) {  
+  lastMsg = msg;
+}
+
+void lib_display_showLastMsg() {
+  String msg = lastMsg;
   int y = 7; //text start pixel from top
 
   while (msg.length()>0) {
@@ -106,9 +117,7 @@ void lib_display_log(String msg) {
     msg = msg.substring(11);
   }
 
-
   display.display();
-
 }
 
 
