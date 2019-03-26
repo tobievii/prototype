@@ -124,10 +124,12 @@ void handleMessages(char* topic, byte* payload, unsigned int length) {
   Serial.println(jsontemp);
   Serial.println("-----");
 
-  String display = request["data"]["display"];
-  
-  Serial.println(display);
-  if (display) { lib_display_log(display); }
+  JsonVariant display = request["data"]["display"];
+  if (!display.isNull()) { 
+    String displayVal = request["data"]["display"];
+    Serial.println(displayVal);
+    lib_display_log(displayVal); 
+  }
   
   if (request["data"]["digitalWrite"]) {
     pinMode(request["data"]["pin"], OUTPUT);
