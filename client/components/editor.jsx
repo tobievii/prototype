@@ -296,7 +296,7 @@ export class Editor extends React.Component {
                         <div style={{ backgroundColor: "red", height: "100%" }}>
                             <MonacoEditor
                                 height="2000"
-                                width="auto"
+                                width="6000"
                                 language="javascript"
                                 theme="vs-dark"
                                 value={this.state.code}
