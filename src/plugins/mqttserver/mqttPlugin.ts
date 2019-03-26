@@ -69,6 +69,9 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
             log(err);
         })
 
+        client.on("ping", () => {
+            //log("MQTT PING!")
+        })
         //client.on("close", (err) => { log("MQTT CLIENT CLOSED") })
     });
 

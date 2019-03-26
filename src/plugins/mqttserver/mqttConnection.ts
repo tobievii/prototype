@@ -278,6 +278,7 @@ export class mqttConnection extends EventEmitter {
             */
 
             if (mqttPacketType == 12) {
+                this.emit("ping");
                 var ping = Buffer.concat([Buffer.from([0b11010000]), Buffer.from([0b0000000])]); //header
                 socket.write(ping)
             }
