@@ -925,6 +925,14 @@ function handleState(req: any, res: any, next: any) {
 
   if ((req.user) && (req.user.level) > 0) {
     if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+
+    if (typeof req.body.id != "string") {
+      res.json({ "error": "id must be a string" })
+    }
+    if (req.body.id.indexOf(" ") != -1) {
+      res.json({ "error": "id may not contain spaces" })
+    }
+
     if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
     if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
     if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
