@@ -924,6 +924,8 @@ function handleState(req: any, res: any, next: any) {
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
+    if (req.body.id == "") { res.json({ "error": "id may not be empty" }) }
+
     if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
     if (typeof req.body.id != "string") {
@@ -931,6 +933,10 @@ function handleState(req: any, res: any, next: any) {
     }
     if (req.body.id.indexOf(" ") != -1) {
       res.json({ "error": "id may not contain spaces" })
+    }
+
+    if (req.body.id.match(/^[a-z0-9_]+$/i) == null) {
+      res.json({ "error": "id may only contain a-z A-Z 0-9 and _" });
     }
 
     if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
