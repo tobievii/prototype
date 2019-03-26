@@ -328,7 +328,7 @@ void lib_display_cloud(int state) {
   }
 
   if (state == 2) {
-    display.drawBitmap(x, y, bitmap_cloud_none, 9, 6, WHITE); 
+    display.drawBitmap(x, y, bitmap_cloud_outline, 9, 6, WHITE); 
   }
 
   if (state == 3) {

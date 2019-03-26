@@ -13,24 +13,40 @@ int mqttStatus = 0;
 // 2 = FAILED ()
 // 3 = SUCCESS
 
-const char* mqttServer = "prototype.dev.iotnxt.io";
+//const char* mqttServer = "prototype.dev.iotnxt.io";
+const char* mqttServer = "192.168.1.145";
 const int mqttPort = 1883;
-String apikey = "dnjskllzve6xzv47l1mw72p74jqbjjz4p";
+String apikey = "4oxk9bg32xyncaxr6494z6jkqxb61tme";
 
 unsigned long lastupdate = 0;
 
 int lib_mqtt_status_get() {
-  return mqttStatus;
+  int returnmqttStatus = mqttStatus;
+  return returnmqttStatus;
 }
 
 void lib_mqtt_loop() {
   detectConnection();
   client.loop();  
-  if (millis() - lastupdate > 15000) {
-    lastupdate = millis();
-    publishUpdate();
-    //pub = true;
+  
+  if (client.connected()) {
+    mqttStatus = 3;lib_display_update();
+    if (millis() - lastupdate > 15000) {
+      lastupdate = millis();
+      publishUpdate();
+      //pub = true;
+    }
+  } else {
+    
+    if (lib_wifi_status_get() == 3) { //if wifi is on
+      mqttStatus = 1;lib_display_update();
+      //connectMqtt();  
+      lib_mqtt_connectMQTT();  
+    } else {
+      mqttStatus = 0;lib_display_update();
+    }
   }
+  
 }
 
 void detectConnection() {
@@ -43,11 +59,12 @@ void detectConnection() {
 }
 
 void lib_mqtt_connectMQTT() {
-  mqttStatus = 1;
+  mqttStatus = 1;lib_display_update();
   client.setServer(mqttServer, mqttPort);
   client.setCallback(handleMessages);
   connectMqtt();
-  client.subscribe(apikey.c_str());
+  String subscribeTopic = String(apikey+"|"+lib_state_deviceid());
+  client.subscribe(subscribeTopic.c_str());
 }
 
 void connectMqtt() {
@@ -59,15 +76,16 @@ void connectMqtt() {
   while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
     if (client.connect("clientid", "api", mqttPassword.c_str() )) {
-      mqttStatus = 3;
+      mqttStatus = 3;lib_display_update();
       Serial.println("connected"); 
+      lib_display_log("MQTT");
       publishUpdate();
       //iotnxt = true;
     } else {
-      mqttStatus = 2; // FAILED
+      mqttStatus = 2; lib_display_update();// FAILED
       Serial.print("failed with state ");
       Serial.print(client.state());
-      lib_display_log("failed to connect.");
+      lib_display_log("MQTT failed.");
 
       /*
 -4 : MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time
