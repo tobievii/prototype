@@ -7,7 +7,8 @@ void setup()
   lib_display_init();
   lib_wifi_init();
   lib_ota_init();
-  //lib_uwb_init();
+  lib_uwb_init();
+
   // unique Identifier
   Serial.println("version: "+lib_state_version());
   String uuid = lib_id_getUuidString();
@@ -18,8 +19,8 @@ void loop()
 {
   lib_display_loop();  
   lib_serial_loop();
-  //lib_uwb_loop();  
   lib_wifi_loop();  
   lib_mqtt_loop();
   lib_ota_loop();
+  lib_uwb_loop();
 }

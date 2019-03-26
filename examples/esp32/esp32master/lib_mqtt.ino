@@ -33,7 +33,7 @@ void lib_mqtt_loop() {
     mqttStatus = 3;lib_display_update();
     if (millis() - lastupdate > 15000) {
       lastupdate = millis();
-      publishUpdate();
+      lib_mqtt_publishUpdate();
       //pub = true;
     }
   } else {
@@ -79,7 +79,7 @@ void connectMqtt() {
       mqttStatus = 3;lib_display_update();
       Serial.println("connected"); 
       lib_display_log("MQTT");
-      publishUpdate();
+      lib_mqtt_publishUpdate();
       //iotnxt = true;
     } else {
       mqttStatus = 2; lib_display_update();// FAILED
@@ -104,10 +104,12 @@ void connectMqtt() {
   }
 }
 
-void publishUpdate() {
-  //Serial.print("publishing!\n");
-  String msg = lib_state_packet(); //"{\"id\":\""+lib_state_deviceid()+"_"+lib_id_getuuid()+"\",\"data\":{\"version\":\""+lib_state_version()+"\",\"button\":false}}";
-  client.publish(apikey.c_str(), msg.c_str());
+void lib_mqtt_publishUpdate() {
+  if (mqttStatus == 3) {
+    Serial.print("publishing!\n");
+    String msg = lib_state_packet(); //"{\"id\":\""+lib_state_deviceid()+"_"+lib_id_getuuid()+"\",\"data\":{\"version\":\""+lib_state_version()+"\",\"button\":false}}";
+    client.publish(apikey.c_str(), msg.c_str());
+  }  
 }
 
 void handleMessages(char* topic, byte* payload, unsigned int length) {
