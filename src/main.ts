@@ -1191,6 +1191,8 @@ app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
 
 })
 
+
+
 app.post("/api/v3/state/clear", (req: any, res: any) => {
 
   if (!req.user) { return; }
@@ -1221,6 +1223,12 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
     }
   })
 })
+
+app.post("/api/v3/allUsers", (req: any, res: any) => {
+  db.users.find({ $or: [{ 'username': { '$regex': req.body.search } }, { 'email': { '$regex': req.body.search } }] }, (err: Error, resp: any) => {
+    res.json(resp)
+  })
+});
 
 app.post("/api/v3/state/query", (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }

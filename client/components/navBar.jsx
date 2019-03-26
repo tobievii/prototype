@@ -7,7 +7,6 @@ import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt } from '@fortawesome/f
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import moment from 'moment'
-import { array } from "prop-types";
 
 
 library.add(faCog)
@@ -15,7 +14,7 @@ library.add(faTimes)
 library.add(faBell);
 library.add(faSignOutAlt)
 library.add(faUserEdit)
-
+var allUsers = []
 
 
 export class Notification extends Component {
@@ -137,6 +136,7 @@ export class NavBar extends Component {
       isLoaded: false,
       notification: [{}],
       displayMenu: false,
+      users: {}
     }
 
     this.showMenu = this.showMenu.bind(this);
@@ -300,6 +300,41 @@ export class NavBar extends Component {
     }
 
   }
+  out = () => {
+    allUsers = []
+    this.setState({ users: [] })
+  }
+  search = evt => {
+    if (evt.target.value.length == 0) {
+      allUsers = []
+      this.setState({ users: [] })
+    }
+    fetch("/api/v3/allUsers", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ search: evt.target.value.toString() })
+    }).then(response => response.json()).then(stats => {
+      this.setState({ users: stats })
+      allUsers = this.state.users
+    }).catch(err => console.error(err.toString()));
+  }
+
+  searchUser = () => {
+    if (allUsers.length == 0) {
+      return null
+    }
+    else {
+      return (
+        <div >
+          <div id="data" style={{ float: "left", width: "300px", overflow: "auto" }}>
+            {allUsers.map((user, i) =>
+              <div style={{ height: "20%" }} key={i}>
+                <Link to={"/u/" + user.username} onClick={this.out}>{user.username}</Link><br></br>
+              </div>
+            )}</div>
+        </div>
+      )
+    }
+  }
 
   render() {
     var username = ""
@@ -331,12 +366,14 @@ export class NavBar extends Component {
                   <span className="navHeading">PR0T0TYP3</span> <span id="navDashboard" style={{ color: "#fff", fontSize: 15 }}>DASHBOARD</span> <span className="version" id="version">{this.props.version}</span>
                 </div>
               </div>
-            </Link>
-            {this.account(this.props.account)}
+            </Link><div>
+              <input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px" }} list="data" onChange={this.search} />
+              {this.account(this.props.account)}
+              {this.searchUser()}
+            </div>
           </div>
-
         </div>
-      </div>
+      </div >
 
     );
   }
