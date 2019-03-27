@@ -136,13 +136,22 @@ export class NavBar extends Component {
       isLoaded: false,
       notification: [{}],
       displayMenu: false,
-      users: {}
+      users: {},
+      showNav: "",
+      showSearch: "none",
+      searchIcon: "none"
     }
 
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
     this.showDropdownMenu = this.showDropdownMenu.bind(this);
     this.hideDropdownMenu = this.hideDropdownMenu.bind(this);
+  }
+
+  componentDidMount = () => {
+    if (window.innerWidth <= 667) {
+      this.setState({ searchIcon: "" })
+    }
   }
 
   showMenu(event) {
@@ -280,12 +289,26 @@ export class NavBar extends Component {
     }
     return
   }
+  searchNav = () => {
+    this.setState({ showNav: "none" })
+    this.setState({ showSearch: "" })
+  }
+
+  findPerson = () => {
+    if (window.innerWidth <= 667) {
+      return (
+        <div className="fas fa-search" onClick={this.searchNav}></div>
+      )
+    }
+
+  }
 
   account = (account) => {
     if (account) {
       if (account.level > 0) {
         return (
           <div style={{ padding: "20px 20px 20px 20px 20px", float: "right", paddingRight: "20px", paddingTop: "18px" }}>
+            <span className="navLink" style={{ float: "left", marginRight: "25px", display: this.state.searchIcon }}>{this.findPerson()}</span>
             <span className="navLink" style={{ float: "left" }}>{this.goSettings(account)}</span>
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
             <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
@@ -323,31 +346,54 @@ export class NavBar extends Component {
       return null
     }
     else {
-      return (
-        <div >
-          <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
+      if (window.innerWidth > 667) {
+        return (
+          <div >
+            <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
+              {allUsers.map((user, i) =>
+                <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
+                  <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                    <p style={{ color: "grey" }}>{user.email}</p></div>
+                  </Link><hr style={{ backgroundColor: "grey" }}></hr>
+                  <br></br>
+                </div>
+              )}</div>
+          </div>
+        )
+      }
+      if (window.innerWidth <= 667) {
+        return (
+          <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
             {allUsers.map((user, i) =>
               <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
-                <Link to={"/u/" + user.username} onClick={this.out}><p>{user.username}<br></br>
-                  <p style={{ color: "grey" }}>{user.email}</p></p>
+                <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                  <p style={{ color: "grey" }}>{user.email}</p></div>
                 </Link><hr style={{ backgroundColor: "grey" }}></hr>
                 <br></br>
               </div>
             )}</div>
-        </div>
-      )
+        )
+      }
     }
   }
 
   findpeople = () => {
-    if (this.props.account) {
-      if (this.props.account.level > 0) {
-        return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} />)
-      }
-      else if (this.props.account.level == 0) {
-        return null
+    if (window.innerWidth > 667) {
+
+      if (this.props.account) {
+        if (this.props.account.level > 0) {
+          return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} />)
+        }
+        else if (this.props.account.level == 0) {
+          return null
+        }
       }
     }
+  }
+
+  normalNav = () => {
+    this.setState({ showNav: "" })
+    this.setState({ showSearch: "none" })
   }
   render() {
     var username = ""
@@ -361,9 +407,9 @@ export class NavBar extends Component {
 
       <div className="row " style={{ paddingBottom: 30 }}>
         <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }}>
-          <div className="navbarInsideWrap">
+          <div className="navbarInsideWrap" >
             <Link to="/">
-              <div style={{ padding: "20px 10px 10px 10px", float: "left" }}>
+              <div style={{ padding: "20px 10px 10px 10px", float: "left", display: this.state.showNav }}>
                 <img
                   src="/iotnxtLogo.png"
                   alt=""
@@ -379,14 +425,17 @@ export class NavBar extends Component {
                   <span className="navHeading">PR0T0TYP3</span> <span id="navDashboard" style={{ color: "#fff", fontSize: 15 }}>DASHBOARD</span> <span className="version" id="version">{this.props.version}</span>
                 </div>
               </div>
-            </Link><div>
+            </Link><div style={{ display: this.state.showNav }}>
               {this.findpeople()}
               {this.account(this.props.account)}
               {this.searchUser()}
             </div>
+            <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
+            <input type="text" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} />
+            {this.searchUser()}
           </div>
         </div>
-      </div >
+      </div>
 
     );
   }
