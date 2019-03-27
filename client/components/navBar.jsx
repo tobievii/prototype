@@ -325,10 +325,13 @@ export class NavBar extends Component {
     else {
       return (
         <div >
-          <div id="data" style={{ float: "left", width: "300px", overflow: "auto" }}>
+          <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
             {allUsers.map((user, i) =>
-              <div style={{ height: "20%" }} key={i}>
-                <Link to={"/u/" + user.username} onClick={this.out}>{user.username}</Link><br></br>
+              <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
+                <Link to={"/u/" + user.username} onClick={this.out}><p>{user.username}<br></br>
+                  <p style={{ color: "grey" }}>{user.email}</p></p>
+                </Link><hr style={{ backgroundColor: "grey" }}></hr>
+                <br></br>
               </div>
             )}</div>
         </div>
@@ -336,6 +339,16 @@ export class NavBar extends Component {
     }
   }
 
+  findpeople = () => {
+    if (this.props.account) {
+      if (this.props.account.level > 0) {
+        return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} />)
+      }
+      else if (this.props.account.level == 0) {
+        return null
+      }
+    }
+  }
   render() {
     var username = ""
     if (this.props.account) {
@@ -367,7 +380,7 @@ export class NavBar extends Component {
                 </div>
               </div>
             </Link><div>
-              <input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px" }} list="data" onChange={this.search} />
+              {this.findpeople()}
               {this.account(this.props.account)}
               {this.searchUser()}
             </div>
