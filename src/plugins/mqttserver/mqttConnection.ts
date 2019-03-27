@@ -122,8 +122,6 @@ export class mqttConnection extends EventEmitter {
                       Handle an incoming PUBLISH packet
                   */
             if (mqttPacketType == 3) {
-                console.log("PACKET SIZE" + data.length)
-                console.log(data.toString())
                 var dataToParse = true;
                 var byteOffset = 0;
 
@@ -132,13 +130,14 @@ export class mqttConnection extends EventEmitter {
                     //packet Type
                     var packetTypeHex = data.slice(byteOffset, byteOffset + 1).toString('hex')[0]
                     parse.packetType = Buffer.from('0' + packetTypeHex, 'hex')[0];
-                    parse.remainingLength = data.readUInt8(byteOffset + 1)
-                    parse.remainingDataTotal = data.length - byteOffset;
+                    parse.remainingLength = getRemainingLength(data);
 
                     parse.retain = !!parseInt(bufferToBinary(data, byteOffset)[7 - 0])
                     parse.dup = !!parseInt(bufferToBinary(data, byteOffset)[7 - 3])
                     parse.qos = parseInt(bufferToBinary(data, byteOffset).slice(-3, -1), 2);
 
+                    byteOffset += parse.remainingLength.bytenum - 1;
+                    parse.remainingDataTotal = data.length - byteOffset;
                     parse.length = data.readUInt16BE(byteOffset + 2);
 
                     var topicStartByte = byteOffset + 4
@@ -160,7 +159,7 @@ export class mqttConnection extends EventEmitter {
 
                     //PAYLOAD
                     parse.payloadStartByte = payloadByte
-                    parse.payloadEndByte = byteOffset + parse.remainingLength + 2
+                    parse.payloadEndByte = byteOffset + parse.remainingLength.total + 2
                     parse.payloadBuffer = data.slice(parse.payloadStartByte, parse.payloadEndByte);
                     parse.payload = parse.payloadBuffer.toString()
 
