@@ -175,7 +175,9 @@ export class StatesViewer extends Component {
               fetch("/api/v3/states/usernameToDevice", {
                 method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
               }).then(response => response.json()).then(serverresponse => {
-
+                for (var s in serverresponse) {
+                  serverresponse[s].selected = false
+                }
                 this.setState({ devicesServer: serverresponse }, () => {
                   for (var device in this.state.devicesServer) {
                     this.socket.emit("join", this.state.devicesServer[device].key);
@@ -220,7 +222,9 @@ export class StatesViewer extends Component {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
-
+            for (var s in serverresponse) {
+              serverresponse[s].selected = false
+            }
             this.setState({ devicesServer: serverresponse }, () => {
               for (var device in this.state.devicesServer) {
                 this.socket.emit("join", this.state.devicesServer[device].key);
@@ -264,6 +268,9 @@ export class StatesViewer extends Component {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {
+            for (var s in serverresponse) {
+              serverresponse[s].selected = false
+            }
             this.setState({ devicesServer: serverresponse }, () => {
               for (var device in this.state.devicesServer) {
                 this.socket.emit("join", this.state.devicesServer[device].key);
