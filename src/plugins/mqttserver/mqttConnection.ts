@@ -122,7 +122,8 @@ export class mqttConnection extends EventEmitter {
                       Handle an incoming PUBLISH packet
                   */
             if (mqttPacketType == 3) {
-
+                console.log("PACKET SIZE" + data.length)
+                console.log(data.toString())
                 var dataToParse = true;
                 var byteOffset = 0;
 
