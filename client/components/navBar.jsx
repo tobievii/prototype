@@ -353,7 +353,7 @@ export class NavBar extends Component {
               {allUsers.map((user, i) =>
                 <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
                   <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
-                    <p style={{ color: "grey" }}>{user.email}</p></div>
+                    <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                   </Link><hr style={{ backgroundColor: "grey" }}></hr>
                   <br></br>
                 </div>
