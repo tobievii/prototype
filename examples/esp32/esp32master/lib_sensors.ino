@@ -2,16 +2,18 @@
 
 #define TOUTCH_PIN T0 // ESP32 Pin D4
 #define LED_PIN 2
-#define DHTPIN 18
+//#define DHTPIN 18
 #define DHTTYPE DHT12
 #define LIGHT_SENSOR 39
+#define RADAR 5
+#define ULTRASONIC 36
 
 int freq = 5000;
 int ledChannel = 0;
 int resolution = 8;
 int dutyCycle = 0;
 
-DHT dht(DHTPIN, DHTTYPE);
+//DHT dht(DHTPIN, DHTTYPE);
 int touch_value = 100;
 int sensorValue;
 int analog_value = 0;
@@ -25,49 +27,54 @@ void lib_sensors_init()
 
 void lib_sensors_loop()
 {
-    sensorValue = analogRead(A0);
-    Serial.println(sensorValue);
-    dutyCycle = map(sensorValue, 0, 4095, 0, 255);
-    ledcWrite(ledChannel, dutyCycle);
-    touch_value = touchRead(TOUTCH_PIN);
 
-    pinMode(LED_PIN, OUTPUT);
-    digitalWrite(LED_PIN, LOW);
+    //getRadar();
+    Serial.print("Radar ");
+    //Serial.println(getRadar());
 
-    if (touch_value < 50)
-    {
-        Serial.print("Sense:  ");
-        Serial.println(analogRead(LIGHT_SENSOR));
-        // digitalWrite(LED_PIN, HIGH);
-    }
-    else
-    {
-        // if (sensorValue < 300)
-        // {
-        //     digitalWrite(LED_PIN, HIGH);
-        // }
-        // else
-        // {
-        //     digitalWrite(LED_PIN, LOW);
-        // }
-    }
+    //sensorValue = analogRead(A0);
+    //Serial.println(sensorValue);
+    // dutyCycle = map(sensorValue, 0, 4095, 0, 255);
+    // ledcWrite(ledChannel, dutyCycle);
+    // touch_value = touchRead(TOUTCH_PIN);
+
+    // pinMode(LED_PIN, OUTPUT);
+    // digitalWrite(LED_PIN, LOW);
+
+    //if (touch_value < 50)
+    //{
+    //Serial.print("Sense:  ");
+    //Serial.println(analogRead(LIGHT_SENSOR));
+    // digitalWrite(LED_PIN, HIGH);
+    //}
+    //else
+    //{
+    // if (sensorValue < 300)
+    // {
+    //     digitalWrite(LED_PIN, HIGH);
+    // }
+    // else
+    // {
+    //     digitalWrite(LED_PIN, LOW);
+    // }
+    //}
     delay(500);
 }
 
-int getTouch()
-{
-    return touchRead(TOUTCH_PIN);
-}
+// int getTouch()
+// {
+//     return touchRead(TOUTCH_PIN);
+// }
 
-float getTemp()
-{
-    return dht.readTemperature();
-}
+// float getTemp()
+// {
+//     return dht.readTemperature();
+// }
 
-float getHumidity()
-{
-    return dht.readHumidity();
-}
+// float getHumidity()
+// {
+//     return dht.readHumidity();
+// }
 
 int getPotentiometer()
 {
@@ -77,4 +84,14 @@ int getPotentiometer()
 int getLightSensor()
 {
     return analogRead(LIGHT_SENSOR);
+}
+
+int getUltrasonic()
+{
+    return analogRead(ULTRASONIC);
+}
+
+int getRadar()
+{
+    return analogRead(RADAR);
 }
