@@ -332,13 +332,15 @@ export class NavBar extends Component {
       allUsers = []
       this.setState({ users: [] })
     }
-    fetch("/api/v3/allUsers", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ search: evt.target.value.toString() })
-    }).then(response => response.json()).then(stats => {
-      this.setState({ users: stats })
-      allUsers = this.state.users
-    }).catch(err => console.error(err.toString()));
+    else if (evt.target.value.length > 0) {
+      fetch("/api/v3/allUsers", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ search: evt.target.value.toString() })
+      }).then(response => response.json()).then(stats => {
+        this.setState({ users: stats })
+        allUsers = this.state.users
+      }).catch(err => console.error(err.toString()));
+    }
   }
 
   searchUser = () => {
