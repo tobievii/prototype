@@ -115,17 +115,16 @@ export function init(app: any, db: any) {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   // returns general server statistics
   app.get("/api/v3/stats", async (req: any, res: any) => {
-    // var stats = {
-    //   users24h: await usersActiveLastDays(1),
-    //   users24hList: await usersActiveLastDaysNames(1),
-    //   userList: await usersNames(),
-    //   users1w: await usersActiveLastDays(7),
-    //   users1m: await usersActiveLastDays(30),
-    //   states24h: await statesActiveLastDays(1),
-    //   packets24h: await packetsActiveLastDays(1)
-    // }
+    var stats = {
+      //   users24h: await usersActiveLastDays(1),
+      //   users24hList: await usersActiveLastDaysNames(1),
+      userList: await usersNames(),
+      //   users1w: await usersActiveLastDays(7),
+      //   users1m: await usersActiveLastDays(30),
+      //   states24h: await statesActiveLastDays(1),
+      //   packets24h: await packetsActiveLastDays(1)
+    }
 
-    var stats = {}
     res.json(stats)
   })
 

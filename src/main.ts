@@ -601,6 +601,8 @@ app.post('/api/v3/shared', (req: any, res: any) => {
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
     if (states.access) {
       res.json(states)
+    } else {
+      res.json({ result: "No Devices" })
     }
   })
 })
