@@ -179,7 +179,6 @@ export class NavBar extends Component {
     this.setState({ displayMenu: false }, () => {
       document.removeEventListener('click', this.hideDropdownMenu);
     });
-
   }
 
   showSettings = () => {
@@ -327,6 +326,12 @@ export class NavBar extends Component {
     allUsers = []
     this.setState({ users: [] })
   }
+
+  closeUserList = () => {
+    allUsers = []
+    this.setState({ users: [] })
+  }
+
   search = evt => {
     if (evt.target.value.length == 0) {
       allUsers = []
@@ -350,7 +355,7 @@ export class NavBar extends Component {
     else {
       if (window.innerWidth > 667) {
         return (
-          <div >
+          <div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
             <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
               {allUsers.map((user, i) =>
                 <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
@@ -364,16 +369,16 @@ export class NavBar extends Component {
         )
       }
       if (window.innerWidth <= 667) {
-        return (
+        return (<div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
           <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
             {allUsers.map((user, i) =>
               <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
                 <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
-                  <p style={{ color: "grey" }}>{user.email}</p></div>
+                  <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                 </Link><hr style={{ backgroundColor: "grey" }}></hr>
                 <br></br>
               </div>
-            )}</div>
+            )}</div></div>
         )
       }
     }
@@ -384,7 +389,7 @@ export class NavBar extends Component {
 
       if (this.props.account) {
         if (this.props.account.level > 0) {
-          return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} />)
+          return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />)
         }
         else if (this.props.account.level == 0) {
           return null
@@ -408,7 +413,7 @@ export class NavBar extends Component {
     return (
 
       <div className="row " style={{ paddingBottom: 30 }}>
-        <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }}>
+        <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }} onClick={this.closeUserList}>
           <div className="navbarInsideWrap" >
             <Link to="/">
               <div style={{ padding: "20px 10px 10px 10px", float: "left", display: this.state.showNav }}>
@@ -433,7 +438,7 @@ export class NavBar extends Component {
               {this.searchUser()}
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="text" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} />
+            <input type="text" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} maxLength="32" />
             {this.searchUser()}
           </div>
         </div>

@@ -62,6 +62,7 @@ export class ShareList extends Component {
     }
 
     componentDidMount = () => {
+        Modal.setAppElement('body');
     }
 
     handleActionCall = (clickdata) => {
@@ -153,10 +154,10 @@ export class ShareList extends Component {
                 {
                     this.state.userSearched.map((user, i) => {
                         if (user.shared == "no") {
-                            return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
                         }
                         else {
-                            return <div id={user.email} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
                         }
                     })
                 }

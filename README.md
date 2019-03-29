@@ -20,6 +20,10 @@ See a live realtime list of your devices, when they were last active and a summa
 
 You can set javascript code to process the device JSON data server side (using sandboxed VM) to make REST calls or perform different actions depending on the state of other devices.
 
+## Tutorial
+
+[![01 Getting started](https://img.youtube.com/vi/JqwMZ8O7OlY/0.jpg)](https://www.youtube.com/watch?v=JqwMZ8O7OlY)
+
 # Install instructions
 
 Clone the repo.

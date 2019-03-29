@@ -73,6 +73,7 @@ void lib_display_update()
   if (lastMsg != "")
   {
     lib_display_showLastMsg();
+    lib_display_sensorValues();
   }
 
   // dashboards
@@ -96,44 +97,25 @@ void lib_display_update()
 
   // //cloud
   //
-  // lib_display_sensorValues();
+  //lib_display_sensorValues();
 
   display.display(); // update display
 }
 
-// void lib_display_sensorValues()
-// {
-//   int y = 7;
-//   String header = "";
-//   float sensor_value = 0;
+void lib_display_sensorValues()
+{
+  int y = 7;
+  //String header = "";
+  //float sensor_value = 0;
 
-//   if (getTemp() < 15 && getPotentiometer() < 1000)
-//   {
-//     header = "TEMP";
-//     sensor_value = getTemp();
-//     lib_display_alarm();
-//   }
-
-//   if (getLightSensor() < 300 && getPotentiometer() > 1000)
-//   {
-//     header = "NIGHT";
-//     sensor_value = getLightSensor();
-//     lib_display_warning();
-//   }
-//   else if (getPotentiometer() > 1000)
-//   {
-//     header = "DAY";
-//     sensor_value = getLightSensor();
-//   }
-
-//   display.setTextSize(0);
-//   display.setTextColor(WHITE);
-//   display.setCursor(32, y + lib_display_line);
-//   display.println(header);
-//   lib_display_line += 10;
-//   display.setCursor(32, y + lib_display_line);
-//   display.println(sensor_value);
-// }
+  display.setTextSize(0);
+  display.setTextColor(WHITE);
+  display.setCursor(32, y + lib_display_line);
+  display.println(getRadar());
+  lib_display_line += 10;
+  display.setCursor(32, y + lib_display_line);
+  display.println(getUltrasonic());
+}
 
 void lib_display_newFrame()
 {

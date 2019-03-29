@@ -601,6 +601,8 @@ app.post('/api/v3/shared', (req: any, res: any) => {
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
     if (states.access) {
       res.json(states)
+    } else {
+      res.json({ result: "No Devices" })
     }
   })
 })
@@ -1239,9 +1241,15 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
 })
 
 app.post("/api/v3/allUsers", (req: any, res: any) => {
-  db.users.find({ $or: [{ 'username': { '$regex': req.body.search } }, { 'email': { '$regex': req.body.search } }] }, (err: Error, resp: any) => {
-    res.json(resp)
-  })
+  db.users.find({
+    $or: [{ 'username': { '$regex': req.body.search } }, { 'email': { '$regex': req.body.search } }],
+    level: { $gte: 1 },
+    "username": { "$exists": true },
+    "$expr": { "$ne": [{ "$strLenCP": "$username" }, 32] } // default random usernames are 32 so we skip these.. usernames shouldnt be this long anyways. I know its kinda a hack.
+  }, { username: 1, "_created_on": 1 }, //only return data we need
+    (err: Error, resp: any) => {
+      res.json(resp)
+    })
 });
 
 app.post("/api/v3/state/query", (req: any, res: any) => {
