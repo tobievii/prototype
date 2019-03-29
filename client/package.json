@@ -71,6 +71,7 @@
     "react-svg-gauge": "^1.0.10",
     "react-syntax-highlighter": "^8.0.1",
     "react-three-renderer": "^3.2.4",
+    "react-toastify": "^5.0.0-rc.3",
     "sass-loader": "^7.1.0",
     "scrypt": "^6.0.3",
     "scrypt-async": "^2.0.1",

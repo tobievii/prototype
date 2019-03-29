@@ -14,6 +14,7 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 import { MapDevices } from "./dashboard/map.jsx"
 
+import { ToastContainer, toast } from 'react-toastify';
 import Media from "react-media";
 
 
@@ -58,6 +59,53 @@ export class Pagination extends Component {
 
 export class DeviceList extends Component {
 
+  componentDidMount() {
+
+    var url = window.location.origin + "/api/v3/data/post"
+    if (this.props.public == true) {
+      setTimeout(() => {
+        return (
+          toast(
+            <div>
+              Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we've added a dummy device for you to get you started
+          </div>
+          )
+        )
+      }, 3000)
+    }
+
+    if (this.props.devices.length == 0) {
+      setTimeout(() => {
+        return (
+          toast(
+            <div>
+              Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we'll add a dummy device shortly for you to get you started
+          </div>
+          )
+        )
+      }, 2000)
+    }
+
+    setTimeout(() => {
+      fetch(url, {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          "id": "Dummy_Device",
+          "data": {
+            "temperature": 24.54,
+            "doorOpen": false,
+            "gps": {
+              "lat": 25.123,
+              "lon": 28.125
+            }
+          }
+        })
+      }).then(response => response.json()).then(resp => {
+        console.log(resp);
+      }).catch(err => console.error(err.toString()));
+    }, 13000)
+  }
+
   state = {
     activePage: 1
   }
@@ -101,6 +149,7 @@ export class DeviceList extends Component {
           <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
             <div className="commanderBgPanel" style={{ margin: 0 }}>
               <center>No devices to display.</center>
+              <ToastContainer />
             </div>
           </div>
         </div>
