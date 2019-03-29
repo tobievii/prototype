@@ -4,6 +4,25 @@ import { EditControl } from "react-leaflet-draw";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import { Widget } from "./widget.jsx"
+var L = require('leaflet');
+
+var RedIcon = L.icon({
+  iconUrl: "./red.svg",
+  iconSize: [45, 45], // size of the icon
+  shadowSize: [50, 64], // size of the shadow
+  iconAnchor: [25, 49], // point of the icon which will correspond to marker's location
+  shadowAnchor: [4, 62],  // the same for the shadow
+  popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
+var BlueIcon = L.icon({
+  iconUrl: "./blue.svg",
+  iconSize: [45, 45], // size of the icon
+  shadowSize: [50, 64], // size of the shadow
+  iconAnchor: [25, 49], // point of the icon which will correspond to marker's location
+  shadowAnchor: [4, 62],  // the same for the shadow
+  popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
 
 var details = {
   lat: -25.864170,
@@ -246,11 +265,21 @@ export class MapDevices extends Component {
   }
 
   getMarker = (marker) => {
-    return (
-      <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]}>
-        {this.getPopup(marker)}
-      </Marker>
-    )
+    if (marker.selectedIcon == true) {
+      console.log("marker")
+      return (
+        <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]} icon={RedIcon} >
+          {this.getPopup(marker)}
+        </Marker >
+      )
+
+    } else {
+      return (
+        <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]} icon={BlueIcon} >
+          {this.getPopup(marker)}
+        </Marker>
+      )
+    }
   }
 
   render() {
