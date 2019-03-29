@@ -85,25 +85,26 @@ export class DeviceList extends Component {
     //     )
     //   }, 2000)
     // }
-
-    setTimeout(() => {
-      fetch(url, {
-        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({
-          "id": "Dummy_Device",
-          "data": {
-            "temperature": 24.54,
-            "doorOpen": false,
-            "gps": {
-              "lat": 25.123,
-              "lon": 28.125
+    if (this.props.devices.length == 0) {
+      setTimeout(() => {
+        fetch(url, {
+          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({
+            "id": "Dummy_Device",
+            "data": {
+              "temperature": 24.54,
+              "doorOpen": false,
+              "gps": {
+                "lat": 25.123,
+                "lon": 28.125
+              }
             }
-          }
-        })
-      }).then(response => response.json()).then(resp => {
-        console.log(resp);
-      }).catch(err => console.error(err.toString()));
-    }, 13000)
+          })
+        }).then(response => response.json()).then(resp => {
+          console.log(resp);
+        }).catch(err => console.error(err.toString()));
+      }, 13000)
+    }
   }
 
   state = {
