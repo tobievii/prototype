@@ -62,29 +62,29 @@ export class DeviceList extends Component {
   componentDidMount() {
 
     var url = window.location.origin + "/api/v3/data/post"
-    if (this.props.public == true) {
-      setTimeout(() => {
-        return (
-          toast(
-            <div>
-              Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we've added a dummy device for you to get you started
-          </div>
-          )
-        )
-      }, 3000)
-    }
+    // if (this.props.public == true) {
+    //   setTimeout(() => {
+    //     return (
+    //       toast(
+    //         <div>
+    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we've added a dummy device for you to get you started
+    //       </div>
+    //       )
+    //     )
+    //   }, 3000)
+    // }
 
-    if (this.props.devices.length == 0) {
-      setTimeout(() => {
-        return (
-          toast(
-            <div>
-              Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we'll add a dummy device shortly for you to get you started
-          </div>
-          )
-        )
-      }, 2000)
-    }
+    // if (this.props.devices.length == 0) {
+    //   setTimeout(() => {
+    //     return (
+    //       toast(
+    //         <div>
+    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we'll add a dummy device shortly for you to get you started
+    //       </div>
+    //       )
+    //     )
+    //   }, 2000)
+    // }
 
     setTimeout(() => {
       fetch(url, {
@@ -149,7 +149,7 @@ export class DeviceList extends Component {
           <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
             <div className="commanderBgPanel" style={{ margin: 0 }}>
               <center>No devices to display.</center>
-              <ToastContainer />
+              {/* <ToastContainer /> */}
             </div>
           </div>
         </div>
