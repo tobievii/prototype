@@ -76,22 +76,22 @@ void lib_sensors_loop()
 //     return dht.readHumidity();
 // }
 
-int getPotentiometer()
+int lib_sensors_getPotentiometer()
 {
     return analogRead(A0);
 }
 
-int getLightSensor()
+int lib_sensors_getLightSensor()
 {
     return analogRead(LIGHT_SENSOR);
 }
 
-int getUltrasonic()
+int lib_sensors_getUltrasonic()
 {
     return analogRead(ULTRASONIC);
 }
 
-int getRadar()
+int lib_sensors_getRadar()
 {
     return analogRead(RADAR);
 }

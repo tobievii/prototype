@@ -70,10 +70,9 @@ void lib_display_update()
   lib_display_wifi(lib_wifi_status_get());
   lib_display_cloud(lib_mqtt_status_get());
 
-  if (lastMsg != "")
-  {
+  if (lastMsg != "") {
     lib_display_showLastMsg();
-    lib_display_sensorValues();
+    // lib_display_sensorValues();
     // lib_display_infor(String(getTemp()));
   }
 
@@ -103,20 +102,20 @@ void lib_display_update()
   display.display(); // update display
 }
 
-void lib_display_sensorValues()
-{
-  int y = 7;
-  //String header = "";
-  //float sensor_value = 0;
+// void lib_display_sensorValues()
+// {
+//   int y = 7;
+//   //String header = "";
+//   //float sensor_value = 0;
 
-  display.setTextSize(0);
-  display.setTextColor(WHITE);
-  display.setCursor(32, y + lib_display_line);
-  display.println(getRadar());
-  lib_display_line += 10;
-  display.setCursor(32, y + lib_display_line);
-  display.println(getUltrasonic());
-}
+//   display.setTextSize(0);
+//   display.setTextColor(WHITE);
+//   display.setCursor(32, y + lib_display_line);
+//   display.println(getRadar());
+//   lib_display_line += 10;
+//   display.setCursor(32, y + lib_display_line);
+//   display.println(getUltrasonic());
+// }
 
 void lib_display_newFrame()
 {
@@ -124,64 +123,66 @@ void lib_display_newFrame()
   lib_display_line = lib_display_line_default;
 }
 
-void lib_display_infor(String lastHeader)
-{
-  String msg = lastHeader;
-  int y = 7; //text start pixel from top
+// rouan: Disabled this for now until we get stuff seperated cleanly.
 
-  while (msg.length() > 0)
-  {
-    display.setTextSize(0);
-    display.setTextColor(WHITE);
-    lib_display_line += 10;
+// void lib_display_infor(String lastHeader)
+// {
+//   String msg = lastHeader;
+//   int y = 7; //text start pixel from top
 
-    if (getTemp() < 15 || msg == "nan")
-    {
-      lib_display_alarm();
-    }
+//   while (msg.length() > 0)
+//   {
+//     display.setTextSize(0);
+//     display.setTextColor(WHITE);
+//     lib_display_line += 10;
 
-    if (getLightSensor() < 1000)
-    {
-      lib_display_warning();
-    }
+//     if (getTemp() < 15 || msg == "nan")
+//     {
+//       lib_display_alarm();
+//     }
 
-    if (getTouch() > 50)
-    {
-      if (getPotentiometer() < 2000)
-      {
-        display.setCursor(32, y + lib_display_line);
-        display.println("TEMP: ");
-        display.setCursor(62, y + lib_display_line);
-        display.println(msg.substring(0, 11));
-        lib_display_line += 10;
-        display.setCursor(32, y + lib_display_line);
-        display.println("HUMI: ");
-        display.setCursor(62, y + lib_display_line);
-        display.println(getHumidity());
-      }
-      else if (getPotentiometer() > 2000)
-      {
-        display.setCursor(32, y + lib_display_line);
-        display.println("LIGHT:");
-        display.setCursor(70, y + lib_display_line);
-        display.println(getLightSensor());
-        lib_display_line += 10;
-        display.setCursor(32, y + lib_display_line);
-        display.println(getTime());
-      }
-    }
-    else
-    {
-      display.setCursor(32, y + lib_display_line);
-      display.println("METER:");
-      display.setCursor(70, y + lib_display_line);
-      display.println(getPotentiometer());
-    }
-    msg = msg.substring(11);
-  }
+//     if (getLightSensor() < 1000)
+//     {
+//       lib_display_warning();
+//     }
 
-  display.display();
-}
+//     if (getTouch() > 50)
+//     {
+//       if (getPotentiometer() < 2000)
+//       {
+//         display.setCursor(32, y + lib_display_line);
+//         display.println("TEMP: ");
+//         display.setCursor(62, y + lib_display_line);
+//         display.println(msg.substring(0, 11));
+//         lib_display_line += 10;
+//         display.setCursor(32, y + lib_display_line);
+//         display.println("HUMI: ");
+//         display.setCursor(62, y + lib_display_line);
+//         display.println(getHumidity());
+//       }
+//       else if (lib_sensors_getPotentiometer() > 2000)
+//       {
+//         display.setCursor(32, y + lib_display_line);
+//         display.println("LIGHT:");
+//         display.setCursor(70, y + lib_display_line);
+//         display.println(lib_sensors_getLightSensor());
+//         lib_display_line += 10;
+//         display.setCursor(32, y + lib_display_line);
+//         display.println(getTime());
+//       }
+//     }
+//     else
+//     {
+//       display.setCursor(32, y + lib_display_line);
+//       display.println("METER:");
+//       display.setCursor(70, y + lib_display_line);
+//       display.println(lib_sensors_getPotentiometer());
+//     }
+//     msg = msg.substring(11);
+//   }
+
+//   display.display();
+// }
 
 void lib_display_log(String msg)
 {
