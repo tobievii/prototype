@@ -1,5 +1,5 @@
 String lib_state_version() {
-  return "0.0.9";
+  return "0.0.10";
 }
 
 String lib_state_deviceid() {
