@@ -33,7 +33,7 @@
 
 // connection pins
 const uint8_t PIN_RST = 26; // reset pin
-const uint8_t PIN_IRQ = 27; // irq pin
+const uint8_t PIN_IRQ = 25; // irq pin
 const uint8_t PIN_SS = 5; // SS ; // spi select pin
 
 // messages used in the ranging protocol
@@ -71,7 +71,7 @@ uint16_t replyDelayTimeUS = 3000;
 uint16_t successRangingCount = 0;
 uint32_t rangingCountPeriod = 0;
 float samplingRate = 0;
-float lastDistance = 0.0f;
+volatile float lastDistance = 0.0f;
 
 void lib_uwb_init() {
     // DEBUG monitoring
@@ -252,12 +252,15 @@ void lib_uwb_loop() {
                 transmitRangeReport(timeComputedRange.getAsMicroSeconds());
                 float distance = timeComputedRange.getAsMeters();
 
-                Serial.print("Range: "); Serial.print(distance); Serial.print(" m");
-                Serial.print("\t RX power: "); Serial.print(DW1000.getReceivePower()); Serial.print(" dBm");
-                Serial.print("\t Sampling: "); Serial.print(samplingRate); Serial.println(" Hz");
+                // Serial.print("Range: "); 
+                Serial.print(samplingRate); Serial.print(" Hz"); Serial.print(distance); Serial.println(" m");
+                //delay(10);
+                // Serial.print("\t RX power: "); Serial.print(DW1000.getReceivePower()); Serial.print(" dBm");
+                // Serial.print("\t Sampling: "); 
 
                 lastDistance = distance;
-                lib_mqtt_publishUpdate();
+                //lib_mqtt_publishUpdate();
+                //delay(500);
                 //lib_state_setFloat("rx", DW1000.getReceivePower());
                 //lib_state_setFloat("sampling", samplingRate);
 

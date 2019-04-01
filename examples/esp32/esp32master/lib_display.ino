@@ -38,9 +38,10 @@ long lastUpdate = 0;
 
 long count = 0;
 
+long lastDashboardChange = 0;
+
 void lib_display_loop()
 {
-
   if (millis() - lastUpdate > 1000)
   {
     // frames per second (millis per frame)
@@ -70,13 +71,20 @@ void lib_display_update()
   lib_display_wifi(lib_wifi_status_get());
   lib_display_cloud(lib_mqtt_status_get());
 
+
+  // dashboards
+  if (millis() - lastDashboardChange > 3000) {
+    lastMsg = lib_state_version();
+  }
+
+
   if (lastMsg != "") {
     lib_display_showLastMsg();
     // lib_display_sensorValues();
     // lib_display_infor(String(getTemp()));
   }
 
-  // dashboards
+
   // lib_display_uuid(lib_id_getuuid());
   //lib_display_uuid("abcdefghijklmnop");
 
@@ -290,7 +298,7 @@ void lib_display_showLogo(void)
   display.clearDisplay();
   display.drawBitmap(0, 0, myBitmap, 128, 64, WHITE);
   display.display();
-  delay(500);
+  //delay(500);
 }
 
 // ----------------------------------------------------------------------------

@@ -16,7 +16,7 @@ int mqttStatus = 0;
 //const char* mqttServer = "prototype.dev.iotnxt.io";
 const char* mqttServer = "192.168.1.145";
 const int mqttPort = 1883;
-String apikey = "4oxk9bg32xyncaxr6494z6jkqxb61tme";
+String apikey = "4oxk9bg32xyncaxr6494z6jkqxb61tmf";
 
 unsigned long lastupdate = 0;
 
@@ -99,7 +99,7 @@ void connectMqtt() {
 4 : MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected
 5 : MQTT_CONNECT_UNAUTHORIZED - the client was not authorized to connect
       */
-      delay(2000); 
+      //delay(2000); 
     }
   }
 }

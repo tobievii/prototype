@@ -8,10 +8,13 @@ CONFIG
 //#define USE_ULTRASONIC
 //#define USE_SENSORS
 
+#define STATUSLED 2
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(2000000);
+  pinMode(STATUSLED, OUTPUT); //enable this pin;
+  digitalWrite(STATUSLED, LOW); //default off;
   
   #ifdef USE_SENSORS
     lib_sensors_init();
