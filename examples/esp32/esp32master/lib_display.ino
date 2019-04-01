@@ -74,6 +74,7 @@ void lib_display_update()
   {
     lib_display_showLastMsg();
     lib_display_sensorValues();
+    // lib_display_infor(String(getTemp()));
   }
 
   // dashboards
@@ -121,6 +122,65 @@ void lib_display_newFrame()
 {
   display.clearDisplay();
   lib_display_line = lib_display_line_default;
+}
+
+void lib_display_infor(String lastHeader)
+{
+  String msg = lastHeader;
+  int y = 7; //text start pixel from top
+
+  while (msg.length() > 0)
+  {
+    display.setTextSize(0);
+    display.setTextColor(WHITE);
+    lib_display_line += 10;
+
+    if (getTemp() < 15 || msg == "nan")
+    {
+      lib_display_alarm();
+    }
+
+    if (getLightSensor() < 1000)
+    {
+      lib_display_warning();
+    }
+
+    if (getTouch() > 50)
+    {
+      if (getPotentiometer() < 2000)
+      {
+        display.setCursor(32, y + lib_display_line);
+        display.println("TEMP: ");
+        display.setCursor(62, y + lib_display_line);
+        display.println(msg.substring(0, 11));
+        lib_display_line += 10;
+        display.setCursor(32, y + lib_display_line);
+        display.println("HUMI: ");
+        display.setCursor(62, y + lib_display_line);
+        display.println(getHumidity());
+      }
+      else if (getPotentiometer() > 2000)
+      {
+        display.setCursor(32, y + lib_display_line);
+        display.println("LIGHT:");
+        display.setCursor(70, y + lib_display_line);
+        display.println(getLightSensor());
+        lib_display_line += 10;
+        display.setCursor(32, y + lib_display_line);
+        display.println(getTime());
+      }
+    }
+    else
+    {
+      display.setCursor(32, y + lib_display_line);
+      display.println("METER:");
+      display.setCursor(70, y + lib_display_line);
+      display.println(getPotentiometer());
+    }
+    msg = msg.substring(11);
+  }
+
+  display.display();
 }
 
 void lib_display_log(String msg)
@@ -299,7 +359,7 @@ const unsigned char bitmap_warning[] PROGMEM = {
 
 void lib_display_warning(void)
 {
-  int x = 41;
+  int x = 65;
   int y = 0;
   display.drawBitmap(x, y, bitmap_warning, 7, 6, WHITE);
 }
@@ -311,7 +371,7 @@ const unsigned char bitmap_alarm[] PROGMEM = {
 
 void lib_display_alarm(void)
 {
-  int x = 32;
+  int x = 55;
   int y = 0;
   display.drawBitmap(x, y, bitmap_alarm, 7, 6, WHITE);
 }
