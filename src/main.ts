@@ -279,6 +279,8 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
 
   var resolved = false;
 
+
+
   // find history by key
   if (req.body.key) {
     resolved = true;
@@ -287,13 +289,27 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
         var query: any = { apikey: device.apikey, devid: device.devid }
         query["payload." + req.body.datapath] = { $exists: true }
         var result: any = []
-        db.packets.find(query, (packetError: Error, packets: any) => {
-          for (var p of packets) {
+        db.packets.find(query).sort({ "_id": -1 }).limit(50, (packetError: Error, rawpackets: any) => {
+          if (packetError) { res.json(packetError); console.log(packetError); }
+
+          var packets: any = []
+
+          for (var p in rawpackets) {
+            var found = 0;
+            for (var o in packets) {
+              if (rawpackets[p]["_created_on"] == packets[o]["_created_on"]) {
+                found++;
+              }
+            }
+            if (found == 0) { packets.push(rawpackets[p]) }
+          }
+
+          for (var pa of packets) {
             var clean: any = {}
             //clean[req.body.datapath] = _.get(p, "payload." + req.body.datapath, "notfound");
             //clean["_created_on"] = p["_created_on"]
-            clean["x"] = p["_created_on"]
-            clean["y"] = _.get(p, "payload." + req.body.datapath, "notfound");
+            clean["x"] = pa["_created_on"]
+            clean["y"] = _.get(pa, "payload." + req.body.datapath, "notfound");
             result.push(clean)
           }
           res.json(result);

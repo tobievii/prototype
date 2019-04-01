@@ -10,6 +10,8 @@ import { ResponsiveLine } from '@nivo/line'
 export class NivoLine extends React.Component {
   state = {}
 
+  lasttimestamp = "";
+
   componentDidMount() {
     if (this.props.state) {
       if (this.props.state.key) {
@@ -19,19 +21,51 @@ export class NivoLine extends React.Component {
     }
   }
 
+
+
+  componentDidUpdate() {
+
+
+    if (_.has(this, "props.state.payload." + this.props.datapath)) {
+      if (this.props.state.payload.timestamp != this.lasttimestamp) {
+
+
+
+        var newdata = { x: this.props.state.payload.timestamp, y: _.get(this, "props.state.payload." + this.props.datapath) }
+
+        if (this.state.linedata) {
+          var linedata = _.clone(this.state.linedata)
+          linedata[0].data.push(newdata)
+          linedata[0].data = linedata[0].data.slice(-50);
+          this.setState({ linedata })
+        }
+        //
+
+
+
+
+
+        this.lasttimestamp = this.props.state.payload.timestamp;
+      }
+    }
+    //console.log(this.props.state);
+    //console.log(this.props.datapath)
+  }
+
   fetchData(key, datapath) {
     fetch("/api/v3/packets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key, datapath })
+      body: JSON.stringify({ key, datapath, limit: 50 })
     }).then(response => response.json()).then(result => {
       //console.log(result);
+
+      result = result.reverse();
 
       var linedata = [{
         id: datapath,
         color: "rgb(0, 255, 255)",
         data: result
       }]
-
       this.setState({ linedata })
     }).catch(err => console.error(err.toString()));
   }
@@ -71,7 +105,7 @@ export class NivoLine extends React.Component {
           "tickSize": 5,
           "tickPadding": 5,
           "tickRotation": 0,
-          "legend": "transportation",
+          "legend": this.props.datapath,
           "legendOffset": 36,
           "legendPosition": "middle"
         }}
