@@ -2,21 +2,25 @@
 
 #define TOUTCH_PIN T0 // ESP32 Pin D4
 #define LED_PIN 2
-//#define DHTPIN 18
+#define DHTPIN 18
 #define DHTTYPE DHT12
 #define LIGHT_SENSOR 39
 #define RADAR 5
-#define ULTRASONIC 36
+#define ULTRASONIC 33
+//const int echoPin = 32;
 
 int freq = 5000;
 int ledChannel = 0;
 int resolution = 8;
 int dutyCycle = 0;
 
-//DHT dht(DHTPIN, DHTTYPE);
+DHT dht(DHTPIN, DHTTYPE);
 int touch_value = 100;
 int sensorValue;
 int analog_value = 0;
+
+// long duration;
+// int distance;
 
 void lib_sensors_init()
 {
@@ -30,7 +34,10 @@ void lib_sensors_loop()
 
     //getRadar();
     Serial.print("Radar ");
-    //Serial.println(getRadar());
+    Serial.println(getRadar());
+
+    //Serial.print("TEST: ");
+    //Serial.println(getUltrasonic());
 
     //sensorValue = analogRead(A0);
     //Serial.println(sensorValue);
@@ -61,20 +68,20 @@ void lib_sensors_loop()
     delay(500);
 }
 
-// int getTouch()
-// {
-//     return touchRead(TOUTCH_PIN);
-// }
+int getTouch()
+{
+    return touchRead(TOUTCH_PIN);
+}
 
-// float getTemp()
-// {
-//     return dht.readTemperature();
-// }
+float getTemp()
+{
+    return dht.readTemperature();
+}
 
-// float getHumidity()
-// {
-//     return dht.readHumidity();
-// }
+float getHumidity()
+{
+    return dht.readHumidity();
+}
 
 int lib_sensors_getPotentiometer()
 {
@@ -86,12 +93,7 @@ int lib_sensors_getLightSensor()
     return analogRead(LIGHT_SENSOR);
 }
 
-int lib_sensors_getUltrasonic()
+int getRadar()
 {
-    return analogRead(ULTRASONIC);
-}
-
-int lib_sensors_getRadar()
-{
-    return analogRead(RADAR);
+    return digitalRead(RADAR);
 }

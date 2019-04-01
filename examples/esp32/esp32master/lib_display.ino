@@ -71,25 +71,24 @@ void lib_display_update()
   lib_display_wifi(lib_wifi_status_get());
   lib_display_cloud(lib_mqtt_status_get());
 
-
   // dashboards
-  if (millis() - lastDashboardChange > 3000) {
+  if (millis() - lastDashboardChange > 3000)
+  {
     lastMsg = lib_state_version();
   }
 
-
-  if (lastMsg != "") {
+  if (lastMsg != "")
+  {
     lib_display_showLastMsg();
-    // lib_display_sensorValues();
+    //lib_display_sensorValues();
     // lib_display_infor(String(getTemp()));
   }
-
 
   // lib_display_uuid(lib_id_getuuid());
   //lib_display_uuid("abcdefghijklmnop");
 
   // //battery
-  // lib_display_drawBattery(8 - (count % 8));
+  //lib_display_drawBattery(lib_battery_percentage());
 
   // //wifi
   // lib_display_drawWifi((count/3) % 4);
@@ -106,24 +105,29 @@ void lib_display_update()
   // //cloud
   //
   //lib_display_sensorValues();
+  lib_battery_update();
+
+  //Serial.println(lib_battery_lastadc());
+  //Serial.println(lib_battery_volts());
+  //Serial.println(lib_battery_percentage());
 
   display.display(); // update display
 }
 
-// void lib_display_sensorValues()
-// {
-//   int y = 7;
-//   //String header = "";
-//   //float sensor_value = 0;
+void lib_display_sensorValues()
+{
+  int y = 7;
+  //String header = "";
+  //float sensor_value = 0;
 
-//   display.setTextSize(0);
-//   display.setTextColor(WHITE);
-//   display.setCursor(32, y + lib_display_line);
-//   display.println(getRadar());
-//   lib_display_line += 10;
-//   display.setCursor(32, y + lib_display_line);
-//   display.println(getUltrasonic());
-// }
+  display.setTextSize(0);
+  display.setTextColor(WHITE);
+  display.setCursor(32, y + lib_display_line);
+  display.println(getRadar());
+  lib_display_line += 10;
+  display.setCursor(32, y + lib_display_line);
+  display.println(getUltrasonic2());
+}
 
 void lib_display_newFrame()
 {
@@ -204,6 +208,7 @@ void lib_display_showLastMsg()
 
   while (msg.length() > 0)
   {
+    lib_display_drawBattery(lib_battery_percentage());
     display.setTextSize(0);
     display.setTextColor(WHITE);
     display.setCursor(32, y + lib_display_line);

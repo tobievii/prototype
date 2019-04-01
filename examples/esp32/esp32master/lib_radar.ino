@@ -7,7 +7,7 @@ int led = 13;
 void lib_radar_init()
 {
 
-    Serial.begin(115200);
+    //Serial.begin(115200);
 
     pinMode(ip, INPUT);
 
@@ -19,7 +19,7 @@ void lib_radar_loop()
 
     val = digitalRead(ip);
 
-    Serial.println(val, DEC);
+    //Serial.println(val, DEC);
 
     if (val > 0)
 
