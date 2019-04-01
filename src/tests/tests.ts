@@ -566,7 +566,6 @@ describe("API", function () {
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("MQTT + /api/v3/data/post + SOCKETS", function (done: any) {
       this.timeout(6000)
-      log("-------- start")
       var mqtt = require('mqtt');
 
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
@@ -607,14 +606,11 @@ describe("API", function () {
       }
 
       socket.on("connect", () => {
-        log("connect")
         socket.emit("join", testAccount.apikey);
 
         /*************************** MQTT Connect *************************************/
 
         client.on('connect', function () {
-          log("mqtt connected")
-
           client.subscribe(testAccount.apikey, function (err: any) {
             if (err) {
               console.log(err)
