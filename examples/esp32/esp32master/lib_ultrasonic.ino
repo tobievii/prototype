@@ -1,6 +1,8 @@
+
+
 // defines pins numbers
-const int trigPin = 36;
-const int echoPin = 39;
+const int trigPin = 33;
+const int echoPin = 32;
 // defines variables
 long duration;
 int distance;
@@ -8,10 +10,8 @@ void lib_ultrasonic_init()
 {
     pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
     pinMode(echoPin, INPUT);  // Sets the echoPin as an Input
-    Serial.begin(115200);     // Starts the serial communication
-}
-void lib_ultrasonic_loop()
-{
+    //Serial.begin(115200);     // Starts the serial communication
+
     // Clears the trigPin
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -26,5 +26,12 @@ void lib_ultrasonic_loop()
     // Prints the distance on the Serial Monitor
     Serial.print("Distance: ");
     Serial.println(distance);
-    delay(200);
+}
+void lib_ultrasonic_loop()
+{
+}
+
+int getUltrasonic2()
+{
+    return distance;
 }
