@@ -7,16 +7,18 @@ import { EventEmitter } from "events";
 import * as net from "net"
 import * as accounts from "../../accounts"
 
-import { log } from "../../utils"
+import { log, generateDifficult } from "../../utils"
 
 export class mqttConnection extends EventEmitter {
     socket: net.Socket;
     apikey: string = "";
     subscriptions: any = [];
     connected: Boolean = false;
+    uuid: string = "";
 
     constructor(socket: net.Socket) {
         super()
+        this.uuid = generateDifficult(32);
         this.socket = socket;
         this.connected = true;
         socket.on("data", this.handleData(socket))

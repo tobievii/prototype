@@ -26,7 +26,16 @@ export function handlePacket(db: any, packet: any, cb: any) {
                 }
 
                 if (mqttConnections[c].connected) {
-                    mqttConnections[c].publish(packet.apikey, JSON.stringify(temp))
+                    var sendit = true;
+
+                    // check if this is not the same socket that sent the packet, if so then we do not echo it back.
+                    if (_.has(packet, "payload.meta.socketUuid")) {
+                        if (packet.payload.meta.socketUuid == mqttConnections[c].uuid) {
+                            sendit = false;
+                        }
+                    }
+
+                    if (sendit) { mqttConnections[c].publish(packet.apikey, JSON.stringify(temp)) }
                 }
             }
         }
@@ -57,7 +66,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
             try {
                 requestClean = JSON.parse(publish.payload)
-                requestClean.meta = { "User-Agent": "MQTT", "method": "publish" }
+                requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
                 eventHub.emit("device", { apikey: publish.topic, packet: requestClean })
             } catch (err) {
                 log(err);
