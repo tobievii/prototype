@@ -101,7 +101,6 @@ export class DeviceList extends Component {
             }
           })
         }).then(response => response.json()).then(resp => {
-          console.log(resp);
         }).catch(err => console.error(err.toString()));
       }, 13000)
     }
@@ -235,7 +234,7 @@ export class StatesViewer extends Component {
 
                   this.setState({ devicesView: serverresponse }, () => {
                     //this.socketConnectDevices();
-                    //this.sort();
+                    this.sort();
                   })
                 })
               }).catch(err => console.error(err.toString()));
@@ -247,6 +246,7 @@ export class StatesViewer extends Component {
                   this.socket.emit("join", this.state.devicesServer[device].key);
                 }
                 this.setState({ devicesView: states }, () => {
+                  this.sort();
                 })
               })
             }
@@ -354,6 +354,7 @@ export class StatesViewer extends Component {
             })
           })
         }
+        this.sort();
       })
     }
   }
@@ -389,7 +390,6 @@ export class StatesViewer extends Component {
   }
 
   handleDevicePacket = (packet) => {
-
     var devices = _.clone(this.state.devicesServer)
     var found = 0;
     for (var dev in devices) {
@@ -427,8 +427,8 @@ export class StatesViewer extends Component {
       } else {
         this.setState({ devicesServer: devices })
         this.setState({ devicesView: devices }, () => {
-          // this.sort()
         })
+        this.sort();
       }
     }
   }
@@ -499,8 +499,8 @@ export class StatesViewer extends Component {
       }).reverse();
     }
 
-    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate)
-
+    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
+    this.setState({ sort: value });
   }
 
   selectCountUpdate = () => {

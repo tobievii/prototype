@@ -266,7 +266,6 @@ export class MapDevices extends Component {
 
   getMarker = (marker) => {
     if (marker.selectedIcon == true) {
-      console.log("marker")
       return (
         <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]} icon={RedIcon} >
           {this.getPopup(marker)}
