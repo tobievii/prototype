@@ -372,7 +372,7 @@ export class DeviceView extends Component {
       //latestState = this.state.view;
 
       if (this.state.view.id) {
-        plugins = <DevicePluginPanel stateId={this.state.view.id} />;
+        plugins = <DevicePluginPanel stateId={this.state.view.id} device={this.state.state} />;
       } else {
         plugins = <p>plugins loading</p>;
       }
