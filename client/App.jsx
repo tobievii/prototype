@@ -31,6 +31,8 @@ import { Dashboard } from "./components/dashboard/dashboard.jsx"
 
 import socketio from "socket.io-client";
 var socket = socketio();
+const publicVapidKey =
+    "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
 
 const test = {
     un: undefined,
@@ -65,8 +67,63 @@ class App extends Component {
 
         p.getStates((states) => { this.setState({ states }) })
 
+        this.serviceworkerfunction();
+
         //socket.on("connect", a => { console.log("socket connected"); });
         //socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
+    }
+
+    serviceworkerfunction = () => {
+        if ('serviceWorker' in navigator) {
+            workerInit().catch(err => console.error(err));
+        }
+
+        async function workerInit() {
+            const register = await navigator.serviceWorker.register('/serviceworker.js', {
+                scope: "/"
+            });
+
+            socket.on("pushNotification", a => {
+                var message = "has been successfuly added to PROTOTYP3.";
+                if (a.type == "ALARM") {
+                    message = a.message;
+                } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
+                    message = "hasn't sent data in the last 24hours";
+                }
+                register.showNotification(a.type, {
+                    body: a.device + " device " + message,
+                    icon: "./iotnxtlogo.png"
+                });
+            })
+
+            const subscription = await register.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
+
+            await fetch("/subscribe", {
+                method: "POST",
+                body: JSON.stringify(subscription),
+                headers: {
+                    "content-type": "application/json"
+                }
+            });
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, "+")
+                .replace(/_/g, "/");
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
     }
 
     // socketHandler = (socketDataIn) => {
