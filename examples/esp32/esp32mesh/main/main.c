@@ -27,8 +27,11 @@
 
 // #define MEMORY_DEBUG
 
+#include "lib_display.h"
+
+
 static int g_sockfd    = -1;
-static const char *TAG = "mwifi_examples";
+static const char *TAG = "main";
 
 void tcp_client_write_task(void *arg)
 {
@@ -373,6 +376,9 @@ static mdf_err_t event_loop_cb(mdf_event_loop_t event, void *ctx)
 
 void app_main()
 {
+    //i2c_master_init();
+    lib_display_start();
+
     mwifi_init_config_t cfg   = MWIFI_INIT_CONFIG_DEFAULT();
     mwifi_config_t config     = {
         .router_ssid     = CONFIG_ROUTER_SSID,

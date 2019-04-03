@@ -49,22 +49,29 @@ var nodes = [];
 var server = net.createServer(function (socket) {
   socket.on("data", (data) => {
     //console.log(data);
-    var dataparsed = JSON.parse(data.toString());
-    dataparsed.timestamp = new Date().toISOString();
 
-    console.log(dataparsed);
+    try {
 
-    var found = false;
+      var dataparsed = JSON.parse(data.toString());
+      dataparsed.timestamp = new Date().toISOString();
 
-    for (var node in nodes) {
-      if (nodes[node].addr == dataparsed.addr) { found = true; nodes[node] = dataparsed; }
+      console.log(dataparsed);
+
+      var found = false;
+
+      for (var node in nodes) {
+        if (nodes[node].addr == dataparsed.addr) { found = true; nodes[node] = dataparsed; }
+      }
+
+      if (found == false) {
+        nodes.push(dataparsed);
+      }
+
+      client.publish(config.apikey, JSON.stringify({ id: devicename, data: { mesh: dataparsed, nodecount: nodes.length, nodes } }));
+
     }
+    catch (e) { }
 
-    if (found == false) {
-      nodes.push(dataparsed);
-    }
-
-    client.publish(config.apikey, JSON.stringify({ id: devicename, data: { mesh: dataparsed, nodecount: nodes.length, nodes } }));
   })
 
 });
