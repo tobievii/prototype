@@ -200,6 +200,36 @@ app.get("/u/:username", (req: any, res: any) => {
   })
 })
 
+const webpush = require("web-push");
+
+const publicVapidKey =
+  "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
+const privateVapidKey = "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90";
+
+webpush.setVapidDetails(
+  "mailto:DeepaSoul.sa@gmail.com",
+  publicVapidKey,
+  privateVapidKey
+);
+
+app.post("/subscribe", (req: any, res: any) => {
+  // Get pushSubscription object
+  const subscription = req.body;
+  // Send 201 - resource created
+  res.status(201).json({});
+
+  // Create payload
+  const payload = JSON.stringify({ title: "Push Test" });
+
+  // Pass object into sendNotification
+  webpush
+    .sendNotification(subscription, payload)
+    .then((response: any) => {
+      // io.to(req.user.apikey).emit('pushNotification', { title: "Push Test" })
+    })
+    .catch((err: any) => console.error(err));
+});
+
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err: Error, data: any) => {
     res.end(data.toString())
@@ -930,7 +960,7 @@ function getWarningNotification() {
         };
 
         db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-
+          io.to(device.apikey).emit('pushNotification', WarningNotificationL)
         })
       })
     }
@@ -990,6 +1020,8 @@ function handleState(req: any, res: any, next: any) {
               seen: false
             }
 
+            io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
+
             if (req.user.notifications) {
               req.user.notifications.push(AlarmNotification)
             } else {
@@ -1036,6 +1068,7 @@ function handleState(req: any, res: any, next: any) {
           }
 
           io.to(req.user.username).emit("info", info)
+          io.to(req.user.apikey).emit('pushNotification', newDeviceNotification)
 
           if (req.user.notifications) {
             req.user.notifications.push(newDeviceNotification)
