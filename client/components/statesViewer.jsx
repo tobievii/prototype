@@ -61,7 +61,7 @@ export class DeviceList extends Component {
 
   componentDidMount() {
 
-    var url = window.location.origin + "/api/v3/data/post"
+
     // if (this.props.public == true) {
     //   setTimeout(() => {
     //     return (
@@ -85,25 +85,6 @@ export class DeviceList extends Component {
     //     )
     //   }, 2000)
     // }
-    if (this.props.devices.length == 0) {
-      setTimeout(() => {
-        fetch(url, {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({
-            "id": "Dummy_Device",
-            "data": {
-              "temperature": 24.54,
-              "doorOpen": false,
-              "gps": {
-                "lat": 25.123,
-                "lon": 28.125
-              }
-            }
-          })
-        }).then(response => response.json()).then(resp => {
-        }).catch(err => console.error(err.toString()));
-      }, 13000)
-    }
   }
 
   state = {
@@ -307,10 +288,12 @@ export class StatesViewer extends Component {
             })
           })
         }
+        this.sort();
       })
     }
     else {
       p.statesByUsername(this.props.username, (states) => {
+
         for (var s in states) {
           states[s].selected = false
         }
@@ -354,7 +337,29 @@ export class StatesViewer extends Component {
             })
           })
         }
+
         this.sort();
+        var url = window.location.origin + "/api/v3/data/post";
+        var dummyPost;
+        if (states.length == 0) {
+          dummyPost = setTimeout(() => {
+            fetch(url, {
+              method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+              body: JSON.stringify({
+                "id": "Dummy_Device",
+                "data": {
+                  "temperature": 24.54,
+                  "doorOpen": false,
+                  "gps": {
+                    "lat": 25.123,
+                    "lon": 28.125
+                  }
+                }
+              })
+            }).then(response => response.json()).then(resp => {
+            }).catch(err => console.error(err.toString()));
+          }, 13000)
+        }
       })
     }
   }
@@ -369,13 +374,6 @@ export class StatesViewer extends Component {
       });
     }
   }
-  // componentWillMount = () => {
-  //   var un = this.props.username;
-  //   var acc = this.props.account;
-  //   var dc = this.state.devicePressed;
-  //   var ds = this.state.devicesServer;
-  //   this.props.sendProps({un, acc, dc, ds});
-  // }
 
   componentWillUnmount = () => {
     this.socket.disconnect();
@@ -416,9 +414,8 @@ export class StatesViewer extends Component {
         }
       }
     }
+
     if (found == 0) {
-      // new device?
-      // this.loadList()
       console.log("recieved data for device not on our list yet.")
     } else {
       // update
