@@ -376,8 +376,9 @@ static mdf_err_t event_loop_cb(mdf_event_loop_t event, void *ctx)
 
 void app_main()
 {
-    //i2c_master_init();
-    lib_display_start();
+
+    xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024,
+                NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
 
     mwifi_init_config_t cfg   = MWIFI_INIT_CONFIG_DEFAULT();
     mwifi_config_t config     = {
