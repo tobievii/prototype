@@ -389,7 +389,7 @@ export class NavBar extends Component {
 
       if (this.props.account) {
         if (this.props.account.level > 0) {
-          return (<input type="text" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />)
+          return (<input type="search" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />)
         }
         else if (this.props.account.level == 0) {
           return null
@@ -438,7 +438,7 @@ export class NavBar extends Component {
               {this.searchUser()}
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="text" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} maxLength="32" />
+            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} maxLength="32" />
             {this.searchUser()}
           </div>
         </div>
