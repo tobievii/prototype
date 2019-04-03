@@ -12,10 +12,18 @@
 
 #include "lib_display.h"
 
+int nodecount = 1;
 
 static const char *TAG = "ssd1306";
 
+void setNodeCount(int nodecounttemp) {
+	nodecount = nodecounttemp;
+}
+
+
+
 void task_test_SSD1306i2c(void *ignore) {
+	
 	u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
 	u8g2_esp32_hal.sda   = PIN_SDA;
 	u8g2_esp32_hal.scl  = PIN_SCL;
@@ -41,19 +49,31 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 
 	ESP_LOGI(TAG, "u8g2_SetPowerSave");
 	u8g2_SetPowerSave(&u8g2, 0); // wake up display
-	ESP_LOGI(TAG, "u8g2_ClearBuffer");
-	u8g2_ClearBuffer(&u8g2);
-	ESP_LOGI(TAG, "u8g2_DrawBox");
-	u8g2_DrawBox(&u8g2, 0, 26, 80,6);
-	u8g2_DrawFrame(&u8g2, 0,26,100,6);
+	
+	for (;;) {
+		//ESP_LOGI(TAG, "u8g2_ClearBuffer");
+		u8g2_ClearBuffer(&u8g2);
+		//// ESP_LOGI(TAG, "u8g2_DrawBox");
+		// u8g2_DrawBox(&u8g2, 0, 26, 80,6);
+		// u8g2_DrawFrame(&u8g2, 0,26,100,6);
 
-	ESP_LOGI(TAG, "u8g2_SetFont");
-  u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
-	ESP_LOGI(TAG, "u8g2_DrawStr");
-  u8g2_DrawStr(&u8g2, 2,17,"Hi nkolban!");
-	ESP_LOGI(TAG, "u8g2_SendBuffer");
-	u8g2_SendBuffer(&u8g2);
-	ESP_LOGI(TAG, "All done!");
+		//ESP_LOGI(TAG, "u8g2_SetFont");
+		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
+		//ESP_LOGI(TAG, "u8g2_DrawStr");
+		u8g2_DrawStr(&u8g2, 0,7,"IoT.nxt MESH");
+		u8g2_DrawStr(&u8g2, 0,15,"Layer X");
+
+		char strnodes[6]; 
+		sprintf(strnodes, "%d", nodecount);
+
+		u8g2_DrawStr(&u8g2, 0,23,"Nodes");
+		u8g2_DrawStr(&u8g2, 26,23,strnodes);
+		//ESP_LOGI(TAG, "u8g2_SendBuffer");
+		u8g2_SendBuffer(&u8g2);
+		//ESP_LOGI(TAG, "All done!");
+		vTaskDelay(1000 / portTICK_RATE_MS);
+	}
+	
 
 	vTaskDelete(NULL);
 }

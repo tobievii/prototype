@@ -33,7 +33,7 @@ LIB DISPLLAY
 /*******************************************************
  *                Function Definitions
  *******************************************************/
-
+void setNodeCount(int nodecounttemp);
 void task_test_SSD1306i2c(void *ignore);
 
 #endif /* __LIB_DISPLAY__ */

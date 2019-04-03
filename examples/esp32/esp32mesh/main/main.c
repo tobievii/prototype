@@ -253,6 +253,8 @@ static void node_write_task(void *arg)
 
         size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d}",
                         count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM));
+        
+        
 
         MDF_LOGD("Node send, size: %d, data: %s", size, data);
         ret = mwifi_write(NULL, &data_type, data, size, true);
@@ -289,6 +291,8 @@ static void print_system_info_timercb(void *timer)
              ", parent rssi: %d, node num: %d, free heap: %u", primary,
              esp_mesh_get_layer(), MAC2STR(sta_mac), MAC2STR(parent_bssid.addr),
              mesh_assoc.rssi, esp_mesh_get_total_node_num(), esp_get_free_heap_size());
+
+    setNodeCount(esp_mesh_get_total_node_num());
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
