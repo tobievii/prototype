@@ -5,7 +5,6 @@ import Media from "react-media";
 export class UserProfile extends Component {
     render() {
         var timeago = moment(this.props.user["_created_on"]).fromNow()
-        console.log(timeago)
 
         var avatar = "/avatar.jpg"
 

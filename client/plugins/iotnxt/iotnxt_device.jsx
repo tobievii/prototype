@@ -25,8 +25,6 @@ export class DevicePluginPanel extends React.Component {
         body: JSON.stringify({ id: this.props.stateId })
       }).then(response => response.json()).then((data) => {
         if (data.plugins_iotnxt_gateway) {
-          console.log("device has a set gateway:")
-          console.log(data.plugins_iotnxt_gateway);
           this.setState({ deviceGateway: data.plugins_iotnxt_gateway })
         } else {
 
