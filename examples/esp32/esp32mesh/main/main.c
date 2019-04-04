@@ -59,7 +59,7 @@ void tcp_client_write_task(void *arg)
         MDF_ERROR_CONTINUE(ret != MDF_OK, "<%s> mwifi_root_read", mdf_err_to_name(ret));
 
         char *json_data = NULL;
-        int json_size   = asprintf(&json_data, "{\"addr\":\"" MACSTR "\",\"data\":%s}",
+        int json_size   = asprintf(&json_data, "{\"addr\":\"" MACSTR "\",\"data\":%s}\n",
                                    MAC2STR(src_addr), data);
 
         MDF_LOGI("TCP write, size: %d, data: %s", json_size, json_data);
@@ -178,6 +178,8 @@ void tcp_client_read_task(void *arg)
 
         char *json_data = cJSON_PrintUnformatted(pSub);
 
+        //trailing newline
+
         ret = mwifi_root_write(dest_addr, 1, &data_type, json_data, strlen(json_data), true);
         MDF_ERROR_CONTINUE(ret != MDF_OK, "<%s> mwifi_root_write", mdf_err_to_name(ret));
 
@@ -266,6 +268,7 @@ static void node_write_task(void *arg)
         esp_mesh_get_parent_bssid(&parent_bssid);
         uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
         memcpy(sta_mac, parent_bssid.addr, MWIFI_ADDR_LEN);
+        
         char str_mac[20]; 
 		sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", sta_mac[0],sta_mac[1],sta_mac[2],sta_mac[3],sta_mac[4],sta_mac[5]);
 
@@ -273,14 +276,34 @@ static void node_write_task(void *arg)
         // wifi_sta_list_t wifi_sta_list   = {0x0};
         // esp_wifi_ap_get_sta_list(&wifi_sta_list);
         
-        char str_children[20] = "[]"; 
+        // char *str_children;
+        // //char str_children[20] = "[]"; 
+        // cJSON *children;
+        // children = cJSON_CreateArray();
+
         // for (int i = 0; i < wifi_sta_list.num; i++) {
         //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+        //     char str_child_mac[20]; 
+		//     sprintf(str_child_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
+        //     wifi_sta_list.sta[i].mac[0],
+        //     wifi_sta_list.sta[i].mac[1],
+        //     wifi_sta_list.sta[i].mac[2],
+        //     wifi_sta_list.sta[i].mac[3],
+        //     wifi_sta_list.sta[i].mac[4],
+        //     wifi_sta_list.sta[i].mac[5]);
+            
+        //     cJSON_AddItemToArray(children, str_child_mac);
+
+        //     // char *newstr = malloc(strlen(str_children) + strlen(str_child_mac));
+        //     // strcpy(newstr, str);
+        //     // strcat(newstr, "\n");
         // }
+
+        // str_children = cJSON_Print(children);
         ///
 
-        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d, \"children\":%s}",
-                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi, str_children);
+        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d}",
+                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi);
         
         
 
