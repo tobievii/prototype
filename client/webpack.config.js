@@ -7,6 +7,9 @@ module.exports = options => {
     output: {
       filename: 'bundle.js',
     },
+    node: {
+      fs: 'empty'
+    },
     resolve: {
       // Add `.ts` and `.tsx` as a resolvable extension.
       extensions: [".ts", ".tsx", ".js"]

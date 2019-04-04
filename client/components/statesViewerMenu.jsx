@@ -131,7 +131,7 @@ export class StatesViewerMenu extends Component {
     render() {
 
         return (
-            < div className="container-fluid protoMenu" style={{}}>
+            < div className="container-fluid protoMenu" >
                 <Media query="(max-width: 599px)">
                     {matches =>
                         matches ? (
@@ -151,15 +151,15 @@ export class StatesViewerMenu extends Component {
                                     </div >
                                 </span >
 
-                                <span className={this.state.display}>
-                                    <span className="col" style={{}}>
+                                <span className={this.state.display} style={{ width: "80%", float: "right" }}>
+                                    <span className="col" >
                                         {this.menuDeleteButton()}
                                         {/* { this.props.selectCount} */}
                                     </span>
 
-                                    <span className="col" style={{ flex: "0 0 120px" }}>
-                                        {this.viewButton()}
-                                        <div style={{ float: "right", marginTop: "7px", textAlign: "left", width: "20px" }}>
+                                    <span className="col" style={{ flex: "0 0 10px" }}>
+                                        <div style={{ float: "right", marginLeft: "20px" }}>{this.viewButton()}</div>
+                                        <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px" }}>
                                             {this.sortButtons()}
                                         </div>
                                     </span>
