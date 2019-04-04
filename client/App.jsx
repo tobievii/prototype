@@ -75,7 +75,16 @@ class App extends Component {
 
     serviceworkerfunction = () => {
         if ('serviceWorker' in navigator) {
-            workerInit().catch(err => console.error(err));
+            if (supportsServiceWorkers(location, navigator)) {
+                workerInit().catch(err => console.error(err));
+            }
+        }
+
+        function supportsServiceWorkers(location, navigator) {
+            if (location.hostname === `localhost` || location.protocol === `https:`) {
+                return `serviceWorker` in navigator
+            }
+            return false
         }
 
         async function workerInit() {
@@ -92,7 +101,7 @@ class App extends Component {
                 }
                 register.showNotification(a.type, {
                     body: a.device + " device " + message,
-                    icon: "./iotnxtlogo.png"
+                    icon: "./iotnxtLogo.png"
                 });
             })
 
