@@ -292,7 +292,10 @@ static void print_system_info_timercb(void *timer)
              esp_mesh_get_layer(), MAC2STR(sta_mac), MAC2STR(parent_bssid.addr),
              mesh_assoc.rssi, esp_mesh_get_total_node_num(), esp_get_free_heap_size());
 
-    setNodeCount(esp_mesh_get_total_node_num());
+
+    lib_display_setNodeNum(esp_mesh_get_total_node_num());
+    lib_display_setLayer(esp_mesh_get_layer());
+    lib_display_setRSSI(mesh_assoc.rssi);
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
@@ -324,7 +327,8 @@ static mdf_err_t wifi_init()
     MDF_ERROR_ASSERT(esp_event_loop_init(NULL, NULL));
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
     MDF_ERROR_ASSERT(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
-    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));
+    //MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));
+    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_APSTA));
     MDF_ERROR_ASSERT(esp_wifi_set_ps(WIFI_PS_NONE));
     MDF_ERROR_ASSERT(esp_mesh_set_6m_rate(false));
     MDF_ERROR_ASSERT(esp_wifi_start());
@@ -418,7 +422,7 @@ void app_main()
     xTaskCreate(node_read_task, "node_read_task", 4 * 1024,
                 NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
 
-    TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_RATE_MS,
+    TimerHandle_t timer = xTimerCreate("print_system_info", 1000 / portTICK_RATE_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
 }

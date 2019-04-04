@@ -12,14 +12,24 @@
 
 #include "lib_display.h"
 
-int nodecount = 1;
+int meshLayer = -1;
+int nodecount = -1;
+int rssi = 99;
+
 
 static const char *TAG = "ssd1306";
 
-void setNodeCount(int nodecounttemp) {
+void lib_display_setNodeNum(int nodecounttemp) {
 	nodecount = nodecounttemp;
 }
 
+void lib_display_setRSSI(int rssitmp) {
+	rssi = rssitmp;
+}
+
+void lib_display_setLayer(int layertmp) {
+	meshLayer = layertmp;
+}
 
 
 void task_test_SSD1306i2c(void *ignore) {
@@ -61,13 +71,27 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
 		//ESP_LOGI(TAG, "u8g2_DrawStr");
 		u8g2_DrawStr(&u8g2, 0,7,"IoT.nxt MESH");
-		u8g2_DrawStr(&u8g2, 0,15,"Layer X");
+
+
+		char strlayer[6]; 
+		sprintf(strlayer, "%d", meshLayer);
+		u8g2_DrawStr(&u8g2, 0,15,"Layer");
+		u8g2_DrawStr(&u8g2, 26,15,strlayer);
+		
 
 		char strnodes[6]; 
 		sprintf(strnodes, "%d", nodecount);
-
 		u8g2_DrawStr(&u8g2, 0,23,"Nodes");
 		u8g2_DrawStr(&u8g2, 26,23,strnodes);
+
+
+		char str_rssi[6]; 
+		sprintf(str_rssi, "%d", rssi);
+		u8g2_DrawStr(&u8g2, 0,31,"RSSI");
+		u8g2_DrawStr(&u8g2, 26,31,str_rssi);
+
+
+
 		//ESP_LOGI(TAG, "u8g2_SendBuffer");
 		u8g2_SendBuffer(&u8g2);
 		//ESP_LOGI(TAG, "All done!");
