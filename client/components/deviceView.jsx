@@ -378,9 +378,10 @@ export class DeviceView extends Component {
       }
     }
 
-    return (<div className="col-lg-3" style={{ overflowY: "auto", height: "600px", display: this.state.dataview }}>
+    return (<div className="col-lg-3" style={{ overflowY: "auto", height: window.innerHeight - 156 + "px", display: this.state.dataview }}>
+      <div style={{ paddingBottom: 25, paddingTop: 0 }}>{plugins}</div>
       <DataView data={this.state.state} />
-      {plugins}
+
     </div>)
   }
 
@@ -452,8 +453,8 @@ export class DeviceView extends Component {
 
     return (
 
-      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 50 }} >
-        <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
+      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 0, overflow: "hidden" }} >
+        <div className="row" style={{ marginBottom: 0, paddingBottom: 1 }}>
           <div className="col-6">
             <h3>{this.state.devid}</h3>
             <span className="faded" >{this.state.timeago}</span><br></br>

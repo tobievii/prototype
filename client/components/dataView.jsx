@@ -106,7 +106,7 @@ export class DataView extends React.Component {
   renderObject = (data, level, path) => {
 
     return (
-      <div style={{ overflowY: 'hidden' }}>
+      <div style={{ overflowY: 'hidden', paddingBottom: 25 }}>
         {Object.keys(data).map((name, i) => {
 
           if (typeof data[name] == "object") {
