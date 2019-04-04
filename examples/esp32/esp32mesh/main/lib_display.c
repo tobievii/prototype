@@ -12,6 +12,7 @@
 
 #include "lib_display.h"
 #include "mwifi.h"
+#include "main.h"
 
 int meshLayer = -1;
 int nodecount = -1;
@@ -95,12 +96,13 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 		u8g2_DrawStr(&u8g2, 26,31,str_rssi);
 
 		//////// MAC
-		// 
-		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
-
 		char str_mac[6]; 
 		sprintf(str_mac, "%02x%02x%02x%02x%02x%02x", sta_mac[0],sta_mac[1],sta_mac[2],sta_mac[3],sta_mac[4],sta_mac[5]);
 		u8g2_DrawStr(&u8g2, 0,39,str_mac);
+
+		// VERSION
+		u8g2_DrawStr(&u8g2, 0,48,"V");
+		u8g2_DrawStr(&u8g2, 10,48,FIRMWARE_VERSION);
 
 		//ESP_LOGI(TAG, "u8g2_SendBuffer");
 		u8g2_SendBuffer(&u8g2);

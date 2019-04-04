@@ -22,6 +22,7 @@
  *
  */
 
+#include "main.h"
 #include "mdf_common.h"
 #include "mwifi.h"
 
@@ -32,6 +33,9 @@
 
 static int g_sockfd    = -1;
 static const char *TAG = "main";
+
+wifi_sta_list_t wifi_sta_list   = {0x0};
+mesh_addr_t parent_bssid        = {0};
 
 void tcp_client_write_task(void *arg)
 {
@@ -243,6 +247,9 @@ static void node_write_task(void *arg)
     char *data    = NULL;
     mwifi_data_type_t data_type      = {0x0};
 
+    //mesh_addr_t parent_bssid        = {0};
+    
+
     MDF_LOGI("NODE task is running");
 
     for (;;) {
@@ -251,8 +258,29 @@ static void node_write_task(void *arg)
             continue;
         }
 
-        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d}",
-                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM));
+        //mesh rssi
+        mesh_assoc_t mesh_assoc         = {0x0};
+        esp_wifi_vnd_mesh_get(&mesh_assoc);
+
+        //parent ssid
+        esp_mesh_get_parent_bssid(&parent_bssid);
+        uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
+        memcpy(sta_mac, parent_bssid.addr, MWIFI_ADDR_LEN);
+        char str_mac[20]; 
+		sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", sta_mac[0],sta_mac[1],sta_mac[2],sta_mac[3],sta_mac[4],sta_mac[5]);
+
+        /// child macs
+        // wifi_sta_list_t wifi_sta_list   = {0x0};
+        // esp_wifi_ap_get_sta_list(&wifi_sta_list);
+        
+        char str_children[20] = "[]"; 
+        // for (int i = 0; i < wifi_sta_list.num; i++) {
+        //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+        // }
+        ///
+
+        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d, \"children\":%s}",
+                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi, str_children);
         
         
 
@@ -276,10 +304,10 @@ static void print_system_info_timercb(void *timer)
 {
     uint8_t primary                 = 0;
     wifi_second_chan_t second       = 0;
-    mesh_addr_t parent_bssid        = {0};
+    
     uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
     mesh_assoc_t mesh_assoc         = {0x0};
-    wifi_sta_list_t wifi_sta_list   = {0x0};
+    
 
     esp_wifi_get_mac(ESP_IF_WIFI_STA, sta_mac);
     esp_wifi_ap_get_sta_list(&wifi_sta_list);

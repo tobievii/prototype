@@ -10,10 +10,16 @@ var mqtt = require('mqtt');
 
 
 
-var config = { apikey: "dnjskllzve6xzv47l1mw72p74jqbjjz4p" };
-var client = mqtt.connect('mqtt://prototype.dev.iotnxt.io', { username: "api", password: "key-" + config.apikey });
+var config = { apikey: "4oxk9bg32xyncaxr6494z6jkqxb61tmf" };
+var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + config.apikey });
 
 const devicename = "esp32mesh"
+
+var meshState = {
+  "id": "iotmesh_mine",
+  "data": {}
+}
+
 
 client.on('connect', function () {
   console.log("connected.");
@@ -30,7 +36,7 @@ client.on('connect', function () {
 })
 
 client.on('message', function (topic, message) {
-  console.log(message.toString())
+  //console.log(message.toString())
 })
 
 
@@ -38,7 +44,8 @@ client.on('message', function (topic, message) {
 
 
 function heartbeat() {
-  client.publish(config.apikey, JSON.stringify({ id: devicename, data: { uptime: process.uptime() } }));
+  meshState.data.uptime = process.uptime();
+  client.publish(config.apikey, JSON.stringify(meshState));
 }
 
 
@@ -48,29 +55,37 @@ var nodes = [];
 
 var server = net.createServer(function (socket) {
   socket.on("data", (data) => {
-    //console.log(data);
 
-    try {
+    console.log(data.toString());
 
-      var dataparsed = JSON.parse(data.toString());
-      dataparsed.timestamp = new Date().toISOString();
 
-      console.log(dataparsed);
+    // try {
 
-      var found = false;
+    //   var dataparsed = JSON.parse(data.toString());
+    //   dataparsed.timestamp = new Date().toISOString();
 
-      for (var node in nodes) {
-        if (nodes[node].addr == dataparsed.addr) { found = true; nodes[node] = dataparsed; }
-      }
+    //   console.log("\n")
+    //   console.log(dataparsed);
+    //   console.log("\n")
 
-      if (found == false) {
-        nodes.push(dataparsed);
-      }
+    //   var found = false;
 
-      client.publish(config.apikey, JSON.stringify({ id: devicename, data: { mesh: dataparsed, nodecount: nodes.length, nodes } }));
+    //   for (var node in nodes) {
+    //     if (nodes[node].addr == dataparsed.addr) { found = true; nodes[node] = dataparsed; }
+    //   }
 
-    }
-    catch (e) { }
+    //   if (found == false) {
+    //     nodes.push(dataparsed);
+    //   }
+
+    //   meshState.data.uptime = process.uptime();
+    //   console.log(meshState);
+
+
+    //   client.publish(config.apikey, JSON.stringify(meshState));
+
+    // }
+    // catch (e) { }
 
   })
 
