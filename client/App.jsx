@@ -101,7 +101,7 @@ class App extends Component {
                 }
                 register.showNotification(a.type, {
                     body: a.device + " device " + message,
-                    icon: "./iotnxtlogo.png"
+                    icon: "./iotnxtLogo.png"
                 });
             })
 
