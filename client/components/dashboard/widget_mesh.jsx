@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Vector } from "../../../src/utils/vector"
 import { Widget } from "./widget.jsx"
 
-import { Tree } from 'react-svg-tree';
-
 export class WidgetMesh extends React.Component {
 
     state = {
