@@ -140,7 +140,7 @@ export class DataView extends React.Component {
 
 
     if (this.dragging == false) {
-      console.log({ e, name, i, data, level, path })
+      //console.log({ e, name, i, data, level, path })
       this.dragging = true;
       e.data = data;
       e.dataname = name;

@@ -245,8 +245,8 @@ export class Dashboard extends React.Component {
           layout[w][option] = data;
         }
       }
-      console.log("widgetChange");
-      console.log({ option, data })
+      // console.log("widgetChange");
+      // console.log({ option, data })
       this.setState({ layout }, () => {
         this.updateServer();
       })
@@ -263,8 +263,8 @@ export class Dashboard extends React.Component {
 
   setOptions = (data) => {
     return (options) => {
-      console.log("WIDGET OPTION CHANGE:")
-      console.log({ data, options })
+      // console.log("WIDGET OPTION CHANGE:")
+      // console.log({ data, options })
 
       // find and update
       var layout = _.clone(this.state.layout);
