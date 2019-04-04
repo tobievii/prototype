@@ -296,6 +296,7 @@ static void print_system_info_timercb(void *timer)
     lib_display_setNodeNum(esp_mesh_get_total_node_num());
     lib_display_setLayer(esp_mesh_get_layer());
     lib_display_setRSSI(mesh_assoc.rssi);
+    lib_display_setMac(sta_mac);
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));

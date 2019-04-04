@@ -36,6 +36,8 @@ LIB DISPLLAY
 void lib_display_setNodeNum(int nodecounttemp);
 void lib_display_setRSSI(int rssitmp);
 void lib_display_setLayer(int layertmp);
+void lib_display_setMac(uint8_t *mac);
 void task_test_SSD1306i2c(void *ignore);
+
 
 #endif /* __LIB_DISPLAY__ */

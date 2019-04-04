@@ -11,11 +11,12 @@
 #include "u8g2_esp32_hal.h"
 
 #include "lib_display.h"
+#include "mwifi.h"
 
 int meshLayer = -1;
 int nodecount = -1;
 int rssi = 99;
-
+uint8_t sta_mac[MWIFI_ADDR_LEN] = {0x0};
 
 static const char *TAG = "ssd1306";
 
@@ -31,6 +32,9 @@ void lib_display_setLayer(int layertmp) {
 	meshLayer = layertmp;
 }
 
+void lib_display_setMac(uint8_t *mac) {
+	memcpy(sta_mac, mac, MWIFI_ADDR_LEN);
+}
 
 void task_test_SSD1306i2c(void *ignore) {
 	
@@ -90,7 +94,13 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 		u8g2_DrawStr(&u8g2, 0,31,"RSSI");
 		u8g2_DrawStr(&u8g2, 26,31,str_rssi);
 
+		//////// MAC
+		// 
+		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
 
+		char str_mac[6]; 
+		sprintf(str_mac, "%02x%02x%02x%02x%02x%02x", sta_mac[0],sta_mac[1],sta_mac[2],sta_mac[3],sta_mac[4],sta_mac[5]);
+		u8g2_DrawStr(&u8g2, 0,39,str_mac);
 
 		//ESP_LOGI(TAG, "u8g2_SendBuffer");
 		u8g2_SendBuffer(&u8g2);
