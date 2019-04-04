@@ -55,6 +55,7 @@ export class Widget extends React.Component {
             <option>Blank</option>
             <option>ThreeDWidget</option>
             <option>Gauge</option>
+            <option>mesh</option>
             <option>map</option>
             {/* <option>button</option> */}
             <option>widgetButton</option>
@@ -160,7 +161,7 @@ export class Widget extends React.Component {
           </div>
         </div>
 
-        <div className="widgetContents" style={{ height: "100%" }}>
+        <div className="widgetContents" height="100%" width="100%" style={{ height: "100%", width: "100%" }}>
           {this.props.children}
         </div>
 

@@ -22,6 +22,7 @@ import { MapDevices } from "./map.jsx"
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
+import { WidgetMesh } from "./widget_mesh.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -349,6 +350,17 @@ export class Dashboard extends React.Component {
         value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
       } catch (e) { }
       return (<ProtoGauge
+        dash={dash}
+        data={data}
+        value={value} />)
+    }
+
+    if (data.type == "mesh") {
+      var value;
+      try {
+        value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
+      } catch (e) { }
+      return (<WidgetMesh
         dash={dash}
         data={data}
         value={value} />)
