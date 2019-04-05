@@ -1303,4 +1303,9 @@ input[type="checkbox"]:checked {
   padding: 70%
 }
 
+.mesh circle:hover {
+  opacity: 0.5;
+}
+
 @import 'mobile.scss'
+

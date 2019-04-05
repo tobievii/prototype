@@ -1,13 +1,7 @@
 var net = require('net');
 var mqtt = require('mqtt');
 
-
-
-
-
-
-
-
+var _ = require("lodash")
 
 
 var config = { apikey: "4oxk9bg32xyncaxr6494z6jkqxb61tmf" };
@@ -17,14 +11,32 @@ const devicename = "esp32mesh"
 
 var meshState = {
   "id": "iotmesh_mine",
-  "data": { nodes: [] }
+  "data": {
+    nodes: [],
+    mesh: []
+    // mesh: [
+    //   [0, [1, 2, 3]],
+    //   [1, [4, 5]],
+    //   [2, [5]],
+    //   [3, [6]],
+    //   [4, [8]],
+    //   [5, [3]],
+    //   [6, [7]],
+    //   [7, []],
+    //   [8, []]
+    // ]
+
+  },
+  "options": {
+    "_nomerge": true
+  }
 }
 
 
 client.on('connect', function () {
   console.log("connected.");
 
-  client.subscribe(config.apikey + "|" + devicename, function (err) {
+  client.subscribe(config.apikey + "|" + meshState.id, function (err) {
     if (err) { console.log(err) }
     console.log("subscribed.")
   })
@@ -36,29 +48,43 @@ client.on('connect', function () {
 })
 
 client.on('message', function (topic, message) {
-  //console.log(message.toString())
+  console.log(message.toString())
+  var msg = JSON.parse(message);
+  meshSocket.write(JSON.stringify(msg.data.cmd))
 })
+
+/*
+{"cmd":{"addr":"ff:ff:ff:ff:ff:ff", "data":{"status":1}}}
+*/
+
+
 
 
 
 
 
 function heartbeat() {
-  meshState.data.uptime = process.uptime();
-  client.publish(config.apikey, JSON.stringify(meshState));
+  sendUpdate();
 }
 
 
+function sendUpdate() {
+  meshState.data.timestamp = new Date().toISOString();
+  meshState.data.uptime = process.uptime();
+  var cleanmesh = _.cloneDeepWith(meshState);
+  cleanmesh.data.mesh = JSON.stringify(cleanmesh.data.mesh);
+  client.publish(config.apikey, JSON.stringify(cleanmesh));
+}
 
+var meshSocket;
 
-
-
-var server = net.createServer(function (socket) {
+var server = net.createServer((socket) => {
+  meshSocket = socket;
 
   socket.on("data", (data) => {
-    console.log(socket.remoteAddress)
+    //console.log(socket.remoteAddress)
     //
-    console.log(data.toString())
+    //console.log(data.toString())
 
     try {
 
@@ -67,22 +93,8 @@ var server = net.createServer(function (socket) {
       device.addr = dataparsed.addr;                // move addr into device 
       device.timestamp = new Date().toISOString();  // timestamp data
 
-
-
-      var found = false;
-      for (var node in meshState.data.nodes) {
-        if (meshState.data.nodes[node].addr == dataparsed.addr) { found = true; meshState.data.nodes[node] = dataparsed; }
-      }
-
-      if (found == false) {
-        meshState.data.nodes.push(dataparsed);
-      }
-
-      //
-      meshState.data.timestamp = new Date().toISOString();
-      meshState.data.uptime = process.uptime();
-      console.log(meshState);
-      client.publish(config.apikey, JSON.stringify(meshState));
+      updateMesh(device);
+      sendUpdate();
     }
     catch (e) {
       console.log("===== ERROR PARSING ====")
@@ -100,18 +112,74 @@ server.listen(portnum);
 console.log("mesh server listening on " + portnum)
 
 
-function updateMeshDevice(device) {
+
+
+function updateMesh(device) {
+
+  var found = false;
+  for (var node in meshState.data.nodes) {
+    if (meshState.data.nodes[node].addr == device.addr) { found = true; meshState.data.nodes[node] = device; }
+  }
+
+  if (found == false) {
+    meshState.data.nodes.push(device);
+  }
+
+  /////////////////////////////
+
+  meshState.data.mesh = buildMeshLayout(meshState.data.nodes);
+
+  // if (device.layer == 1) {
+  //   var found = 0;
+  //   for (var m in meshState.data.mesh) {
+  //     if (meshState.data.mesh[m][0] == device.addr) {
+  //       found = 1;
+  //     }
+  //   }
+
+  //   if (found == 0) {
+  //     if (device.children) {
+  //       meshState.data.mesh.push([device.addr, device.children])
+  //     } else {
+  //       meshState.data.mesh.push([device.addr, []])
+  //     }
+
+  //   }
+  // }
+
+
 
 }
 
 
-function updateMesh(device) {
-  if (device.layer == 1) {
-    meshState.data.root = device;
+
+function buildMeshLayout(nodes) {
+  var mesh = []
+
+  // FIND DEPTH
+  var maxlayer = 0;
+  for (var node of nodes) {
+    if (node.layer > maxlayer) {
+      maxlayer = node.layer;
+    }
   }
 
-  if (device.layer == 2) {
-    console.log(device);
-    //meshState.data.root = device;
+  // ITERATE
+  if (maxlayer > 0) {
+    for (var l = 1; l <= maxlayer; l++) {
+      //console.log(l);
+      ////
+      for (var node of nodes) {
+        if (node.layer == l) {
+          mesh.push([node.addr, node.children])
+        }
+      }
+      ////
+    }
   }
+
+
+  // NEXT
+  //console.log(maxlayer)
+  return mesh;
 }

@@ -361,6 +361,7 @@ export class Dashboard extends React.Component {
         value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
       } catch (e) { }
       return (<WidgetMesh
+        state={this.props.state}
         dash={dash}
         data={data}
         value={value} />)

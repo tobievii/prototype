@@ -11,15 +11,7 @@ export class WidgetMesh extends React.Component {
         valueanim: 0,
         typeError: false,
         color: "#11cc88",
-        mesh: [
-            [0, [1, 2, 3]],
-            [1, [4, 5]],
-            [2, []],
-            [3, [6]],
-            [4, []],
-            [5, []],
-            [6, []],
-        ],
+        mesh: [],
         calc: []
     }
 
@@ -127,6 +119,15 @@ export class WidgetMesh extends React.Component {
         return lines;
     }
 
+    onMouseOver(addr) {
+        return (evt) => {
+            if (addr != undefined) {
+                this.setState({ focus: addr })
+            }
+        }
+
+    }
+
     meshRender(mesh) {
         var nodeLocations = this.calcLocation(mesh);
         var lines = this.calcLines(mesh, nodeLocations);
@@ -142,13 +143,15 @@ export class WidgetMesh extends React.Component {
         }
 
         if (xOffset) {
-            return (<svg className="mesh" height="100%" width="100%">
+            return (<svg className="mesh" height="50%" width="100%" style={{ background: "#000" }} onMouseOver={this.onMouseOver()} >
                 {lines.map((l, i) => {
-                    return (<line x1={l.from.x + xOffset} y1={l.from.y + yOffset} x2={l.to.x + xOffset} y2={l.to.y + yOffset} strokeWidth="2" stroke={this.state.color} />)
+                    return (<line key={i} x1={l.from.x + xOffset} y1={l.from.y + yOffset} x2={l.to.x + xOffset} y2={l.to.y + yOffset} strokeWidth="3" stroke={this.state.color} />)
                 })}
 
                 {Object.keys(nodeLocations).map((m, i) => {
                     return (<circle key={i}
+                        onMouseOver={this.onMouseOver(m)}
+                        style={{ cursor: "pointer" }}
                         cx={nodeLocations[m].x + xOffset}
                         cy={nodeLocations[m].y + yOffset}
                         r="20" fill={this.state.color} />)
@@ -156,15 +159,17 @@ export class WidgetMesh extends React.Component {
 
                 {Object.keys(nodeLocations).map((m, i) => {
                     return (<text
+                        key={i}
                         x={nodeLocations[m].x + xOffset}
                         y={nodeLocations[m].y + yOffset}
-                        fill="#F3343A"
+                        fill="#ffffff"
                         className="value-text"
-                        fontSize="15px"
+                        fontSize="10px"
                         fontWeight="normal"
                         textAnchor="middle"
+                        style={{ pointerEvents: "none" }}
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{m}</text>)
+                        dominantBaseline="central">{m.split(":").join("")}</text>)
                 })}
             </svg>)
         }
@@ -172,17 +177,94 @@ export class WidgetMesh extends React.Component {
 
     }
 
+
+    displayFocusData() {
+        var focusData = {}
+
+        if (this.state.focus) {
+            for (var node of this.props.state.payload.data.nodes) {
+                if (node.addr == this.state.focus) {
+                    focusData = node
+                }
+            }
+        }
+
+        return (<div style={{ textAlign: "left" }}><pre style={{ color: "#fff" }}>{JSON.stringify(focusData, null, 2)}</pre></div>)
+        //return (<div style={{ textAlign: "left" }}><pre style={{ color: "#fff" }}>{JSON.stringify(this.props.state, null, 2)}</pre></div>)
+        //return (<div style={{ textAlign: "left" }}><pre style={{ color: "#fff" }}>{JSON.stringify(this.state.focus, null, 2)}</pre></div>)
+
+    }
+
+
+    handleWidgetData(dataIn) {
+        if (!dataIn) {
+            return (<div>loading...</div>)
+        }
+
+        var parsedValue;
+
+        try {
+            parsedValue = JSON.parse(this.props.value);
+        } catch (e) {
+            return (<div>could not parse JSON</div>)
+        }
+
+
+
+        if (Array.isArray(parsedValue)) {
+
+            if (parsedValue.length == 0) {
+                return (
+
+                    <div>Mesh is empty.</div>
+
+                )
+            }
+
+            return (
+                this.meshRender(parsedValue)
+            );
+        } else {
+            return (
+                <div>
+                    This widget expects an Array in in the form:
+<pre style={{ display: "block", textAlign: "left", color: "#fff" }}>
+                        {`[
+            [0, [1, 2, 3]],
+            [1, [4, 5]],
+            [2, []],
+            [3, [6]],
+            [4, []],
+            [5, []],
+            [6, []],
+]`}</pre></div>
+            )
+        }
+
+
+
+        return (<div>error</div>)
+    }
+
+
     render() {
-
-
-
         return (
             <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
                 <div ref={this.myRef} style={{ height: "100%", width: "100%" }}>
-                    {this.meshRender(this.state.mesh)}
+                    {this.handleWidgetData(this.state.mesh)}
+                    {this.displayFocusData()}
+
                 </div>
             </Widget >
-        );
+        )
+
+
+
+
+
+
+
+
 
     }
 };

@@ -276,34 +276,27 @@ static void node_write_task(void *arg)
         // wifi_sta_list_t wifi_sta_list   = {0x0};
         // esp_wifi_ap_get_sta_list(&wifi_sta_list);
         
-        // char *str_children;
+        char *str_children;
+        //sprintf(str_children, "%d", wifi_sta_list.num);
+
         // //char str_children[20] = "[]"; 
-        // cJSON *children;
-        // children = cJSON_CreateArray();
+        
+        cJSON *children;
+        children = cJSON_CreateArray();
 
-        // for (int i = 0; i < wifi_sta_list.num; i++) {
-        //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
-        //     char str_child_mac[20]; 
-		//     sprintf(str_child_mac, "%02x:%02x:%02x:%02x:%02x:%02x", 
-        //     wifi_sta_list.sta[i].mac[0],
-        //     wifi_sta_list.sta[i].mac[1],
-        //     wifi_sta_list.sta[i].mac[2],
-        //     wifi_sta_list.sta[i].mac[3],
-        //     wifi_sta_list.sta[i].mac[4],
-        //     wifi_sta_list.sta[i].mac[5]);
-            
-        //     cJSON_AddItemToArray(children, str_child_mac);
+        for (int i = 0; i < wifi_sta_list.num; i++) {
+                    //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));        
+            char str_child_mac[20]; 
+            sprintf(str_child_mac, "%02x:%02x:%02x:%02x:%02x:%02x", wifi_sta_list.sta[i].mac[0], wifi_sta_list.sta[i].mac[1], wifi_sta_list.sta[i].mac[2], wifi_sta_list.sta[i].mac[3], wifi_sta_list.sta[i].mac[4], wifi_sta_list.sta[i].mac[5]);
+            cJSON *arrayItem = cJSON_CreateString(str_child_mac);
+            cJSON_AddItemToArray(children, arrayItem);
+        }
 
-        //     // char *newstr = malloc(strlen(str_children) + strlen(str_child_mac));
-        //     // strcpy(newstr, str);
-        //     // strcat(newstr, "\n");
-        // }
-
-        // str_children = cJSON_Print(children);
+        str_children = cJSON_Print(children);
         ///
 
-        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d}",
-                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi);
+        size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d ,\"children\": %s }",
+                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi,str_children);
         
         
 
@@ -312,7 +305,7 @@ static void node_write_task(void *arg)
         MDF_FREE(data);
         MDF_ERROR_CONTINUE(ret != MDF_OK, "<%s> mwifi_write", mdf_err_to_name(ret));
 
-        vTaskDelay(3000 / portTICK_RATE_MS);
+        vTaskDelay(500 / portTICK_RATE_MS);
     }
 
     MDF_LOGW("NODE task is exit");
