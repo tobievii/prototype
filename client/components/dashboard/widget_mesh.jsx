@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Vector } from "../../../src/utils/vector"
 import { Widget } from "./widget.jsx"
-
+import * as moment from "moment"
 export class WidgetMesh extends React.Component {
 
     state = {
@@ -145,7 +145,7 @@ export class WidgetMesh extends React.Component {
         if (xOffset) {
             return (<svg className="mesh" height="50%" width="100%" style={{ background: "#000" }} onMouseOver={this.onMouseOver()} >
                 {lines.map((l, i) => {
-                    return (<line key={i} x1={l.from.x + xOffset} y1={l.from.y + yOffset} x2={l.to.x + xOffset} y2={l.to.y + yOffset} strokeWidth="3" stroke={this.state.color} />)
+                    return (<line key={i} x1={l.from.x + xOffset} y1={l.from.y + yOffset} x2={l.to.x + xOffset} y2={l.to.y + yOffset} strokeWidth="2" stroke={this.state.color} />)
                 })}
 
                 {Object.keys(nodeLocations).map((m, i) => {
@@ -154,14 +154,14 @@ export class WidgetMesh extends React.Component {
                         style={{ cursor: "pointer" }}
                         cx={nodeLocations[m].x + xOffset}
                         cy={nodeLocations[m].y + yOffset}
-                        r="20" fill={this.state.color} />)
+                        r="7" fill={this.state.color} />)
                 })}
 
                 {Object.keys(nodeLocations).map((m, i) => {
                     return (<text
                         key={i}
                         x={nodeLocations[m].x + xOffset}
-                        y={nodeLocations[m].y + yOffset}
+                        y={nodeLocations[m].y + yOffset + 20}
                         fill="#ffffff"
                         className="value-text"
                         fontSize="10px"
@@ -169,7 +169,11 @@ export class WidgetMesh extends React.Component {
                         textAnchor="middle"
                         style={{ pointerEvents: "none" }}
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{m.split(":").join("")}</text>)
+                        dominantBaseline="central">{
+                            //m.split(":").join("")
+                            this.showNodeAgo(m)
+                        }
+                    </text>)
                 })}
             </svg>)
         }
@@ -178,15 +182,36 @@ export class WidgetMesh extends React.Component {
     }
 
 
+    showNodeAgo(addr) {
+        try {
+            var lastseen = moment(this.getNodeByAddr(addr).timestamp).fromNow()
+            if (lastseen == "a few seconds ago") { lastseen = "online" }
+            return lastseen
+        } catch (e) {
+            return "offline"
+        }
+    }
+
+    getNodeByAddr(addr) {
+        for (var n in this.props.state.payload.data.nodes) {
+            if (this.props.state.payload.data.nodes[n].addr == addr) {
+                return this.props.state.payload.data.nodes[n];
+            }
+        }
+    }
+
     displayFocusData() {
         var focusData = {}
 
         if (this.state.focus) {
-            for (var node of this.props.state.payload.data.nodes) {
+
+            /*for (var node of this.props.state.payload.data.nodes) {
                 if (node.addr == this.state.focus) {
                     focusData = node
                 }
             }
+            */
+            focusData = this.getNodeByAddr(this.state.focus)
         }
 
         return (<div style={{ textAlign: "left" }}><pre style={{ color: "#fff" }}>{JSON.stringify(focusData, null, 2)}</pre></div>)

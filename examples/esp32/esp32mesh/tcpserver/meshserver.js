@@ -28,7 +28,7 @@ var meshState = {
 
   },
   "options": {
-    "_nomerge": true
+    "_merge": false
   }
 }
 
@@ -50,7 +50,15 @@ client.on('connect', function () {
 client.on('message', function (topic, message) {
   console.log(message.toString())
   var msg = JSON.parse(message);
-  meshSocket.write(JSON.stringify(msg.data.cmd))
+
+  if (msg.data.cmd) {
+    meshSocket.write(JSON.stringify(msg.data.cmd))
+  }
+
+  if (msg.data.meshClear) {
+    process.exit();
+  }
+
 })
 
 /*
@@ -81,25 +89,29 @@ var meshSocket;
 var server = net.createServer((socket) => {
   meshSocket = socket;
 
-  socket.on("data", (data) => {
+  socket.on("data", (dataraw) => {
     //console.log(socket.remoteAddress)
     //
     //console.log(data.toString())
-
+    var splitdata = dataraw.toString().trim().split("\n");
     try {
+      for (var data of splitdata) {
 
-      var dataparsed = JSON.parse(data.toString());
-      var device = dataparsed.data;
-      device.addr = dataparsed.addr;                // move addr into device 
-      device.timestamp = new Date().toISOString();  // timestamp data
+        var dataparsed = JSON.parse(data.toString());
+        console.log(dataparsed);
+        var device = dataparsed.data;
+        device.addr = dataparsed.addr;                // move addr into device 
+        device.timestamp = new Date().toISOString();  // timestamp data
 
-      updateMesh(device);
-      sendUpdate();
+        updateMesh(device);
+        sendUpdate();
+      }
+
     }
     catch (e) {
       console.log("===== ERROR PARSING ====")
       console.log(e);
-      console.log(data.toString());
+      console.log(dataraw.toString().trim().split("\n"));
       console.log("========================")
     }
 
