@@ -124,7 +124,7 @@ export class DeviceView extends Component {
   updateTime = () => {
     if (this.state.view) {
       if (this.state.view.timestamp) {
-        var timeago = moment(this.state.view.timestamp).fromNow()
+        var timeago = this.state.view.timestamp + " (" + moment(this.state.view.timestamp).fromNow() + ")"
         this.setState({ timeago })
       }
     }
