@@ -252,7 +252,7 @@ describe("API", function () {
               } else {
                 var timeout = setTimeout(() => {
                   done("error timeout")
-                }, 3000)
+                }, 6000)
                 done(result);
               }
             }
