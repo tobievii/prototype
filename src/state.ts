@@ -81,7 +81,23 @@ export function postState(
       var info: any = {}
       if (findResult) {
         delete findResult["_id"];
-        packetToUpsert = _.merge(findResult, packet);
+
+        var mergepacket = true; //default
+
+        if (packet.payload.options) {
+          if (packet.payload.options["_merge"] === false) {
+            mergepacket = false;
+          }
+        }
+
+        if (mergepacket) {
+          packetToUpsert = _.merge(findResult, packet);
+        } else {
+          delete findResult.payload; // we clear payload, but retain other data like dashboard and workflow.
+          packetToUpsert = _.merge(findResult, packet);
+        }
+
+
         packetToUpsert["_last_seen"] = new Date();
         info.newdevice = false
       } else {

@@ -112,11 +112,27 @@ export class DeviceView extends Component {
 
   updateView = (packet) => {
     var view = _.clone(this.state.view);
-    view = _.merge(view, packet)
+    var state = _.clone(this.state.state);
+
+    var merge = true; //default is to merge
+
+    if (packet.options) {
+      if (packet.options["_merge"] === false) {
+        merge = false;
+      }
+    }
+
+    if (merge) {
+      view = _.merge(view, packet)
+      state.payload = _.merge(state.payload, packet);
+    } else {
+      delete view.data;
+      delete state.payload.data;
+      state.payload = _.merge(state.payload, packet);
+      view = _.merge(view, packet)
+    }
 
     // should be same as DB.states for this device.
-    var state = _.clone(this.state.state);
-    state.payload = _.merge(state.payload, packet);
     state["_last_seen"] = packet.timestamp;
     this.setState({ view, state })
   }
