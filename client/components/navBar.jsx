@@ -340,7 +340,7 @@ export class NavBar extends Component {
     else if (evt.target.value.length > 0) {
       fetch("/api/v3/allUsers", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify({ search: evt.target.value.toString() })
+        body: JSON.stringify({ search: evt.target.value.toLowerCase() })
       }).then(response => response.json()).then(stats => {
         this.setState({ users: stats })
         this.setState({ allUsers: this.state.users })
@@ -355,28 +355,26 @@ export class NavBar extends Component {
     else {
       if (window.innerWidth > 667) {
         return (
-          <div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
-            <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
+          <div style={{ position: "fixed", top: "48px", bottom: "0", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
+            <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden" }}>
               {this.state.allUsers.map((user, i) =>
-                <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
+                <div style={{ height: "5%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
                   <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                     <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
-                  </Link><hr style={{ backgroundColor: "grey" }}></hr>
-                  <br></br>
+                  </Link>
                 </div>
               )}</div>
           </div>
         )
       }
       if (window.innerWidth <= 667) {
-        return (<div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
-          <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
+        return (<div style={{ position: "fixed", top: "48px", bottom: "0", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
+          <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
             {this.state.allUsers.map((user, i) =>
-              <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
+              <div style={{ height: "20%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
                 <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                   <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
-                </Link><hr style={{ backgroundColor: "grey" }}></hr>
-                <br></br>
+                </Link>
               </div>
             )}</div></div>
         )
