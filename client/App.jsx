@@ -57,7 +57,7 @@ class App extends Component {
         p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
 
         socket.on("connect", a => {
-            socket.on("post", a => {
+            socket.on("notification", a => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })
