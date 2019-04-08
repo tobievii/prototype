@@ -383,12 +383,10 @@ export class DeviceView extends Component {
 
   dataColumn = () => {
     var plugins;
-
     if (this.state.view) {
-      //latestState = this.state.view;
 
       if (this.state.view.id) {
-        plugins = <DevicePluginPanel stateId={this.state.view.id} device={this.state.state} />;
+        plugins = <DevicePluginPanel username={this.props.username} stateId={this.state.view.id} device={this.state.state} />;
       } else {
         plugins = <p>plugins loading</p>;
       }
