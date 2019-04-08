@@ -14,7 +14,6 @@ library.add(faTimes)
 library.add(faBell);
 library.add(faSignOutAlt)
 library.add(faUserEdit)
-var allUsers = []
 
 
 export class Notification extends Component {
@@ -139,7 +138,8 @@ export class NavBar extends Component {
       users: {},
       showNav: "",
       showSearch: "none",
-      searchIcon: "none"
+      searchIcon: "none",
+      allUsers: []
     }
 
     this.showMenu = this.showMenu.bind(this);
@@ -323,18 +323,18 @@ export class NavBar extends Component {
 
   }
   out = () => {
-    allUsers = []
+    this.setState({ allUsers: [] })
     this.setState({ users: [] })
   }
 
   closeUserList = () => {
-    allUsers = []
+    this.setState({ allUsers: [] })
     this.setState({ users: [] })
   }
 
   search = evt => {
     if (evt.target.value.length == 0) {
-      allUsers = []
+      this.setState({ allUsers: [] })
       this.setState({ users: [] })
     }
     else if (evt.target.value.length > 0) {
@@ -343,13 +343,13 @@ export class NavBar extends Component {
         body: JSON.stringify({ search: evt.target.value.toString() })
       }).then(response => response.json()).then(stats => {
         this.setState({ users: stats })
-        allUsers = this.state.users
+        this.setState({ allUsers: this.state.users })
       }).catch(err => console.error(err.toString()));
     }
   }
 
   searchUser = () => {
-    if (allUsers.length == 0) {
+    if (this.state.allUsers.length == 0) {
       return null
     }
     else {
@@ -357,7 +357,7 @@ export class NavBar extends Component {
         return (
           <div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
             <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden" }}>
-              {allUsers.map((user, i) =>
+              {this.state.allUsers.map((user, i) =>
                 <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
                   <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                     <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
@@ -371,7 +371,7 @@ export class NavBar extends Component {
       if (window.innerWidth <= 667) {
         return (<div style={{ position: "fixed", top: "48px", bottom: "6", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
           <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", height: "300px", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
-            {allUsers.map((user, i) =>
+            {this.state.allUsers.map((user, i) =>
               <div style={{ height: "20%", marginLeft: "5px" }} key={i}>
                 <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                   <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>

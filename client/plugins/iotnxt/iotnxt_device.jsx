@@ -16,13 +16,13 @@ export class DevicePluginPanel extends React.Component {
 
   getDevice() {
     if (this.props.stateId) {
-      fetch('/api/v3/state', {
+      fetch("/api/v3/state", {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: this.props.stateId })
+        body: JSON.stringify({ id: this.props.stateId, username: this.props.username })
       }).then(response => response.json()).then((data) => {
         if (data.plugins_iotnxt_gateway) {
           this.setState({ deviceGateway: data.plugins_iotnxt_gateway })
@@ -102,7 +102,7 @@ export class DevicePluginPanel extends React.Component {
 
 
 
-  componentDidMount() {
+  componentWillMount = () => {
     this.getServerGateways();
     this.getAccount();
     this.getDevice();

@@ -492,7 +492,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
 
-  if (req.username) {
+  if (req.body.username) {
     //
 
     if (req.body.username != req.user.username) {
@@ -510,9 +510,8 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
       if (user) {
         ///
         if (req.body.id) {
-          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-
-            if (state == null) { res.json({ "error": "id not found" }); return; }
+          db.states.findOne({ $and: [{ apikey: user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
+            if (state == null || state == "" || state == undefined || state.length == 0) { res.json({ "error": "id not found" }); return; }
 
             if (state) {
               var viewState = state.payload;
@@ -550,28 +549,19 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     }
   }
 
+});
 
+app.post("/api/v3/state", (req: any, res: any) => {
+  findstate(req, res);
 
 });
 
-app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
-  var scryptParameters = scrypt.paramsSync(0.1);
-
-  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
-    for (var i in result) {
-      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
-      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
-    }
-  })
-});
-
-app.post("/api/v3/state", (req: any, res: any, next: any) => {
-
+async function findstate(req: any, res: any) {
   if (req.body.username) {
 
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
-        db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
+        await db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
             if (give.public == false || give.public == null || give.public == undefined || !give.public || give.public == "") {
               if (found == null) {
@@ -583,11 +573,10 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
       }
     }
 
-    db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
+    await db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
-        //log(user)
         if (req.body.id) {
-          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+          db.states.findOne({ $and: [{ apikey: user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
             res.json(state);
           })
         } else {
@@ -607,8 +596,7 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
       res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
     }
   }
-});
-
+}
 app.post('/api/v3/publicStates', (req: any, res: any) => {
   if (req.user.level == 0) {
     db.states.find({ public: true }, (err: Error, result: any) => {
