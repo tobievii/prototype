@@ -25,30 +25,32 @@
 #include "main.h"
 #include "mdf_common.h"
 #include "mwifi.h"
+#include "duktape.h"
 
 // #define MEMORY_DEBUG
 
 #include "lib_display.h"
 
-
-static int g_sockfd    = -1;
+static int g_sockfd = -1;
 static const char *TAG = "main";
 
-wifi_sta_list_t wifi_sta_list   = {0x0};
-mesh_addr_t parent_bssid        = {0};
+wifi_sta_list_t wifi_sta_list = {0x0};
+mesh_addr_t parent_bssid = {0};
 
 void tcp_client_write_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
-    char *data    = MDF_CALLOC(1, MWIFI_PAYLOAD_LEN);
-    size_t size   = MWIFI_PAYLOAD_LEN;
+    char *data = MDF_CALLOC(1, MWIFI_PAYLOAD_LEN);
+    size_t size = MWIFI_PAYLOAD_LEN;
     uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
-    mwifi_data_type_t data_type      = {0x0};
+    mwifi_data_type_t data_type = {0x0};
 
     MDF_LOGI("TCP client write task is running");
 
-    while (mwifi_is_connected()) {
-        if (g_sockfd == -1) {
+    while (mwifi_is_connected())
+    {
+        if (g_sockfd == -1)
+        {
             vTaskDelay(500 / portTICK_RATE_MS);
             continue;
         }
@@ -59,8 +61,8 @@ void tcp_client_write_task(void *arg)
         MDF_ERROR_CONTINUE(ret != MDF_OK, "<%s> mwifi_root_read", mdf_err_to_name(ret));
 
         char *json_data = NULL;
-        int json_size   = asprintf(&json_data, "{\"addr\":\"" MACSTR "\",\"data\":%s}\n",
-                                   MAC2STR(src_addr), data);
+        int json_size = asprintf(&json_data, "{\"addr\":\"" MACSTR "\",\"data\":%s}\n",
+                                 MAC2STR(src_addr), data);
 
         MDF_LOGI("TCP write, size: %d, data: %s", json_size, json_data);
         ret = write(g_sockfd, json_data, json_size);
@@ -85,7 +87,7 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
     MDF_LOGI("Create a tcp client, ip: %s, port: %d", ip, port);
 
     mdf_err_t ret = ESP_OK;
-    int sockfd    = -1;
+    int sockfd = -1;
     struct sockaddr_in server_addr = {
         .sin_family = AF_INET,
         .sin_port = htons(port),
@@ -102,7 +104,8 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
 
 ERR_EXIT:
 
-    if (sockfd != -1) {
+    if (sockfd != -1)
+    {
         close(sockfd);
     }
 
@@ -112,18 +115,21 @@ ERR_EXIT:
 void tcp_client_read_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
-    size_t size   = MWIFI_PAYLOAD_LEN;
+    char *data = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    size_t size = MWIFI_PAYLOAD_LEN;
     uint8_t dest_addr[MWIFI_ADDR_LEN] = {0x0};
-    mwifi_data_type_t data_type       = {0x0};
+    mwifi_data_type_t data_type = {0x0};
 
     MDF_LOGI("TCP client read task is running");
 
-    while (mwifi_is_connected()) {
-        if (g_sockfd == -1) {
+    while (mwifi_is_connected())
+    {
+        if (g_sockfd == -1)
+        {
             g_sockfd = socket_tcp_client_create(CONFIG_SERVER_IP, CONFIG_SERVER_PORT);
 
-            if (g_sockfd == -1) {
+            if (g_sockfd == -1)
+            {
                 vTaskDelay(500 / portTICK_RATE_MS);
                 continue;
             }
@@ -133,7 +139,8 @@ void tcp_client_read_task(void *arg)
         ret = read(g_sockfd, data, size);
         MDF_LOGI("TCP read, %d, size: %d, data: %s", g_sockfd, size, data);
 
-        if (ret <= 0) {
+        if (ret <= 0)
+        {
             MDF_LOGW("<%s> TCP read", strerror(errno));
             close(g_sockfd);
             g_sockfd = -1;
@@ -141,14 +148,15 @@ void tcp_client_read_task(void *arg)
         }
 
         cJSON *pJson = NULL;
-        cJSON *pSub  = NULL;
+        cJSON *pSub = NULL;
 
         pJson = cJSON_Parse(data);
         MDF_ERROR_CONTINUE(!pJson, "cJSON_Parse, data format error");
 
         pSub = cJSON_GetObjectItem(pJson, "addr");
 
-        if (!pSub) {
+        if (!pSub)
+        {
             MDF_LOGW("cJSON_GetObjectItem, Destination address not set");
             cJSON_Delete(pJson);
             continue;
@@ -157,20 +165,23 @@ void tcp_client_read_task(void *arg)
         /**
          * @brief  Convert mac from string format to binary
          */
-        do {
+        do
+        {
             uint32_t mac_data[MWIFI_ADDR_LEN] = {0};
             sscanf(pSub->valuestring, MACSTR,
                    mac_data, mac_data + 1, mac_data + 2,
                    mac_data + 3, mac_data + 4, mac_data + 5);
 
-            for (int i = 0; i < MWIFI_ADDR_LEN; i++) {
+            for (int i = 0; i < MWIFI_ADDR_LEN; i++)
+            {
                 dest_addr[i] = mac_data[i];
             }
         } while (0);
 
         pSub = cJSON_GetObjectItem(pJson, "data");
 
-        if (!pSub) {
+        if (!pSub)
+        {
             MDF_LOGW("cJSON_GetObjectItem, Failed to get data");
             cJSON_Delete(pJson);
             continue;
@@ -199,16 +210,18 @@ static void node_read_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
     cJSON *pJson = NULL;
-    cJSON *pSub  = NULL;
-    char *data    = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
-    size_t size   = MWIFI_PAYLOAD_LEN;
-    mwifi_data_type_t data_type      = {0x0};
+    cJSON *pSub = NULL;
+    char *data = MDF_MALLOC(MWIFI_PAYLOAD_LEN);
+    size_t size = MWIFI_PAYLOAD_LEN;
+    mwifi_data_type_t data_type = {0x0};
     uint8_t src_addr[MWIFI_ADDR_LEN] = {0x0};
 
     MDF_LOGI("Note read task is running");
 
-    for (;;) {
-        if (!mwifi_is_connected()) {
+    for (;;)
+    {
+        if (!mwifi_is_connected())
+        {
             vTaskDelay(500 / portTICK_RATE_MS);
             continue;
         }
@@ -224,7 +237,8 @@ static void node_read_task(void *arg)
 
         pSub = cJSON_GetObjectItem(pJson, "status");
 
-        if (!pSub) {
+        if (!pSub)
+        {
             MDF_LOGW("cJSON_GetObjectItem, Destination address not set");
             cJSON_Delete(pJson);
             continue;
@@ -244,49 +258,51 @@ static void node_read_task(void *arg)
 static void node_write_task(void *arg)
 {
     mdf_err_t ret = MDF_OK;
-    int count     = 0;
-    size_t size   = 0;
-    char *data    = NULL;
-    mwifi_data_type_t data_type      = {0x0};
+    int count = 0;
+    size_t size = 0;
+    char *data = NULL;
+    mwifi_data_type_t data_type = {0x0};
 
     //mesh_addr_t parent_bssid        = {0};
-    
 
     MDF_LOGI("NODE task is running");
 
-    for (;;) {
-        if (!mwifi_is_connected()) {
+    for (;;)
+    {
+        if (!mwifi_is_connected())
+        {
             vTaskDelay(500 / portTICK_RATE_MS);
             continue;
         }
 
         //mesh rssi
-        mesh_assoc_t mesh_assoc         = {0x0};
+        mesh_assoc_t mesh_assoc = {0x0};
         esp_wifi_vnd_mesh_get(&mesh_assoc);
 
         //parent ssid
         esp_mesh_get_parent_bssid(&parent_bssid);
         uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
         memcpy(sta_mac, parent_bssid.addr, MWIFI_ADDR_LEN);
-        
-        char str_mac[20]; 
-		sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", sta_mac[0],sta_mac[1],sta_mac[2],sta_mac[3],sta_mac[4],sta_mac[5]);
+
+        char str_mac[20];
+        sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", sta_mac[0], sta_mac[1], sta_mac[2], sta_mac[3], sta_mac[4], sta_mac[5]);
 
         /// child macs
         // wifi_sta_list_t wifi_sta_list   = {0x0};
         // esp_wifi_ap_get_sta_list(&wifi_sta_list);
-        
+
         char *str_children;
         //sprintf(str_children, "%d", wifi_sta_list.num);
 
-        // //char str_children[20] = "[]"; 
-        
+        // //char str_children[20] = "[]";
+
         cJSON *children;
         children = cJSON_CreateArray();
 
-        for (int i = 0; i < wifi_sta_list.num; i++) {
-                    //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));        
-            char str_child_mac[20]; 
+        for (int i = 0; i < wifi_sta_list.num; i++)
+        {
+            //     //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+            char str_child_mac[20];
             sprintf(str_child_mac, "%02x:%02x:%02x:%02x:%02x:%02x", wifi_sta_list.sta[i].mac[0], wifi_sta_list.sta[i].mac[1], wifi_sta_list.sta[i].mac[2], wifi_sta_list.sta[i].mac[3], wifi_sta_list.sta[i].mac[4], wifi_sta_list.sta[i].mac[5]);
             cJSON *arrayItem = cJSON_CreateString(str_child_mac);
             cJSON_AddItemToArray(children, arrayItem);
@@ -296,9 +312,7 @@ static void node_write_task(void *arg)
         ///
 
         size = asprintf(&data, "{\"seq\":%d,\"layer\":%d,\"status\":%d,\"version\":\"%s\",\"nodenum\":%d,\"parent\":\"%s\", \"rssi\": %d ,\"children\": %s }",
-                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION ,esp_mesh_get_total_node_num(),str_mac, mesh_assoc.rssi,str_children);
-        
-        
+                        count++, esp_mesh_get_layer(), gpio_get_level(CONFIG_LED_GPIO_NUM), FIRMWARE_VERSION, esp_mesh_get_total_node_num(), str_mac, mesh_assoc.rssi, str_children);
 
         MDF_LOGD("Node send, size: %d, data: %s", size, data);
         ret = mwifi_write(NULL, &data_type, data, size, true);
@@ -318,12 +332,11 @@ static void node_write_task(void *arg)
  */
 static void print_system_info_timercb(void *timer)
 {
-    uint8_t primary                 = 0;
-    wifi_second_chan_t second       = 0;
-    
+    uint8_t primary = 0;
+    wifi_second_chan_t second = 0;
+
     uint8_t sta_mac[MWIFI_ADDR_LEN] = {0};
-    mesh_assoc_t mesh_assoc         = {0x0};
-    
+    mesh_assoc_t mesh_assoc = {0x0};
 
     esp_wifi_get_mac(ESP_IF_WIFI_STA, sta_mac);
     esp_wifi_ap_get_sta_list(&wifi_sta_list);
@@ -332,22 +345,24 @@ static void print_system_info_timercb(void *timer)
     esp_mesh_get_parent_bssid(&parent_bssid);
 
     MDF_LOGI("System information, channel: %d, layer: %d, self mac: " MACSTR ", parent bssid: " MACSTR
-             ", parent rssi: %d, node num: %d, free heap: %u", primary,
+             ", parent rssi: %d, node num: %d, free heap: %u",
+             primary,
              esp_mesh_get_layer(), MAC2STR(sta_mac), MAC2STR(parent_bssid.addr),
              mesh_assoc.rssi, esp_mesh_get_total_node_num(), esp_get_free_heap_size());
-
 
     lib_display_setNodeNum(esp_mesh_get_total_node_num());
     lib_display_setLayer(esp_mesh_get_layer());
     lib_display_setRSSI(mesh_assoc.rssi);
     lib_display_setMac(sta_mac);
 
-    for (int i = 0; i < wifi_sta_list.num; i++) {
+    for (int i = 0; i < wifi_sta_list.num; i++)
+    {
         MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
     }
 
 #ifdef MEMORY_DEBUG
-    if (!heap_caps_check_integrity_all(true)) {
+    if (!heap_caps_check_integrity_all(true))
+    {
         MDF_LOGE("At least one heap is corrupt");
     }
 
@@ -358,10 +373,11 @@ static void print_system_info_timercb(void *timer)
 
 static mdf_err_t wifi_init()
 {
-    mdf_err_t ret          = nvs_flash_init();
+    mdf_err_t ret = nvs_flash_init();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
         MDF_ERROR_ASSERT(nvs_flash_erase());
         ret = nvs_flash_init();
     }
@@ -372,7 +388,7 @@ static mdf_err_t wifi_init()
     MDF_ERROR_ASSERT(esp_event_loop_init(NULL, NULL));
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
     MDF_ERROR_ASSERT(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
-    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));    
+    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));
     MDF_ERROR_ASSERT(esp_wifi_set_ps(WIFI_PS_NONE));
     MDF_ERROR_ASSERT(esp_mesh_set_6m_rate(false));
     MDF_ERROR_ASSERT(esp_wifi_start());
@@ -392,52 +408,97 @@ static mdf_err_t event_loop_cb(mdf_event_loop_t event, void *ctx)
 {
     MDF_LOGI("event_loop_cb, event: %d", event);
 
-    switch (event) {
-        case MDF_EVENT_MWIFI_STARTED:
-            MDF_LOGI("MESH is started");
-            break;
+    switch (event)
+    {
+    case MDF_EVENT_MWIFI_STARTED:
+        MDF_LOGI("MESH is started");
+        break;
 
-        case MDF_EVENT_MWIFI_PARENT_CONNECTED:
-            MDF_LOGI("Parent is connected on station interface");
-            break;
+    case MDF_EVENT_MWIFI_PARENT_CONNECTED:
+        MDF_LOGI("Parent is connected on station interface");
+        break;
 
-        case MDF_EVENT_MWIFI_PARENT_DISCONNECTED:
-            MDF_LOGI("Parent is disconnected on station interface");
-            break;
+    case MDF_EVENT_MWIFI_PARENT_DISCONNECTED:
+        MDF_LOGI("Parent is disconnected on station interface");
+        break;
 
-        case MDF_EVENT_MWIFI_ROUTING_TABLE_ADD:
-        case MDF_EVENT_MWIFI_ROUTING_TABLE_REMOVE:
-            MDF_LOGI("total_num: %d", esp_mesh_get_total_node_num());
-            break;
+    case MDF_EVENT_MWIFI_ROUTING_TABLE_ADD:
+    case MDF_EVENT_MWIFI_ROUTING_TABLE_REMOVE:
+        MDF_LOGI("total_num: %d", esp_mesh_get_total_node_num());
+        break;
 
-        case MDF_EVENT_MWIFI_ROOT_GOT_IP: {
-            MDF_LOGI("Root obtains the IP address. It is posted by LwIP stack automatically");
-            xTaskCreate(tcp_client_write_task, "tcp_client_write_task", 4 * 1024,
-                        NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
-            xTaskCreate(tcp_client_read_task, "tcp_server_read", 4 * 1024,
-                        NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
-            break;
-        }
+    case MDF_EVENT_MWIFI_ROOT_GOT_IP:
+    {
+        MDF_LOGI("Root obtains the IP address. It is posted by LwIP stack automatically");
+        xTaskCreate(tcp_client_write_task, "tcp_client_write_task", 4 * 1024,
+                    NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
+        xTaskCreate(tcp_client_read_task, "tcp_server_read", 4 * 1024,
+                    NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
+        break;
+    }
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return MDF_OK;
 }
 
+static duk_ret_t native_print(duk_context *ctx)
+{
+    duk_push_string(ctx, " ");
+    duk_insert(ctx, 0);
+    duk_join(ctx, duk_get_top(ctx) - 1);
+    printf("%s\n", duk_safe_to_string(ctx, -1));
+    return 0;
+}
+
+static duk_ret_t native_adder(duk_context *ctx)
+{
+    int i;
+    int n = duk_get_top(ctx); /* #args */
+    double res = 0.0;
+
+    for (i = 0; i < n; i++)
+    {
+        res += duk_to_number(ctx, i);
+    }
+
+    duk_push_number(ctx, res);
+    return 1; /* one return value */
+}
+
 void app_main()
 {
+    int test = 0;
 
-    xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024,
-                NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
+    while (test == 0)
+    {
+        duk_context *ctx = duk_create_heap_default();
 
-    mwifi_init_config_t cfg   = MWIFI_INIT_CONFIG_DEFAULT();
-    mwifi_config_t config     = {
-        .router_ssid     = CONFIG_ROUTER_SSID,
+        duk_push_c_function(ctx, native_print, DUK_VARARGS);
+        duk_put_global_string(ctx, "print");
+        duk_push_c_function(ctx, native_adder, DUK_VARARGS);
+        duk_put_global_string(ctx, "adder");
+
+        duk_eval_string(ctx, "print('Hello world!');");
+
+        duk_eval_string(ctx, "print('2+3=' + adder(2, 3));");
+        duk_pop(ctx); /* pop eval result */
+
+        duk_destroy_heap(ctx);
+
+        test = 1;
+    }
+
+    xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
+
+    mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
+    mwifi_config_t config = {
+        .router_ssid = CONFIG_ROUTER_SSID,
         .router_password = CONFIG_ROUTER_PASSWORD,
-        .mesh_id         = CONFIG_MESH_ID,
-        .mesh_password   = CONFIG_MESH_PASSWORD,
+        .mesh_id = CONFIG_MESH_ID,
+        .mesh_password = CONFIG_MESH_PASSWORD,
     };
 
     /**
