@@ -278,8 +278,6 @@ static void node_write_task(void *arg)
     char *data = NULL;
     mwifi_data_type_t data_type = {0x0};
 
-    //mesh_addr_t parent_bssid        = {0};
-
     MDF_LOGI("NODE task is running");
 
     for (;;)
@@ -302,14 +300,7 @@ static void node_write_task(void *arg)
         char str_mac[20];
         sprintf(str_mac, "%02x:%02x:%02x:%02x:%02x:%02x", sta_mac[0], sta_mac[1], sta_mac[2], sta_mac[3], sta_mac[4], sta_mac[5]);
 
-        /// child macs
-        // wifi_sta_list_t wifi_sta_list   = {0x0};
-        // esp_wifi_ap_get_sta_list(&wifi_sta_list);
-
         char *str_children;
-        //sprintf(str_children, "%d", wifi_sta_list.num);
-
-        // //char str_children[20] = "[]";
 
         cJSON *children;
         children = cJSON_CreateArray();
