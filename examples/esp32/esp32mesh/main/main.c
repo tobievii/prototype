@@ -27,12 +27,27 @@
 #include "mwifi.h"
 #include "duktape.h"
 
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event_loop.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+
+#include "lwip/err.h"
+#include "lwip/sys.h"
+
 // #define MEMORY_DEBUG
 
 #include "lib_display.h"
 
 static int g_sockfd = -1;
 static const char *TAG = "main";
+
+static EventGroupHandle_t s_wifi_event_group;
 
 wifi_sta_list_t wifi_sta_list = {0x0};
 mesh_addr_t parent_bssid = {0};
@@ -388,10 +403,33 @@ static mdf_err_t wifi_init()
     MDF_ERROR_ASSERT(esp_event_loop_init(NULL, NULL));
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
     MDF_ERROR_ASSERT(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
-    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));
+    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_APSTA));
     MDF_ERROR_ASSERT(esp_wifi_set_ps(WIFI_PS_NONE));
     MDF_ERROR_ASSERT(esp_mesh_set_6m_rate(false));
     MDF_ERROR_ASSERT(esp_wifi_start());
+
+    s_wifi_event_group = xEventGroupCreate();
+
+    wifi_config_t wifi_config = {
+        .ap = {
+            .ssid = CONFIG_ROUTER_SSID,
+            .ssid_len = strlen(CONFIG_ROUTER_SSID),
+            .password = CONFIG_ROUTER_PASSWORD,
+            .max_connection = 30,
+            .authmode = WIFI_AUTH_WPA_WPA2_PSK
+        },
+    };
+
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_start());
+
+    if (strlen(CONFIG_ROUTER_PASSWORD) == 0) {
+        wifi_config.ap.authmode = WIFI_AUTH_OPEN;
+    }
+    
+    ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s",
+             CONFIG_ROUTER_SSID, CONFIG_ROUTER_PASSWORD);
 
     return MDF_OK;
 }
@@ -530,4 +568,5 @@ void app_main()
     TimerHandle_t timer = xTimerCreate("print_system_info", 1000 / portTICK_RATE_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
+    ESP_LOGI(TAG, "ESP_WIFI_MODE_APSTA");
 }
