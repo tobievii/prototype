@@ -322,11 +322,13 @@ export class MapDevices extends Component {
               }
 
               if (marker.selectedIcon == undefined) {
+                marker.selectedIcon = false;
                 fetch("/api/v3/selectedIcon", {
                   method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                   body: JSON.stringify({ key: marker.key, selectedIcon: false })
                 })
-                  .then(response => response.json()).then(result => { })
+                  .then(response => response.json()).then(result => {
+                  })
                   .catch(err => console.error(err.toString()));
               }
 

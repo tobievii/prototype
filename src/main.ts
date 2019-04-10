@@ -920,9 +920,7 @@ function checkExsisting(req: any, res: any) {
 
     findNotified(state.notifications);
     findSeen(state.notifications);
-
   })
-
 }
 
 setInterval(() => {
@@ -992,43 +990,64 @@ function handleState(req: any, res: any, next: any) {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
-          if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+          var message = "";
+          var AlarmNotification = {
+            type: "ALARM",
+            device: req.body.id,
+            created: Date.now(),
+            message: message,
+            notified: true,
+            seen: false
+          }
 
-            var message = Result.workflowCode.substring(
-              Result.workflowCode.lastIndexOf('alarm1("') + 8,
-              Result.workflowCode.lastIndexOf('")')
-            )
+          if (Result.workflowCode != undefined) {
+            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+              AlarmNotification.message = Result.workflowCode.substring(
+                Result.workflowCode.lastIndexOf('alarm1("') + 8,
+                Result.workflowCode.lastIndexOf('")')
+              )
 
-            var AlarmNotification = {
-              type: "ALARM",
-              device: req.body.id,
-              created: Date.now(),
-              message: message,
-              notified: true,
-              seen: false
-            }
+              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
+              io.to(req.user.apikey).emit("notification");
 
-            io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
-
-            if (req.user.notifications) {
-              req.user.notifications.push(AlarmNotification)
-            } else {
-              req.user.notifications = [AlarmNotification]
-            }
-            db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-
-              for (var a of result.notifications) {
-                if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                  db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                    if (err !== null) {
-                      console.log(err)
-                    } else if (updated)
-                      console.log(updated)
-                  })
-                }
+              if (req.user.notifications) {
+                req.user.notifications.push(AlarmNotification)
+              } else {
+                req.user.notifications = [AlarmNotification]
               }
-            })
-          } else return
+              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+
+                for (var a of result.notifications) {
+                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
+                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+                      if (err !== null) {
+                        console.log(err)
+                      } else if (updated)
+                        console.log(updated)
+                    })
+                  }
+                }
+              })
+            }
+          } else if (Result.boundaryLayer != undefined) {
+            if (Result.boundaryLayer.inbound == false) {
+              AlarmNotification.message = "has gone out of its boundary";
+              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
+              io.to(req.user.apikey).emit("notification");
+              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+                for (var a of result.notifications) {
+                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
+                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+                      if (err !== null) {
+                        console.log(err)
+                      } else if (updated)
+                        console.log(updated)
+                    })
+                  }
+                }
+              })
+            }
+          }
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
@@ -1065,7 +1084,7 @@ function handleState(req: any, res: any, next: any) {
           }
 
           db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            io.to(req.user).emit("notification")
+            io.to(req.user.apikey).emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
           })
