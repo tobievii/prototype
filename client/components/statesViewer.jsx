@@ -310,7 +310,7 @@ export class StatesViewer extends Component {
               }
               this.setState({ devicesView: serverresponse }, () => {
                 //this.socketConnectDevices();
-                //this.sort();
+                this.sort();
               })
             })
           }).catch(err => console.error(err.toString()));
@@ -338,7 +338,6 @@ export class StatesViewer extends Component {
           })
         }
 
-        this.sort();
         var url = window.location.origin + "/api/v3/data/post";
         var dummyPost;
         if (states.length == 0) {

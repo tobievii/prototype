@@ -100,7 +100,7 @@ class App extends Component {
                     message = "hasn't sent data in the last 24hours";
                 }
                 register.showNotification(a.type, {
-                    body: a.device + " device " + message,
+                    body: '"' + a.device + '" ' + message,
                     icon: "./iotnxtLogo.png"
                 });
             })
