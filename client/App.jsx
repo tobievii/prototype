@@ -27,8 +27,6 @@ import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
-import { Dashboard } from "./components/dashboard/dashboard.jsx"
-
 import socketio from "socket.io-client";
 var socket = socketio();
 const publicVapidKey =
@@ -68,9 +66,6 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
-
-        //socket.on("connect", a => { console.log("socket connected"); });
-        //socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
     }
 
     serviceworkerfunction = () => {

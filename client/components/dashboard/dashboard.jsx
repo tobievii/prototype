@@ -465,7 +465,7 @@ export class Dashboard extends React.Component {
     }
   }
 
-  loading() {
+  loading = () => {
     if (this.props.state) {
 
       if (this.props.state.layout) {
@@ -481,7 +481,7 @@ export class Dashboard extends React.Component {
 
         if (this.settingLayout == false) {
           this.settingLayout = true;
-          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
+          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { })
         }
 
         return (<div>loading</div>)
@@ -496,7 +496,7 @@ export class Dashboard extends React.Component {
 
   }
 
-  render() {
+  render = () => {
     if (this.state.layout) {
 
       return (
@@ -508,7 +508,7 @@ export class Dashboard extends React.Component {
         </div>
       )
     } else {
-      return this.loading()
+      return this.loading();
     }
 
   }
