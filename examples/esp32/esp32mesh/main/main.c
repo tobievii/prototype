@@ -27,6 +27,19 @@
 #include "mwifi.h"
 #include "duktape.h"
 
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event_loop.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+
+#include "lwip/err.h"
+#include "lwip/sys.h"
+
 // #define MEMORY_DEBUG
 
 #include "lib_display.h"
@@ -371,6 +384,28 @@ static void print_system_info_timercb(void *timer)
 #endif /**< MEMORY_DEBUG */
 }
 
+static EventGroupHandle_t s_wifi_event_group;
+
+// static esp_err_t event_handler(void *ctx, system_event_t *event)
+// {
+//     switch (event->event_id)
+//     {
+//     case SYSTEM_EVENT_AP_STACONNECTED:
+//         ESP_LOGI(TAG, "station:" MACSTR " join, AID=%d",
+//                  MAC2STR(event->event_info.sta_connected.mac),
+//                  event->event_info.sta_connected.aid);
+//         break;
+//     case SYSTEM_EVENT_AP_STADISCONNECTED:
+//         ESP_LOGI(TAG, "station:" MACSTR "leave, AID=%d",
+//                  MAC2STR(event->event_info.sta_disconnected.mac),
+//                  event->event_info.sta_disconnected.aid);
+//         break;
+//     default:
+//         break;
+//     }
+//     return ESP_OK;
+// }
+
 static mdf_err_t wifi_init()
 {
     mdf_err_t ret = nvs_flash_init();
@@ -388,10 +423,35 @@ static mdf_err_t wifi_init()
     MDF_ERROR_ASSERT(esp_event_loop_init(NULL, NULL));
     MDF_ERROR_ASSERT(esp_wifi_init(&cfg));
     MDF_ERROR_ASSERT(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
-    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_STA));
+    MDF_ERROR_ASSERT(esp_wifi_set_mode(WIFI_MODE_AP));
     MDF_ERROR_ASSERT(esp_wifi_set_ps(WIFI_PS_NONE));
     MDF_ERROR_ASSERT(esp_mesh_set_6m_rate(false));
+
+    s_wifi_event_group = xEventGroupCreate();
+
+    // ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL));
+
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    wifi_config_t wifi_config = {
+        .ap = {
+            .ssid = CONFIG_ROUTER_SSID,
+            .ssid_len = strlen(CONFIG_ROUTER_SSID),
+            .password = CONFIG_ROUTER_PASSWORD,
+            .max_connection = 10,
+            .authmode = WIFI_AUTH_WPA_WPA2_PSK},
+    };
+    if (strlen(CONFIG_ROUTER_PASSWORD) == 0)
+    {
+        wifi_config.ap.authmode = WIFI_AUTH_OPEN;
+    }
+
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
+    // ESP_ERROR_CHECK(esp_wifi_start());
     MDF_ERROR_ASSERT(esp_wifi_start());
+
+    ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s",
+             CONFIG_ROUTER_SSID, CONFIG_ROUTER_PASSWORD);
 
     return MDF_OK;
 }
@@ -530,4 +590,6 @@ void app_main()
     TimerHandle_t timer = xTimerCreate("print_system_info", 1000 / portTICK_RATE_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
+
+    ESP_LOGI(TAG, "ESP_WIFI_MODE_AP");
 }
