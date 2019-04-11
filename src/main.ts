@@ -34,7 +34,6 @@ const app = express()
 var http = require('http');
 var https = require('https');
 var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
 import * as accounts from './accounts'
 
 import * as events from "events";
@@ -51,14 +50,7 @@ import { logDb } from "./log"
 logDb(db);//pass db instance to logger
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
-import { userInfo } from 'os';
 import * as stats from "./stats"
-import { utils } from 'mocha';
-import { isNullOrUndefined } from "util";
-import { Socket } from "net";
-
-
-
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -564,7 +556,6 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
 app.post("/api/v3/state", (req: any, res: any) => {
   findstate(req, res);
-
 });
 
 async function findstate(req: any, res: any) {
@@ -608,6 +599,7 @@ async function findstate(req: any, res: any) {
     }
   }
 }
+
 app.post('/api/v3/publicStates', (req: any, res: any) => {
   if (req.user.level == 0) {
     db.states.find({ public: true }, (err: Error, result: any) => {

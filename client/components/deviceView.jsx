@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Stats } from "./stats.jsx"
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -13,7 +11,6 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-import Media from "react-media";
 
 import moment from 'moment'
 
@@ -213,12 +210,12 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Deleting a device is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -288,12 +285,12 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Clearing A State is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 //this.handleClickDelete()
                 {
                   fetch("/api/v3/state/clear", {

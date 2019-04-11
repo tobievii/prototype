@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import moment from 'moment'
-import { convertCompilerOptionsFromJson } from "typescript";
 import { confirmAlert } from 'react-confirm-alert';
 import { ShareList } from './ShareList.jsx'
 
@@ -202,6 +201,40 @@ export class StatesViewerItem extends Component {
     }
   }
 
+  confirmation = (device) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className='protoPopup' align="center">
+            <h1>Are you sure?</h1>
+            <p>This will make device visible to Anyone even unregistered vistors </p>
+            <div>
+              <button className="smallButton" style={{ margin: "5px" }} onClick={onClose}>
+                No, Cancel it!
+              </button>
+
+              <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
+                {
+                  fetch("/api/v3/makedevPublic", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      devid: device.key
+                    })
+                  }).then(response => response.json()).then(serverresponse => {
+                    device.public = true;
+                    this.setState({ device: device })
+                    this.setDevice(device)
+                    { onClose() }
+                  }).catch(err => console.error(err.toString()));
+                }
+              }}>Yes,Share Publicly!</button>
+            </div>
+          </div>
+        )
+      }
+    })
+  }
+
   publicShare = (device) => {
     if (this.props.account.email == this.props.device.meta.user.email) {
       if (device.public != undefined || device.public != null) {
@@ -219,66 +252,25 @@ export class StatesViewerItem extends Component {
             }
           }).catch(err => console.error(err.toString()));
         } else {
-          confirmAlert({
-            customUI: ({ onClose }) => {
-              return (
-                <div className='protoPopup'>
-                  <h1>Are you sure?</h1>
-                  <p>This will make device visible to Anyone even unregistered vistors </p>
-                  <button onClick={onClose}>No</button>
-                  <button style={{ margin: "15px" }} onClick={() => {
-                    {
-                      fetch("/api/v3/makedevPublic", {
-                        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          devid: device.key
-                        })
-                      }).then(response => response.json()).then(serverresponse => {
-                        device.public = true;
-                        this.setState({ device: device })
-                        this.setDevice(device)
-                        { onClose() }
-                      }).catch(err => console.error(err.toString()));
-                    }
-                  }}>Yes,Share Publicly !</button>
-                </div>
-              )
-            }
-          })
+          this.confirmation(device);
         }
       } else {
-        confirmAlert({
-          customUI: ({ onClose }) => {
-            return (
-              <div className='protoPopup'>
-                <h1>Are you sure?</h1>
-                <p>This will make device visible to Anyone even unregistered vistors </p>
-                <button onClick={onClose}>No</button>
-                <button style={{ margin: "15px" }} onClick={() => {
-                  {
-                    fetch("/api/v3/makedevPublic", {
-                      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        devid: device.key
-                      })
-                    }).then(response => response.json()).then(serverresponse => {
-                      device.public = true;
-                      this.setState({ device: device })
-                      this.setDevice(device)
-                      { onClose() }
-                    }).catch(err => console.error(err.toString()));
-                  }
-                }}>Yes,Share Publicly !</button>
-              </div>
-            )
-          }
-        })
+        this.confirmation(device);
       }
     }
   }
 
-  clickShare = (device) => {
+  clickShare = (response) => {
     this.setState({ isOpen: false })
+    if (response.mail != undefined && response.mail == "sent") {
+      fetch("/api/v3/state", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: this.props.device.devid, username: this.props.username })
+      }).then(response => response.json()).then(state => {
+        this.setState({ device: state })
+        this.setDevice(state)
+      }).catch(err => console.error(err.toString()));
+    }
   }
 
   selectBoxClickHandler = (action) => {
@@ -461,6 +453,7 @@ export class StatesViewerItem extends Component {
       var maxlength = 120;
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
       var viewUsed = this.props.view
+      var qr = { mail: "failedq" }
       if (viewUsed == "list") {
 
         return (
@@ -484,7 +477,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.clickShare() }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
 
             </div>
           </div>
@@ -505,7 +498,7 @@ export class StatesViewerItem extends Component {
               {this.stateListIcons(viewUsed, this.state.device)}
               {/* {this.mapIcon()}
               </div> */}
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
             </div>
           </div>
         )

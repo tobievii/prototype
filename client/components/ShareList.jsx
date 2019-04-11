@@ -53,7 +53,9 @@ export class ShareList extends Component {
         shared: [],
         Devicestate: "SHARE PUBLICLY",
         DevicestateIcon: "fas fa-globe-africa",
-        checkboxstate: ""
+        checkboxstate: "",
+        qresponse: { mail: "failed" },
+        show: " "
     };
 
 
@@ -83,6 +85,7 @@ export class ShareList extends Component {
     }
 
     unshare = (remove) => {
+        this.setState({ show: "noDisplayShare" });
         for (let i in this.state.userSearched) {
             if (remove == this.state.userSearched[i].uuid) {
                 this.state.userSearched[i].shared = "no";
@@ -93,6 +96,8 @@ export class ShareList extends Component {
             body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
         }).then(response => response.json()).then(stats => {
             this.setState({ stats: stats })
+            this.setState({ qresponse: { mail: "sent" } })
+            this.setState({ show: " " });
         }).catch(err => console.error(err.toString()));
     }
 
@@ -206,6 +211,8 @@ export class ShareList extends Component {
     }
 
     shareDevice = () => {
+        this.setState({ show: "noDisplayShare" });
+
         this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
         for (let dev in this.state.EmailsharedDevice) {
             for (let i in this.state.userSearched) {
@@ -224,6 +231,8 @@ export class ShareList extends Component {
                     person: this.props.username
                 })
             }).then(response => response.json()).then(serverresponse => {
+                this.setState({ qresponse: serverresponse.result })
+                this.setState({ show: " " });
             }).catch(err => console.error(err.toString()));
         }
         this.setState({ SelectedUsers: [] })
@@ -236,11 +245,11 @@ export class ShareList extends Component {
             confirmAlert({
                 customUI: ({ onClose }) => {
                     return (
-                        <div className='protoPopup'>
+                        <div className='protoPopup' align="center">
                             <h1>Are you sure?</h1>
                             <p>This will make device visible to Anyone even unregistered vistors </p>
-                            <button onClick={onClose}>No</button>
-                            <button style={{ margin: "15px" }} onClick={() => {
+                            <button className="smallButton" style={{ margin: "5px" }} onClick={onClose}>No, Cancel it!</button>
+                            <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
                                 {
                                     fetch("/api/v3/makedevPublic", {
                                         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -253,7 +262,7 @@ export class ShareList extends Component {
                                         this.setState({ Devicestate: "UNSHARE PUBLICLY" })
                                     }).catch(err => console.error(err.toString()));
                                 }
-                            }}>Yes,Share Publicly !</button>
+                            }}>Yes,Share Publicly!</button>
                         </div>
                     )
                 }
@@ -304,7 +313,7 @@ export class ShareList extends Component {
     render() {
         return (<div ><center>
             {this.setValues(this.props.isOpen)}
-            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className="fas fa-times" onClick={() => { this.props.closeModel(); count = 0; }} style={{ color: "red" }}></i>
+            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className={"fas fa-times " + this.state.show} onClick={() => { this.props.closeModel(this.state.qresponse); count = 0; }} style={{ color: "red" }}></i>
                 <center style={{ color: "white", display: this.state.checkboxstate }}>
                     <br></br> Search For users to share  with<br></br>
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>

@@ -76,16 +76,18 @@ export class StatesViewerMenu extends Component {
         confirmAlert({
             customUI: ({ onClose }) => {
                 return (
-                    <div className='protoPopup'>
+                    <div className='protoPopup' align="center">
                         <h1>Are you sure?</h1>
                         <p>Deleting a device is irreversible</p>
-                        <button onClick={onClose}>No</button>
+                        <div >
+                            <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-                        <button style={{ margin: "15px" }} onClick={() => {
-                            //this.handleClickDelete()
-                            this.props.deleteSelected()
-                            onClose()
-                        }}>Yes, Delete it!</button>
+                            <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
+                                //this.handleClickDelete()
+                                this.props.deleteSelected()
+                                onClose()
+                            }}>Yes, delete it!</button>
+                        </div>
                     </div>
                 )
             }
@@ -143,9 +145,6 @@ export class StatesViewerMenu extends Component {
 
                                 <span>
                                     <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px" }}>
-                                        {/* <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
-                                                <input name="query" onChange={this.props.search} placeholder="filter" style={{ width: "100%" }} />
-                                            </form> */}
                                         {this.changeClass()}
                                     </div >
                                 </span >
