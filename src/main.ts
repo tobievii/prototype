@@ -453,6 +453,17 @@ app.get("/admin/processusers", (req: any, res: any) => {
   })
 })
 
+app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
+  var scryptParameters = scrypt.paramsSync(0.1);
+
+  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
+    for (var i in result) {
+      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
+      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
+    }
+  })
+});
+
 app.get("/admin/processusersseen", (req: any, res: any) => {
   if (req.user.level < 100) { res.end("no permission"); return; }
 
