@@ -569,7 +569,7 @@ input[type="color"] {
   padding: 0;
 }
 
-.textOverFLow{
+.textOverFLow {
   text-overflow: ellipsis !important;
 }
 
@@ -789,7 +789,7 @@ input[type="checkbox"]:checked {
 }
 
 .widgetTitleBar {
-  background-color: $panelBg;  
+  background-color: $panelBg;
   height: 32px;
   display: flex;
   justify-content: space-between;
@@ -799,8 +799,8 @@ input[type="checkbox"]:checked {
   width: 100%;
 }
 
-.widgetGrab {  
-  background: $panelBg;  
+.widgetGrab {
+  background: $panelBg;
   cursor: grab;
   height: 100%;
   padding: 5px 5px 5px 8px;
@@ -810,8 +810,8 @@ input[type="checkbox"]:checked {
 }
 
 .widgetGrab:hover {
-  background-color: lighten($panelBg,15%);  
-} 
+  background-color: lighten($panelBg, 15%);
+}
 
 .widgetGrab:active {
   cursor: grabbing;
@@ -1183,26 +1183,31 @@ input[type="checkbox"]:checked {
 }
 
 
-.leaflet-popup-content-wrapper{
+.leaflet-popup-content-wrapper {
   box-shadow: 3px 3px grey;
-  color:red;
-  background:#1b394d;
-  width:100%;
-}
-  
-
-.leaflet-container a.leaflet-popup-close-button{
-  color:red;
+  color: red;
+  background: #1b394d;
+  width: 100%;
 }
 
-.leaflet-popup-tip{
-  background:#1b394d;
- box-shadow: 3px 3px grey;
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: red;
+}
+
+.leaflet-popup-tip {
+  background: #1b394d;
+  box-shadow: 3px 3px grey;
 }
 
 .rowList {
   display: grid;
   grid-template-columns: 50% 50%;
+}
+
+.rowList2 {
+  display: grid;
+  grid-template-columns: 100%;
 }
 
 .viewButton:hover {
@@ -1308,4 +1313,3 @@ input[type="checkbox"]:checked {
 }
 
 @import 'mobile.scss'
-

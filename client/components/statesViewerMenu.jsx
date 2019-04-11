@@ -5,7 +5,7 @@ import Media from "react-media";
 var searchButton = "icon"
 
 export class StatesViewerMenu extends Component {
-    state = { selectAll: false, sort: "", view: "map", boundary: undefined, boundaryVisible: false, display: "" }
+    state = { selectAll: false, sort: "", view: "map", display: "" }
 
     selectBox = () => {
         if (this.props.public == false) {
@@ -129,7 +129,6 @@ export class StatesViewerMenu extends Component {
     }
 
     render() {
-
         return (
             < div className="container-fluid protoMenu" >
                 <Media query="(max-width: 599px)">
