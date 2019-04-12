@@ -167,15 +167,30 @@ export class StatesViewerMenu extends Component {
     }
 
     addButton = () => {
-        if (this.state.wifipass == "" || this.state.ssid == "") {
-            return (
-                <div className="protoButton" style={{ width: "15%", float: "right", marginLeft: "2%", cursor: "not-allowed", opacity: "0.4" }}>ADD DEVICE</div>
-            )
+        if (window.innerWidth > 667) {
+            if (this.state.wifipass == "" || this.state.ssid == "") {
+                return (
+                    <div className="protoButton" style={{ width: "15%", float: "right", marginLeft: "2%", cursor: "not-allowed", opacity: "0.4", textAlign: "center" }}>ADD DEVICE</div>
+                )
+            }
+            else {
+                return (
+                    <div className="protoButton protoButtonClickable" style={{ width: "15%", float: "right", marginLeft: "2%", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
+                )
+            }
         }
-        else {
-            return (
-                <div className="protoButton protoButtonClickable" style={{ width: "15%", float: "right", marginLeft: "2%" }} onClick={this.bits}>ADD DEVICE</div>
-            )
+
+        else if (window.innerWidth < 667) {
+            if (this.state.wifipass == "" || this.state.ssid == "") {
+                return (
+                    <div className="protoButton" style={{ marginTop: "30px", width: "50%", float: "right", cursor: "not-allowed", opacity: "0.4", marginLeft: "400px", textAlign: "center" }}>ADD DEVICE</div>
+                )
+            }
+            else {
+                return (
+                    <div className="protoButton protoButtonClickable" style={{ marginTop: "30px", width: "50%", float: "right", textAlign: "center", marginLeft: "400px", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
+                )
+            }
         }
     }
 
@@ -190,9 +205,9 @@ export class StatesViewerMenu extends Component {
         }
         else if (window.innerWidth < 667) {
             return (
-                <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer", float: "center" }} onClick={this.inputDeviceShow}></i>
-                    <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", marginRight: "5px" }} required /><br></br>
-                        WIFI password: <input name="wifipass" type="text" style={{ width: "50%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
+                <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
+                    <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
+                        WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
                 </div >
             )
         }
@@ -236,7 +251,7 @@ export class StatesViewerMenu extends Component {
 
     code = () => {
         try {
-            return (<div style={{ height: "20%" }}>
+            return (<div style={{ height: "10%" }}>
                 {
                     this.state.code.map((user, i) => {
                         return <div id={user} key={i} className="commanderBgPanel" style={{ float: "center" }}>{user}</div>
@@ -271,7 +286,6 @@ export class StatesViewerMenu extends Component {
                                     <span className="col" >
                                         {this.menuDeleteButton()}
                                         {/* { this.props.selectCount} */}
-                                        {this.addDevice()}
                                     </span>
 
                                     <span className="col" style={{ flex: "0 0 10px" }}>
@@ -285,9 +299,10 @@ export class StatesViewerMenu extends Component {
                                             style={customStyles}
                                             contentLabel="Example Modal"                                >
                                             <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} />
-                                            <div>{this.code()}</div>
+                                            {this.code()}
                                         </Modal>
                                     </span>
+                                    {this.addDevice()}
                                 </span>
                             </div >
                         ) : (
@@ -319,7 +334,7 @@ export class StatesViewerMenu extends Component {
                                         style={customStyles}
                                         contentLabel="Example Modal"                               >
                                         <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} /><br></br>
-                                        <div>{this.code()}</div>
+                                        {this.code()}
                                     </Modal>
                                 </div>
                             )
