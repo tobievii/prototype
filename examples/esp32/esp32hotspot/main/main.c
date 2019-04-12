@@ -24,6 +24,7 @@
 
 #include "lib_display.h"
 #include "lib_tcpserver.h"
+#include "lib_serial.h"
 
 /* The examples use simple WiFi configuration that you can set via
    'make menuconfig'.
@@ -31,8 +32,8 @@
    the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
 */
 
-#define EXAMPLE_ESP_WIFI_SSID      CONFIG_ESP_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS      CONFIG_ESP_WIFI_PASSWORD
+#define EXAMPLE_ESP_WIFI_SSID      "raptormesh"
+#define EXAMPLE_ESP_WIFI_PASS      "raptormesh"
 #define EXAMPLE_MAX_STA_CONN       CONFIG_MAX_STA_CONN
 
 
@@ -112,16 +113,16 @@ static void initialise_wifi(void)
 
 void app_main()
 {
-    lib_display_log("1 starting");
-    xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, 5, NULL);    
+    // lib_display_log("1 starting");
+    // xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, 5, NULL);    
 
     ESP_ERROR_CHECK( nvs_flash_init() );
     
     initialise_wifi();
-    lib_display_log("2 wifi rdy");
+    //lib_display_log("2 wifi rdy");
     //wait_for_ip();
 
+    xTaskCreate(serial_port_task, "serial_port_task", 4096, NULL, 5, NULL);
     xTaskCreate(tcp_server_task, "tcp_server", 4096, NULL, 5, NULL);
-
-    
+        
 }

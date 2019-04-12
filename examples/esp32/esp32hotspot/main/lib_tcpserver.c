@@ -15,6 +15,7 @@
 #include <lwip/netdb.h>
 
 #include "lib_display.h"
+#include "lib_serial.h"
 
 #define PORT CONFIG_EXAMPLE_PORT
 
@@ -104,12 +105,13 @@ void tcp_server_task(void *pvParameters)
                 ESP_LOGI(TAG, "IOT RECV: %s", rx_buffer);
 
                 lib_display_log(rx_buffer);
+                serial_port_writelen(rx_buffer, len);
 
-                int err = send(sock, rx_buffer, len, 0);
-                if (err < 0) {
-                    ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
-                    break;
-                }
+                // int err = send(sock, rx_buffer, len, 0);
+                // if (err < 0) {
+                //     ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
+                //     break;
+                // }
             }
         }
 

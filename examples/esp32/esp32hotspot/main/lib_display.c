@@ -25,6 +25,7 @@ static const char *TAG = "ssd1306";
 
 void lib_display_log(char *intext) {
 	//LOGTXT = intext;
+	//memcpy(LOGTXT, intext, strlen(intext));
 	memcpy(LOGTXT, intext, 20);
 }
 
