@@ -14,6 +14,8 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
+#include "lib_display.h"
+
 #define PORT CONFIG_EXAMPLE_PORT
 
 static const char *TAG = "example";
@@ -100,6 +102,8 @@ void tcp_server_task(void *pvParameters)
                 rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
                 ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
                 ESP_LOGI(TAG, "IOT RECV: %s", rx_buffer);
+
+                lib_display_log(rx_buffer);
 
                 int err = send(sock, rx_buffer, len, 0);
                 if (err < 0) {

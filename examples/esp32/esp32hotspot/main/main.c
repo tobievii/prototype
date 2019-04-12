@@ -22,6 +22,7 @@
 #include "lwip/sys.h"
 #include <lwip/netdb.h>
 
+#include "lib_display.h"
 #include "lib_tcpserver.h"
 
 /* The examples use simple WiFi configuration that you can set via
@@ -99,20 +100,28 @@ static void initialise_wifi(void)
     ESP_ERROR_CHECK( esp_wifi_start() );
 }
 
-static void wait_for_ip()
-{
-    uint32_t bits = IPV4_GOTIP_BIT | IPV6_GOTIP_BIT ;
+// static void wait_for_ip()
+// {
+//     uint32_t bits = IPV4_GOTIP_BIT | IPV6_GOTIP_BIT ;
 
-    ESP_LOGI(TAG, "Waiting for AP connection...");
-    xEventGroupWaitBits(wifi_event_group, bits, false, true, portMAX_DELAY);
-    ESP_LOGI(TAG, "Connected to AP");
-}
+//     ESP_LOGI(TAG, "Waiting for AP connection...");
+//     xEventGroupWaitBits(wifi_event_group, bits, false, true, portMAX_DELAY);
+//     ESP_LOGI(TAG, "Connected to AP");
+// }
 
 
 void app_main()
 {
+    lib_display_log("1 starting");
+    xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, 5, NULL);    
+
     ESP_ERROR_CHECK( nvs_flash_init() );
+    
     initialise_wifi();
+    lib_display_log("2 wifi rdy");
     //wait_for_ip();
+
     xTaskCreate(tcp_server_task, "tcp_server", 4096, NULL, 5, NULL);
+
+    
 }
