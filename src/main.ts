@@ -1004,7 +1004,7 @@ function handleState(req: any, res: any, next: any) {
           }
 
           if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined && newpacket.err == '') {
               AlarmNotification.message = Result.workflowCode.substring(
                 Result.workflowCode.lastIndexOf('alarm1("') + 8,
                 Result.workflowCode.lastIndexOf('")')
