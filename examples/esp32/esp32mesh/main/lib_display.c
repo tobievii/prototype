@@ -22,52 +22,52 @@ uint8_t sta_mac[MWIFI_ADDR_LEN] = {0x0};
 static const char *TAG = "ssd1306";
 const uint8_t bitmap1[] = {
 
-	0x00, // ........
-	0x00, // ........
-	0x02, // ......#.
-	0x02, // ......#.
-	0x0A, // ....#.#.
-	0x0A, // .##.#.#.
-	0x2A, // ..#.#.#.
-	0x00  // ........
+		0x00, // ........
+		0x00, // ........
+		0x02, // ......#.
+		0x02, // ......#.
+		0x0A, // ....#.#.
+		0x0A, // .##.#.#.
+		0x2A, // ..#.#.#.
+		0x00	// ........
 
 };
 
 const uint8_t bitmapm[] = {
 
-	0x00, // ........
-	0x00, // ........
-	0x00, // ........
-	0x00, // ........
-	0x02, // ......#.
-	0x1A, // ...##.#.
-	0x1A, // ...##.#.
-	0x00  // ........
+		0x00, // ........
+		0x00, // ........
+		0x00, // ........
+		0x00, // ........
+		0x02, // ......#.
+		0x1A, // ...##.#.
+		0x1A, // ...##.#.
+		0x00	// ........
 
 };
 const uint8_t bitmapl[] = {
 
-	0x00, // ........
-	0x00, // ........
-	0x00, // ........
-	0x00, // ........
-	0x00, // ........
-	0x06, // .....##.
-	0x06, // .....##.
-	0x00  // ........
+		0x00, // ........
+		0x00, // ........
+		0x00, // ........
+		0x00, // ........
+		0x00, // ........
+		0x06, // .....##.
+		0x06, // .....##.
+		0x00	// ........
 
 };
 
 const uint8_t bitmap2[] = {
 
-  0x3C, // ..####..
-  0x46, // .#...##.
-  0x87, // #....###
-  0x89, // #...#..#
-  0x91, // #..#...#
-  0xE1, // ###....#
-  0x62, // .##...#.
-  0x3C  // ..####..
+		0x3C, // ..####..
+		0x46, // .#...##.
+		0x87, // #....###
+		0x89, // #...#..#
+		0x91, // #..#...#
+		0xE1, // ###....#
+		0x62, // .##...#.
+		0x3C	// ..####..
 
 };
 
@@ -83,28 +83,6 @@ const uint8_t bitmap2[] = {
 // 0x00  // ........
 
 //};
-
-const uint8_t parent[] = {
-	0x38, // ..###...
-	0x2C, // ..#.##..
-	0x24, // ..#..#..
-	0x24, // ..#..#..
-	0x3C, // ..####..
-	0x20, // ..#.....
-	0x20, // ..#.....
-	0x20  // ..#.....
-};
-
-const uint8_t child[] = {
-	0x1C, // ...###..
-	0x3E, // ..#####.
-	0x60, // .##.....
-	0x40, // .#......
-	0x40, // .#......
-	0x60, // .##.....
-	0x3E, // ..#####.
-	0x1C  // ...###..
-};
 
 void lib_display_setNodeNum(int nodecounttemp)
 {
@@ -141,11 +119,11 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 
 	u8g2_t u8g2; // a structure which will contain all the data for one display
 	u8g2_Setup_ssd1306_i2c_64x48_er_f(
-		&u8g2,
-		U8G2_R0,
-		//u8x8_byte_sw_i2c,
-		u8g2_esp32_i2c_byte_cb,
-		u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
+			&u8g2,
+			U8G2_R0,
+			//u8x8_byte_sw_i2c,
+			u8g2_esp32_i2c_byte_cb,
+			u8g2_esp32_gpio_and_delay_cb); // init u8g2 structure
 	u8x8_SetI2CAddress(&u8g2.u8x8, 0x78);
 
 	ESP_LOGI(TAG, "u8g2_InitDisplay");
@@ -186,11 +164,12 @@ u8g2_Setup_ssd1306_i2c_64x48_er_f(&u8g2, rotation, u8x8_byte_arduino_hw_i2c, u8x
 
 		if (meshLayer == 1)
 		{
-			u8g2_DrawBitmap(&u8g2, 40, 0, 1, 8, parent);
+			u8g2_DrawStr(&u8g2, 45, 7, "P");
 		}
-		else if (meshLayer>1)
+
+		else if (meshLayer > 1)
 		{
-			u8g2_DrawBitmap(&u8g2, 40, 0, 1, 8, child);
+			u8g2_DrawStr(&u8g2, 45, 7, "C");
 		}
 
 		u8g2_DrawStr(&u8g2, 0, 7, "IoT.nxt");
