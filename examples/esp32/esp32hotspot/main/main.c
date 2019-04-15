@@ -43,7 +43,7 @@ static EventGroupHandle_t wifi_event_group;
 const int IPV4_GOTIP_BIT = BIT0;
 const int IPV6_GOTIP_BIT = BIT1;
 
-static const char *TAG = "hotspot";
+static const char *TAG = "main";
 
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
@@ -122,7 +122,7 @@ void app_main()
     //lib_display_log("2 wifi rdy");
     //wait_for_ip();
 
-    xTaskCreate(serial_port_task, "serial_port_task", 4096, NULL, 5, NULL);
-    xTaskCreate(tcp_server_task, "tcp_server", 4096, NULL, 5, NULL);
+    xTaskCreate(serial_port_task, "serial_port_task", 4096*4, NULL, 5, NULL);
+    xTaskCreate(tcp_server_task, "tcp_server", 4096*4, NULL, 5, NULL);
         
 }
