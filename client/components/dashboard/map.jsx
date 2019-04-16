@@ -330,7 +330,7 @@ export class MapDevices extends Component {
                   .catch(err => console.error(err.toString()));
               }
 
-              if (marker.payload.data != undefined && marker.payload.data != null && marker.payload.data != {}) {
+              if (marker.payload.data != undefined && marker.payload.data != null) {
                 if (marker.payload.data.gps != undefined) {
                   if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
                     marker.meta.ipLoc = {
