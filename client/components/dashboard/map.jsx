@@ -330,36 +330,36 @@ export class MapDevices extends Component {
                   .catch(err => console.error(err.toString()));
               }
 
-              if (marker.payload.data != undefined && marker.payload.data != null) {
-                if (marker.payload.data.gps != undefined) {
-                  if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
+              // if (marker.payload.data != undefined && marker.payload.data != null) {
+              if (marker.payload.data.gps != undefined) {
+                if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
+                  marker.meta.ipLoc = {
+                    ll:
+                      [
+                        marker.payload.data.gps.lat,
+                        marker.payload.data.gps.lon
+                      ]
+                  }
+                } else {
+                  if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
                     marker.meta.ipLoc = {
                       ll:
                         [
-                          marker.payload.data.gps.lat,
-                          marker.payload.data.gps.lon
+                          marker.payload.data.gps.latitude,
+                          marker.payload.data.gps.longitude
                         ]
                     }
                   } else {
-                    if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
-                      marker.meta.ipLoc = {
-                        ll:
-                          [
-                            marker.payload.data.gps.latitude,
-                            marker.payload.data.gps.longitude
-                          ]
-                      }
-                    } else {
-                      if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                    if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
+                      marker.meta.ipLoc = defaultLoc
+                    } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                      if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
                         marker.meta.ipLoc = defaultLoc
-                      } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
-                        if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
-                          marker.meta.ipLoc = defaultLoc
-                        }
                       }
                     }
                   }
                 }
+                // }
               } else {
                 if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
                   marker.meta.ipLoc = defaultLoc
