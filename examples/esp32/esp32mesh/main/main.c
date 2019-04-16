@@ -21,7 +21,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
+#include <stdint.h>
+#include <stdio.h>
 #include "main.h"
 #include "mdf_common.h"
 #include "mwifi.h"
@@ -341,39 +342,39 @@ static void node_write_task(void *arg)
     vTaskDelete(NULL);
 }
 
+void node_mesh_write(char *dataraw, int len)
+{
+    ESP_LOGI(TAG, "RECV LEN: %d SERIAL:%s", len, dataraw);
+    //ESP_LOGI(TAG, "NODEMESHTCPWRITE: %s", dataraw);
+    //ESP_LOG_BUFFER_HEX_LEVEL(TAG, dataraw, len, 0);
 
+    // //cleanup incoming data
+    // // char datatcp[len];
 
-void node_mesh_write(char *dataraw, int len) {
+    // // for (int a = 0; a < len; a++ ) {
+    // //     datatcp[a] = dataraw[a];
+    // // }
+    // // datatcp[len-1] = '\0';
 
-    //cleanup incoming data
-    char datatcp[len];
+    // // //memset(datatcp, '\0', sizeof(datatcp));
+    // // //strcpy(datatcp, dataraw);
 
-    for (int a = 0; a < len; a++ ) {
-        datatcp[a] = dataraw[a];
-    }
-    datatcp[len-1] = '\0';
-
-    //memset(datatcp, '\0', sizeof(datatcp));
-    //strcpy(datatcp, dataraw);
-    
     size_t size = 0;
-
     char *data = NULL;
 
-    //datatcp[strcspn(datatcp, "\n")] = 0;
-    //datatcp[strcspn(datatcp, "\r")] = 0;
+    dataraw[strcspn(dataraw, "\n")] = 0;
+    dataraw[strcspn(dataraw, "\r")] = 0;
 
     size = asprintf(&data, "{\"tcp\": \"%s\", \"len\" : %d}", dataraw, len);
     mwifi_data_type_t data_type = {0x0};
 
-    MDF_LOGD("TCP mesh chars: %d send: %s", len, datatcp);
+    MDF_LOGD("TCP mesh chars: %d send: %s", len, data);
 
-    if (mwifi_is_connected()) {
-        mwifi_write(NULL, &data_type, data, size, true);    
-        //MDF_FREE(data);
-        //MDF_FREE(dataclean);
+    if (mwifi_is_connected())
+    {
+        mwifi_write(NULL, &data_type, data, size, true);
     }
-
+    MDF_FREE(data);
 }
 
 /**
@@ -592,7 +593,6 @@ void app_main()
     xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
 
     xTaskCreate(serial_port_task, "serial_port_task", 4096, NULL, 5, NULL);
-
 
     mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
     mwifi_config_t config = {
