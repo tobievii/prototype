@@ -296,13 +296,7 @@ export class MapDevices extends Component {
     });
 
     var position = [details.lat, details.lng]
-    var defaultLoc = {
-      ll:
-        [
-          0.01,
-          0.01
-        ]
-    }
+
     return (
       <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(this.props.deviceCall)} deviceSelected={deviceSelected} widget={this.props.widget} >
         <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
@@ -311,11 +305,15 @@ export class MapDevices extends Component {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {
-
             allDevices.map((marker) => {
-              var gps = {
-              }
               var bLayer = marker.boundaryLayer;
+              var defaultLoc = {
+                ll:
+                  [
+                    0.01,
+                    0.01
+                  ]
+              }
 
               if (bLayer == 0) {
                 marker.boundaryLayer = undefined;
@@ -332,30 +330,32 @@ export class MapDevices extends Component {
                   .catch(err => console.error(err.toString()));
               }
 
-              if (marker.payload.data.gps != undefined) {
-                if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
-                  marker.meta.ipLoc = {
-                    ll:
-                      [
-                        marker.payload.data.gps.lat,
-                        marker.payload.data.gps.lon
-                      ]
-                  }
-                } else {
-                  if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
+              if (marker.payload.data != undefined && marker.payload.data != null && marker.payload.data != {}) {
+                if (marker.payload.data.gps != undefined) {
+                  if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
                     marker.meta.ipLoc = {
                       ll:
                         [
-                          marker.payload.data.gps.latitude,
-                          marker.payload.data.gps.longitude
+                          marker.payload.data.gps.lat,
+                          marker.payload.data.gps.lon
                         ]
                     }
                   } else {
-                    if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
-                      marker.meta.ipLoc = defaultLoc
-                    } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
-                      if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                    if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
+                      marker.meta.ipLoc = {
+                        ll:
+                          [
+                            marker.payload.data.gps.latitude,
+                            marker.payload.data.gps.longitude
+                          ]
+                      }
+                    } else {
+                      if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
                         marker.meta.ipLoc = defaultLoc
+                      } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                        if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                          marker.meta.ipLoc = defaultLoc
+                        }
                       }
                     }
                   }
