@@ -267,6 +267,11 @@ export class MapDevices extends Component {
   }
 
   getMarker = (marker) => {
+
+    // if (marker.devid == "newacc") {
+    //   console.log(marker)
+    // }
+
     if (marker.selectedIcon == true) {
       return (
         <Marker position={[marker.meta.ipLoc.ll[0], marker.meta.ipLoc.ll[1]]} icon={RedIcon} >
@@ -330,36 +335,39 @@ export class MapDevices extends Component {
                   .catch(err => console.error(err.toString()));
               }
 
-              // if (marker.payload.data != undefined && marker.payload.data != null) {
-              if (marker.payload.data.gps != undefined) {
-                if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
-                  marker.meta.ipLoc = {
-                    ll:
-                      [
-                        marker.payload.data.gps.lat,
-                        marker.payload.data.gps.lon
-                      ]
-                  }
-                } else {
-                  if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
+              if (marker.payload.data != undefined && marker.payload.data != null) {
+
+                if (marker.payload.data.gps != undefined) {
+                  if (marker.payload.data.gps.lat != undefined && marker.payload.data.gps.lon != undefined) {
                     marker.meta.ipLoc = {
                       ll:
                         [
-                          marker.payload.data.gps.latitude,
-                          marker.payload.data.gps.longitude
+                          marker.payload.data.gps.lat,
+                          marker.payload.data.gps.lon
                         ]
                     }
                   } else {
-                    if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
-                      marker.meta.ipLoc = defaultLoc
-                    } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
-                      if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                    if (marker.payload.data.gps.latitude != undefined && marker.payload.data.gps.longitude != undefined) {
+                      marker.meta.ipLoc = {
+                        ll:
+                          [
+                            marker.payload.data.gps.latitude,
+                            marker.payload.data.gps.longitude
+                          ]
+                      }
+                    } else {
+                      if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
                         marker.meta.ipLoc = defaultLoc
+                      } else if (marker.meta.ipLoc != undefined || marker.meta.ipLoc != null) {
+                        if (marker.meta.ipLoc.ll == undefined || marker.meta.ipLoc.ll == null) {
+                          marker.meta.ipLoc = defaultLoc
+                        }
                       }
                     }
                   }
+                } else {
+                  marker.meta.ipLoc = defaultLoc;
                 }
-                // }
               } else {
                 if (marker.meta.ipLoc == undefined || marker.meta.ipLoc == null) {
                   marker.meta.ipLoc = defaultLoc
