@@ -284,7 +284,7 @@ td.react-bootstrap-table-editing-cell {
 .commanderBgPanel {
   background: rgba(3, 4, 5, 0.5);
   color: rgba(255, 246, 235, 0.959);
-  padding: 10px 20px 10px 20px;
+  padding: 5px 10px 5px 10px;
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
@@ -1315,5 +1315,18 @@ input[type="checkbox"]:checked {
 .mesh circle:hover {
   opacity: 0.5;
 }
+
+/*
+PLUGIN 
+*/
+
+.blockstyle {
+  border: 1px solid rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.2);
+  margin: 0px;
+  padding: 20px;
+}
+
 
 @import 'mobile.scss'
