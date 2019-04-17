@@ -1,54 +1,54 @@
 #include "WiFi.h"
 #include <Preferences.h>
 
-#define AP_SSID  "vinceESP"       //can set ap hostname here
+#define AP_SSID "PrototypeESP32" //can set ap hostname here
 
 WiFiServer server(80);
 Preferences preferences;
 static volatile bool wifi_connected = false;
 String wifiSSID, wifiPassword;
 
-
 void WiFiEvent(WiFiEvent_t event)
 {
-  switch (event) {
+  switch (event)
+  {
 
-    case SYSTEM_EVENT_AP_START:
-      //can set ap hostname here
-      WiFi.softAPsetHostname(AP_SSID);
-      //enable ap ipv6 here
-      WiFi.softAPenableIpV6();
-      break;
+  case SYSTEM_EVENT_AP_START:
+    //can set ap hostname here
+    WiFi.softAPsetHostname(AP_SSID);
+    //enable ap ipv6 here
+    WiFi.softAPenableIpV6();
+    break;
 
-    case SYSTEM_EVENT_STA_START:
-      //set sta hostname here
-      WiFi.setHostname(AP_SSID);
-      break;
-    case SYSTEM_EVENT_STA_CONNECTED:
-      //enable sta ipv6 here
-      WiFi.enableIpV6();
-      break;
-    case SYSTEM_EVENT_AP_STA_GOT_IP6:
-      //both interfaces get the same event
-      Serial.print("STA IPv6: ");
-      Serial.println(WiFi.localIPv6());
-      Serial.print("AP IPv6: ");
-      Serial.println(WiFi.softAPIPv6());
-      break;
-    case SYSTEM_EVENT_STA_GOT_IP:
-      wifiOnConnect();
-      wifi_connected = true;
-      break;
-    case SYSTEM_EVENT_STA_DISCONNECTED:
-      wifi_connected = false;
-      wifiOnDisconnect();
-      break;
-    default:
-      break;
+  case SYSTEM_EVENT_STA_START:
+    //set sta hostname here
+    WiFi.setHostname(AP_SSID);
+    break;
+  case SYSTEM_EVENT_STA_CONNECTED:
+    //enable sta ipv6 here
+    WiFi.enableIpV6();
+    break;
+  case SYSTEM_EVENT_AP_STA_GOT_IP6:
+    //both interfaces get the same event
+    Serial.print("STA IPv6: ");
+    Serial.println(WiFi.localIPv6());
+    Serial.print("AP IPv6: ");
+    Serial.println(WiFi.softAPIPv6());
+    break;
+  case SYSTEM_EVENT_STA_GOT_IP:
+    wifiOnConnect();
+    wifi_connected = true;
+    break;
+  case SYSTEM_EVENT_STA_DISCONNECTED:
+    wifi_connected = false;
+    wifiOnDisconnect();
+    break;
+  default:
+    break;
   }
 }
 
-String urlDecode(const String& text)
+String urlDecode(const String &text)
 {
   String decoded = "";
   char temp[] = "0x00";
@@ -65,20 +65,21 @@ String urlDecode(const String& text)
 
       decodedChar = strtol(temp, NULL, 16);
     }
-    else {
+    else
+    {
       if (encodedChar == '+')
       {
         decodedChar = ' ';
       }
-      else {
-        decodedChar = encodedChar;  // normal ascii char
+      else
+      {
+        decodedChar = encodedChar; // normal ascii char
       }
     }
     decoded += decodedChar;
   }
   return decoded;
 }
-
 
 void setup()
 {
@@ -93,8 +94,8 @@ void setup()
   Serial.println(WiFi.softAPIP());
 
   preferences.begin("wifi", false);
-  wifiSSID =  preferences.getString("ssid", "none");           //NVS key ssid
-  wifiPassword =  preferences.getString("password", "none");   //NVS key password
+  wifiSSID = preferences.getString("ssid", "none");         //NVS key ssid
+  wifiPassword = preferences.getString("password", "none"); //NVS key password
   preferences.end();
   Serial.print("Stored SSID: ");
   Serial.println(wifiSSID);
@@ -106,9 +107,12 @@ void setup()
 
 void loop()
 {
-  if (wifi_connected) {
+  if (wifi_connected)
+  {
     wifiConnectedLoop();
-  } else {
+  }
+  else
+  {
     wifiDisconnectedLoop();
   }
 }
@@ -123,7 +127,7 @@ void wifiOnConnect()
   Serial.println(WiFi.localIP());
   Serial.print("STA IPv6: ");
   Serial.println(WiFi.localIPv6());
-  WiFi.mode(WIFI_MODE_STA);     //close AP network
+  WiFi.mode(WIFI_MODE_STA); //close AP network
 }
 
 //when wifi disconnects
@@ -144,20 +148,25 @@ void wifiConnectedLoop()
 
 void wifiDisconnectedLoop()
 {
-  WiFiClient client = server.available();   // listen for incoming clients
+  WiFiClient client = server.available(); // listen for incoming clients
 
-  if (client) {                             // if you get a client,
-    Serial.println("New client");           // print a message out the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        if (c == '\n') {                    // if the byte is a newline character
+  if (client)
+  {                               // if you get a client,
+    Serial.println("New client"); // print a message out the serial port
+    String currentLine = "";      // make a String to hold incoming data from the client
+    while (client.connected())
+    { // loop while the client's connected
+      if (client.available())
+      {                         // if there's bytes to read from the client,
+        char c = client.read(); // read a byte, then
+        Serial.write(c);        // print it out the serial monitor
+        if (c == '\n')
+        { // if the byte is a newline character
 
           // if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
+          if (currentLine.length() == 0)
+          {
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
             client.println("HTTP/1.1 200 OK");
@@ -171,15 +180,20 @@ void wifiDisconnectedLoop()
             client.println();
             // break out of the while loop:
             break;
-          } else {    // if you got a newline, then clear currentLine:
+          }
+          else
+          { // if you got a newline, then clear currentLine:
             currentLine = "";
           }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
+        }
+        else if (c != '\r')
+        {                   // if you got anything else but a carriage return character,
+          currentLine += c; // add it to the end of the currentLine
           continue;
         }
 
-        if (currentLine.startsWith("GET /a?ssid=") ) {
+        if (currentLine.startsWith("GET /a?ssid="))
+        {
           //Expecting something like:
           //GET /a?ssid=blahhhh&pass=poooo
           Serial.println("");
