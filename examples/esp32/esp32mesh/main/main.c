@@ -21,7 +21,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
+#include <stdint.h>
+#include <stdio.h>
 #include "main.h"
 #include "mdf_common.h"
 #include "mwifi.h"
@@ -43,6 +44,7 @@
 // #define MEMORY_DEBUG
 
 #include "lib_display.h"
+#include "lib_serial.h"
 
 static int g_sockfd = -1;
 static const char *TAG = "main";
@@ -332,12 +334,47 @@ static void node_write_task(void *arg)
         MDF_FREE(data);
         MDF_ERROR_CONTINUE(ret != MDF_OK, "<%s> mwifi_write", mdf_err_to_name(ret));
 
-        vTaskDelay(500 / portTICK_RATE_MS);
+        vTaskDelay(5000 / portTICK_RATE_MS);
     }
 
     MDF_LOGW("NODE task is exit");
 
     vTaskDelete(NULL);
+}
+
+void node_mesh_write(char *dataraw, int len)
+{
+    ESP_LOGI(TAG, "RECV LEN: %d SERIAL:%s", len, dataraw);
+    //ESP_LOGI(TAG, "NODEMESHTCPWRITE: %s", dataraw);
+    //ESP_LOG_BUFFER_HEX_LEVEL(TAG, dataraw, len, 0);
+
+    // //cleanup incoming data
+    // // char datatcp[len];
+
+    // // for (int a = 0; a < len; a++ ) {
+    // //     datatcp[a] = dataraw[a];
+    // // }
+    // // datatcp[len-1] = '\0';
+
+    // // //memset(datatcp, '\0', sizeof(datatcp));
+    // // //strcpy(datatcp, dataraw);
+
+    size_t size = 0;
+    char *data = NULL;
+
+    dataraw[strcspn(dataraw, "\n")] = 0;
+    dataraw[strcspn(dataraw, "\r")] = 0;
+
+    size = asprintf(&data, "{\"tcp\": \"%s\", \"len\" : %d}", dataraw, len);
+    mwifi_data_type_t data_type = {0x0};
+
+    MDF_LOGD("TCP mesh chars: %d send: %s", len, data);
+
+    if (mwifi_is_connected())
+    {
+        mwifi_write(NULL, &data_type, data, size, true);
+    }
+    MDF_FREE(data);
 }
 
 /**
@@ -357,11 +394,11 @@ static void print_system_info_timercb(void *timer)
     esp_wifi_vnd_mesh_get(&mesh_assoc);
     esp_mesh_get_parent_bssid(&parent_bssid);
 
-    MDF_LOGI("System information, channel: %d, layer: %d, self mac: " MACSTR ", parent bssid: " MACSTR
-             ", parent rssi: %d, node num: %d, free heap: %u",
-             primary,
-             esp_mesh_get_layer(), MAC2STR(sta_mac), MAC2STR(parent_bssid.addr),
-             mesh_assoc.rssi, esp_mesh_get_total_node_num(), esp_get_free_heap_size());
+    // MDF_LOGI("System information, channel: %d, layer: %d, self mac: " MACSTR ", parent bssid: " MACSTR
+    //          ", parent rssi: %d, node num: %d, free heap: %u",
+    //          primary,
+    //          esp_mesh_get_layer(), MAC2STR(sta_mac), MAC2STR(parent_bssid.addr),
+    //          mesh_assoc.rssi, esp_mesh_get_total_node_num(), esp_get_free_heap_size());
 
     lib_display_setNodeNum(esp_mesh_get_total_node_num());
     lib_display_setLayer(esp_mesh_get_layer());
@@ -370,7 +407,7 @@ static void print_system_info_timercb(void *timer)
 
     for (int i = 0; i < wifi_sta_list.num; i++)
     {
-        MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+        //MDF_LOGI("Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
     }
 
 #ifdef MEMORY_DEBUG
@@ -530,28 +567,32 @@ static duk_ret_t native_adder(duk_context *ctx)
 
 void app_main()
 {
-    int test = 0;
 
-    while (test == 0)
-    {
-        duk_context *ctx = duk_create_heap_default();
+    // javascript:
+    // int test = 0;
 
-        duk_push_c_function(ctx, native_print, DUK_VARARGS);
-        duk_put_global_string(ctx, "print");
-        duk_push_c_function(ctx, native_adder, DUK_VARARGS);
-        duk_put_global_string(ctx, "adder");
+    // while (test == 0)
+    // {
+    //     duk_context *ctx = duk_create_heap_default();
 
-        duk_eval_string(ctx, "print('Hello world!');");
+    //     duk_push_c_function(ctx, native_print, DUK_VARARGS);
+    //     duk_put_global_string(ctx, "print");
+    //     duk_push_c_function(ctx, native_adder, DUK_VARARGS);
+    //     duk_put_global_string(ctx, "adder");
 
-        duk_eval_string(ctx, "print('2+3=' + adder(2, 3));");
-        duk_pop(ctx); /* pop eval result */
+    //     duk_eval_string(ctx, "print('Hello world!');");
 
-        duk_destroy_heap(ctx);
+    //     duk_eval_string(ctx, "print('2+3=' + adder(2, 3));");
+    //     duk_pop(ctx); /* pop eval result */
 
-        test = 1;
-    }
+    //     duk_destroy_heap(ctx);
+
+    //     test = 1;
+    // }
 
     xTaskCreate(task_test_SSD1306i2c, "task_test_SSD1306i2c", 4 * 1024, NULL, CONFIG_MDF_TASK_DEFAULT_PRIOTY, NULL);
+
+    xTaskCreate(serial_port_task, "serial_port_task", 4096, NULL, 5, NULL);
 
     mwifi_init_config_t cfg = MWIFI_INIT_CONFIG_DEFAULT();
     mwifi_config_t config = {

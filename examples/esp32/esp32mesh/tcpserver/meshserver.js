@@ -88,7 +88,7 @@ var meshSocket;
 
 var server = net.createServer((socket) => {
   meshSocket = socket;
-
+  console.log("CONNECTED")
   socket.on("data", (dataraw) => {
     //console.log(socket.remoteAddress)
     //
@@ -98,7 +98,19 @@ var server = net.createServer((socket) => {
       for (var data of splitdata) {
 
         var dataparsed = JSON.parse(data.toString());
-        console.log(dataparsed);
+
+        //console.log(dataparsed)
+
+        if (dataparsed.data.tcp) {
+          console.log(dataparsed)
+          var tcp_decode = Buffer.from(dataparsed.data.tcp, "base64");
+          console.log("decoded:");
+          console.log(tcp_decode)
+          sendIotnxt(tcp_decode);
+          // console.log("decoded:");
+          // console.log(tcp_decode.toString())
+        }
+
         var device = dataparsed.data;
         device.addr = dataparsed.addr;                // move addr into device 
         device.timestamp = new Date().toISOString();  // timestamp data
@@ -194,4 +206,46 @@ function buildMeshLayout(nodes) {
   // NEXT
   //console.log(maxlayer)
   return mesh;
+}
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////
+
+var net = require('net');
+var iotnxtqueue = new net.Socket();
+iotnxtqueue.connected = false;
+
+function sendIotnxt(packet) {
+  if (iotnxtqueue.connected == false) {
+    iotnxtqueue.connect(8883, 'amqp.greenqueue.qa.iotnxt.io', () => {
+      console.log('Connected');
+      iotnxtqueue.connected = true;
+      iotnxtqueue.write(packet);
+    });
+
+    iotnxtqueue.on('data', (data) => {
+      console.log('Received: ' + data);
+      //iotnxtqueue.destroy(); // kill iotnxtqueue after server's response
+    });
+
+    iotnxtqueue.on('close', () => {
+      console.log('Connection closed');
+      iotnxtqueue.connected = false;
+    });
+
+    iotnxtqueue.on("error", () => {
+      iotnxtqueue.connected = false;
+      sendIotnxt(packet);
+    })
+
+    iotnxtqueue.connected = true;
+  } else {
+    iotnxtqueue.write(packet);
+  }
 }

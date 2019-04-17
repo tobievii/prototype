@@ -44,7 +44,7 @@ void serial_port_task(void *pvParameters) {
           //memcpy(buf, data , len);
           //ESP_LOGI(TAG, "RECV: %s", buf);
           ESP_LOGI(TAG, "RECV: %d", len);
-          lib_display_log((char *) data);
+          //lib_display_log((char *) data);
         }
 
         //// char buf[10+1] = {};
