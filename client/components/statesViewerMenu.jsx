@@ -32,6 +32,9 @@ export class StatesViewerMenu extends Component {
         fetch("/api/v3/getsort", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(serverresponse => {
+            if (serverresponse.sort == null || serverresponse.sort == undefined) {
+                serverresponse.sort = "";
+            }
             this.setState({ sort: serverresponse.sort })
         }).catch(err => console.error(err.toString()));
     }
