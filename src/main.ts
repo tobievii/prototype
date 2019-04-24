@@ -86,8 +86,8 @@ eventHub.on("notification", (notification: any, device: any) => {
     io.to(device.apikey).emit("notification");
     io.to(device.key).emit('notificationState');
   } else {
-    io.to(device.apikey).emit("notification");
-    io.to(device.key).emit('notificationState');
+    io.to(device).emit("notification");
+    io.to(device).emit('notificationState');
   }
 });
 

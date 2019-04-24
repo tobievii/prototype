@@ -109,7 +109,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   app.post("/api/v3/notifications/seen", (req: any, res: any) => {
     deviceSeen(db, req.user);
-    io.emit("notification");
     res.json({ result: "done" })
   });
 
@@ -184,6 +183,8 @@ export function deviceSeen(db: any, user: any) {
       }
       final.push(notifications[notification]);
     }
+
+    io.emit("notification", undefined, user.apikey);
 
     db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
       console.log(updated);
