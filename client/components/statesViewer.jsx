@@ -202,13 +202,6 @@ export class StatesViewer extends Component {
       this.setState({ sort: serverresponse.sort })
     }).catch(err => console.error(err.toString()));
 
-
-
-    fetch("/api/v3/notifications/notitest", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" }, body: JSON.stringify({ message: "Heyy Dee" })
-    }).then(response => response.json()).then(serverresponse => {
-    }).catch(err => console.error(err.toString()));
-
     this.socket.on("connect", a => {
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
