@@ -37,7 +37,9 @@ function Timer(fn: any, t: any) {
 
   // start with new interval, stop current interval
   this.reset = function (newT: any) {
-    t = newT;
+    if (newT != null || newT != undefined) {
+      t = newT;
+    }
     return this.stop().start();
   }
 }
@@ -46,14 +48,12 @@ var p = 0;
 
 function getWarningNotification(db: any) {
   //console.log("Ran warning at " + new Date())
-
   var deviceTime: any;
 
   var now: any = new Date();
   var dayago = new Date(now - (1000 * 60 * 60 * 24));
 
   db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
-
     for (var s in listDevices) {
       var device = listDevices[s]
       db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
@@ -67,7 +67,7 @@ function getWarningNotification(db: any) {
         };
 
         db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-          // io.to(device.apikey).emit('pushNotification', WarningNotificationL)
+          io.emit("notification", WarningNotificationL, device);
         })
       })
     }
@@ -106,24 +106,21 @@ function msToHMS(ms: any) {
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
   io = eventHub;
-  app.post("/api/v3/notifications/notitest", (req: any, res: any) => {
-    createNotification(db, "info", req.body.message, req.user);
-    res.json({ result: "done" })
-  });
 
   app.post("/api/v3/notifications/seen", (req: any, res: any) => {
     deviceSeen(db, req.user);
+    io.emit("notification");
     res.json({ result: "done" })
   });
 
-  // timer = new Timer(function () {
-  //   if (p == 0) {
-  //     console.log("Ran warning at " + new Date() + "  3")
-  //     p = 1
-  //   } else {
-  //     getWarningNotification(db);
-  //   }
-  // }, 1000);
+  timer = new Timer(function () {
+    if (p == 0) {
+      console.log("Ran warning at " + new Date() + "  3")
+      p = 1
+    } else {
+      getWarningNotification(db);
+    }
+  }, 5000);
 }
 
 export function warning(message: string) {
@@ -138,12 +135,41 @@ export function info(message: string) {
   console.log(message);
 }
 
-export function createNotification(db: any, notiType: any, message: any, user: any) {
-  var paraInfor = {
-    db: db,
-    notiType: notiType,
-    message: message,
-    user: user
+export function createNotification(db: any, notification: any, req: any, device: any) {
+  if (notification.type == "ALARM") {
+    io.emit("notification", notification, device);
+
+    if (req.user.notifications) {
+      req.user.notifications.push(notification)
+    } else {
+      req.user.notifications = [notification]
+    }
+    db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+
+      for (var a of result.notifications) {
+        if (a.type == 'ALARM' && a.device == req.body.id) {
+          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+            if (err !== null) {
+              console.log(err)
+            } else if (updated)
+              console.log(updated)
+          })
+        }
+      }
+    })
+  } else if (notification.type == "NEW DEVICE ADDED") {
+    io.emit("notification", notification, device);
+
+    if (req.user.notifications) {
+      req.user.notifications.push(notification)
+    } else {
+      req.user.notifications = [notification]
+    }
+
+    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+      if (err) console.log(err);
+      if (updated) console.log(updated);
+    })
   }
 }
 
@@ -162,12 +188,15 @@ export function deviceSeen(db: any, user: any) {
     db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
       console.log(updated);
     })
-
   });
 }
 
 //to do: update on device post, remove warning
-function checkExsisting(req: any, res: any, db: any) {
+export function checkExisting(req: any, res: any, db: any) {
+  // timer.reset(500);
+  // timer.stop();
+  // timer.start();
+
   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
 
     function findNotified(array: any) {

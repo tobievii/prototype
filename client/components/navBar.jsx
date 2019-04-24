@@ -277,7 +277,7 @@ export class NavBar extends Component {
   }
 
   countArray = () => {
-    var count = undefined;
+    var count = 0;
     var notifications = this.props.account.notifications;
     if (this.props.account.notifications) {
       for (var x in notifications) {

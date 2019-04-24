@@ -255,11 +255,22 @@ export class StatesViewer extends Component {
         this.handleDevicePacket(packet)
       })
 
+
+      this.socket.on("notificationState", a => {
+        this.getDevices();
+      })
+
       this.socket.on('boundary', (packet) => {
         this.handleDevicePacket(packet)
       })
     });
 
+    setTimeout(() => {
+      this.getDevices();
+    }, 500);
+  }
+
+  getDevices = () => {
     if (this.props.public == true) {
       p.publicStates((states) => {
         for (var s in states) {

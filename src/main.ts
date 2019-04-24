@@ -49,6 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -78,6 +79,17 @@ eventHub.on("device", (data: any) => {
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
 })
+
+eventHub.on("notification", (notification: any, device: any) => {
+  if (notification != undefined || notification != null) {
+    io.to(device.apikey).emit('pushNotification', notification)
+    io.to(device.apikey).emit("notification");
+    io.to(device.key).emit('notificationState');
+  } else {
+    io.to(device.apikey).emit("notification");
+    io.to(device.key).emit('notificationState');
+  }
+});
 
 //app.use(express.json())
 app.use(safeParser);
@@ -197,7 +209,7 @@ const publicVapidKey =
 const privateVapidKey = "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90";
 
 webpush.setVapidDetails(
-  "mailto:DeepaSoul.sa@gmail.com",
+  "mailto:prototype@iotnxt.com",
   publicVapidKey,
   privateVapidKey
 );
@@ -294,8 +306,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
   var resolved = false;
-
-
 
   // find history by key
   if (req.body.key) {
@@ -942,6 +952,8 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 // }
 
 function handleState(req: any, res: any, next: any) {
+  checkExisting(req, res, db);
+
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
@@ -977,6 +989,20 @@ function handleState(req: any, res: any, next: any) {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+          if (info.newdevice) {
+
+            var newDeviceNotification = {
+              type: "NEW DEVICE ADDED",
+              device: req.body.id,
+              created: packet._created_on,
+              notified: true,
+              seen: false
+            }
+
+            createNotification(db, newDeviceNotification, req, Result);
+            io.to(req.user.username).emit("info", info);
+          }
+
           var message = "";
           var AlarmNotification = {
             type: "ALARM",
@@ -988,51 +1014,17 @@ function handleState(req: any, res: any, next: any) {
           }
 
           if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined && newpacket.err == '') {
+            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
               AlarmNotification.message = Result.workflowCode.substring(
                 Result.workflowCode.lastIndexOf('alarm1("') + 8,
                 Result.workflowCode.lastIndexOf('")')
               )
-
-              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
-              io.to(req.user.apikey).emit("notification");
-
-              if (req.user.notifications) {
-                req.user.notifications.push(AlarmNotification)
-              } else {
-                req.user.notifications = [AlarmNotification]
-              }
-              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-
-                for (var a of result.notifications) {
-                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                      if (err !== null) {
-                        console.log(err)
-                      } else if (updated)
-                        console.log(updated)
-                    })
-                  }
-                }
-              })
+              createNotification(db, AlarmNotification, req, Result);
             }
           } else if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
-              io.to(req.user.apikey).emit("notification");
-              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-                for (var a of result.notifications) {
-                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                      if (err !== null) {
-                        console.log(err)
-                      } else if (updated)
-                        console.log(updated)
-                    })
-                  }
-                }
-              })
+              createNotification(db, AlarmNotification, req, Result);
             }
           }
         })
@@ -1051,31 +1043,7 @@ function handleState(req: any, res: any, next: any) {
             }
           })
 
-        if (info.newdevice) {
 
-          var newDeviceNotification = {
-            type: "NEW DEVICE ADDED",
-            device: req.body.id,
-            created: packet._created_on,
-            notified: true,
-            seen: false
-          }
-
-          io.to(req.user.username).emit("info", info)
-          io.to(req.user.apikey).emit('pushNotification', newDeviceNotification)
-
-          if (req.user.notifications) {
-            req.user.notifications.push(newDeviceNotification)
-          } else {
-            req.user.notifications = [newDeviceNotification]
-          }
-
-          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            io.to(req.user.apikey).emit("notification")
-            if (err) res.json(err);
-            if (updated) res.json(updated);
-          })
-        }
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
