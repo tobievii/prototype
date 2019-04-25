@@ -49,6 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -78,6 +79,17 @@ eventHub.on("device", (data: any) => {
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
 })
+
+eventHub.on("notification", (notification: any, device: any) => {
+  if (notification != undefined || notification != null) {
+    io.to(device.apikey).emit('pushNotification', notification)
+    io.to(device.apikey).emit("notification");
+    io.to(device.key).emit('notificationState');
+  } else {
+    io.to(device).emit("notification");
+    io.to(device).emit('notificationState');
+  }
+});
 
 //app.use(express.json())
 app.use(safeParser);
@@ -197,21 +209,17 @@ const publicVapidKey =
 const privateVapidKey = "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90";
 
 webpush.setVapidDetails(
-  "mailto:DeepaSoul.sa@gmail.com",
+  "mailto:prototype@iotnxt.com",
   publicVapidKey,
   privateVapidKey
 );
 
 app.post("/subscribe", (req: any, res: any) => {
-  // Get pushSubscription object
   const subscription = req.body;
-  // Send 201 - resource created
   res.status(201).json({});
 
-  // Create payload
   const payload = JSON.stringify({ title: "Push Test" });
 
-  // Pass object into sendNotification
   webpush
     .sendNotification(subscription, payload)
     .then((response: any) => {
@@ -298,8 +306,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
   var resolved = false;
-
-
 
   // find history by key
   if (req.body.key) {
@@ -557,9 +563,11 @@ app.post("/api/v3/state", (req: any, res: any) => {
 });
 
 async function findstate(req: any, res: any) {
-  if (req.body.username) {
 
+
+  if (req.body.username) {
     if (req.body.username != req.user.username) {
+
       if (req.user.level < 100) {
         await db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
@@ -577,7 +585,11 @@ async function findstate(req: any, res: any) {
       if (user) {
         if (req.body.id) {
           db.states.findOne({ $and: [{ apikey: user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
-            res.json(state);
+            if (state == null || state == undefined) {
+              res.json({ error: "Device " + req.body.id + " was not found." })
+            } else {
+              res.json(state);
+            }
           })
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -590,6 +602,7 @@ async function findstate(req: any, res: any) {
 
     if (req.body.id) {
       db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+
         res.json(state);
       })
     } else {
@@ -668,7 +681,7 @@ app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any, packet: any) => {
-  checkExsisting(req, res)
+  // checkExsisting(req, res)
 
   if (req.body) {
     // find state by username
@@ -892,84 +905,55 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
   })
 });
 
-function checkExsisting(req: any, res: any) {
-  db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
+// function checkExsisting(req: any, res: any) {
+//   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
 
-    function findNotified(array: any) {
-      var t = [];
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].notified == undefined || array[i].notified == null) {
+//     function findNotified(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].notified == undefined || array[i].notified == null) {
 
-          array[i].notified = false;
+//           array[i].notified = false;
 
-          io.to(req.user.username).emit("info", info)
+//           io.to(req.user.username).emit("info", info)
 
-          db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-            io.to(req.user).emit("notification")
-            if (err) res.json(err);
-            if (updated) res.json(updated);
-          })
-        }
-        t.push(array[i]);
-      }
-    }
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.to(req.user).emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
 
-    function findSeen(array: any) {
-      var t = [];
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].seen == undefined || array[i].seen == null) {
+//     function findSeen(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].seen == undefined || array[i].seen == null) {
 
-          array[i].seen = false;
+//           array[i].seen = false;
 
-          io.to(req.user.username).emit("info", info)
+//           io.to(req.user.username).emit("info", info)
 
-          db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-            io.to(req.user).emit("notification")
-            if (err) res.json(err);
-            if (updated) res.json(updated);
-          })
-        }
-        t.push(array[i]);
-      }
-    }
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.to(req.user).emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
 
-    findNotified(state.notifications);
-    findSeen(state.notifications);
-  })
-}
-
-setInterval(() => {
-  //getWarningNotification();     //disable till we find out cause of lag
-}, 600000)
-
-function getWarningNotification() {
-
-  var now: any = new Date();
-  var dayago = new Date(now - (1000 * 60 * 60 * 24));
-  db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
-
-    for (var s in listDevices) {
-      var device = listDevices[s]
-      db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
-
-        var WarningNotificationL = {
-          type: "CONNECTION DOWN 24HR WARNING",
-          device: device.devid,
-          created: new Date(),
-          notified: true,
-          seen: false
-        };
-
-        db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-          io.to(device.apikey).emit('pushNotification', WarningNotificationL)
-        })
-      })
-    }
-  })
-
-}
+//     findNotified(state.notifications);
+//     findSeen(state.notifications);
+//   })
+// }
 
 function handleState(req: any, res: any, next: any) {
+  checkExisting(req, res, db);
+
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
@@ -1005,6 +989,20 @@ function handleState(req: any, res: any, next: any) {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
 
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+          if (info.newdevice) {
+
+            var newDeviceNotification = {
+              type: "NEW DEVICE ADDED",
+              device: req.body.id,
+              created: packet._created_on,
+              notified: true,
+              seen: false
+            }
+
+            createNotification(db, newDeviceNotification, req, Result);
+            io.to(req.user.username).emit("info", info);
+          }
+
           var message = "";
           var AlarmNotification = {
             type: "ALARM",
@@ -1016,51 +1014,17 @@ function handleState(req: any, res: any, next: any) {
           }
 
           if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined && newpacket.err == '') {
+            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
               AlarmNotification.message = Result.workflowCode.substring(
                 Result.workflowCode.lastIndexOf('alarm1("') + 8,
                 Result.workflowCode.lastIndexOf('")')
               )
-
-              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
-              io.to(req.user.apikey).emit("notification");
-
-              if (req.user.notifications) {
-                req.user.notifications.push(AlarmNotification)
-              } else {
-                req.user.notifications = [AlarmNotification]
-              }
-              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-
-                for (var a of result.notifications) {
-                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                      if (err !== null) {
-                        console.log(err)
-                      } else if (updated)
-                        console.log(updated)
-                    })
-                  }
-                }
-              })
+              createNotification(db, AlarmNotification, req, Result);
             }
           } else if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              io.to(req.user.apikey).emit('pushNotification', AlarmNotification);
-              io.to(req.user.apikey).emit("notification");
-              db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-                for (var a of result.notifications) {
-                  if (a = undefined || a.type !== 'ALARM' && a.device !== req.body.id) {
-                    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-                      if (err !== null) {
-                        console.log(err)
-                      } else if (updated)
-                        console.log(updated)
-                    })
-                  }
-                }
-              })
+              createNotification(db, AlarmNotification, req, Result);
             }
           }
         })
@@ -1079,31 +1043,7 @@ function handleState(req: any, res: any, next: any) {
             }
           })
 
-        if (info.newdevice) {
 
-          var newDeviceNotification = {
-            type: "NEW DEVICE ADDED",
-            device: req.body.id,
-            created: packet._created_on,
-            notified: true,
-            seen: false
-          }
-
-          io.to(req.user.username).emit("info", info)
-          io.to(req.user.apikey).emit('pushNotification', newDeviceNotification)
-
-          if (req.user.notifications) {
-            req.user.notifications.push(newDeviceNotification)
-          } else {
-            req.user.notifications = [newDeviceNotification]
-          }
-
-          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            io.to(req.user.apikey).emit("notification")
-            if (err) res.json(err);
-            if (updated) res.json(updated);
-          })
-        }
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {

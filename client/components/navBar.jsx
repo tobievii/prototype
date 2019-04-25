@@ -277,17 +277,26 @@ export class NavBar extends Component {
   }
 
   countArray = () => {
-
+    var count = 0;
+    var notifications = this.props.account.notifications;
     if (this.props.account.notifications) {
-      if (this.props.account.notifications.length == 0 || this.props.account.notifications == undefined) {
+      for (var x in notifications) {
+        if (notifications[x].seen == false) {
+          count++;
+        }
+      }
+
+      if (count == 0 || count == undefined) {
         return <span />;
       }
       else {
-        return <span className="button__badge">{this.props.account.notifications.length}</span>
+        return <span className="button__badge">{count}</span>
       }
+    } else {
+      return <span></span>
     }
-    return
   }
+
   searchNav = () => {
     this.setState({ showNav: "none" })
     this.setState({ showSearch: "" })

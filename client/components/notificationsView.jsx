@@ -5,6 +5,14 @@ export class NotificationsView extends Component {
     constructor(props) {
         super(props);
         this.state = { notifications: [] };
+
+        fetch('/api/v3/notifications/seen', {
+            method: 'POST', headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => { })
     }
 
     componentDidMount() {
