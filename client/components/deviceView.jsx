@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Stats } from "./stats.jsx"
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -13,7 +11,6 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-import Media from "react-media";
 
 import moment from 'moment'
 
@@ -112,11 +109,27 @@ export class DeviceView extends Component {
 
   updateView = (packet) => {
     var view = _.clone(this.state.view);
-    view = _.merge(view, packet)
+    var state = _.clone(this.state.state);
+
+    var merge = true; //default is to merge
+
+    if (packet.options) {
+      if (packet.options["_merge"] === false) {
+        merge = false;
+      }
+    }
+
+    if (merge) {
+      view = _.merge(view, packet)
+      state.payload = _.merge(state.payload, packet);
+    } else {
+      delete view.data;
+      delete state.payload.data;
+      state.payload = _.merge(state.payload, packet);
+      view = _.merge(view, packet)
+    }
 
     // should be same as DB.states for this device.
-    var state = _.clone(this.state.state);
-    state.payload = _.merge(state.payload, packet);
     state["_last_seen"] = packet.timestamp;
     this.setState({ view, state })
   }
@@ -124,7 +137,7 @@ export class DeviceView extends Component {
   updateTime = () => {
     if (this.state.view) {
       if (this.state.view.timestamp) {
-        var timeago = moment(this.state.view.timestamp).fromNow()
+        var timeago = this.state.view.timestamp + " (" + moment(this.state.view.timestamp).fromNow() + ")"
         this.setState({ timeago })
       }
     }
@@ -197,12 +210,12 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Deleting a device is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -272,12 +285,12 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Clearing A State is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 //this.handleClickDelete()
                 {
                   fetch("/api/v3/state/clear", {
@@ -367,20 +380,19 @@ export class DeviceView extends Component {
 
   dataColumn = () => {
     var plugins;
-
     if (this.state.view) {
-      //latestState = this.state.view;
 
       if (this.state.view.id) {
-        plugins = <DevicePluginPanel stateId={this.state.view.id} />;
+        plugins = <DevicePluginPanel username={this.props.username} stateId={this.state.view.id} device={this.state.state} />;
       } else {
         plugins = <p>plugins loading</p>;
       }
     }
 
-    return (<div className="col-lg-3" style={{ overflowY: "auto", height: "600px", display: this.state.dataview }}>
+    return (<div className="col-lg-3" style={{ overflowY: "auto", height: window.innerHeight - 156 + "px", display: this.state.dataview }}>
+      <div style={{ paddingBottom: 25, paddingTop: 0 }}>{plugins}</div>
       <DataView data={this.state.state} />
-      {plugins}
+
     </div>)
   }
 
@@ -452,8 +464,8 @@ export class DeviceView extends Component {
 
     return (
 
-      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 50 }} >
-        <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
+      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 0, overflow: "hidden" }} >
+        <div className="row" style={{ marginBottom: 0, paddingBottom: 1 }}>
           <div className="col-6">
             <h3>{this.state.devid}</h3>
             <span className="faded" >{this.state.timeago}</span><br></br>

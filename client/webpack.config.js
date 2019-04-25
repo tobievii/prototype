@@ -7,18 +7,20 @@ module.exports = options => {
     output: {
       filename: 'bundle.js',
     },
+    node: {
+      fs: 'empty'
+    },
     resolve: {
       // Add `.ts` and `.tsx` as a resolvable extension.
       extensions: [".ts", ".tsx", ".js"]
     },
     watchOptions: {
-      poll: true,
+      poll: false,
       ignored: ["node_modules", "build", "dist"]
     },
     plugins: [new MonacoWebpackPlugin()],
     module: {
-      rules: [
-        {
+      rules: [{
           test: /\.scss$/,
           use: [
             "style-loader", // creates style nodes from JS strings
@@ -26,36 +28,38 @@ module.exports = options => {
             "sass-loader" // compiles Sass to CSS, using Node Sass by default
           ]
         },
-        { test: /\.tsx?$/, loader: "ts-loader" },
+        {
+          test: /\.tsx?$/,
+          loader: "ts-loader"
+        },
         {
           test: /.js$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                cacheDirectory: true,
-              },
+          use: [{
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
             },
-          ],
+          }, ],
         },
         {
           test: /.jsx$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                cacheDirectory: true,
-              },
+          use: [{
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
             },
-          ],
+          }, ],
         },
         {
           test: /\.css$/,
-          use: [
-            { loader: "style-loader" },
-            { loader: "css-loader" }
+          use: [{
+              loader: "style-loader"
+            },
+            {
+              loader: "css-loader"
+            }
           ]
         }
 

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 
 import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
+import { OptionsTextarea } from "./options/options_textarea.jsx"
+import { OptionsCode } from "./options/options_code.jsx"
 
 export class Widget extends React.Component {
   state = {
@@ -19,6 +21,8 @@ export class Widget extends React.Component {
 
         if (option.type == "input") { return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "color") { return (<OptionsColor key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "textarea") { return (<OptionsTextarea key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "code") { return (<OptionsCode key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 
@@ -34,7 +38,7 @@ export class Widget extends React.Component {
       return (<div className="widgetMenu" style={{
         position: "absolute",
         zIndex: 100,
-        width: 200,
+        width: "auto",
         fontSize: 14
       }} >
         <div className="widgetMenuItem widgetMenuItemButton" onClick={this.removeWidget} >
@@ -55,7 +59,9 @@ export class Widget extends React.Component {
             <option>Blank</option>
             <option>ThreeDWidget</option>
             <option>Gauge</option>
+            <option>mesh</option>
             <option>map</option>
+            <option>form</option>
             {/* <option>button</option> */}
             <option>widgetButton</option>
           </select></div>
@@ -160,7 +166,7 @@ export class Widget extends React.Component {
           </div>
         </div>
 
-        <div className="widgetContents" style={{ height: "100%" }}>
+        <div className="widgetContents" height="100%" width="100%" style={{ height: "100%", width: "100%" }}>
           {this.props.children}
         </div>
 

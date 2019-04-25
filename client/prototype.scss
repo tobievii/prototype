@@ -124,8 +124,8 @@ input[type=search]:focus,
 input[type=tel]:focus,
 input[type=color]:focus,
 .uneditable-input:focus {
-  border-color: rgba(243, 53, 58, 0.8);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(243, 53, 58, 0.6);
+  //border-color: rgba(243, 53, 58, 0.8);
+  //box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(243, 53, 58, 0.6);
   outline: 0 none;
   border-radius: 0;
 }
@@ -284,7 +284,7 @@ td.react-bootstrap-table-editing-cell {
 .commanderBgPanel {
   background: rgba(3, 4, 5, 0.5);
   color: rgba(255, 246, 235, 0.959);
-  padding: 10px 20px 10px 20px;
+  padding: 5px 10px 5px 10px;
   border: 1px solid rgba(60, 19, 25, 0);
   box-sizing: border-box;
   font-weight: 100;
@@ -561,7 +561,7 @@ input {
 
 input:focus {
   color: white;
-  border: 1px solid rgba(255, 39, 32, 0.5);
+  //border: 1px solid rgba(255, 39, 32, 0.5);
   outline: none;
 }
 
@@ -569,7 +569,7 @@ input[type="color"] {
   padding: 0;
 }
 
-.textOverFLow{
+.textOverFLow {
   text-overflow: ellipsis !important;
 }
 
@@ -712,29 +712,29 @@ input[type="color"] {
   margin-bottom: 11px;
 }
 
-input[type="checkbox"] {
-  /* remove standard background appearance */
+// CHECKBOX STYLE
+
+input[type=checkbox] { 
+  appearance: none;  
   -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  /* create custom checkbox appearance */
-
-  width: 15px;
-  height: 15px;
-  padding: 3px;
-  /* background-color only for content */
-  background-clip: content-box;
-  border: 1px solid white;
-  background-color: #e7e6e7;
-
+  -moz-appearance: none; 
+  outline: none;
+} 
+input[type=checkbox]:before {
+  font-family: FontAwesome;
+  display: inline-block;
+  width: 20px;
+  font-size: 22px;
+  outline: none;
 }
 
-/* appearance for checked checkbox */
-input[type="checkbox"]:checked {
-  background-color: red;
-  border: 1px solid red;
-}
+input[type=checkbox]:before { content: "\f096"; } 
+input[type=checkbox]:before { letter-spacing: 10px; } 
 
+input[type=checkbox]:checked:before { content: "\f046"; } 
+input[type=checkbox]:checked:before { letter-spacing: 10px; } 
+
+// END CHECKBOX STYLE
 
 .dataView {
   background: $panelBg;
@@ -789,7 +789,7 @@ input[type="checkbox"]:checked {
 }
 
 .widgetTitleBar {
-  background-color: $panelBg;  
+  background-color: $panelBg;
   height: 32px;
   display: flex;
   justify-content: space-between;
@@ -799,8 +799,8 @@ input[type="checkbox"]:checked {
   width: 100%;
 }
 
-.widgetGrab {  
-  background: $panelBg;  
+.widgetGrab {
+  background: $panelBg;
   cursor: grab;
   height: 100%;
   padding: 5px 5px 5px 8px;
@@ -810,8 +810,8 @@ input[type="checkbox"]:checked {
 }
 
 .widgetGrab:hover {
-  background-color: lighten($panelBg,15%);  
-} 
+  background-color: lighten($panelBg, 15%);
+}
 
 .widgetGrab:active {
   cursor: grabbing;
@@ -1183,26 +1183,35 @@ input[type="checkbox"]:checked {
 }
 
 
-.leaflet-popup-content-wrapper{
+.leaflet-popup-content-wrapper {
   box-shadow: 3px 3px grey;
-  color:red;
-  background:#1b394d;
-  width:100%;
-}
-  
-
-.leaflet-container a.leaflet-popup-close-button{
-  color:red;
+  color: red;
+  background: #1b394d;
+  width: 100%;
 }
 
-.leaflet-popup-tip{
-  background:#1b394d;
- box-shadow: 3px 3px grey;
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: red;
+}
+
+.leaflet-popup-tip {
+  background: #1b394d;
+  box-shadow: 3px 3px grey;
+}
+
+.noDisplayShare {
+  display: none
 }
 
 .rowList {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 50% 50%;
+}
+
+.rowList2 {
+  display: grid;
+  grid-template-columns: 100%;
 }
 
 .viewButton:hover {
@@ -1302,5 +1311,22 @@ input[type="checkbox"]:checked {
   position: absolute;
   padding: 70%
 }
+
+.mesh circle:hover {
+  opacity: 0.5;
+}
+
+/*
+PLUGIN 
+*/
+
+.blockstyle {
+  border: 1px solid rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.2);
+  margin: 0px;
+  padding: 20px;
+}
+
 
 @import 'mobile.scss'

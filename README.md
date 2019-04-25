@@ -20,6 +20,10 @@ See a live realtime list of your devices, when they were last active and a summa
 
 You can set javascript code to process the device JSON data server side (using sandboxed VM) to make REST calls or perform different actions depending on the state of other devices.
 
+## Tutorial
+
+[![01 Getting started](https://img.youtube.com/vi/JqwMZ8O7OlY/0.jpg)](https://www.youtube.com/watch?v=JqwMZ8O7OlY)
+
 # Install instructions
 
 Clone the repo.
@@ -71,6 +75,51 @@ Go to [http://localhost:8080/](http://localhost:8080/) and log in with the defau
 
        email: admin@localhost.com
     password: admin
+
+
+# Configuration
+
+Optionally you can use a config file with prototype.
+
+Create a text file named `iotconfig.json` and place it 2 folders up from prototype.
+
+**So your folder structure should look something like:**
+
+```bash
+# PLACE CONFIG FILE HERE
+~/iot/iotconfig.json    # config file
+
+# ANY SUB FOLDER 
+# git clone https://github.com/IoT-nxt/prototype.git
+~/iot/prod                     # any folder name (we use different branch names here)
+
+# PROTOTYPE REPO
+# after cloneing in "prod" folder your should have prototype sub folder
+~/iot/prod/prototype           # prototype main folder
+~/iot/prod/prototype/build
+~/iot/prod/prototype/client
+~/iot/prod/prototype/src
+~/iot/prod/prototype/package.json
+```
+
+**Contents of config file:**
+
+All values are optional. See /src/config.ts for defaults values.
+
+```json
+{
+  "ssl": true,
+  "sslOptions": {
+    "certPath": "/etc/letsencrypt/live/prototype.iotnxt.io/fullchain.pem",
+    "keyPath": "/etc/letsencrypt/live/prototype.iotnxt.io/privkey.pem"
+  },
+  "httpPort": 80,
+  "httpsPort": 443,
+  "mongoConnection": "mongodb://testuser:testpass@mongotest.iotnxt.io:27017/prototype"
+}
+```
+
+
 
 # Roadmap
 

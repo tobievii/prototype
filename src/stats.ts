@@ -6,13 +6,15 @@ var dbStats: any;
 export async function accountStats(user: any, cb: Function) {
   var db = dbStats;
 
-  var stats = {
-    packetsMonth: await accountPacketsThisMonth(),
-    packetsTotal: await accountPacketsTotal(),
-    packetsToday: await accountPacketsToday(),
-    statesTotal: await accountStatesTotal(),
-    statesActive: await accountStatesActive24h()
-  }
+  // var stats = {
+  //   packetsMonth: await accountPacketsThisMonth(),
+  //   packetsTotal: await accountPacketsTotal(),
+  //   packetsToday: await accountPacketsToday(),
+  //   statesTotal: await accountStatesTotal(),
+  //   statesActive: await accountStatesActive24h()
+  // }
+
+  var stats = {}
 
   cb(undefined, stats);
 
@@ -85,7 +87,7 @@ export function init(app: any, db: any) {
     db.packets.aggregate([
       {
         $match:
-          { _created_on: { $gt: new Date("2018-01-01T00:00:00.000Z") }, apikey: req.user.apikey, devid: req.body.deviceid }
+          { _created_on: { $gt: new Date("2019-01-01T00:00:00.000Z") }, apikey: req.user.apikey, devid: req.body.deviceid }
       },
       {
         $group: {
@@ -114,14 +116,15 @@ export function init(app: any, db: any) {
   // returns general server statistics
   app.get("/api/v3/stats", async (req: any, res: any) => {
     var stats = {
-      users24h: await usersActiveLastDays(1),
-      users24hList: await usersActiveLastDaysNames(1),
+      //   users24h: await usersActiveLastDays(1),
+      //   users24hList: await usersActiveLastDaysNames(1),
       userList: await usersNames(),
-      users1w: await usersActiveLastDays(7),
-      users1m: await usersActiveLastDays(30),
-      states24h: await statesActiveLastDays(1),
-      packets24h: await packetsActiveLastDays(1)
+      //   users1w: await usersActiveLastDays(7),
+      //   users1m: await usersActiveLastDays(30),
+      //   states24h: await statesActiveLastDays(1),
+      //   packets24h: await packetsActiveLastDays(1)
     }
+
     res.json(stats)
   })
 

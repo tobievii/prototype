@@ -13,15 +13,9 @@ import { log } from "../../utils"
 export const name = "MQTT"
 
 export function handlePacket(db: any, packet: any, cb: any) {
-    //log("mqtt handle packet")
-    //log(packet)
-
     for (var c in mqttConnections) {
-        //mqttConnections[c].publish("glp5xm1jpwhtwdnsykv5nv4hhwrp1xy9", packet)
-
         for (var sub of mqttConnections[c].subscriptions) {
-            if (sub == packet.apikey) {
-
+            if ((sub == packet.apikey) || (sub == packet.apikey + "|" + packet.devid)) {
                 var temp = _.clone(packet.payload);
                 delete temp["meta"]
                 delete temp.timestamp
@@ -32,17 +26,20 @@ export function handlePacket(db: any, packet: any, cb: any) {
                 }
 
                 if (mqttConnections[c].connected) {
-                    mqttConnections[c].publish(packet.apikey, JSON.stringify(temp))
-                }
+                    var sendit = true;
 
+                    // check if this is not the same socket that sent the packet, if so then we do not echo it back.
+                    if (_.has(packet, "payload.meta.socketUuid")) {
+                        if (packet.payload.meta.socketUuid == mqttConnections[c].uuid) {
+                            sendit = false;
+                        }
+                    }
+
+                    if (sendit) { mqttConnections[c].publish(packet.apikey, JSON.stringify(temp)) }
+                }
             }
         }
-
-        // if (mqttConnections[c].apikey == packet.apikey) {
-
-        // }
     }
-
 }
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
@@ -69,7 +66,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
             try {
                 requestClean = JSON.parse(publish.payload)
-                requestClean.meta = { "User-Agent": "MQTT", "method": "publish" }
+                requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
                 eventHub.emit("device", { apikey: publish.topic, packet: requestClean })
             } catch (err) {
                 log(err);
@@ -81,6 +78,9 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
             log(err);
         })
 
+        client.on("ping", () => {
+            //log("MQTT PING!")
+        })
         //client.on("close", (err) => { log("MQTT CLIENT CLOSED") })
     });
 

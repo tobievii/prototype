@@ -87,12 +87,11 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   })
 
   app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
-    console.log("set gateway for device")
     var gateway = {
       GatewayId: req.body.GatewayId,
       HostAddress: req.body.HostAddress
     }
-    setgatewaydevice(db, req.user.apikey, req.body.id, gateway, (err: Error, result: any) => {
+    setgatewaydevice(db, req.body.key, req.user.level, req.user.apikey, req.body.id, gateway, (err: Error, result: any) => {
       res.json(result);
     })
   });
@@ -322,15 +321,27 @@ function setgatewayaccountdefault(db: any, gateway: any, user: any, cb: any) {
     })
 }
 
-function setgatewaydevice(db: any, apikey: string, id: string, gateway: any, cb: any) {
-  db.states.update({ devid: id, apikey: apikey },
-    {
-      "$set": {
-        "plugins_iotnxt_gateway": {
-          GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress
+function setgatewaydevice(db: any, key: any, level: any, apikey: string, id: string, gateway: any, cb: any) {
+  if (level > 0 && level < 100) {
+    db.states.update({ $and: [{ devid: id, apikey: apikey }] },
+      {
+        "$set": {
+          "plugins_iotnxt_gateway": {
+            GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress
+          }
         }
-      }
-    }, cb)
+      }, cb)
+  }
+  else if (level >= 100) {
+    db.states.update({ $and: [{ devid: id, key: key }] },
+      {
+        "$set": {
+          "plugins_iotnxt_gateway": {
+            GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress
+          }
+        }
+      }, cb)
+  }
 }
 
 function updategateway(db: any, gateway: any, update: any, cb: any) {

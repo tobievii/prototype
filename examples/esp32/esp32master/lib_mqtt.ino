@@ -1,5 +1,6 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include <ArduinoJson.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -12,25 +13,40 @@ int mqttStatus = 0;
 // 2 = FAILED ()
 // 3 = SUCCESS
 
-const char* mqttServer = "prototype.dev.iotnxt.io";
+//const char* mqttServer = "prototype.dev.iotnxt.io";
+const char* mqttServer = "192.168.1.145";
 const int mqttPort = 1883;
-String apikey = "dnjskllzve6xzv47l1mw72p74jqbjjz4p";
-String deviceid = "microRaptor2";
+String apikey = "4oxk9bg32xyncaxr6494z6jkqxb61tmf";
 
 unsigned long lastupdate = 0;
 
 int lib_mqtt_status_get() {
-  return mqttStatus;
+  int returnmqttStatus = mqttStatus;
+  return returnmqttStatus;
 }
 
 void lib_mqtt_loop() {
   detectConnection();
   client.loop();  
-  if (millis() - lastupdate > 15000) {
-    lastupdate = millis();
-    publishUpdate();
-    //pub = true;
+  
+  if (client.connected()) {
+    mqttStatus = 3;lib_display_update();
+    if (millis() - lastupdate > 15000) {
+      lastupdate = millis();
+      lib_mqtt_publishUpdate();
+      //pub = true;
+    }
+  } else {
+    
+    if (lib_wifi_status_get() == 3) { //if wifi is on
+      mqttStatus = 1;lib_display_update();
+      //connectMqtt();  
+      lib_mqtt_connectMQTT();  
+    } else {
+      mqttStatus = 0;lib_display_update();
+    }
   }
+  
 }
 
 void detectConnection() {
@@ -43,11 +59,12 @@ void detectConnection() {
 }
 
 void lib_mqtt_connectMQTT() {
-  mqttStatus = 1;
+  mqttStatus = 1;lib_display_update();
   client.setServer(mqttServer, mqttPort);
   client.setCallback(handleMessages);
   connectMqtt();
-  client.subscribe(apikey.c_str());
+  String subscribeTopic = String(apikey+"|"+lib_state_deviceid());
+  client.subscribe(subscribeTopic.c_str());
 }
 
 void connectMqtt() {
@@ -59,15 +76,16 @@ void connectMqtt() {
   while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
     if (client.connect("clientid", "api", mqttPassword.c_str() )) {
-      mqttStatus = 3;
+      mqttStatus = 3;lib_display_update();
       Serial.println("connected"); 
-      publishUpdate();
+      lib_display_log("MQTT");
+      lib_mqtt_publishUpdate();
       //iotnxt = true;
     } else {
-      mqttStatus = 2; // FAILED
+      mqttStatus = 2; lib_display_update();// FAILED
       Serial.print("failed with state ");
       Serial.print(client.state());
-      lib_display_log("failed to connect.");
+      lib_display_log("MQTT failed.");
 
       /*
 -4 : MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time
@@ -81,38 +99,42 @@ void connectMqtt() {
 4 : MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected
 5 : MQTT_CONNECT_UNAUTHORIZED - the client was not authorized to connect
       */
-      delay(2000); 
+      //delay(2000); 
     }
   }
 }
 
-void publishUpdate() {
-  //Serial.print("publishing!\n");
-  String msg = "{\"id\":\""+deviceid+"_"+lib_id_getuuid()+"\",\"data\":{\"button\":false}}";
-  client.publish(apikey.c_str(), msg.c_str());
+void lib_mqtt_publishUpdate() {
+  if (mqttStatus == 3) {
+    Serial.print("publishing!\n");
+    String msg = lib_state_packet(); //"{\"id\":\""+lib_state_deviceid()+"_"+lib_id_getuuid()+"\",\"data\":{\"version\":\""+lib_state_version()+"\",\"button\":false}}";
+    client.publish(apikey.c_str(), msg.c_str());
+  }  
 }
 
 void handleMessages(char* topic, byte* payload, unsigned int length) {
   //Serial.println(payload);
   Serial.println("MQTT recv");
 
-  // StaticJsonDocument<200> requestDoc;
-  // DeserializationError error = deserializeJson(requestDoc, payload);
-  // JsonObject request = requestDoc.as<JsonObject>();
+  StaticJsonDocument<200> requestDoc;
+  DeserializationError error = deserializeJson(requestDoc, payload);
+  JsonObject request = requestDoc.as<JsonObject>();
 
-  // String jsontemp; 
-  // serializeJson(request,jsontemp);
-  // Serial.println("api call:");
-  // Serial.println(jsontemp);
-  // Serial.println("-----");
+  String jsontemp; 
+  serializeJson(request,jsontemp);
+  Serial.println("api call:");
+  Serial.println(jsontemp);
+  Serial.println("-----");
 
-  // String display = request["data"]["display"];
+  JsonVariant display = request["data"]["display"];
+  if (!display.isNull()) { 
+    String displayVal = request["data"]["display"];
+    Serial.println(displayVal);
+    lib_display_log(displayVal); 
+  }
   
-  // Serial.println(display);
-  // if (display) { log(display); }
-  
-  // if (request["data"]["digitalWrite"]) {
-  //   pinMode(request["data"]["pin"], OUTPUT);
-  //   digitalWrite(request["data"]["pin"], request["data"]["level"]);
-  // }   
+  if (request["data"]["digitalWrite"]) {
+    pinMode(request["data"]["pin"], OUTPUT);
+    digitalWrite(request["data"]["pin"], request["data"]["level"]);
+  }   
 }

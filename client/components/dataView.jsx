@@ -106,7 +106,7 @@ export class DataView extends React.Component {
   renderObject = (data, level, path) => {
 
     return (
-      <div style={{ overflowY: 'hidden' }}>
+      <div style={{ overflowY: 'hidden', paddingBottom: 25 }}>
         {Object.keys(data).map((name, i) => {
 
           if (typeof data[name] == "object") {
@@ -140,7 +140,7 @@ export class DataView extends React.Component {
 
 
     if (this.dragging == false) {
-      console.log({ e, name, i, data, level, path })
+      //console.log({ e, name, i, data, level, path })
       this.dragging = true;
       e.data = data;
       e.dataname = name;

@@ -53,6 +53,10 @@ void lib_wifi_status() {
 
     if (wifiStatus == WL_CONNECTED) { // 3
       Serial.println("connected to a WiFi network");
+      Serial.print("Connected to ");
+      Serial.println(ssid);
+      Serial.print("IP address: ");
+      Serial.println(WiFi.localIP());
     }
 
     if (wifiStatus == WL_CONNECT_FAILED) { // 4
@@ -74,6 +78,12 @@ void lib_wifi_status() {
     lib_wifi_status_last = wifiStatus;
     lib_display_update();
   }
+}
+
+
+String lib_wifi_ip() {
+  IPAddress ip = WiFi.localIP();
+  return String(ip[0]) + String(".") + String(ip[1]) + String(".") + String(ip[2]) + String(".") + String(ip[3])  ; 
 }
 
 
