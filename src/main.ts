@@ -155,11 +155,11 @@ app.get('/', (req: any, res: any) => {
 
   if (req.user) {
     if (req.user.level > 0) {
-      fs.readFile('../public/react.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err, data: any) => {
         res.end(data.toString())
       })
     } else {
-      fs.readFile('../public/react.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err, data: any) => {
         res.end(data.toString())
       })
     }
@@ -172,19 +172,19 @@ app.get('/', (req: any, res: any) => {
 stats.init(app, db);
 
 app.get('/admin/accounts', (req: any, res: any) => {
-  fs.readFile('../public/admin_accounts.html', (err: Error, data: any) => {
+  fs.readFile('../public/admin_accounts.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get("/recover/:recoverToken", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get("/accounts/secure", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
@@ -197,7 +197,7 @@ app.get('/signout', (req: any, res: any) => {
 app.post('/signin', accounts.signInFromWeb(db));
 
 app.get("/u/:username", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
@@ -229,41 +229,41 @@ app.post("/subscribe", (req: any, res: any) => {
 });
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get("/notifications", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 
 app.get('/settings', (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 });
 
 app.get('/view/:id', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get('/view/:id/:mode', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
   trex.log("fbp:");
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
