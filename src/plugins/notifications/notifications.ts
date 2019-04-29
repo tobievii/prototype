@@ -84,6 +84,9 @@ function getWarningNotification(db: any) {
       }
     }
     deviceTime = final._last_seen.getTime() - dayago.getTime();
+    if (deviceTime < 0) {
+      deviceTime = 86000000;
+    }
     timer.reset(deviceTime);
     timer.stop();
     timer.start();
@@ -187,12 +190,10 @@ export function deviceSeen(db: any, user: any) {
     io.emit("notification", undefined, user.apikey);
 
     db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
-      console.log(updated);
     })
   });
 }
 
-//to do: update on device post, remove warning
 export function checkExisting(req: any, res: any, db: any) {
   // timer.reset(500);
   // timer.stop();
