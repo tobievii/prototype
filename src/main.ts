@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting, testF } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -414,7 +414,7 @@ app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    res.json({ error: "Pease select a device to view device information/dashboard." })
   }
 });
 
@@ -529,7 +529,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Pease select a device to view device information/dashboard." })
         }
         ///
       }
@@ -552,7 +552,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Pease select a device to view device information/dashboard." })
     }
   }
 
@@ -592,7 +592,7 @@ async function findstate(req: any, res: any) {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Pease select a device to view device information/dashboard." })
         }
       }
     })
@@ -606,7 +606,7 @@ async function findstate(req: any, res: any) {
         res.json(state);
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Pease select a device to view device information/dashboard." })
     }
   }
 }
@@ -785,7 +785,6 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
-
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
@@ -953,7 +952,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   checkExisting(req, res, db);
-
+  testF(req, res);
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
@@ -1013,15 +1012,7 @@ function handleState(req: any, res: any, next: any) {
             seen: false
           }
 
-          if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
-              AlarmNotification.message = Result.workflowCode.substring(
-                Result.workflowCode.lastIndexOf('alarm1("') + 8,
-                Result.workflowCode.lastIndexOf('")')
-              )
-              createNotification(db, AlarmNotification, req, Result);
-            }
-          } else if (Result.boundaryLayer != undefined) {
+          if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
               createNotification(db, AlarmNotification, req, Result);

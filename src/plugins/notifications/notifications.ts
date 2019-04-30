@@ -12,6 +12,9 @@ export const workflowDefinitions = [
 
 var timer: any;
 var io: any;
+var reqL: any;
+var resL: any;
+var dbl: any;
 
 export const workflow = { warning, alarm1, info }
 
@@ -109,7 +112,7 @@ function msToHMS(ms: any) {
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
   io = eventHub;
-
+  dbl = db;
   app.post("/api/v3/notifications/seen", (req: any, res: any) => {
     deviceSeen(db, req.user);
     res.json({ result: "done" })
@@ -130,15 +133,34 @@ export function warning(message: string) {
 }
 
 export function alarm1(message: string) {
-  console.log(message);
+  var devid = reqL.body.id;
+  var message = message;
+  var AlarmNotification = {
+    type: "ALARM",
+    device: devid,
+    created: Date.now(),
+    message: message,
+    notified: true,
+    seen: false
+  }
+
+  createNotification(dbl, AlarmNotification, reqL, { apikey: reqL.user.apikey });
 }
 
 export function info(message: string) {
   console.log(message);
 }
 
+export function testF(req: any, res: any) {
+  reqL = req;
+  resL = res
+}
+
 export function createNotification(db: any, notification: any, req: any, device: any) {
-  if (notification.type == "ALARM") {
+
+
+  if (notification.type === "ALARM") {
+
     io.emit("notification", notification, device);
 
     if (req.user.notifications) {
@@ -147,17 +169,12 @@ export function createNotification(db: any, notification: any, req: any, device:
       req.user.notifications = [notification]
     }
     db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-
-      for (var a of result.notifications) {
-        if (a.type == 'ALARM' && a.device == req.body.id) {
-          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            if (err !== null) {
-              console.log(err)
-            } else if (updated)
-              console.log(updated)
-          })
-        }
-      }
+      db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+        if (err !== null) {
+          console.log(err)
+        } else if (updated)
+          console.log(updated)
+      })
     })
   } else if (notification.type == "NEW DEVICE ADDED") {
     io.emit("notification", notification, device);
@@ -195,9 +212,6 @@ export function deviceSeen(db: any, user: any) {
 }
 
 export function checkExisting(req: any, res: any, db: any) {
-  // timer.reset(500);
-  // timer.stop();
-  // timer.start();
 
   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
 
