@@ -314,7 +314,7 @@ export class IotnxtQueue extends events.EventEmitter {
 
   /* ################################################################################## */
 
-  public publishState(cb: any) {
+  public publishState(packetIn: any, cb: any) {
 
 
     var packet = JSON.parse(JSON.stringify(this.state));
@@ -327,7 +327,7 @@ export class IotnxtQueue extends events.EventEmitter {
       "Raptor": "000000000000"
     };
 
-    var dateNow = new Date();
+    var dateNow = new Date(packetIn.payload.timestamp);
     var fromUtc = new Date(dateNow.getTime() - 15 * 1000)
 
     packet.MessageId = getGUID();

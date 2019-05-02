@@ -20,9 +20,13 @@ export function postState(
     return;
   }
 
-
-
   var event = new Date();
+
+  // enables timestamp override if included in packet
+  if (request.timestamp) {
+    event = new Date(request.timestamp);
+  }
+
   request.timestamp = event.toJSON();
 
   var packet: any = {
