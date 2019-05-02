@@ -589,7 +589,7 @@ function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
         }
       }
     }
-    iotnxtqueues[gateway.GatewayId + "|" + gateway.HostAddress].publishState(cb);
+    iotnxtqueues[gateway.GatewayId + "|" + gateway.HostAddress].publishState(packet, cb);
   } else {
     //console.log("QUEUE UNDEFINED")
   }
