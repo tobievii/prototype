@@ -21,18 +21,15 @@ export const workflowDefinitions = [
   "}"
 ];
 
-export const workflow = {
-  write: writeToPort,
-  list: listPorts
-};
+export function workflow(options: any) {
+  this.write = writeToPort
+
+  this.list = listPorts;
+}
 
 export function writeToPort(comName: string, data: string, cb: Function) {
   console.log("writeToPort")
   sp.write(comName, data, cb);
-  
-  
-  
-  
 }
 
 export function listPorts() {
@@ -192,7 +189,7 @@ export class SerialJSONDevice extends events.EventEmitter {
         var parsedJson;
         try {
           parsedJson = JSON.parse(cleanoutput);
-        } catch (err) {}
+        } catch (err) { }
         var jsonData = {
           device: this.device,
           options: options,
@@ -242,7 +239,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   sp.on("connect", device => {
     console.log("--- connect ---");
-    updateserialportdevice(db, device, (err: Error, res: any) => {});
+    updateserialportdevice(db, device, (err: Error, res: any) => { });
     //console.log(device);
     //eventHub.emit("device",{apikey:"cp3rrhjeryufe2xnlsxk7yooxat2m3rj", packet: {id:"testSerial", data:{a:1}}    })
   });
@@ -295,9 +292,9 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
                   }
                 });
               }
-            } catch (err) {}
+            } catch (err) { }
           }
-        } catch (err) {}
+        } catch (err) { }
         //////
       }
     });
@@ -355,12 +352,12 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     });
   });
 
-  app.post("/api/v3/serialports/connect", (req:any, res:any)=>{
+  app.post("/api/v3/serialports/connect", (req: any, res: any) => {
     console.log(req.body)
     if (typeof req.body.connect == "undefined") {
       req.body.connect = true;
-    } 
-    setSerialportConnect(db, req.body, req.user, req.body.connect, (err:Error, result:any) => {
+    }
+    setSerialportConnect(db, req.body, req.user, req.body.connect, (err: Error, result: any) => {
       if (err) res.json(err);
       res.json(result);
     })
@@ -384,8 +381,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 
 
-function setSerialportConnect(db: any, device: any, user: any, connect:boolean, cb: any) {
-  updateserialportdevice(db, {comName: device.comName, connect:connect}, cb)
+function setSerialportConnect(db: any, device: any, user: any, connect: boolean, cb: any) {
+  updateserialportdevice(db, { comName: device.comName, connect: connect }, cb)
 }
 
 

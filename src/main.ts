@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-import { createNotification, checkExisting, setParams } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -952,8 +952,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   checkExisting(req, res, db);
-  setParams(req, res);
-  
+
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
@@ -999,7 +998,7 @@ function handleState(req: any, res: any, next: any) {
               seen: false
             }
 
-            createNotification(db, newDeviceNotification, req, Result);
+            createNotification(db, newDeviceNotification, req.user, Result);
             io.to(req.user.username).emit("info", info);
           }
 
@@ -1016,7 +1015,7 @@ function handleState(req: any, res: any, next: any) {
           if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req, Result);
+              createNotification(db, AlarmNotification, req.user, Result);
             }
           }
         })
@@ -1341,9 +1340,15 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           }
         }
 
+        var options = {
+          apikey: state.apikey,
+          devid: state.devid
+        }
+
         for (var plugin of plugins) {
           if (plugin.workflow) {
-            sandbox[plugin.name] = plugin.workflow;
+            var workflow = plugin.workflow;
+            sandbox[plugin.name] = new workflow(options);
           }
         }
 

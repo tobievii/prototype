@@ -12,11 +12,58 @@ export const workflowDefinitions = [
 
 var timer: any;
 var eventHubGlobal: any;
-var reqGlobal: any;
-var resGlobal: any;
 var dbGlobal: any;
 
-export const workflow = { warning, alarm1, info }
+export function workflow(options: any) {
+  this.alarm1 = function (message: string) {
+    var AlarmNotification = {
+      type: "ALARM",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+
+  this.warning = function warning(message: string) {
+    console.log(message);
+
+    var AlarmNotification = {
+      type: "WARNING",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+
+  this.info = function info(message: string) {
+    console.log(message);
+
+    var AlarmNotification = {
+      type: "INFO",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+}
 
 function Timer(fn: any, t: any) {
   var timerObj: any = setInterval(fn, t);
@@ -128,68 +175,19 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   }, 5000);
 }
 
-export function warning(message: string) {
-  console.log(message);
-}
+export function createNotification(db: any, notification: any, user: any, device: any) {
+  eventHubGlobal.emit("notification", notification, device);
 
-export function alarm1(message: string) {
-  var devid = reqGlobal.body.id;
-  var message = message;
-  var AlarmNotification = {
-    type: "ALARM",
-    device: devid,
-    created: Date.now(),
-    message: message,
-    notified: true,
-    seen: false
+  if (user.notifications) {
+    user.notifications.push(notification)
+  } else {
+    user.notifications = [notification]
   }
 
-  createNotification(dbGlobal, AlarmNotification, reqGlobal, { apikey: reqGlobal.user.apikey });
-}
-
-export function info(message: string) {
-  console.log(message);
-}
-
-export function setParams(req: any, res: any) {
-  reqGlobal = req;
-  resGlobal = res
-}
-
-export function createNotification(db: any, notification: any, req: any, device: any) {
-
-
-  if (notification.type === "ALARM") {
-
-    eventHubGlobal.emit("notification", notification, device);
-
-    if (req.user.notifications) {
-      req.user.notifications.push(notification)
-    } else {
-      req.user.notifications = [notification]
-    }
-    db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-      db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-        if (err !== null) {
-          console.log(err)
-        } else if (updated)
-          console.log(updated)
-      })
-    })
-  } else if (notification.type == "NEW DEVICE ADDED") {
-    eventHubGlobal.emit("notification", notification, device);
-
-    if (req.user.notifications) {
-      req.user.notifications.push(notification)
-    } else {
-      req.user.notifications = [notification]
-    }
-
-    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-      if (err) console.log(err);
-      if (updated) console.log(updated);
-    })
-  }
+  db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+    if (err) console.log(err);
+    if (updated) console.log(updated);
+  })
 }
 
 export function deviceSeen(db: any, user: any) {
