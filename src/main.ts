@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-import { createNotification, checkExisting, testF } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting, setParams } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -952,7 +952,8 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   checkExisting(req, res, db);
-  testF(req, res);
+  setParams(req, res);
+  
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
