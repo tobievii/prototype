@@ -313,7 +313,8 @@ export class ShareList extends Component {
     render() {
         return (<div ><center>
             {this.setValues(this.props.isOpen)}
-            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className={"fas fa-times " + this.state.show} onClick={() => { this.props.closeModel(this.state.qresponse); count = 0; }} style={{ color: "red" }}></i>
+            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}>
+                <i className={"fas fa-times " + this.state.show} onClick={() => { this.props.closeModel(this.state.qresponse); count = 0; }} style={{ color: "red" }}></i>
                 <center style={{ color: "white", display: this.state.checkboxstate }}>
                     <br></br> Search For users to share  with<br></br>
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>

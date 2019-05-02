@@ -25,6 +25,7 @@ import socketio from "socket.io-client";
 
 import { Dashboard } from "./dashboard/dashboard.jsx"
 import { Editor } from "./editor.jsx"
+import { StatesViewer } from "./statesViewer.jsx";
 var loggedInUser = "";
 const customStyles = {
   content: {
@@ -44,6 +45,8 @@ const customStyles = {
     background: "rgba(27, 57, 77,0.9)",
   }
 };
+
+var viewController = "";
 
 export class DeviceView extends Component {
   state = {
@@ -83,6 +86,7 @@ export class DeviceView extends Component {
 
   constructor(props) {
     super(props);
+    // console.log(props)
     this.socket = socketio();
     this.state.devid = props.devid
     this.socket.on("connect", a => {
@@ -103,9 +107,6 @@ export class DeviceView extends Component {
       this.setState({ devicesServer: states })
     })
   }
-
-
-
 
   updateView = (packet) => {
     var view = _.clone(this.state.view);
@@ -152,13 +153,16 @@ export class DeviceView extends Component {
     }).catch(err => console.error(err.toString()));
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     this.updateTime();
     setInterval(() => {
       this.updateTime();
     }, 500)
 
+    this.getDeviceDV();
+  }
 
+  getDeviceDV = () => {
     fetch("/api/v3/view", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
@@ -182,13 +186,11 @@ export class DeviceView extends Component {
     }).then(response => response.json()).then(state => {
       this.setState({ state }, () => {
         if (state.error) {
-          console.log(state.error)
         } else {
           this.socket.emit("join", state.key)
         }
       })
     }).catch(err => console.error(err.toString()));
-
   }
 
   componentWillUnmount = () => {
@@ -221,7 +223,7 @@ export class DeviceView extends Component {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: id, username: this.props.username, key: this.state.state.key })
                   }).then(response => response.json()).then(serverresponse => {
-                    window.location.href = "/"
+                    onClose();
                   }).catch(err => console.error(err.toString()));
                 }
               }}>Yes, Delete it!</button>
@@ -297,7 +299,7 @@ export class DeviceView extends Component {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({ id: this.state.devid, username: this.props.username })
                   }).then(response => response.json()).then(serverresponse => {
-                    window.location.reload()
+                    onClose();
                   }).catch(err => console.error(err.toString()));
                 }
               }}>Yes, Clear it!</button>
@@ -458,48 +460,65 @@ export class DeviceView extends Component {
     }
   }
 
+  openModal = () => {
+    this.props.openModal();
+  }
+
+  views = () => {
+    if (this.props.mainView != "dashboard") {
+      viewController = "";
+      return (
+        <StatesViewer deviceClicked={() => { this.getDeviceDV(); this.dashboardColumn() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} />
+      )
+    } else {
+      viewController = "changeDisplay";
+      return null
+    }
+  }
+
 
   render() {
-
-
     return (
-
-      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 0, overflow: "hidden" }} >
-        <div className="row" style={{ marginBottom: 0, paddingBottom: 1 }}>
-          <div className="col-6">
-            <h3>{this.state.devid}</h3>
-            <span className="faded" >{this.state.timeago}</span><br></br>
-          </div>
-          <div className="col-6 noDisplay" >
-            <div className="" style={{ display: this.state.shareDisplay }}>
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
-                <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+      <div className={"mock-up " + this.props.mainView}>
+        {this.views()}
+        <div className="" style={{ width: "100%", paddingRight: "10px", marginLeft: 2, marginRight: 3 }} >
+          <div className="deviceViewContainer" style={{ paddingBottom: 0, paddingRight: 5, paddingLeft: 5, overflow: "hidden" }}>
+            <div className="row" style={{ marginBottom: 5, marginTop: 10, paddingBottom: 1 }}>
+              <div className="col-5">
+                <h3>{this.props.devid}</h3>
               </div>
+              <div className="col-7 noDisplay" >
+                <div className="" style={{ display: this.state.shareDisplay }}>
 
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
-                <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
+                  <div className="" style={{ width: "auto", float: "right", fontSize: 18, marginRight: 10, marginLeft: 15, cursor: "pointer" }} onClick={() => this.deleteDevice(this.props.devid)}>
+                    <FontAwesomeIcon icon="trash" />
+                  </div>
+
+                  <div className="" style={{ width: "auto", float: "right", fontSize: 18, cursor: "pointer" }} onClick={this.clearState}>
+                    <FontAwesomeIcon icon="eraser" />
+                  </div>
+
+                  <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
+
+                    <i className="fas fa-share-alt"></i>
+                  </div>
+
+                  <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 14, fontSize: 18, cursor: "pointer" }} className=""  >
+                    <i className="fas fa-edit"></i>
+                  </div>
+                  <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 16, fontSize: 18, cursor: "pointer" }} className=""  >
+                    <i className="fas fa-database"></i>
+                  </div>
+                  <div className="faded" style={{ width: "auto", float: "right", marginRight: 16, marginTop: 8, fontSize: 12 }}>{this.state.timeago}</div>
+
+                  <ShareList devid={this.props.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
+                </div>
               </div>
-
-              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
-
-                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
-              </div>
-
-              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
-                <i className="fas fa-edit"></i> {this.state.EditorButton}
-              </div>
-              <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
-                <i className="fas fa-database"></i> {this.state.dataButton}
-              </div>
-
-              <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
             </div>
-          </div>
+            {this.orderScreenSize()}
+          </div >
         </div>
-        {this.orderScreenSize()}
-      </div >
-
-
+      </div>
     );
   }
 }

@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "./prototype.scss"
 
 import { NavBar } from "./components/navBar.jsx";
+import { AddDevice } from "./components/addDevice.jsx";
 import { Account } from "./public/account.jsx"
 // not logged in content:
 import { Landing } from "./public/landing.jsx"
@@ -39,18 +40,16 @@ const test = {
     ds: undefined
 }
 
+var publicS = undefined;
+
 class App extends Component {
-    state = {};
+    state = {
+        devicesView: "dashboardDevices",
+        isOpen: false
+    };
 
     constructor(props) {
         super(props);
-        p.getAccount(account => {
-            this.setState({ account });
-            if (account.level > 0) {
-                socket.emit("join", account.apikey);
-                this.setState({ loggedIn: true })
-            }
-        })
 
         p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
 
@@ -66,6 +65,16 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
+    }
+
+    componentWillMount = () => {
+        p.getAccount(account => {
+            this.setState({ account });
+            if (account.level > 0) {
+                socket.emit("join", account.apikey);
+                this.setState({ loggedIn: true })
+            }
+        })
     }
 
     serviceworkerfunction = () => {
@@ -177,22 +186,75 @@ class App extends Component {
 
     home = ({ match }) => {
         if (this.state.account) {
+            if (match.params.username == undefined) {
+                match.params.username = this.state.account.username;
+            }
             if (this.state.account.level > 0) {
+                publicS = false;
+                var view = undefined;
+
+                if (this.state.devicesView == "dashboard") {
+                    view = <DeviceView
+                        openModal={this.openModal}
+                        mainView={this.state.devicesView}
+                        devid={match.params.devid}
+                        username={match.params.username}
+                        acc={test.acc}
+                        deviceCall={test.dc}
+                        devices={test.ds}
+                        sendProps={this.setProps}
+                        account={this.state.account}
+                        public={false}
+                        visiting={false}
+                    />
+                } else if (this.state.devicesView == "devices") {
+                    view = <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
+                } else if (this.state.devicesView == "dashboardDevices") {
+                    view = <DeviceView
+                        openModal={this.openModal}
+                        mainView={this.state.devicesView}
+                        devid={match.params.devid}
+                        username={match.params.username}
+                        acc={test.acc}
+                        deviceCall={test.dc}
+                        devices={test.ds}
+                        sendProps={this.setProps}
+                        account={this.state.account}
+                        public={false}
+                        visiting={false}
+                    />
+                }
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />
+                        {/* <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} /> */}
+                        {view}
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer loggedIn={true} />
                     </div>
                 )
             } else {
+                publicS = true
                 return (
                     <div>
                         <Account account={this.state.account} />
                         <Landing />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} />
+                        {/* <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} /> */}
+
+                        <DeviceView
+                            mainView={this.state.devicesView}
+                            devid={match.params.devid}
+                            username={match.params.username}
+                            acc={test.acc}
+                            deviceCall={test.dc}
+                            devices={test.ds}
+                            sendProps={this.setProps}
+                            account={this.state.account}
+                            public={true}
+                            visiting={false}
+                        />
+
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -205,12 +267,17 @@ class App extends Component {
         return (
             <div>
                 <DeviceView
+                    openModal={this.openModal}
+                    mainView={this.state.devicesView}
                     devid={match.params.devid}
                     username={match.params.username}
                     acc={test.acc}
                     deviceCall={test.dc}
                     devices={test.ds}
+                    sendProps={this.setProps}
                     account={this.state.account}
+                    public={publicS}
+                    visiting={false}
                 />
             </div>
         )
@@ -220,7 +287,20 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
+                {/* <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} /> */}
+                <DeviceView
+                    openModal={this.openModal}
+                    mainView={this.state.devicesView}
+                    devid={match.params.devid}
+                    username={match.params.username}
+                    acc={test.acc}
+                    deviceCall={test.dc}
+                    devices={test.ds}
+                    sendProps={this.setProps}
+                    account={this.state.account}
+                    public={false}
+                    visiting={true}
+                />
                 <Footer />
             </div>
 
@@ -255,18 +335,41 @@ class App extends Component {
         )
     }
 
+    changeView = (view) => {
+        this.setState({ devicesView: view });
+    }
+
+    clickShare = (response) => {
+        this.setState({ isOpen: false })
+        if (response.mail != undefined && response.mail == "sent") {
+            fetch("/api/v3/state", {
+                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: this.props.device.devid, username: this.props.username })
+            }).then(response => response.json()).then(state => {
+                this.setState({ device: state })
+                this.setDevice(state)
+            }).catch(err => console.error(err.toString()));
+        }
+    }
+
+    openModal = () => {
+        this.setState({ isOpen: true });
+    }
+
     render() {
         return (
             <div className="App">
 
                 <Router>
                     <div>
-                        <NavBar version={this.state.version} account={this.state.account} />
+                        <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
+                        <AddDevice mainView={this.changeView} version={this.state.version} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route path="/view/:devid" component={this.deviceView} />
-                        <Route exact path="/u/:username" component={this.userView} />
-                        <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
+                        <Route exact path="/uv/:username" component={this.userView} />
+                        <Route exact path="/u/:username/view/:devid" component={this.home} />
+                        <Route exact path="/uv/:username/view/:devid" component={this.userView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />

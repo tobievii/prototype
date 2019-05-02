@@ -714,12 +714,13 @@ input[type="color"] {
 
 // CHECKBOX STYLE
 
-input[type=checkbox] { 
-  appearance: none;  
+input[type=checkbox] {
+  appearance: none;
   -webkit-appearance: none;
-  -moz-appearance: none; 
+  -moz-appearance: none;
   outline: none;
-} 
+}
+
 input[type=checkbox]:before {
   font-family: FontAwesome;
   display: inline-block;
@@ -728,13 +729,60 @@ input[type=checkbox]:before {
   outline: none;
 }
 
-input[type=checkbox]:before { content: "\f096"; } 
-input[type=checkbox]:before { letter-spacing: 10px; } 
+input[type=checkbox]:before {
+  content: "\f096";
+}
 
-input[type=checkbox]:checked:before { content: "\f046"; } 
-input[type=checkbox]:checked:before { letter-spacing: 10px; } 
+input[type=checkbox]:before {
+  letter-spacing: 10px;
+}
+
+input[type=checkbox]:checked:before {
+  content: "\f046";
+}
+
+input[type=checkbox]:checked:before {
+  letter-spacing: 10px;
+}
 
 // END CHECKBOX STYLE
+
+.spinner-demo {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin: 15px 5px 0 0;
+  margin-left: 20px !important;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.spinner-demo2:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 20px;
+  height: 20px;
+  margin-top: -5px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 1px solid rgba(3, 4, 5, 0.5);
+  border-top-color: white;
+  animation: spin .6s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
 .dataView {
   background: $panelBg;
@@ -742,7 +790,7 @@ input[type=checkbox]:checked:before { letter-spacing: 10px; }
   font-size: 14px;
   //padding: 7px 7px 7px 15px;
   padding: 1px 1px 1px 10px;
-  cursor: pointer;
+  cursor: grab;
   min-height: 15px;
   border: 1px transparent solid;
   box-sizing: border-box;
@@ -750,6 +798,10 @@ input[type=checkbox]:checked:before { letter-spacing: 10px; }
   width: 100%;
   transition: all 0.1s;
   //overflow: hidden;
+}
+
+.dashboard {
+  display: block !important;
 }
 
 .dataView:hover {
@@ -1209,6 +1261,10 @@ input[type=checkbox]:checked:before { letter-spacing: 10px; }
   grid-template-columns: 50% 50%;
 }
 
+div.rowList.dashboardDevices {
+  display: block;
+}
+
 .rowList2 {
   display: grid;
   grid-template-columns: 100%;
@@ -1231,7 +1287,7 @@ input[type=checkbox]:checked:before { letter-spacing: 10px; }
 
 .deviceViewContainer {
   background: rgb(20, 34, 44);
-  padding-top: 60px;
+  margin-top: 55px;
 }
 
 .deviceViewBlock {
@@ -1321,11 +1377,42 @@ PLUGIN
 */
 
 .blockstyle {
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0, 0, 0, 0.2);
   margin: 0px;
   padding: 20px;
+}
+
+.mock-up {
+  // display: -ms-grid;
+  display: grid;
+  grid-template-columns: 28% 72%;
+}
+
+.arrow-up {
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid rgba(70, 70, 70, 0.5);
+}
+
+.buttonsSeperate {
+  // display: -ms-grid;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  text-align: center;
+}
+
+.colorRed {
+  background: rgba(255, 0, 0, 0.6) !important;
+  color: White;
+}
+
+.sucess:hover {
+  background: rgba(19, 196, 84, 0.6) !important;
+  color: White;
 }
 
 

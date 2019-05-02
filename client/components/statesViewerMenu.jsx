@@ -74,25 +74,31 @@ export class StatesViewerMenu extends Component {
     menuDeleteButton = () => {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
-                if (this.props.selectCount > 0) {
-                    return (
-                        <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
-                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
-                    )
-                } else {
-                    return (
-                        <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
-                    )
+                if (this.props.mainView == "devices") {
+                    if (this.props.selectCount > 0) {
+                        return (
+                            <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
+                                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+                        )
+                    } else {
+                        return (
+                            <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                        )
+                    }
                 }
             }
         }
     }
 
     viewButton = () => {
-        if (this.state.view == "list") {
-            return <i className="viewButton fas fa-map-marked-alt" title="Map View" style={{ color: "grey", marginTop: "10px", cursor: "pointer" }} onClick={this.viewButtonClicked("map")} ></i>;
-        } else if (this.state.view == "map") {
-            return <i className="viewButton fas fa-list-ul" title="List View" style={{ color: "grey", marginTop: "10px" }} onClick={this.viewButtonClicked("list")} ></i>;
+        if (this.props.mainView != "devices") {
+            return <i className="viewButton fas fa-list-ul" title="List View" style={{ color: "grey", marginTop: "10px", opacity: 0.3, cursor: "not-allowed" }} ></i>;
+        } else {
+            if (this.state.view == "list") {
+                return <i className="viewButton fas fa-map-marked-alt" title="Map View" style={{ color: "grey", marginTop: "10px", cursor: "pointer" }} onClick={this.viewButtonClicked("map")} ></i>;
+            } else if (this.state.view == "map") {
+                return <i className="viewButton fas fa-list-ul" title="List View" style={{ color: "grey", marginTop: "10px" }} onClick={this.viewButtonClicked("list")} ></i>;
+            }
         }
     }
 
@@ -142,7 +148,6 @@ export class StatesViewerMenu extends Component {
             this.setState({ showAddDevice: "" })
         }
         else if (this.state.showAddDevice == "") {
-
             this.setState({ menu: "" })
             this.setState({ addIcon: "fas fa-plus-circle" })
             this.setState({ showAddDevice: "none" })
@@ -271,82 +276,82 @@ export class StatesViewerMenu extends Component {
     render() {
         return (
             < div className="container-fluid protoMenu" >
-                <Media query="(max-width: 599px)">
+                {/* <Media query="(max-width: 599px)">
                     {matches =>
-                        matches ? (
-                            <div className="row" style={{ padding: 5 }} >
-                                <span>
-                                    <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
-                                        {this.selectBox()}
-                                    </div>
-                                </span>
+                        matches ? ( */}
+                <div className="row" style={{ padding: 5 }} >
+                    <span>
+                        <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
+                            {this.selectBox()}
+                        </div>
+                    </span>
 
-                                <span>
+                    <span>
 
 
-                                    <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                                        {this.changeClass()}
-                                    </div >
-                                </span >
+                        <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
+                            {this.changeClass()}
+                        </div >
+                    </span >
 
-                                <span className={this.state.display} style={{ width: "80%", float: "right" }}>
-                                    <span className="col" >
-                                        {this.menuDeleteButton()}
-                                        {/* { this.props.selectCount} */}
-                                    </span>
+                    <span className={this.state.display} style={{ width: "80%", float: "right" }}>
+                        <span className="col" >
+                            {this.menuDeleteButton()}
+                            {/* { this.props.selectCount} */}
+                        </span>
 
-                                    <span className="col" style={{ flex: "0 0 10px" }}>
-                                        <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
-                                        <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
-                                            {this.sortButtons()}
-                                        </div>
-                                        <Modal
-                                            isOpen={this.state.modalIsOpen}
-                                            onRequestClose={this.closeModal}
-                                            style={customStyles}
-                                            contentLabel="Example Modal"                                >
-                                            <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} />
-                                            {this.code()}
-                                        </Modal>
-                                    </span>
-                                    {this.addDevice()}
-                                </span>
-                            </div >
-                        ) : (
-                                <div className="row" style={{ padding: 5 }} >
-                                    <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
-                                        {this.selectBox()}
-                                    </div>
+                        <span className="col" style={{ flex: "0 0 10px" }}>
+                            <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
+                            <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
+                                {this.sortButtons()}
+                            </div>
+                            <Modal
+                                isOpen={this.state.modalIsOpen}
+                                onRequestClose={this.closeModal}
+                                style={customStyles}
+                                contentLabel="Example Modal"                                >
+                                <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} />
+                                {this.code()}
+                            </Modal>
+                        </span>
+                        {/* {this.addDevice()} */}
+                    </span>
+                </div >
+                {/* //         ) : (
+                //                 <div className="row" style={{ padding: 5 }} >
+                //                     <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
+                //                         {this.selectBox()}
+                //                     </div>
 
-                                    <div className="col" style={{ flex: "0 0 300px", padding: 0, display: this.state.menu }}>
-                                        <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
-                                            <input name="query" type="search" onChange={this.props.search} placeholder="by device name or email..." style={{ width: "100%" }} />
-                                        </form>
-                                    </div>
+                //                     <div className="col" style={{ flex: "0 0 300px", padding: 0, display: this.state.menu }}>
+                //                         <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
+                //                             <input name="query" type="search" onChange={this.props.search} placeholder="by device name or email..." style={{ width: "100%" }} />
+                //                         </form>
+                //                     </div>
 
-                                    <div className="col" style={{ flex: "0 0 70px", display: this.state.menu }}>
-                                        {this.viewButton()}
-                                        <div style={{ float: "left", marginTop: "7px", textAlign: "left", width: "20px" }}>
-                                            {this.sortButtons()}
-                                        </div>
-                                    </div>
+                //                     <div className="col" style={{ flex: "0 0 70px", display: this.state.menu }}>
+                //                         {this.viewButton()}
+                //                         <div style={{ float: "left", marginTop: "7px", textAlign: "left", width: "20px" }}>
+                //                             {this.sortButtons()}
+                //                         </div>
+                //                     </div>
 
-                                    <div className="col">
-                                        {this.menuDeleteButton()}
-                                        {this.addDevice()}
-                                    </div>
-                                    <Modal
-                                        isOpen={this.state.modalIsOpen}
-                                        onRequestClose={this.closeModal}
-                                        style={customStyles}
-                                        contentLabel="Example Modal"                               >
-                                        <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} /><br></br>
-                                        {this.code()}
-                                    </Modal>
-                                </div>
-                            )
-                    }
-                </Media>
+                //                     <div className="col">
+                //                         {this.menuDeleteButton()}
+                //                         {this.addDevice()}
+                //                     </div>
+                //                     <Modal 
+                //                         isOpen={this.state.modalIsOpen}
+                //                         onRequestClose={this.closeModal}
+                //                         style={customStyles}
+                //                         contentLabel="Example Modal"                               >
+                //                         <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} /><br></br>
+                //                         {this.code()}
+                //                     </Modal>
+                //                 </div>
+                //             )
+                //     }
+                // </Media>*/}
             </div >
         )
     }

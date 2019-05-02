@@ -510,14 +510,16 @@ export class MapDevices extends Component {
   render() {
     allDevices = this.props.devices;
     deviceSelected = this.props.deviceCall;
-
-    allDevices.map((p, index) => {
-      if (deviceSelected != undefined) {
-        if (p.devid == deviceSelected.devid) {
-          this.setvalues(p);
+    if (allDevices == undefined && deviceSelected == undefined) {
+    } else {
+      allDevices.map((p, index) => {
+        if (deviceSelected != undefined) {
+          if (p.devid == deviceSelected.devid) {
+            this.setvalues(p);
+          }
         }
-      }
-    });
+      });
+    }
 
     var position = [details.lat, details.lng]
 

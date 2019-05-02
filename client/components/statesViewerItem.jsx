@@ -294,18 +294,21 @@ export class StatesViewerItem extends Component {
   displayDeviceInfo = () => {
     if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
       return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+          <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
             <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
           </div>
         </Link>
       )
     }
     else {
-
+      var userLink = "/u/";
+      if (this.props.visiting == true) {
+        userLink = "/uv/";
+      }
       return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+        <Link className="col" to={userLink + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+          <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
             <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
           </div>
         </Link>
@@ -410,7 +413,7 @@ export class StatesViewerItem extends Component {
             <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
             <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-            {this.mapIcon(viewUsed)}
+            {/* {this.mapIcon(viewUsed)} */}
           </div>
         )
       }
@@ -422,7 +425,7 @@ export class StatesViewerItem extends Component {
             {this.notifications(icon, device)}
             <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
             <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
-            {this.mapIcon(viewUsed)}
+            {/* {this.mapIcon(viewUsed)} */}
           </div>
         )
       }
@@ -435,10 +438,26 @@ export class StatesViewerItem extends Component {
           <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-          {this.mapIcon(viewUsed)}
+          {/* {this.mapIcon(viewUsed)} */}
         </div>
       )
     }
+  }
+
+  deviceInformation = () => {
+    var userLink = "/u/";
+    if (this.props.visiting == true) {
+      userLink = "/uv/";
+    }
+
+    return (
+      <Link className="col" to={userLink + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }} onClick={this.adjustMapView(this.props.device)}>
+        <div>
+          <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
+          <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+        </div>
+      </Link>
+    )
   }
 
   render() {
@@ -454,20 +473,17 @@ export class StatesViewerItem extends Component {
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
       var viewUsed = this.props.view
       var qr = { mail: "failedq" }
-      if (viewUsed == "list") {
+      if (viewUsed == "list" && this.props.mainView == "devices") {
 
         return (
           <div className="container-fluid" style={{ marginBottom: 2 }}>
             <div className="row statesViewerItem" style={this.calcStyle()} >
 
               {this.selectbox()}
+              {
+                this.deviceInformation()
+              }
 
-              <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
-                <div>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
-                  <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
-                </div>
-              </Link>
 
               <div className="col changeTimeagoWidth" style={{ flex: "0 0 230px", textAlign: "right" }}>
                 <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
@@ -482,12 +498,13 @@ export class StatesViewerItem extends Component {
             </div>
           </div>
         );
-      } else if (viewUsed == "map") {
+      } else {
         return (
           <div className="container-fluid" style={{ marginBottom: 2 }}>
             <div className="row statesViewerItemMap" style={this.calcStyle()} >
 
               {this.selectbox()}
+
               {this.displayDeviceInfo()}
 
               <div className="col" align="right" style={{ marginTop: "4px" }}>
