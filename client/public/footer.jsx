@@ -5,10 +5,9 @@ import "../prototype.scss"
 export default class Footer extends React.Component {
   state = {}
 
-  render() {
-    return (
-      <div style={{ margin: 40 }}>
-        <hr></hr>
+  show = () => {
+    if (this.props.loggedIn == false) {
+      return (
         <div style={{}}>
           <div className="container">
             <div className="row">
@@ -29,6 +28,19 @@ export default class Footer extends React.Component {
             </div>
           </div>
         </div>
+      )
+    }
+    else if (this.props.loggedin == true) {
+      return (
+        <div></div>
+      )
+    }
+  }
+  render() {
+    return (
+      <div style={{ margin: 40 }}>
+        {this.show()}
+
         <div className="" >
           <div className="row">
             <div className="col-12" style={{ fontSize: "150%", userSelect: "none", textAlign: "right" }}>

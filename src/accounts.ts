@@ -98,6 +98,9 @@ export function signInFromWeb(db: any) {
           db.users.findOne(
             { email: req.body.email },
             (err: Error, user: any | undefined) => {
+              if (user == null) {
+                res.json({ error: "Account not registered" });
+              }
               scrypt.verifyKdf(user.password.buffer, decryptedString, function (err: Error, result: any) {
                 if (result == true) {
                   req.user = user;
@@ -209,7 +212,7 @@ export function registerExistingAccount(db: any, user: any, cb: any) {
 
       if (usersEmailExists.length == 0) {
         db.users.update({ uuid: user.uuid }, user, { upsert: true }, cb);
-
+        //cb("Registration Succcesful", undefined)
       } else {
         cb("that email is taken", undefined)
       }
@@ -267,7 +270,8 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     email: email.toLowerCase(),
     apikey: generate(32),
     password: generateDifficult(16),
-    level: 0
+    level: 0,
+    sort: ""
   };
 
 

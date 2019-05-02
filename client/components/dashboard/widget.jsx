@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 
 import { OptionsInput } from "./options/options_input.jsx"
+import { OptionsColor } from "./options/options_color.jsx"
+import { OptionsTextarea } from "./options/options_textarea.jsx"
+import { OptionsCode } from "./options/options_code.jsx"
 
 export class Widget extends React.Component {
-
   state = {
     menuVisible: false,
     boundaryVisible: false
@@ -17,9 +19,10 @@ export class Widget extends React.Component {
     if (this.props.options) {
       return (<div>{this.props.options.map((option, i) => {
 
-        if (option.type == "input") {
-          return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />)
-        }
+        if (option.type == "input") { return (<OptionsInput key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "color") { return (<OptionsColor key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "textarea") { return (<OptionsTextarea key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "code") { return (<OptionsCode key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 
@@ -35,7 +38,7 @@ export class Widget extends React.Component {
       return (<div className="widgetMenu" style={{
         position: "absolute",
         zIndex: 100,
-        width: 200,
+        width: "auto",
         fontSize: 14
       }} >
         <div className="widgetMenuItem widgetMenuItemButton" onClick={this.removeWidget} >
@@ -56,7 +59,9 @@ export class Widget extends React.Component {
             <option>Blank</option>
             <option>ThreeDWidget</option>
             <option>Gauge</option>
+            <option>mesh</option>
             <option>map</option>
+            <option>form</option>
             {/* <option>button</option> */}
             <option>widgetButton</option>
           </select></div>
@@ -80,12 +85,6 @@ export class Widget extends React.Component {
     }
   }
 
-  onDrag = (e) => {
-
-    e.preventDefault();
-    e.stopPropagation();
-
-  }
 
   devicePathButton = (name) => {
     if (name == "map") {
@@ -116,25 +115,26 @@ export class Widget extends React.Component {
   }
 
   getWrench = () => {
-    if (this.props.widget == undefined || this.props.widget == false) {
+    if (this.props.widget == false && this.props.label == "map") {
       return (
         <div></div>
       )
-    } else if (this.props.widget == true) {
+    } else {
       return (
         <div>
-          <div className="widgetOptionsButton" style={{ padding: "4px 6px 4px 6px" }} ><i className="fas fa-wrench" onDrag={this.onDrag} onClick={this.showMenu()}></i></div>
+          <div className="widgetOptionsButton"
+            onClick={this.showMenu()}
+            style={{ padding: "4px 6px 4px 6px" }} >
+            <i className="fas fa-wrench"  ></i></div>
           {this.menu()}
         </div>
       )
     }
   }
   // This must move into the map widget!
-  //
   // mapWidget = () => {
   //   var p = this.props.children.type;
   //   var color = "";
-
   //   if (this.props.children.type.name == "MapDevices") {
   //     if (this.state.boundaryVisible == true) {
   //       color = "white";
@@ -163,11 +163,10 @@ export class Widget extends React.Component {
           {this.devicePathButton(this.props.label)}
           <div className="widgetOptions">
             {this.getWrench()}
-
           </div>
         </div>
 
-        <div className="widgetContents" style={{ height: "100%" }}>
+        <div className="widgetContents" height="100%" width="100%" style={{ height: "100%", width: "100%" }}>
           {this.props.children}
         </div>
 

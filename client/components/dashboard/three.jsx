@@ -76,7 +76,7 @@ export class ThreeDWidget extends Component {
     }
     render() {
         return (
-            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>
                 <div
                     style={{
                         width: "100%", height: '100%',

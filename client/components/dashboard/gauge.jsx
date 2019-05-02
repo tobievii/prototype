@@ -10,7 +10,7 @@ export class ProtoGauge extends React.Component {
         max: 100,
         valueanim: 0,
         typeError: false,
-        color: "#1c8"
+        color: "#11cc88"
     }
 
     animtimer;
@@ -26,14 +26,20 @@ export class ProtoGauge extends React.Component {
         var options = [
             { name: "min", type: "input", value: this.state.min },
             { name: "max", type: "input", value: this.state.max },
-            { name: "color", type: "input", value: this.state.color }
+            { name: "color", type: "color", value: this.state.color }
         ]
         this.options = options;
     }
 
     componentDidMount() {
-        // send parent how to configure this widget
-        this.updatedOptions();
+
+        if (this.props.data.options) {
+            this.setState(_.merge(this.state, this.props.data.options), () => {
+                this.updatedOptions();
+            });
+        } else {
+            this.updatedOptions();
+        }
 
         this.animtimer = setInterval(() => {
             // var targetval = this.state.value + 5
@@ -50,19 +56,6 @@ export class ProtoGauge extends React.Component {
                     this.setState({ typeError: true })
                 } else {
                     //ANIMATE GAUGE
-
-                    // LOAD OPTIONS
-                    if (this.props.data) {
-                        if (this.props.data.options) {
-                            if (this.props.data.options.min) {
-                                this.state.min = this.props.data.options.min
-                            }
-                            if (this.props.data.options.max) {
-                                this.state.max = this.props.data.options.max
-                            }
-                            this.updatedOptions();
-                        }
-                    }
 
                     // ADJUST FOR MAX
                     if (this.props.value > this.state.max) {
@@ -141,7 +134,7 @@ export class ProtoGauge extends React.Component {
     render() {
 
         return (
-            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} widget={true}>
+            <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
                 <svg viewBox="0 0 100 100" className="gauge">
                     <text
                         x="50"

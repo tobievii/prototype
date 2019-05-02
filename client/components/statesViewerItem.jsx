@@ -1,8 +1,6 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import moment from 'moment'
-import { control } from "leaflet";
-import { convertCompilerOptionsFromJson } from "typescript";
 import { confirmAlert } from 'react-confirm-alert';
 import { ShareList } from './ShareList.jsx'
 
@@ -22,7 +20,12 @@ export class StatesViewerItem extends Component {
     deviceShare: undefined,
     opacityp: "1",
     opacity: "1",
-    isOpen: false
+    opacityw: "1",
+    opacitya: "1",
+    isOpen: false,
+    User: "",
+    warningNotification: "",
+    alarmNotification: ""
   };
 
   intervalUpdator = undefined;
@@ -31,13 +34,22 @@ export class StatesViewerItem extends Component {
     super(props)
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     // console.log("mounted " + this.props.device.devid)
 
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
+    if (this.props.account.level < 100 && this.props.account.level > 0) {
+      this.setState({ User: this.props.username })
+    }
+    else if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
+      this.setState({ User: this.props.device.fromUsers.username })
 
+    }
+    else if (this.props.account.level >= 100 && this.props.visiting == true) {
+      this.setState({ User: this.props.username })
+    }
 
     this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
   }
@@ -65,6 +77,35 @@ export class StatesViewerItem extends Component {
       }
     } else {
       this.setState({ opacity: "0.2" })
+    }
+
+    if (device.boundaryLayer != undefined || device.boundaryLayer != null) {
+      if (device.boundaryLayer.inbound != true) {
+        this.setState({ opacitya: "1" })
+      } else {
+        this.setState({ opacitya: "0.2" })
+      }
+    } else {
+      this.setState({ opacitya: "0.2" })
+    }
+
+    if (device.notification24 != undefined) {
+      this.setState({ opacityw: "1" })
+    } else {
+      this.setState({ warningNotification: { type: "Device has no warnings" } });
+      this.setState({ opacityw: "0.2" })
+    }
+
+    var notifications = this.props.account.notifications;
+    for (var s in notifications) {
+      if (notifications[s].type == "CONNECTION DOWN 24HR WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
+        this.setState({ warningNotification: notifications[s] });
+      }
+
+      if (notifications[s].type == "ALARM" && device.devid == notifications[s].device && notifications[s].seen == false) {
+        this.setState({ opacitya: "1" })
+        this.setState({ alarmNotification: notifications[s] });
+      }
     }
   }
 
@@ -160,58 +201,19 @@ export class StatesViewerItem extends Component {
     }
   }
 
-  publicShare = (device) => {
-    if (device.public != undefined || device.public != null) {
-      if (device.public == true) {
-        fetch("/api/v3/makedevPrivate", {
-          method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-          body: JSON.stringify({
-            devid: device.key
-          })
-        }).then(response => response.json()).then(serverresponse => {
-          if (serverresponse.nModified == 1) {
-            device.public = false;
-            this.setState({ device: device })
-            this.setDevice(device)
-          }
-        }).catch(err => console.error(err.toString()));
-      } else {
-        confirmAlert({
-          customUI: ({ onClose }) => {
-            return (
-              <div className='protoPopup'>
-                <h1>Are you sure?</h1>
-                <p>This will make device visible to Anyone even unregistered vistors </p>
-                <button onClick={onClose}>No</button>
-                <button style={{ margin: "15px" }} onClick={() => {
-                  {
-                    fetch("/api/v3/makedevPublic", {
-                      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        devid: device.key
-                      })
-                    }).then(response => response.json()).then(serverresponse => {
-                      device.public = true;
-                      this.setState({ device: device })
-                      this.setDevice(device)
-                      { onClose() }
-                    }).catch(err => console.error(err.toString()));
-                  }
-                }}>Yes,Share Publicly !</button>
-              </div>
-            )
-          }
-        })
-      }
-    } else {
-      confirmAlert({
-        customUI: ({ onClose }) => {
-          return (
-            <div className='protoPopup'>
-              <h1>Are you sure?</h1>
-              <p>This will make device visible to Anyone even unregistered vistors </p>
-              <button onClick={onClose}>No</button>
-              <button style={{ margin: "15px" }} onClick={() => {
+  confirmation = (device) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className='protoPopup' align="center">
+            <h1>Are you sure?</h1>
+            <p>This will make device visible to Anyone even unregistered vistors </p>
+            <div>
+              <button className="smallButton" style={{ margin: "5px" }} onClick={onClose}>
+                No, Cancel it!
+              </button>
+
+              <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
                 {
                   fetch("/api/v3/makedevPublic", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -225,16 +227,49 @@ export class StatesViewerItem extends Component {
                     { onClose() }
                   }).catch(err => console.error(err.toString()));
                 }
-              }}>Yes,Share Publicly !</button>
+              }}>Yes,Share Publicly!</button>
             </div>
-          )
+          </div>
+        )
+      }
+    })
+  }
+
+  publicShare = (device) => {
+    if (this.props.account.email == this.props.device.meta.user.email) {
+      if (device.public != undefined || device.public != null) {
+        if (device.public == true) {
+          fetch("/api/v3/makedevPrivate", {
+            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            body: JSON.stringify({
+              devid: device.key
+            })
+          }).then(response => response.json()).then(serverresponse => {
+            if (serverresponse.nModified == 1) {
+              device.public = false;
+              this.setState({ device: device })
+              this.setDevice(device)
+            }
+          }).catch(err => console.error(err.toString()));
+        } else {
+          this.confirmation(device);
         }
-      })
+      } else {
+        this.confirmation(device);
+      }
     }
   }
 
-  clickShare = (device) => {
-    return () => {
+  clickShare = (response) => {
+    this.setState({ isOpen: false })
+    if (response.mail != undefined && response.mail == "sent") {
+      fetch("/api/v3/state", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: this.props.device.devid, username: this.props.username })
+      }).then(response => response.json()).then(state => {
+        this.setState({ device: state })
+        this.setDevice(state)
+      }).catch(err => console.error(err.toString()));
     }
   }
 
@@ -257,15 +292,19 @@ export class StatesViewerItem extends Component {
   }
 
   displayDeviceInfo = () => {
-    if (this.props.public == true) {
+    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
       return (
-        <div className="col" style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-          <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-        </div>
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
+          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
+            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
+          </div>
+        </Link>
       )
-    } else {
+    }
+    else {
+
       return (
-        <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} title="View Device Data">
+        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
           <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
             <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
           </div>
@@ -276,19 +315,21 @@ export class StatesViewerItem extends Component {
 
   selectbox = () => {
     if (this.props.public == false) {
-      if (this.props.device.selected) {
+      if (this.props.visiting == false) {
+        if (this.props.device.selected) {
 
-        return (
-          <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-            <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
-          </div>
-        )
-      } else {
-        return (
-          <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-            <i className="statesViewerCheckBoxes fas fa-check" ></i>
-          </div>
-        )
+          return (
+            <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+            </div>
+          )
+        } else {
+          return (
+            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
+              <i className="statesViewerCheckBoxes fas fa-check" ></i>
+            </div>
+          )
+        }
       }
     }
   }
@@ -315,14 +356,44 @@ export class StatesViewerItem extends Component {
     }
   }
 
+  notifications = (icon, device) => {
+    if (this.props.account.level > 0 && device.notification24) {
+      return (
+        <Link style={{ position: "right" }} to="/notifications" className="navLink" title="Notifications">
+          <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+        </Link>
+      )
+    } else {
+      return (
+        <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px" }}></i></span>
+      )
+    }
+  }
+  adminDevices = () => {
+    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
+      return (
+        <span style={{ color: "red" }}>*</span>
+      )
+    }
+    else {
+      return (
+        <span ></span>
+      )
+    }
+  }
+
   toggleModal = () => {
-    this.setState({ isOpen: !this.state.isOpen })
+    if (this.props.account.email == this.props.device.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
+    else if (this.props.account.email == this.props.device.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
   }
 
   stateListIcons = (viewUsed, device) => {
     var icon = "";
     var columSize = "";
-    var opacity = "0.2";
 
     if (viewUsed == "map") {
       icon = "iconSmall";
@@ -332,21 +403,36 @@ export class StatesViewerItem extends Component {
       columSize = "200px"
     }
     if (this.props.public == false) {
-      return (
-        <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px" }}></i></span>
-          <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
-          <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
-          {this.mapIcon(viewUsed)}
-        </div>
-      )
+      if (this.props.visiting == true) {
+        return (
+          <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            {this.mapIcon(viewUsed)}
+          </div>
+        )
+      }
+      else {
+
+        return (
+          <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
+            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
+            {this.notifications(icon, device)}
+            <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
+            <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
+            {this.mapIcon(viewUsed)}
+          </div>
+        )
+      }
     }
+
     else if (this.props.public == true) {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={icon}><i className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: opacity, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
@@ -367,6 +453,7 @@ export class StatesViewerItem extends Component {
       var maxlength = 120;
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
       var viewUsed = this.props.view
+      var qr = { mail: "failedq" }
       if (viewUsed == "list") {
 
         return (
@@ -375,9 +462,9 @@ export class StatesViewerItem extends Component {
 
               {this.selectbox()}
 
-              <Link className="col" to={"/u/" + this.props.username + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
+              <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
                 <div>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+                  <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
                   <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
                 </div>
               </Link>
@@ -390,7 +477,7 @@ export class StatesViewerItem extends Component {
                 {this.stateListIcons(viewUsed, this.props.device)}
               </div>
 
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
 
             </div>
           </div>
@@ -411,7 +498,7 @@ export class StatesViewerItem extends Component {
               {this.stateListIcons(viewUsed, this.state.device)}
               {/* {this.mapIcon()}
               </div> */}
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
+              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
             </div>
           </div>
         )

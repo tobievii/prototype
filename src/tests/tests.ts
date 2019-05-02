@@ -16,6 +16,11 @@ var testAccount = {
 
 import * as http from "http";
 
+import { teltonikaTestMocha } from "./teltonika_simulate"
+
+// Disabled for now until we can get a repeatable method
+// teltonikaTestMocha();
+
 describe("API", function () {
   describe("REST API", function () {
     var testvalue: any;
@@ -252,7 +257,7 @@ describe("API", function () {
               } else {
                 var timeout = setTimeout(() => {
                   done("error timeout")
-                }, 3000)
+                }, 6000)
                 done(result);
               }
             }
@@ -473,7 +478,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("/api/v3/data/post + SOCKETS + MQTT", function (done: any) {
-      this.timeout(4000)
+      this.timeout(6000)
       var mqtt = require('mqtt');
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
 
@@ -565,8 +570,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("MQTT + /api/v3/data/post + SOCKETS", function (done: any) {
-      this.timeout(4000)
-      log("-------- start")
+      this.timeout(6000)
       var mqtt = require('mqtt');
 
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
@@ -607,14 +611,11 @@ describe("API", function () {
       }
 
       socket.on("connect", () => {
-        log("connect")
         socket.emit("join", testAccount.apikey);
 
         /*************************** MQTT Connect *************************************/
 
         client.on('connect', function () {
-          log("mqtt connected")
-
           client.subscribe(testAccount.apikey, function (err: any) {
             if (err) {
               console.log(err)
@@ -658,7 +659,7 @@ describe("API", function () {
 
     /************************************   MQTT+SOCKETS+REST API   ****************************************/
     it("SOCKETS  +  MQTT + /api/v3/data/post", function (done: any) {
-      this.timeout(4000)
+      this.timeout(6000)
       var mqtt = require('mqtt');
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
 

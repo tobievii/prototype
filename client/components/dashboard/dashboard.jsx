@@ -22,6 +22,8 @@ import { MapDevices } from "./map.jsx"
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
+import { WidgetMesh } from "./widget_mesh.jsx"
+import { WidgetForm } from "./widget_form.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -245,8 +247,8 @@ export class Dashboard extends React.Component {
           layout[w][option] = data;
         }
       }
-      console.log("widgetChange");
-      console.log({ option, data })
+      // console.log("widgetChange");
+      // console.log({ option, data })
       this.setState({ layout }, () => {
         this.updateServer();
       })
@@ -263,8 +265,8 @@ export class Dashboard extends React.Component {
 
   setOptions = (data) => {
     return (options) => {
-      console.log("WIDGET OPTION CHANGE:")
-      console.log({ data, options })
+      // console.log("WIDGET OPTION CHANGE:")
+      // console.log({ data, options })
 
       // find and update
       var layout = _.clone(this.state.layout);
@@ -354,6 +356,18 @@ export class Dashboard extends React.Component {
         value={value} />)
     }
 
+    if (data.type == "mesh") {
+      var value;
+      try {
+        value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
+      } catch (e) { }
+      return (<WidgetMesh
+        state={this.props.state}
+        dash={dash}
+        data={data}
+        value={value} />)
+    }
+
     if (data.type == "map") {
       return (<MapDevices
         dash={dash}
@@ -363,7 +377,8 @@ export class Dashboard extends React.Component {
         deviceCall={this.props.state}
         devices={this.props.devices}
         widget={true}
-        showBoundary={this.state.showB} />)
+        showBoundary={this.state.showB}
+        PopUpLink={false} />)
     }
 
     if (data.type == "widgetButton") {
@@ -373,6 +388,17 @@ export class Dashboard extends React.Component {
         data={data}
       />)
     }
+
+
+    if (data.type == "form") {
+      return (<WidgetForm
+        state={this.props.state}
+        dash={dash}
+        data={data}
+      />)
+    }
+
+    // ADD WIDGETS ABOVE THIS LINE
     //////////
 
     if (data.type.toUpperCase() == "BLANK") {
@@ -451,7 +477,7 @@ export class Dashboard extends React.Component {
     }
   }
 
-  loading() {
+  loading = () => {
     if (this.props.state) {
 
       if (this.props.state.layout) {
@@ -467,7 +493,7 @@ export class Dashboard extends React.Component {
 
         if (this.settingLayout == false) {
           this.settingLayout = true;
-          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
+          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { })
         }
 
         return (<div>loading</div>)
@@ -482,19 +508,19 @@ export class Dashboard extends React.Component {
 
   }
 
-  render() {
+  render = () => {
     if (this.state.layout) {
 
       return (
         <div
-          style={{ minHeight: 50, textAlign: "center" }}
+          style={{ minHeight: 50 }}
           onDragOver={(e) => this.onDragOver(e)}
           onDrop={(e) => this.onDrop(e, "complete")} >
           {this.generateDashboard()}
         </div>
       )
     } else {
-      return this.loading()
+      return this.loading();
     }
 
   }

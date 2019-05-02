@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Stats } from "./stats.jsx"
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -13,7 +11,6 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-import Media from "react-media";
 
 import moment from 'moment'
 
@@ -76,7 +73,10 @@ export class DeviceView extends Component {
     editorChanged: false,
     devicesServer: undefined,
     loggedin: "",
-    owner: ""
+    owner: "",
+    dataButton: "HIDE DATA",
+    dataview: "",
+    dashboard: "col-lg-9"
   };
 
   socket;
@@ -109,11 +109,27 @@ export class DeviceView extends Component {
 
   updateView = (packet) => {
     var view = _.clone(this.state.view);
-    view = _.merge(view, packet)
+    var state = _.clone(this.state.state);
+
+    var merge = true; //default is to merge
+
+    if (packet.options) {
+      if (packet.options["_merge"] === false) {
+        merge = false;
+      }
+    }
+
+    if (merge) {
+      view = _.merge(view, packet)
+      state.payload = _.merge(state.payload, packet);
+    } else {
+      delete view.data;
+      delete state.payload.data;
+      state.payload = _.merge(state.payload, packet);
+      view = _.merge(view, packet)
+    }
 
     // should be same as DB.states for this device.
-    var state = _.clone(this.state.state);
-    state.payload = _.merge(state.payload, packet);
     state["_last_seen"] = packet.timestamp;
     this.setState({ view, state })
   }
@@ -121,7 +137,7 @@ export class DeviceView extends Component {
   updateTime = () => {
     if (this.state.view) {
       if (this.state.view.timestamp) {
-        var timeago = moment(this.state.view.timestamp).fromNow()
+        var timeago = this.state.view.timestamp + " (" + moment(this.state.view.timestamp).fromNow() + ")"
         this.setState({ timeago })
       }
     }
@@ -157,14 +173,6 @@ export class DeviceView extends Component {
     fetch("/api/v3/account", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
     }).then(response => response.json()).then(account => {
-      this.setState({ loggedin: this.props.account.apikey })
-      this.setState({ owner: this.state.state.apikey })
-      if (this.state.loggedin != this.state.owner && this.props.account.level < 100) {
-        this.setState({ shareDisplay: "none" })
-      }
-      else {
-        this.setState({ shareDisplay: "" })
-      }
 
     }).catch(err => console.error(err.toString()));
 
@@ -172,8 +180,6 @@ export class DeviceView extends Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.devid, username: this.props.username })
     }).then(response => response.json()).then(state => {
-
-
       this.setState({ state }, () => {
         if (state.error) {
           console.log(state.error)
@@ -204,16 +210,16 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Deleting a device is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 {
                   fetch("/api/v3/state/delete", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id, username: this.props.username })
+                    body: JSON.stringify({ id: id, username: this.props.username, key: this.state.state.key })
                   }).then(response => response.json()).then(serverresponse => {
                     window.location.href = "/"
                   }).catch(err => console.error(err.toString()));
@@ -262,7 +268,6 @@ export class DeviceView extends Component {
       var apiMenu = num;
       this.setState({ apiMenu });
 
-
     }
   }
 
@@ -280,12 +285,12 @@ export class DeviceView extends Component {
       confirmAlert({
         customUI: ({ onClose }) => {
           return (
-            <div className='protoPopup'>
+            <div className='protoPopup' align="center">
               <h1>Are you sure?</h1>
               <p>Clearing A State is irreversible</p>
-              <button onClick={onClose}>No</button>
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button style={{ margin: "15px" }} onClick={() => {
+              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
                 //this.handleClickDelete()
                 {
                   fetch("/api/v3/state/clear", {
@@ -305,8 +310,12 @@ export class DeviceView extends Component {
   };
 
   toggleModal = () => {
-
-    this.setState({ isOpen: !this.state.isOpen })
+    if (this.props.account.email == this.state.state.meta.user.email) {
+      this.setState({ isOpen: !this.state.isOpen })
+    }
+    else {
+      this.setState({ isOpen: this.state.isOpen })
+    }
   }
 
   drawState = () => {
@@ -371,25 +380,24 @@ export class DeviceView extends Component {
 
   dataColumn = () => {
     var plugins;
-
     if (this.state.view) {
-      //latestState = this.state.view;
 
       if (this.state.view.id) {
-        plugins = <DevicePluginPanel stateId={this.state.view.id} />;
+        plugins = <DevicePluginPanel username={this.props.username} stateId={this.state.view.id} device={this.state.state} />;
       } else {
         plugins = <p>plugins loading</p>;
       }
     }
 
-    return (<div className="col-lg-3">
+    return (<div className="col-lg-3" style={{ overflowY: "auto", height: window.innerHeight - 156 + "px", display: this.state.dataview }}>
+      <div style={{ paddingBottom: 25, paddingTop: 0 }}>{plugins}</div>
       <DataView data={this.state.state} />
-      {plugins}
+
     </div>)
   }
 
   dashboardColumn = () => {
-    return (<div className="col-lg-9" >
+    return (<div className={this.state.dashboard} >
       {this.editorBlock()}
 
       <Dashboard
@@ -402,9 +410,43 @@ export class DeviceView extends Component {
     </div>)
   }
 
+  hideData = () => {
+    if (this.state.dataButton == "HIDE DATA") {
+      this.setState({ dataview: "none" })
+      this.setState({ dataButton: "SHOW DATA" })
+      this.setState({ dashboard: "col-lg-12" })
+    }
+    else if ((this.state.dataButton == "SHOW DATA")) {
+      this.setState({ dataview: "" })
+      this.setState({ dataButton: "HIDE DATA" })
+      this.setState({ dashboard: "col-lg-9" })
+    }
+  }
+
   orderScreenSize = () => {
-    if (window.innerWidth < 960) {
-      return (<div className="row">
+    if (window.innerWidth < 667) {
+      return (<div className="row" >
+        <div className="col-12" style={{ display: this.state.shareDisplay, marginTop: 12 }}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
+            <FontAwesomeIcon icon="trash" />
+          </div>
+
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
+            <FontAwesomeIcon icon="eraser" />
+          </div>
+
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
+
+            <i className="fas fa-share-alt"></i>
+          </div>
+
+          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }}   >
+            <i className="fas fa-edit"></i>
+          </div>
+          <div onClick={this.hideData} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} className="commanderBgPanel commanderBgPanelClickable"  >
+            <i className="fas fa-database"></i>
+          </div>
+        </div>
         {this.dashboardColumn()}
         {this.dataColumn()}
       </div>)
@@ -422,40 +464,40 @@ export class DeviceView extends Component {
 
     return (
 
-      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 50 }} >
-        <div className="row" style={{ marginBottom: 10, paddingBottom: 1 }}>
-
+      <div className="container-fluid  deviceViewContainer" style={{ paddingBottom: 0, overflow: "hidden" }} >
+        <div className="row" style={{ marginBottom: 0, paddingBottom: 1 }}>
           <div className="col-6">
             <h3>{this.state.devid}</h3>
-            <span className="faded" >{this.state.timeago}</span>
+            <span className="faded" >{this.state.timeago}</span><br></br>
           </div>
+          <div className="col-6 noDisplay" >
+            <div className="" style={{ display: this.state.shareDisplay }}>
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
+                <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+              </div>
 
-          <div className="col-6" style={{ display: this.state.shareDisplay }}>
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10, marginRight: 10, marginLeft: 3 }} onClick={() => this.deleteDevice(this.state.devid)}>
-              <FontAwesomeIcon icon="trash" /> {this.state.trashButtonText}
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
+                <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
+              </div>
+
+              <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
+
+                <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
+              </div>
+
+              <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i className="fas fa-edit"></i> {this.state.EditorButton}
+              </div>
+              <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
+                <i className="fas fa-database"></i> {this.state.dataButton}
+              </div>
+
+              <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
             </div>
-
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", fontSize: 10 }} onClick={this.clearState}>
-              <FontAwesomeIcon icon="eraser" /> {this.state.eraseButtonText}
-            </div>
-
-            <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10, }} onClick={this.toggleModal}>
-
-              <i className="fas fa-share-alt"></i> {this.state.sharebuttonText}
-            </div>
-
-            <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 10, fontSize: 10 }} className="commanderBgPanel commanderBgPanelClickable"  >
-              <i className="fas fa-edit"></i> {this.state.EditorButton}
-            </div>
-
-            <ShareList devid={this.state.devid} isOpen={this.state.isOpen} username={this.props.username} closeModel={() => { this.setState({ isOpen: false }) }} />
           </div>
         </div>
-
-
         {this.orderScreenSize()}
-
-      </div>
+      </div >
 
 
     );

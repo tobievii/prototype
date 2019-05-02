@@ -4,8 +4,8 @@ import { Widget } from "./widget.jsx"
 export class WidgetButton extends React.Component {
 
   state = {
-    color: "#111",
-    background: "#1c8",
+    color: "#111111",
+    background: "#11cc88",
     command: JSON.stringify({ "foo": true }),
     buttonText: "SEND"
   }
@@ -13,14 +13,16 @@ export class WidgetButton extends React.Component {
   options;
 
   setOptions = (options) => {
-    this.setState(_.merge(this.state, options))
+    this.setState(_.merge(this.state, options), () => {
+      this.updatedOptions();
+    })
     this.props.dash.setOptions(options);
   }
 
   updatedOptions = () => {
     var options = [
-      { name: "color", type: "input", value: this.state.color },
-      { name: "background", type: "input", value: this.state.background },
+      { name: "color", type: "color", value: this.state.color },
+      { name: "background", type: "color", value: this.state.background },
       { name: "command", type: "input", value: this.state.command },
       { name: "buttonText", type: "input", value: this.state.buttonText }
     ]
@@ -45,7 +47,7 @@ export class WidgetButton extends React.Component {
   }
 
   render() {
-    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions} widget={true}>
+    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
       <button style={{ width: "100%", height: "100%", color: this.state.color, background: this.state.background, border: "none" }}
         onClick={this.onClick} >{this.state.buttonText}</button>
     </Widget>

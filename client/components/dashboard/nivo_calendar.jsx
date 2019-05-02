@@ -33,7 +33,7 @@ export class Calendar extends React.Component {
   }
 
   render() {
-    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} widget={true}>
+    return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>
       <ResponsiveCalendar
         data={this.state.activity}
         from={this.state.from}
