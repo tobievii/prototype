@@ -491,7 +491,7 @@ export class NavBar extends Component {
     }
     return (
 
-      <div className="row " style={{ paddingBottom: 30 }}>
+      <div className="row " style={{ paddingBottom: 20 }}>
         <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }} onClick={this.closeUserList}>
           <div className="navbarInsideWrap" >
             <Link to="/">

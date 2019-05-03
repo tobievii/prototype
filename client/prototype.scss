@@ -758,6 +758,10 @@ input[type=checkbox]:checked:before {
   cursor: pointer;
 }
 
+.cross:hover {
+  color: red !important;
+}
+
 .spinner-demo2:before {
   content: '';
   box-sizing: border-box;
@@ -877,6 +881,10 @@ input[type=checkbox]:checked:before {
 
 .widgetOptionsButton:hover {
   opacity: 0.75;
+}
+
+.menuIcons {
+  display: none;
 }
 
 .widgetMenu {
@@ -1141,7 +1149,7 @@ input[type=checkbox]:checked:before {
 
 
 .statesViewerCheckBoxes {
-  padding-top: 16px;
+  padding-top: 10px;
   padding-left: 6px;
 }
 

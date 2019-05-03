@@ -485,7 +485,7 @@ export class DeviceView extends Component {
           <div className="deviceViewContainer" style={{ paddingBottom: 0, paddingRight: 5, paddingLeft: 5, overflow: "hidden" }}>
             <div className="row" style={{ marginBottom: 5, marginTop: 10, paddingBottom: 1 }}>
               <div className="col-5">
-                <h3>{this.props.devid}</h3>
+                <h3 style={{ paddingLeft: 5 }}>{this.props.devid}</h3>
               </div>
               <div className="col-7 noDisplay" >
                 <div className="" style={{ display: this.state.shareDisplay }}>

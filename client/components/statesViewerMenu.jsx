@@ -27,8 +27,7 @@ export class StatesViewerMenu extends Component {
     constructor() {
         super();
         this.state = { selectAll: false, sort: "", menu: "", view: "map", addIcon: "fas fa-plus-circle", display: "", showAddDevice: "none", addDeviceButton: "none", ssid: "", wifipass: "", code: [], modalIsOpen: false }
-        this.openModal = this.openModal.bind(this);
-        this.closeModal = this.closeModal.bind(this);
+
         fetch("/api/v3/getsort", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(serverresponse => {
@@ -77,12 +76,12 @@ export class StatesViewerMenu extends Component {
                 if (this.props.mainView == "devices") {
                     if (this.props.selectCount > 0) {
                         return (
-                            <div className="protoButton protoButtonClickable" style={{ float: "left", marginRight: 10 }} title={this.props.selectCount + " selected."}
+                            <div className="protoButton protoButtonClickable" style={{ background: "rgba(255,0,0, 0.6)", float: "left", margin: "2px 10px 0px 10px" }} title={this.props.selectCount + " selected."}
                                 onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
                         )
                     } else {
                         return (
-                            <div className="protoButton" style={{ float: "left", marginRight: 10, opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                            <div className="protoButton" style={{ float: "left", margin: "2px 10px 0px 10px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
                         )
                     }
                 }
@@ -141,89 +140,6 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    inputDeviceShow = () => {
-        if (this.state.showAddDevice == "none") {
-            this.setState({ menu: "none" })
-            this.setState({ addIcon: "fas fa-minus-circle" })
-            this.setState({ showAddDevice: "" })
-        }
-        else if (this.state.showAddDevice == "") {
-            this.setState({ menu: "" })
-            this.setState({ addIcon: "fas fa-plus-circle" })
-            this.setState({ showAddDevice: "none" })
-        }
-    }
-
-    ssid = (ssid) => {
-        return (evt) => {
-            this.setState({ ssid: evt.target.value })
-        }
-    }
-
-    wifiPassword = (wifipass) => {
-        return (evt) => {
-            this.setState({ wifipass: evt.target.value })
-        }
-    }
-    bits = () => {
-        var data = Buffer.from(JSON.stringify({ wifi: { ssid: this.state.ssid, pass: this.state.wifipass } }))
-
-        for (var a = 0; a < data.length; a++) {
-            var byte = data[a].toString(2)
-            for (var b = 0; b <= 8 - byte.length; b++) {
-                byte = "0" + byte;
-            }
-            this.state.code.push(byte)
-        }
-        this.openModal()
-    }
-
-    addButton = () => {
-        if (window.innerWidth > 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ width: "15%", float: "right", marginLeft: "2%", cursor: "not-allowed", opacity: "0.4", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ width: "15%", float: "right", marginLeft: "2%", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
-        }
-
-        else if (window.innerWidth < 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ marginTop: "30px", width: "50%", float: "right", cursor: "not-allowed", opacity: "0.4", marginLeft: "400px", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ marginTop: "30px", width: "50%", float: "right", textAlign: "center", marginLeft: "400px", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
-        }
-    }
-
-    addDevice = () => {
-        if (window.innerWidth > 667) {
-            return (
-                <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer" }} onClick={this.inputDeviceShow}></i>
-                    <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "25%", marginRight: "5px" }} required />
-                        WIFI password: <input name="wifipass" type="text" style={{ width: "25%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required />{this.addButton()}</div>
-                </div >
-            )
-        }
-        else if (window.innerWidth < 667) {
-            return (
-                <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
-                    <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
-                        WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
-                </div >
-            )
-        }
-    }
 
     changeSearch = () => {
         if (searchButton == "icon") {
@@ -235,50 +151,32 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    openModal() {
-        this.setState({ modalIsOpen: true });
-    }
-
-    closeModal() {
-        this.setState({ modalIsOpen: false });
-        this.setState({ code: [] })
-    }
-
     changeClass = () => {
-        if (searchButton == "icon") {
+        if (searchButton == "icon" && this.props.mainView != "devices") {
             return (
-                <i onClick={this.changeSearch} className="fas fa-search"></i>
+                <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
+                    <i onClick={this.changeSearch} className="fas fa-search"></i>
+                </div>
             )
-        } else if (searchButton == "filter") {
+        } else if (searchButton == "filter" || this.props.mainView == "devices") {
             return (
-                <div style={{ padding: 0 }}>
-                    <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
-                    <form id="search" style={{ textAlign: "left" }} style={{ width: "92%", float: "right" }}>
-                        <input name="query" type="search" onChange={this.props.search} style={{ width: "100%" }} />
-                    </form>
+                <div>
+                    <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
+                        <i style={{ marginTop: 13 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                    </span>
+                    <span style={{ padding: 0 }}>
+                        <form id="search" style={{ flex: "0 0 240px", textAlign: "left", float: "right", marginTop: 2 }}>
+                            <input name="query" type="search" onChange={this.props.search} style={{ width: "100%" }} placeholder="search for device..." />
+                        </form>
+                    </span>
                 </div>
             )
         }
     }
 
-    code = () => {
-        try {
-            return (<div style={{ height: "10%" }}>
-                {
-                    this.state.code.map((user, i) => {
-                        return <div id={user} key={i} className="commanderBgPanel" style={{ float: "center" }}>{user}</div>
-                    })
-                }
-            </div >)
-        } catch (err) { }
-    }
-
     render() {
         return (
             < div className="container-fluid protoMenu" >
-                {/* <Media query="(max-width: 599px)">
-                    {matches =>
-                        matches ? ( */}
                 <div className="row" style={{ padding: 5 }} >
                     <span>
                         <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
@@ -289,69 +187,24 @@ export class StatesViewerMenu extends Component {
                     <span>
 
 
-                        <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                            {this.changeClass()}
-                        </div >
+
+                        {this.changeClass()}
+
                     </span >
 
-                    <span className={this.state.display} style={{ width: "80%", float: "right" }}>
+                    <span className={this.state.display} style={{ width: "80%", float: "right" }} >
                         <span className="col" >
                             {this.menuDeleteButton()}
-                            {/* { this.props.selectCount} */}
                         </span>
 
-                        <span className="col" style={{ flex: "0 0 10px" }}>
+                        <span className="col" style={{ flex: "0 0 10px" }} >
                             <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
                             <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
                                 {this.sortButtons()}
                             </div>
-                            <Modal
-                                isOpen={this.state.modalIsOpen}
-                                onRequestClose={this.closeModal}
-                                style={customStyles}
-                                contentLabel="Example Modal"                                >
-                                <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} />
-                                {this.code()}
-                            </Modal>
                         </span>
-                        {/* {this.addDevice()} */}
                     </span>
                 </div >
-                {/* //         ) : (
-                //                 <div className="row" style={{ padding: 5 }} >
-                //                     <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
-                //                         {this.selectBox()}
-                //                     </div>
-
-                //                     <div className="col" style={{ flex: "0 0 300px", padding: 0, display: this.state.menu }}>
-                //                         <form id="search" style={{ textAlign: "left" }} style={{ width: "100%" }}>
-                //                             <input name="query" type="search" onChange={this.props.search} placeholder="by device name or email..." style={{ width: "100%" }} />
-                //                         </form>
-                //                     </div>
-
-                //                     <div className="col" style={{ flex: "0 0 70px", display: this.state.menu }}>
-                //                         {this.viewButton()}
-                //                         <div style={{ float: "left", marginTop: "7px", textAlign: "left", width: "20px" }}>
-                //                             {this.sortButtons()}
-                //                         </div>
-                //                     </div>
-
-                //                     <div className="col">
-                //                         {this.menuDeleteButton()}
-                //                         {this.addDevice()}
-                //                     </div>
-                //                     <Modal 
-                //                         isOpen={this.state.modalIsOpen}
-                //                         onRequestClose={this.closeModal}
-                //                         style={customStyles}
-                //                         contentLabel="Example Modal"                               >
-                //                         <i className="fas fa-times" onClick={this.closeModal} style={{ color: "red" }} /><br></br>
-                //                         {this.code()}
-                //                     </Modal>
-                //                 </div>
-                //             )
-                //     }
-                // </Media>*/}
             </div >
         )
     }

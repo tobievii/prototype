@@ -194,7 +194,7 @@ export class AddDevice extends Component {
     getBLEDevices = () => {
         if (this.state.bleDevices.length < 1) {
             return (
-                <div className="commanderBgPanel">Scan for devices below...</div>
+                <h3>Scan for devices below...</h3>
             )
         } else {
             return (
@@ -227,7 +227,10 @@ export class AddDevice extends Component {
         }).then(response => response.json()).then(resp => {
             this.setState({ pairedDevices: resp })
             this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
-        }).catch(err => console.error(err.toString()));
+        }).catch(err => {
+            console.error(err.toString())
+            this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
+        });
     }
 
 
@@ -278,7 +281,7 @@ export class AddDevice extends Component {
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}>
                         <div style={{ background: "#131e27", padding: 12, width: "100%" }}>
-                            <span className={"fas fa-times navLink"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10, float: "right" }}></span>
+                            <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10, float: "right" }}></span>
                             <span className={"fas fa-arrow-circle-left navLink"} onClick={() => { this.goBack() }} style={{}}></span>
                             <span style={{ float: "right", marginRight: "40%" }}>{this.state.popupHeading}</span>
                         </div>

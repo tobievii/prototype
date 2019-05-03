@@ -338,7 +338,7 @@ export class StatesViewerItem extends Component {
   }
 
   mapIcon = (viewUsed) => {
-    if (viewUsed == "map") {
+    if (this.props.mainView == "devices") {
       if (!this.props.device.selectedIcon) {
         return (
           <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
@@ -352,10 +352,8 @@ export class StatesViewerItem extends Component {
           </span>
         )
       }
-    } else if (viewUsed == "list") {
-      return (
-        <span style={{ display: "none" }}></span>
-      )
+    } else {
+      return null;
     }
   }
 
@@ -445,6 +443,7 @@ export class StatesViewerItem extends Component {
   }
 
   deviceInformation = () => {
+    var dataPreview = JSON.stringify(this.props.device.payload.data)
     var userLink = "/u/";
     if (this.props.visiting == true) {
       userLink = "/uv/";
@@ -484,13 +483,13 @@ export class StatesViewerItem extends Component {
                 this.deviceInformation()
               }
 
-
               <div className="col changeTimeagoWidth" style={{ flex: "0 0 230px", textAlign: "right" }}>
                 <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
                 <span className="faded dataPreview" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
               </div>
               <div style={{ paddingTop: "7px" }}>
                 {this.stateListIcons(viewUsed, this.props.device)}
+                {this.mapIcon()}
               </div>
 
               <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
@@ -513,8 +512,7 @@ export class StatesViewerItem extends Component {
 
               {/* <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}> */}
               {this.stateListIcons(viewUsed, this.state.device)}
-              {/* {this.mapIcon()}
-              </div> */}
+
               <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
             </div>
           </div>

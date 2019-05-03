@@ -39,7 +39,7 @@ export class Pagination extends Component {
 
   render() {
     if (this.props.pages.length > 1) {
-      return (<div style={{ marginLeft: "8px", marginBottom: "10px" }}>
+      return (<div style={{ marginLeft: "8px" }}>
         {
           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
         }
@@ -244,7 +244,7 @@ export class StatesViewer extends Component {
 
 
       this.socket.on("notificationState", a => {
-        this.getDevices();
+        this.getDevices("notification");
       })
 
       this.socket.on('boundary', (packet) => {
@@ -256,7 +256,7 @@ export class StatesViewer extends Component {
     // }, 500);
   }
 
-  getDevices = () => {
+  getDevices = (functionCall) => {
     if (this.props.public == true) {
       p.publicStates((states) => {
         for (var s in states) {
@@ -276,7 +276,9 @@ export class StatesViewer extends Component {
 
             this.setState({ devicesView: serverresponse }, () => {
               this.setState({ devicePressed: serverresponse[0] });
-              this.sort();
+              if (functionCall == "initial load") {
+                this.sort();
+              }
             })
           })
         }).catch(err => console.error(err.toString()));
@@ -301,7 +303,9 @@ export class StatesViewer extends Component {
               }
               this.setState({ devicesView: serverresponse }, () => {
                 this.setState({ devicePressed: serverresponse[0] });
-                this.sort();
+                if (functionCall == "initial load") {
+                  this.sort();
+                }
               })
             })
           }).catch(err => console.error(err.toString()));
@@ -312,12 +316,12 @@ export class StatesViewer extends Component {
             }
             this.setState({ devicesView: states }, () => {
               this.setState({ devicePressed: states[0] });
-              this.sort();
+              if (functionCall == "initial load") {
+                this.sort();
+              }
             })
           })
         }
-
-
 
         if (states.length == 0) {
           var url = window.location.origin + "/api/v3/data/post";
@@ -355,7 +359,7 @@ export class StatesViewer extends Component {
   }
 
   componentWillMount = () => {
-    this.getDevices();
+    this.getDevices("initial load");
   }
 
   componentWillUnmount = () => {
@@ -409,7 +413,7 @@ export class StatesViewer extends Component {
         this.setState({ devicesServer: devices })
         this.setState({ devicesView: devices }, () => {
         })
-        // this.sort();
+        //this.sort();
       }
     }
   }
@@ -605,12 +609,20 @@ export class StatesViewer extends Component {
     return (
       <Media query="(max-width: 599px)">
         {matches => {
-          var num;
-          matches ? (
-            num = 10
-          ) : (
-              num = 13
-            )
+          var num = 0;
+          if (window.innerHeight >= 800 && window.innerHeight < 1007) {
+            num = 14;
+          } else if (window.innerHeight >= 1007 && window.innerHeight < 2014) {
+            num = 19;
+          }
+
+          if (num == 0) {
+            matches ? (
+              num = 10
+            ) : (
+                num = 14
+              )
+          }
           return (
             <div >
               <DeviceList mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={num} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
