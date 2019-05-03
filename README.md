@@ -464,3 +464,33 @@ git push origin branch_name
 
 
 ```
+
+
+# Cluster
+
+http://pm2.keymetrics.io/
+
+```
+sudo npm i pm2 -g
+pm2 start main.js -i 0
+```
+
+# Redis
+
+https://tecadmin.net/install-redis-ubuntu/
+```
+# install
+sudo apt-get install redis-server
+
+# run
+sudo systemctl enable redis-server.service
+```
+
+Add redis to iotconfig.json
+
+```json
+"redis": {
+  "host": "localhost",
+  "port": 6379
+}
+```

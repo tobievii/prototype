@@ -1003,30 +1003,32 @@ function handleState(req: any, res: any, next: any) {
             io.to(req.user.username).emit("info", info);
           }
 
-          var message = "";
-          var AlarmNotification = {
-            type: "ALARM",
-            device: req.body.id,
-            created: Date.now(),
-            message: message,
-            notified: true,
-            seen: false
-          }
+          // disabled for now:
 
-          if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
-              AlarmNotification.message = Result.workflowCode.substring(
-                Result.workflowCode.lastIndexOf('alarm1("') + 8,
-                Result.workflowCode.lastIndexOf('")')
-              )
-              createNotification(db, AlarmNotification, req, Result);
-            }
-          } else if (Result.boundaryLayer != undefined) {
-            if (Result.boundaryLayer.inbound == false) {
-              AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req, Result);
-            }
-          }
+          // var message = "";
+          // var AlarmNotification = {
+          //   type: "ALARM",
+          //   device: req.body.id,
+          //   created: Date.now(),
+          //   message: message,
+          //   notified: true,
+          //   seen: false
+          // }
+
+          // if (Result.workflowCode != undefined) {
+          //   if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+          //     AlarmNotification.message = Result.workflowCode.substring(
+          //       Result.workflowCode.lastIndexOf('alarm1("') + 8,
+          //       Result.workflowCode.lastIndexOf('")')
+          //     )
+          //     createNotification(db, AlarmNotification, req, Result);
+          //   }
+          // } else if (Result.boundaryLayer != undefined) {
+          //   if (Result.boundaryLayer.inbound == false) {
+          //     AlarmNotification.message = "has gone out of its boundary";
+          //     createNotification(db, AlarmNotification, req, Result);
+          //   }
+          // }
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
@@ -1037,8 +1039,8 @@ function handleState(req: any, res: any, next: any) {
           (findErr: Error, findResult: any) => {
             if (findResult.notification24 == true) {
               db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-                console.log(result)
-                console.log(err)
+                //console.log(result)
+                //console.log(err)
               })
             }
           })
@@ -1397,39 +1399,53 @@ if (config.ssl) {
 
 /* ############################################################################## */
 
-var io = require('socket.io')(server);
-
-io.on('connection', function (socket: any) {
-  setTimeout(function () {
-    socket.emit("connect", { hello: "world" })
-  }, 5000)
-
-
-  socket.on('join', function (path: string) {
-    socket.join(path);
-  });
-
-  socket.on('post', (data: any) => {
-    for (var key in socket.rooms) {
-      if (socket.rooms.hasOwnProperty(key)) {
-
-        var testkey = key;
-
-        if (key.split("|").length == 2) { testkey = key.split("|")[0] }
-
-        var packet = {
-          id: data.id,
-          data: data.data,
-          meta: { method: "socketioclient" }
-        }
-
-        handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
-
-      }
-    }
-  })
-  socket.on('disconnect', function () { })
+var io = require('socket.io')(server, {
+  transports: ['websocket', 'polling']
 });
+
+const bindListeners = (io: any) => {
+  io.on('connection', function (socket: any) {
+    setTimeout(function () {
+      socket.emit("connect", { hello: "world" })
+    }, 5000)
+
+
+    socket.on('join', function (path: string) {
+      socket.join(path);
+    });
+
+    socket.on('post', (data: any) => {
+      for (var key in socket.rooms) {
+        if (socket.rooms.hasOwnProperty(key)) {
+
+          var testkey = key;
+
+          if (key.split("|").length == 2) { testkey = key.split("|")[0] }
+
+          var packet = {
+            id: data.id,
+            data: data.data,
+            meta: { method: "socketioclient" }
+          }
+
+          handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
+
+        }
+      }
+    })
+    socket.on('disconnect', function () { })
+  });
+}
+
+if (config.redis) {
+  log("REDIS ENABLED")
+  const redis = require('socket.io-redis')
+  io.adapter(redis(config.redis))
+}
+
+bindListeners(io)
+
+/* ############################################################################## */
 
 if (config.ssl) {
   server.listen(443);
