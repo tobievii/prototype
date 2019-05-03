@@ -53,16 +53,16 @@ export function postState(
 
   if (meta.ip) {
     packet.meta.ip = meta.ip;
-    packet.meta.ipLoc = geoip.lookup(meta.ip);
-    if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
-      packet.meta.ipLoc = {
-        ll:
-          [
-            0.01,
-            0.01
-          ]
-      }
-    }
+    //   packet.meta.ipLoc = geoip.lookup(meta.ip);
+    //   if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
+    //     packet.meta.ipLoc = {
+    //       ll:
+    //         [
+    //           0.01,
+    //           0.01
+    //         ]
+    //     }
+    //   }
   }
 
   if (meta.userAgent) {
