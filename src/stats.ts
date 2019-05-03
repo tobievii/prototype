@@ -135,7 +135,7 @@ export function init(app: any, db: any) {
       db.users.find({ level: { $gt: 0 }, }, (err: Error, userList: any) => {
         var nameList: any = []
         for (var user of userList) {
-          nameList.push({ email: user.email, username: user.username, selected: "deselected", uuid: user.uuid, shared: "no" });
+          nameList.push({ email: user.email, username: user.username, selected: "deselected", uuid: user.uuid, shared: "no", icon: "far fa-square" });
         }
         resolve(nameList)
       })
