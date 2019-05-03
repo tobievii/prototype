@@ -4,7 +4,7 @@ import { AddRoute } from "./pluginHTTP_add.jsx";
 import { PortList } from "./pluginHTTP_list.jsx";
 
 import socketio from 'socket.io-client';
-const socket = socketio();
+const socket = socketio({ transports: ['websocket', 'polling'] });
 
 export const name = "HTTP";
 
