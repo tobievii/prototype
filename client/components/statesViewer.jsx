@@ -191,7 +191,7 @@ export class StatesViewer extends Component {
     var ds = this.state.devicesServer;
     this.props.sendProps({ un, acc, dc, ds });
 
-    this.socket = socketio();
+    this.socket = socketio({ transports: ['websocket', 'polling'] });
 
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },

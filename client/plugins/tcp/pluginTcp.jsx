@@ -4,12 +4,12 @@ import { AddPort } from "./pluginTcp_addPort.jsx";
 import { PortList } from "./pluginTcp_portList.jsx";
 
 import socketio from 'socket.io-client';
-const  socket = socketio();
+const socket = socketio({ transports: ['websocket', 'polling'] });
 
 export const name = "TCP";
 
 export class SettingsPanel extends React.Component {
-  state = { ports : [], user : {} };
+  state = { ports: [], user: {} };
 
   getAccount = () => {
     fetch("/api/v3/account", { method: "GET" })
@@ -26,16 +26,17 @@ export class SettingsPanel extends React.Component {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json" },
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(form)
     }).then(response => response.json())
-      .then((data) => { 
-        if (data.err) { 
+      .then((data) => {
+        if (data.err) {
           cb(data.err, undefined)
         } else {
           cb(undefined, data);
         }
-        this.getPorts(); 
+        this.getPorts();
       })
       .catch(err => console.error(err.toString()));
   };
@@ -53,7 +54,7 @@ export class SettingsPanel extends React.Component {
     this.getAccount();
     this.getPorts();
 
-    socket.on("plugin",(data)=>{
+    socket.on("plugin", (data) => {
       console.log(data);
       this.getPorts();
     })
