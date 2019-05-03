@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { log } from "./utils"
 
 export var version = {
-    "version": "5.0.38",
+    "version": "5.0.39",
     "description": "prototype"
 }
 
