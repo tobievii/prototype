@@ -195,17 +195,30 @@ app.get('/signout', (req: any, res: any) => {
   res.redirect('/');
 });
 
-app.get('/api/v3/bluetoothDevices', (req: any, res: any) => {
+app.get('/api/v3/scanbluetoothDevices', (req: any, res: any) => {
   var devices: any = [];
+  var done = false;
   device
-    .on('finished', () => {
-      console.log.bind(console, 'finished')
-      res.json(devices)
-    })
+    .on('finished', () => { done = true })
     .on('found', function found(address: any, name: any) {
-      console.log('Found: ' + address + ' with name ' + name);
+      // console.log('Found: ' + address + ' with name ' + name);
       devices.push({ address: address, name: name })
     }).scan();
+
+  var timerObj = setInterval(() => {
+    if (done == true) {
+      clearInterval(timerObj);
+      res.json(devices)
+    }
+  }, 5000)
+});
+
+app.get('/api/v3/getPairedDevices', (req: any, res: any) => {
+  device.listPairedDevices((devices: any) => {
+    // console.log(devices)
+    res.json(devices);
+  });
+
 });
 
 app.post('/signin', accounts.signInFromWeb(db));

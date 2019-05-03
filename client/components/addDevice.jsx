@@ -35,12 +35,18 @@ export class AddDevice extends Component {
         devicesView: "dashboardDevices",
         ssid: "",
         wifipass: "",
-        code: []
+        code: [],
+        pairedDevices: [],
+        bleDevices: []
     }
 
     constructor(props) {
         super(props);
     }
+
+    // componentDidMount = () => {
+    //     this.getPairedDevices();
+    // }
 
     setView = (view) => {
         this.setState({ devicesView: view });
@@ -108,7 +114,7 @@ export class AddDevice extends Component {
         } else if (this.state.popupInfo == "wifi") {
             return (
                 <div>
-                    SSID      : <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 40, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.ssid("ssid")} placeholder="NETWORK NAME"></input><br /><br />
+                    SSID      : <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 43, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.ssid("ssid")} placeholder="NETWORK NAME"></input><br /><br />
                     PASSWORD  : <input type="password" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 8, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.wifiPassword("password")} placeholder="PASSWORD"></input><br /><br />
                     <button className="commanderBgPanel commanderBgPanelClickable" onClick={this.bits} style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.bits() }}>ADD</button>
                 </div>
@@ -117,17 +123,17 @@ export class AddDevice extends Component {
             return (
                 <div >
                     <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth") }}>SCAN FOR DEVICE</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT BLUETOOTH", "selectBluetooth") }}>SELECT BLUETOOTH DEVICE</button>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT BLUETOOTH", "selectBluetooth"); this.getPairedDevices() }}>SELECT BLUETOOTH DEVICE</button>
                 </div>
             )
         } else if (this.state.popupInfo == "scanBluetooth") {
             return (
                 <div align="left" style={{ textAlign: "left" }}>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-laptop"></i>  Device 1</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-mobile-alt"></i>  Device 2</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-mobile-alt"></i>  Device 3</button>
+                    {
+                        this.getBLEDevices()
+                    }
                     <br /><br />
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "5px 0px" }} onClick={this.getPairedDevices}>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "5px 0px" }} onClick={this.getBlutoothDevices}>
                         REFRESH <i className="fas fa-redo NavLink"></i>
                     </button>
                 </div>
@@ -137,9 +143,13 @@ export class AddDevice extends Component {
                 <div style={{ width: "380px" }} align="center">
                     <select className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="Select device">
                         <option unselectable="true">SELECT DEVICE</option>
-                        <option>Device 1</option>
-                        <option>Device 2</option>
-                        <option>Device 3</option>
+                        {
+                            this.state.pairedDevices.map((device) => {
+                                return (
+                                    <option key={device.address}>{device.name}</option>
+                                )
+                            })
+                        }
                     </select>
                 </div>
             )
@@ -160,10 +170,6 @@ export class AddDevice extends Component {
         } else if (this.state.popupInfo == "scanDevices") {
             return (
                 <div style={{ width: "380px" }} align="center">
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-laptop"></i>  Device 1</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-mobile-alt"></i>  Device 2</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-mobile-alt"></i>  Device 3</button>
-                    <br /><br /><br />
                     <div className="commanderBgPanel ">
                         <span>Scanning</span><span style={{}} className="spinner-demo spinner-demo2"></span>
                     </div>
@@ -185,13 +191,42 @@ export class AddDevice extends Component {
         }
     }
 
-    getPairedDevices = () => {
+    getBLEDevices = () => {
+        if (this.state.bleDevices.length < 1) {
+            return (
+                <div className="commanderBgPanel">Scan for devices below...</div>
+            )
+        } else {
+            return (
+                this.state.bleDevices.map((device) => {
+                    return (
+                        <div key={device.address} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}><i className="fas fa-laptop"></i>  {device.name}</div>
+                    )
+                })
+            )
+        }
+    }
+
+    getBlutoothDevices = () => {
         this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
-        fetch("/api/v3/bluetoothDevices", {
+        fetch("/api/v3/scanbluetoothDevices", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(resp => {
-            console.log(resp);
+            this.setState({ bleDevices: resp })
             this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
+        }).catch(err => {
+            console.error(err.toString())
+            this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
+        });
+    }
+
+    getPairedDevices = () => {
+        this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
+        fetch("/api/v3/getPairedDevices", {
+            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        }).then(response => response.json()).then(resp => {
+            this.setState({ pairedDevices: resp })
+            this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
         }).catch(err => console.error(err.toString()));
     }
 
@@ -243,9 +278,9 @@ export class AddDevice extends Component {
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}>
                         <div style={{ background: "#131e27", padding: 12, width: "100%" }}>
-                            <span className={"fas fa-times navLink"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10 }}></span>
+                            <span className={"fas fa-times navLink"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10, float: "right" }}></span>
                             <span className={"fas fa-arrow-circle-left navLink"} onClick={() => { this.goBack() }} style={{}}></span>
-                            <span style={{ float: "right", marginRight: "305px" }}>{this.state.popupHeading}</span>
+                            <span style={{ float: "right", marginRight: "40%" }}>{this.state.popupHeading}</span>
                         </div>
                         <center>
                             <div className='protoPopup'>
