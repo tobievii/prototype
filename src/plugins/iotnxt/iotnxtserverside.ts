@@ -14,9 +14,6 @@ var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 var enablePackets = false;
 
 export function handlePacket(db: any, packet: any, cb: any) {
-
-  log("handle packet")
-
   if (enablePackets) {
     iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
       if (err) console.log(err);
@@ -27,10 +24,6 @@ export function handlePacket(db: any, packet: any, cb: any) {
   } else {
     cb(packet);
   }
-
-
-
-
 }
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {

@@ -28,7 +28,7 @@ var compression = require('compression')
 
 import express = require('express');
 
-var sprintf = require("sprintf-js").sprintf;
+
 
 const app = express()
 var http = require('http');
@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -70,12 +70,9 @@ app.use('/u/:username/view', express.static('../client/dist'))
 // PLUGINS
 
 eventHub.on("device", (data: any) => {
-  //log("----")
-
-
-
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
+
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
 })
@@ -952,7 +949,8 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 // }
 
 function handleState(req: any, res: any, next: any) {
-  checkExisting(req, res, db);
+  var hrstart = process.hrtime()
+  //checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
 
@@ -983,24 +981,23 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
-    var hrstart = process.hrtime()
+
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
           if (info.newdevice) {
 
-            var newDeviceNotification = {
-              type: "NEW DEVICE ADDED",
-              device: req.body.id,
-              created: packet._created_on,
-              notified: true,
-              seen: false
-            }
+            // var newDeviceNotification = {
+            //   type: "NEW DEVICE ADDED",
+            //   device: req.body.id,
+            //   created: packet._created_on,
+            //   notified: true,
+            //   seen: false
+            // }
 
-            createNotification(db, newDeviceNotification, req, Result);
-            io.to(req.user.username).emit("info", info);
+            // createNotification(db, newDeviceNotification, req, Result);
+            // io.to(req.user.username).emit("info", info);
           }
 
           // disabled for now:
@@ -1049,16 +1046,15 @@ function handleState(req: any, res: any, next: any) {
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
-            });
+            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => { });
           }
         }
 
         res.json({ result: "success" });
 
         var hrend = process.hrtime(hrstart)
-
-        log(sprintf('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000))
+        // log('Execution time (hr): ')
+        // log(hrend);
       })
     })
   } else {
@@ -1071,7 +1067,6 @@ function handleState(req: any, res: any, next: any) {
 */
 
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
-
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { log(err); cb(err, undefined); return; }
 
