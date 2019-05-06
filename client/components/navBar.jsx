@@ -207,7 +207,7 @@ export class NavBar extends Component {
   showSettings = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
-        return (<Link to="/settings" className="navLink" title="Settings"><FontAwesomeIcon icon="cog" /></Link>)
+        return (<Link to="/settings" className="navLink" title="Settings"><FontAwesomeIcon icon="cog" title="View settings" /></Link>)
       }
     }
   }
@@ -224,7 +224,7 @@ export class NavBar extends Component {
 
     return (
       <div className="dropdown">
-        <div className="fas fa-user" onClick={() => this.showDropdownMenu("account")}></div>
+        <div className="fas fa-user" title="View account infromation" onClick={() => this.showDropdownMenu("account")}></div>
 
         {this.state.displayMenu ? (
 
@@ -445,7 +445,7 @@ export class NavBar extends Component {
   changeViews = (account) => {
     return (
       <div className="dropdown">
-        <FontAwesomeIcon icon="eye" onClick={() => this.showDropdownMenu("views")} />
+        <FontAwesomeIcon icon="eye" title="Change main view" onClick={() => this.showDropdownMenu("views")} />
         {this.state.displayViews ? (
           <div className="arrow-up">
             <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
@@ -473,7 +473,7 @@ export class NavBar extends Component {
 
   addDeviceButton = () => {
     return (
-      <FontAwesomeIcon icon="plus" onClick={this.addButtonClicked} />
+      <FontAwesomeIcon icon="plus" title="Add A Device" onClick={this.addButtonClicked} />
     )
   }
 

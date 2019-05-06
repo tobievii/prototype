@@ -347,16 +347,15 @@ export class StatesViewer extends Component {
     }
   }
 
-  getNewDevice = () => {
-    if (this.busyGettingNewDevice == true) {
-      console.log("already busy.. please wait")
-    } else {
-      console.log("getting new device(s)")
-      p.statesByUsername(this.props.username, (states) => {
-        console.log(states);
-      });
-    }
-  }
+  // getNewDevice = () => {
+  //   if (this.busyGettingNewDevice == true) {
+  //     console.log("already busy.. please wait")
+  //   } else {
+  //     p.statesByUsername(this.props.username, (states) => {
+  //       console.log(states);
+  //     });
+  //   }
+  // }
 
   componentWillMount = () => {
     this.getDevices("initial load");
@@ -379,10 +378,6 @@ export class StatesViewer extends Component {
     var devices = _.clone(this.state.devicesServer)
     var found = 0;
     for (var dev in devices) {
-      // if (devices[dev].devid == packet.devid && packet.notification24) {
-      //   devices[dev]["notification24"] = packet.notification24;
-      // }
-
       if (devices[dev].devid == packet.id) {
         found = 1;
         devices[dev]["_last_seen"] = packet.timestamp;

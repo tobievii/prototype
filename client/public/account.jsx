@@ -70,7 +70,7 @@ export class Account extends Component {
     return str;
   };
 
-  getMenuPageStyle = function(menu) {
+  getMenuPageStyle = function (menu) {
     if (menu == this.state.menu) {
       return { display: "" };
     } else {
@@ -78,7 +78,7 @@ export class Account extends Component {
     }
   };
 
-  getMenuClasses = function(num) {
+  getMenuClasses = function (num) {
     if (num == this.state.menu) {
       return "menuTab borderTopSpot paddingButton";
     } else {
@@ -86,7 +86,7 @@ export class Account extends Component {
     }
   };
 
-  onClickMenuTab = function(menu) {
+  onClickMenuTab = function (menu) {
     return event => {
       if (this.state.menu == menu) {
         this.setState({ menu: 0 });
@@ -131,7 +131,7 @@ export class Account extends Component {
       .then(response => response.json())
       .then(data => {
         if (data.signedin) {
-          location.reload();
+          window.location = "/";
         }
 
         if (data.error) {
@@ -142,8 +142,6 @@ export class Account extends Component {
   };
 
   register = () => {
-    console.log("register");
-
     fetch("/api/v3/admin/register", {
       method: "POST",
       headers: {
@@ -228,14 +226,14 @@ export class Account extends Component {
                   REGISTER
                 </div>
               ) : (
-                <div
-                  className={this.getMenuClasses(2)}
-                  onClick={this.onClickMenuTab(2)}
-                  style={{ width: "150", float: "right" }}
-                >
-                  REGISTER
+                  <div
+                    className={this.getMenuClasses(2)}
+                    onClick={this.onClickMenuTab(2)}
+                    style={{ width: "150", float: "right" }}
+                  >
+                    REGISTER
                 </div>
-              )
+                )
             }
           </Media>
         );

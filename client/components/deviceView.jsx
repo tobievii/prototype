@@ -86,7 +86,6 @@ export class DeviceView extends Component {
 
   constructor(props) {
     super(props);
-    // console.log(props)
     this.socket = socketio();
     this.state.devid = props.devid
     this.socket.on("connect", a => {
@@ -163,34 +162,29 @@ export class DeviceView extends Component {
   }
 
   getDeviceDV = () => {
-    fetch("/api/v3/view", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ id: this.props.devid, username: this.props.username })
-    }).then(response => response.json()).then(view => {
-      if (view.error) {
-      } else {
-        this.setState({ view })
-      }
-
-    }).catch(err => console.error(err.toString()));
-
-    fetch("/api/v3/account", {
-      method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-    }).then(response => response.json()).then(account => {
-
-    }).catch(err => console.error(err.toString()));
-
-    fetch("/api/v3/state", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ id: this.props.devid, username: this.props.username })
-    }).then(response => response.json()).then(state => {
-      this.setState({ state }, () => {
-        if (state.error) {
+    setTimeout(() => {
+      fetch("/api/v3/view", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: this.props.devid, username: this.props.username })
+      }).then(response => response.json()).then(view => {
+        if (view.error) {
         } else {
-          this.socket.emit("join", state.key)
+          this.setState({ view })
         }
-      })
-    }).catch(err => console.error(err.toString()));
+      }).catch(err => console.error(err.toString()));
+
+      fetch("/api/v3/state", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ id: this.props.devid, username: this.props.username })
+      }).then(response => response.json()).then(state => {
+        this.setState({ state }, () => {
+          if (state.error) {
+          } else {
+            this.socket.emit("join", state.key)
+          }
+        })
+      }).catch(err => console.error(err.toString()));
+    }, 100);
   }
 
   componentWillUnmount = () => {

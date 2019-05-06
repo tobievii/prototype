@@ -41,6 +41,7 @@ const test = {
 }
 
 var publicS = undefined;
+var visitingG = undefined;
 
 class App extends Component {
     state = {
@@ -185,6 +186,7 @@ class App extends Component {
     }
 
     home = ({ match }) => {
+        visitingG = false;
         if (this.state.account) {
             if (match.params.username == undefined) {
                 match.params.username = this.state.account.username;
@@ -194,40 +196,14 @@ class App extends Component {
                 var view = undefined;
 
                 if (this.state.devicesView == "dashboard") {
-                    view = <DeviceView
-                        openModal={this.openModal}
-                        mainView={this.state.devicesView}
-                        devid={match.params.devid}
-                        username={match.params.username}
-                        acc={test.acc}
-                        deviceCall={test.dc}
-                        devices={test.ds}
-                        sendProps={this.setProps}
-                        account={this.state.account}
-                        public={false}
-                        visiting={false}
-                    />
+                    view = this.deviceView(match);
                 } else if (this.state.devicesView == "devices") {
                     view = <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
                 } else if (this.state.devicesView == "dashboardDevices") {
-                    view = <DeviceView
-                        openModal={this.openModal}
-                        mainView={this.state.devicesView}
-                        devid={match.params.devid}
-                        username={match.params.username}
-                        acc={test.acc}
-                        deviceCall={test.dc}
-                        devices={test.ds}
-                        sendProps={this.setProps}
-                        account={this.state.account}
-                        public={false}
-                        visiting={false}
-                    />
+                    view = this.deviceView(match);
                 }
                 return (
                     <div>
-                        {/* <Dashboard state={this.state.states} /> */}
-                        {/* <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} /> */}
                         {view}
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
@@ -240,20 +216,7 @@ class App extends Component {
                     <div>
                         <Account account={this.state.account} />
                         <Landing />
-                        {/* <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} /> */}
-
-                        <DeviceView
-                            mainView={this.state.devicesView}
-                            devid={match.params.devid}
-                            username={match.params.username}
-                            acc={test.acc}
-                            deviceCall={test.dc}
-                            devices={test.ds}
-                            sendProps={this.setProps}
-                            account={this.state.account}
-                            public={true}
-                            visiting={false}
-                        />
+                        {this.deviceView(match)}
 
                         <Footer loggedIn={false} />
                     </div>)
@@ -263,7 +226,7 @@ class App extends Component {
         }
     }
 
-    deviceView = ({ match }) => {
+    deviceView = (match) => {
         return (
             <div>
                 <DeviceView
@@ -277,30 +240,18 @@ class App extends Component {
                     sendProps={this.setProps}
                     account={this.state.account}
                     public={publicS}
-                    visiting={false}
+                    visiting={visitingG}
                 />
             </div>
         )
     }
 
     userView = ({ match }) => {
+        visitingG = true;
         return (
             <div>
                 <UserPage username={match.params.username} />
-                {/* <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} /> */}
-                <DeviceView
-                    openModal={this.openModal}
-                    mainView={this.state.devicesView}
-                    devid={match.params.devid}
-                    username={match.params.username}
-                    acc={test.acc}
-                    deviceCall={test.dc}
-                    devices={test.ds}
-                    sendProps={this.setProps}
-                    account={this.state.account}
-                    public={false}
-                    visiting={true}
-                />
+                {this.deviceView(match)}
                 <Footer />
             </div>
 
@@ -339,19 +290,6 @@ class App extends Component {
         this.setState({ devicesView: view });
     }
 
-    clickShare = (response) => {
-        this.setState({ isOpen: false })
-        if (response.mail != undefined && response.mail == "sent") {
-            fetch("/api/v3/state", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id: this.props.device.devid, username: this.props.username })
-            }).then(response => response.json()).then(state => {
-                this.setState({ device: state })
-                this.setDevice(state)
-            }).catch(err => console.error(err.toString()));
-        }
-    }
-
     openModal = () => {
         this.setState({ isOpen: true });
     }
@@ -366,7 +304,6 @@ class App extends Component {
                         <AddDevice mainView={this.changeView} version={this.state.version} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
-                        <Route path="/view/:devid" component={this.deviceView} />
                         <Route exact path="/uv/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.home} />
                         <Route exact path="/uv/:username/view/:devid" component={this.userView} />
