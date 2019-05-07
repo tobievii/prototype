@@ -191,7 +191,7 @@ export class StatesViewer extends Component {
     var ds = this.state.devicesServer;
     this.props.sendProps({ un, acc, dc, ds });
 
-    this.socket = socketio();
+    this.socket = socketio({ transports: ['websocket', 'polling'] });
 
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -481,11 +481,7 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     this.setState({ sort: value });
 
-    fetch("/api/v3/sort", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ sort: value })
-    }).then(response => response.json()).then(serverresponse => {
-    }).catch(err => console.error(err.toString()));
+
   }
 
   selectCountUpdate = () => {

@@ -28,7 +28,7 @@ import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
 import socketio from "socket.io-client";
-var socket = socketio();
+var socket = socketio({ transports: ['websocket', 'polling'] });
 const publicVapidKey =
     "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
 

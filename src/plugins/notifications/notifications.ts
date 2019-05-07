@@ -5,7 +5,7 @@ export const name = "notifications"
 export const workflowDefinitions = [
   "var " + name + " = { ",
   "warning: (message:string)",
-  "alarm1: (message:string)",
+  "alarm: (message:string)",
   "info: (message:string)",
   "}"
 ];
@@ -256,6 +256,115 @@ export function checkExisting(req: any, res: any, db: any) {
   })
 }
 
-export var bot: any;
+
+
+// export function createNotification(db: any, notification: any, req: any, device: any) {
+//   if (notification.type == "ALARM") {
+//     io.emit("notification", notification, device);
+
+//     if (req.user.notifications) {
+//       req.user.notifications.push(notification)
+//     } else {
+//       req.user.notifications = [notification]
+//     }
+//     db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+
+//       for (var a of result.notifications) {
+//         if (a.type == 'ALARM' && a.device == req.body.id) {
+//           db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+//             if (err !== null) {
+//               console.log(err)
+//             } else if (updated)
+//               console.log(updated)
+//           })
+//         }
+//       }
+//     })
+//   } else if (notification.type == "NEW DEVICE ADDED") {
+//     io.emit("notification", notification, device);
+
+//     if (req.user.notifications) {
+//       req.user.notifications.push(notification)
+//     } else {
+//       req.user.notifications = [notification]
+//     }
+
+//     db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
+//       if (err) console.log(err);
+//       if (updated) console.log(updated);
+//     })
+//   }
+// }
+
+// export function deviceSeen(db: any, user: any) {
+//   db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
+//     var notifications = result.notifications;
+//     var final = [];
+
+//     for (var notification in notifications) {
+//       if (notifications[notification].seen == false) {
+//         notifications[notification].seen = true;
+//       }
+//       final.push(notifications[notification]);
+//     }
+
+//     io.emit("notification", undefined, user.apikey);
+
+//     db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
+//     })
+//   });
+// }
+
+// export function checkExisting(req: any, res: any, db: any) {
+//   // timer.reset(500);
+//   // timer.stop();
+//   // timer.start();
+
+//   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
+
+//     function findNotified(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].notified == undefined || array[i].notified == null) {
+
+//           array[i].notified = false;
+
+//           io.emit("info", info)
+
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
+
+//     function findSeen(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].seen == undefined || array[i].seen == null) {
+
+//           array[i].seen = false;
+
+//           io.emit("info", info)
+
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
+
+//     findNotified(state.notifications);
+//     findSeen(state.notifications);
+//   })
+// }
+
+// export var bot: any;
 
 

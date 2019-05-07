@@ -12,7 +12,7 @@ import { AddGatewayPanel } from "./addGateway.jsx"
 import { GatewayList } from "./gatewayList.jsx"
 
 import socketio from 'socket.io-client';
-const socket = socketio();
+const socket = socketio({ transports: ['websocket', 'polling'] });
 
 export class SettingsPanel extends React.Component {
   state = { gateways: [] }

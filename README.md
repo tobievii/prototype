@@ -429,3 +429,68 @@ Enables linking device state bidirectionally to the [Iot.nxt](https://www.iotnxt
 
 The serialports plugin enables autodetection of arduino or similar serialport devices. Also enables the serialports object in process scripts that enables listing of devices and writing to ports.
 
+
+
+# Developers
+
+Fork the main repo to your account.
+
+## Keep your forked repository up to date
+
+```
+# Add the remote and call it 'upstream'.
+
+git remote add upstream https://github.com/IoT-nxt/prototype
+
+# Fetch all the branches of that remote into remote-tracking branches
+
+git fetch upstream
+
+# Merge upstream changes in to your downstream repository.
+
+git merge upstream/master
+
+# Create a new branch of where you want to work. or use the existing dev branch.
+
+git checkout -b 'branch_name' # Without the single quotes
+
+# Perform your work locally using standard local repo workflow.
+
+# Then push your changes in to your Downstream remote repository.
+
+git push origin branch_name
+
+# Repeat above steps whenever you need to update your repository with the work that has occurred upstream since the last merge was performed.
+
+
+```
+
+
+# Cluster
+
+http://pm2.keymetrics.io/
+
+```
+sudo npm i pm2 -g
+pm2 start main.js -i 0
+```
+
+# Redis
+
+https://tecadmin.net/install-redis-ubuntu/
+```
+# install
+sudo apt-get install redis-server
+
+# run
+sudo systemctl enable redis-server.service
+```
+
+Add redis to iotconfig.json
+
+```json
+"redis": {
+  "host": "localhost",
+  "port": 6379
+}
+```

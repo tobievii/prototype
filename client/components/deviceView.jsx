@@ -83,7 +83,7 @@ export class DeviceView extends Component {
 
   constructor(props) {
     super(props);
-    this.socket = socketio();
+    this.socket = socketio({ transports: ['websocket', 'polling'] });
     this.state.devid = props.devid
     this.socket.on("connect", a => {
       this.socket.on("post", (packet) => {

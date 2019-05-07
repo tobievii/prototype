@@ -14,9 +14,6 @@ var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 var enablePackets = false;
 
 export function handlePacket(db: any, packet: any, cb: any) {
-
-  log("handle packet")
-
   if (enablePackets) {
     iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
       if (err) console.log(err);
@@ -27,10 +24,6 @@ export function handlePacket(db: any, packet: any, cb: any) {
   } else {
     cb(packet);
   }
-
-
-
-
 }
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
@@ -359,7 +352,7 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
     if (gateways) {
       var deviceTree: any = {};
       var results = 0;
-      db.states.find({}, (err: Error, deviceStates: any[]) => {
+      db.states.find({ "plugins_iotnxt_gateway": { "GatewayId": gateway.GatewayId, HostAddress: gateway.HostAddress } }, (err: Error, deviceStates: any[]) => {
         if (deviceStates.length == 0) {
           cb(gateway, {})
         }
@@ -393,8 +386,6 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
                 }
               }
 
-
-
               //console.log("results:"+results+" deviceStates.length:"+deviceStates.length)
               if (results == deviceStates.length) {
                 cb(gateway, deviceTree);
@@ -414,42 +405,13 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
 
 // callsback with this device's gateway
 export function findDeviceGateway(db: any, apikey: string, devid: string, cb: any) {
-
-  db.states.findOne({ apikey: apikey, devid: devid }, (e: Error, deviceState: any) => {
-
+  db.states.findOne({ apikey: apikey, devid: devid, "plugins_iotnxt_gateway": { $exists: true } }, (e: Error, deviceState: any) => {
     if (deviceState == null) { cb(new Error("no device")); return; }
 
     if (deviceState.plugins_iotnxt_gateway) {
       cb(deviceState, deviceState.plugins_iotnxt_gateway);
     } else {
       cb(undefined, undefined);
-      //check account setting
-      // db.users.findOne({ apikey: apikey },(err: Error, user: any) => {
-
-      //   if (user == null) { 
-
-      //     cb(undefined, undefined);
-      //       // getserverdefaultgateway(db, (err:Error,defaultgateway:any)=>{
-      //       //   cb(deviceState, defaultgateway); //first in config serverwide
-      //       // })          
-
-      //     }
-
-      //     if (user) {
-      //       if (user.plugins_iotnxt_gatewaydefault) {
-      //         //account has gateway set
-      //         cb(deviceState, user.plugins_iotnxt_gatewaydefault);
-      //       } else {
-      //         //account has no gateway set
-      //         getserverdefaultgateway(db, (err:Error,defaultgateway:any)=>{
-      //           cb(deviceState, defaultgateway); //first in config serverwide
-      //         })          
-      //       }
-      //     }
-
-
-      //   }
-      // );
     }
   })
 }
@@ -589,7 +551,7 @@ function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
         }
       }
     }
-    iotnxtqueues[gateway.GatewayId + "|" + gateway.HostAddress].publishState(cb);
+    iotnxtqueues[gateway.GatewayId + "|" + gateway.HostAddress].publishState(packet, cb);
   } else {
     //console.log("QUEUE UNDEFINED")
   }
