@@ -1,22 +1,26 @@
 $break-small: 320px;
 $break-large: 1200px;
 
-@media(max-width: 600px){
-    .mapContainer{
-      height: 350px;
-      margin-top: 70px;
+@media(max-width: 600px) {
+    .mapContainer {
+        height: 350px;
+        margin-top: 70px;
+    }
+
+    .notificationPanel {
+        width: 320px !important;
     }
 
     .map {
         margin-top: 10px;
-      }
+    }
 
-    .navHeading{
+    .navHeading {
         display: none;
     }
 
-    .apiInfo{
-        padding-top: 0px; 
+    .apiInfo {
+        padding-top: 0px;
         margin: 60px 37px 0px !important;
     }
 
@@ -51,107 +55,126 @@ $break-large: 1200px;
         background-image: linear-gradient(rgba(243, 53, 58, 0.1), rgba(0, 0, 0, 0));
     }
 
-    .navBar{
+    .navBar {
         position: absolute;
         z-index: 2000;
-        right: 4px !important; 
-        margin-right: 0px !important; 
+        right: 4px !important;
+        margin-right: 0px !important;
     }
 
-    .rowList{
+    .rowList {
         display: block;
     }
 
-    .version{
+    .version {
         color: #f3353a;
         font-size: 13px;
     }
 
-    .menuIcons{
-        display:none;
-    }
-
-    .dataPreview{
+    .menuIcons {
         display: none;
     }
+
+    // .dataPreview{
+    //     display: none;
+    // }
 
     .statesViewerItem {
         display: flex;
     }
 
-    .changeTimeagoWidth{
+    .changeTimeagoWidth {
         flex: 0 0 130px !important;
     }
 
-    .commanderBgPanel{
+    .commanderBgPanel {
         overflow: auto;
     }
 
-    .apiInfoMenu{
+    .apiInfoMenu {
         display: grid;
         grid-template-columns: 20% 20% 20% 20% 20%;
     }
+
     .menuSelectable {
         background-image: linear-gradient(#101218, black);
     }
 
-    .searchIcon{
-        padding-top: 5px; 
+    .searchIcon {
+        padding-top: 5px;
     }
-    .settingsMenu{
+
+    .settingsMenu {
         display: inline;
         font-size: 13px;
     }
 
-    .settingsPage{
+    .noDisplay {
+        display: none !important;
+    }
+
+    .settingsPage {
         margin: 10px 2px 0px 2px !important;
     }
-    
-    .settingsDetails{
+
+    .settingsDetails {
         color: grey;
     }
 
-    .fullWidth{
+    .fullWidth {
         width: 100% !important;
     }
 
-    .floatLeft{
+    .floatLeft {
         margin-top: 5px !important;
         float: left !important;
     }
 
-    .alignLeft{
+    .alignLeft {
         text-align: left !important;
     }
 
-    .smallButton{
+    .smallButton {
         font-size: 13px;
-      }
+    }
+
+    .paddingButton {
+        margin-top: 14px !important;
+        padding: 7px !important;
+        padding-bottom: 4px !important;
+    }
 }
 
-@media(max-width: 400px){
-    .fullWidth{
+@media(max-width: 400px) {
+
+
+    .fullWidth {
         width: 100% !important;
     }
 
-    .floatLeft{
+    .notificationPanel {
+        width: 320px !important;
+    }
+
+    .floatLeft {
         margin-top: 5px !important;
         float: left !important;
     }
-    .settingsMenu{
+
+    .settingsMenu {
         display: inline;
     }
 
-    .searchIcon{
-        padding-top: 5px; 
+    .searchIcon {
+        padding-top: 5px;
     }
 
-    .apiInfo{
-        padding-top: 0px; 
+    .apiInfo {
+        padding-top: 0px;
         margin: 60px 37px 0px !important;
     }
 
-    .apiInfoMenu{
+    .apiInfoMenu {
         display: grid;
         grid-template-columns: 20% 20% 20% 20% 20%;
         align-self: center;
@@ -161,15 +184,15 @@ $break-large: 1200px;
         display: flex;
     }
 
-    .changeTimeagoWidth{
+    .changeTimeagoWidth {
         flex: 0 0 130px !important;
     }
 
-    .dataPreview{
+    .dataPreview {
         display: none;
     }
 
-    .navHeading{
+    .navHeading {
         display: none;
     }
 
@@ -178,12 +201,12 @@ $break-large: 1200px;
         padding-top: 100;
     }
 
-    .version{
+    .version {
         color: #f3353a;
         font-size: 13px;
     }
 
-    .commanderBgPanel{
+    .commanderBgPanel {
         overflow: auto;
     }
 
@@ -192,7 +215,7 @@ $break-large: 1200px;
         overflow: hidden;
         background: rgba(3, 4, 5, 0.5);
         color: rgba(255, 246, 235, 0.959);
-        padding: 12px 0px 2px 8px !important;
+        padding: 10px 0px 2px 8px !important;
         margin-top: 7px;
         border-top: 1px solid rgba(161, 200, 231, 0.151);
         border-left: 1px solid rgba(97, 115, 129, 0.151);
@@ -214,7 +237,7 @@ $break-large: 1200px;
         transition: all 0.2s;
         user-select: none;
     }
-  
+
     .borderTopSpot {
         border-top: 1px solid #f3353a;
         background-image: linear-gradient(rgba(243, 53, 58, 0.1), rgba(0, 0, 0, 0));
@@ -222,16 +245,16 @@ $break-large: 1200px;
 
     .menuSelectable {
         background-image: linear-gradient(#101218, black);
-      }
-
-    .navBar{
-        position: absolute;
-        z-index: 2000;
-        right: 4px !important; 
-        margin-right: 0px !important; 
     }
 
-    #navDashboard{
+    .navBar {
+        position: absolute;
+        z-index: 2000;
+        right: 4px !important;
+        margin-right: 0px !important;
+    }
+
+    #navDashboard {
         display: none;
     }
 
@@ -248,27 +271,32 @@ $break-large: 1200px;
         border-top: none;
         border-right: 1px solid rgba(97, 115, 129, 0.151);
         margin-right: 0px;
-      }
+    }
 
-      .loginB{
-          width: 100%;
-          margin-right: 14px; 
-      }
+    .loginB {
+        width: 100%;
+        margin-right: 14px;
+    }
 
-      .rowList{
-          display: block;
-      }
+    .rowList {
+        display: block;
+    }
 
-      .menuIcons{
-          display:none;
-      }
+    .menuIcons {
+        display: none;
+    }
 
-      .alignLeft{
-          text-align: left !important;
-      }
+    .alignLeft {
+        text-align: left !important;
+    }
 
-      .smallButton{
+    .smallButton {
         font-size: 13px;
-      }
+    }
 
+    .paddingButton {
+        margin-top: 14px !important;
+        padding: 7px !important;
+        padding-bottom: 4px !important;
+    }
 }

@@ -20,9 +20,13 @@ export function postState(
     return;
   }
 
-
-
   var event = new Date();
+
+  // enables timestamp override if included in packet
+  if (request.timestamp) {
+    event = new Date(request.timestamp);
+  }
+
   request.timestamp = event.toJSON();
 
   var packet: any = {
@@ -49,16 +53,16 @@ export function postState(
 
   if (meta.ip) {
     packet.meta.ip = meta.ip;
-    packet.meta.ipLoc = geoip.lookup(meta.ip);
-    if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
-      packet.meta.ipLoc = {
-        ll:
-          [
-            0.01,
-            0.01
-          ]
-      }
-    }
+    //   packet.meta.ipLoc = geoip.lookup(meta.ip);
+    //   if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
+    //     packet.meta.ipLoc = {
+    //       ll:
+    //         [
+    //           0.01,
+    //           0.01
+    //         ]
+    //     }
+    //   }
   }
 
   if (meta.userAgent) {
@@ -70,12 +74,34 @@ export function postState(
 
   db.states.findOne({ apikey: user.apikey, devid: request.id },
     (findErr: Error, findResult: any) => {
+      // if (findResult.notification24 == true) {
+      //   db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+      //     console.log(result)
+      //     console.log(err)
+      //   })
+      // }
       var packetToUpsert: any = {};
 
       var info: any = {}
       if (findResult) {
         delete findResult["_id"];
-        packetToUpsert = _.merge(findResult, packet);
+
+        var mergepacket = true; //default
+
+        if (packet.payload.options) {
+          if (packet.payload.options["_merge"] === false) {
+            mergepacket = false;
+          }
+        }
+
+        if (mergepacket) {
+          packetToUpsert = _.merge(findResult, packet);
+        } else {
+          delete findResult.payload; // we clear payload, but retain other data like dashboard and workflow.
+          packetToUpsert = _.merge(findResult, packet);
+        }
+
+
         packetToUpsert["_last_seen"] = new Date();
         info.newdevice = false
       } else {

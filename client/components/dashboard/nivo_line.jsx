@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import protoGraphTheme from './theme.jsx'
+import { Widget } from "./widget.jsx"
 
 // Nivo calendar http://nivo.rocks/calendar
 
@@ -8,6 +9,8 @@ import { ResponsiveLine } from '@nivo/line'
 
 export class NivoLine extends React.Component {
   state = {}
+
+  lasttimestamp = "";
 
   componentDidMount() {
     if (this.props.state) {
@@ -18,19 +21,51 @@ export class NivoLine extends React.Component {
     }
   }
 
+
+
+  componentDidUpdate() {
+
+
+    if (_.has(this, "props.state.payload." + this.props.datapath)) {
+      if (this.props.state.payload.timestamp != this.lasttimestamp) {
+
+
+
+        var newdata = { x: this.props.state.payload.timestamp, y: _.get(this, "props.state.payload." + this.props.datapath) }
+
+        if (this.state.linedata) {
+          var linedata = _.clone(this.state.linedata)
+          linedata[0].data.push(newdata)
+          linedata[0].data = linedata[0].data.slice(-50);
+          this.setState({ linedata })
+        }
+        //
+
+
+
+
+
+        this.lasttimestamp = this.props.state.payload.timestamp;
+      }
+    }
+    //console.log(this.props.state);
+    //console.log(this.props.datapath)
+  }
+
   fetchData(key, datapath) {
     fetch("/api/v3/packets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key, datapath })
+      body: JSON.stringify({ key, datapath, limit: 50 })
     }).then(response => response.json()).then(result => {
       //console.log(result);
+
+      result = result.reverse();
 
       var linedata = [{
         id: datapath,
         color: "rgb(0, 255, 255)",
         data: result
       }]
-
       this.setState({ linedata })
     }).catch(err => console.error(err.toString()));
   }
@@ -70,7 +105,7 @@ export class NivoLine extends React.Component {
           "tickSize": 5,
           "tickPadding": 5,
           "tickRotation": 0,
-          "legend": "transportation",
+          "legend": this.props.datapath,
           "legendOffset": 36,
           "legendPosition": "middle"
         }}
@@ -102,247 +137,11 @@ export class NivoLine extends React.Component {
 
   render() {
 
-
-    // var linedata = [
-    //   {
-    //     "id": "japan",
-    //     "color": "hsl(198, 70%, 50%)",
-    //     "data": [
-    //       {
-    //         "x": "plane",
-    //         "y": 181
-    //       },
-    //       {
-    //         "x": "helicopter",
-    //         "y": 262
-    //       },
-    //       {
-    //         "x": "boat",
-    //         "y": 112
-    //       },
-    //       {
-    //         "x": "train",
-    //         "y": 289
-    //       },
-    //       {
-    //         "x": "subway",
-    //         "y": 195
-    //       },
-    //       {
-    //         "x": "bus",
-    //         "y": 6
-    //       },
-    //       {
-    //         "x": "car",
-    //         "y": 75
-    //       },
-    //       {
-    //         "x": "moto",
-    //         "y": 121
-    //       },
-    //       {
-    //         "x": "bicycle",
-    //         "y": 29
-    //       },
-    //       {
-    //         "x": "others",
-    //         "y": 220
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     "id": "france",
-    //     "color": "hsl(332, 70%, 50%)",
-    //     "data": [
-    //       {
-    //         "x": "plane",
-    //         "y": 140
-    //       },
-    //       {
-    //         "x": "helicopter",
-    //         "y": 191
-    //       },
-    //       {
-    //         "x": "boat",
-    //         "y": 175
-    //       },
-    //       {
-    //         "x": "train",
-    //         "y": 98
-    //       },
-    //       {
-    //         "x": "subway",
-    //         "y": 176
-    //       },
-    //       {
-    //         "x": "bus",
-    //         "y": 97
-    //       },
-    //       {
-    //         "x": "car",
-    //         "y": 181
-    //       },
-    //       {
-    //         "x": "moto",
-    //         "y": 171
-    //       },
-    //       {
-    //         "x": "bicycle",
-    //         "y": 145
-    //       },
-    //       {
-    //         "x": "others",
-    //         "y": 62
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     "id": "us",
-    //     "color": "hsl(280, 70%, 50%)",
-    //     "data": [
-    //       {
-    //         "x": "plane",
-    //         "y": 146
-    //       },
-    //       {
-    //         "x": "helicopter",
-    //         "y": 212
-    //       },
-    //       {
-    //         "x": "boat",
-    //         "y": 217
-    //       },
-    //       {
-    //         "x": "train",
-    //         "y": 190
-    //       },
-    //       {
-    //         "x": "subway",
-    //         "y": 223
-    //       },
-    //       {
-    //         "x": "bus",
-    //         "y": 131
-    //       },
-    //       {
-    //         "x": "car",
-    //         "y": 67
-    //       },
-    //       {
-    //         "x": "moto",
-    //         "y": 47
-    //       },
-    //       {
-    //         "x": "bicycle",
-    //         "y": 236
-    //       },
-    //       {
-    //         "x": "others",
-    //         "y": 80
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     "id": "germany",
-    //     "color": "hsl(160, 70%, 50%)",
-    //     "data": [
-    //       {
-    //         "x": "plane",
-    //         "y": 160
-    //       },
-    //       {
-    //         "x": "helicopter",
-    //         "y": 288
-    //       },
-    //       {
-    //         "x": "boat",
-    //         "y": 77
-    //       },
-    //       {
-    //         "x": "train",
-    //         "y": 214
-    //       },
-    //       {
-    //         "x": "subway",
-    //         "y": 7
-    //       },
-    //       {
-    //         "x": "bus",
-    //         "y": 198
-    //       },
-    //       {
-    //         "x": "car",
-    //         "y": 203
-    //       },
-    //       {
-    //         "x": "moto",
-    //         "y": 174
-    //       },
-    //       {
-    //         "x": "bicycle",
-    //         "y": 235
-    //       },
-    //       {
-    //         "x": "others",
-    //         "y": 86
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     "id": "norway",
-    //     "color": "hsl(168, 70%, 50%)",
-    //     "data": [
-    //       {
-    //         "x": "plane",
-    //         "y": 219
-    //       },
-    //       {
-    //         "x": "helicopter",
-    //         "y": 84
-    //       },
-    //       {
-    //         "x": "boat",
-    //         "y": 204
-    //       },
-    //       {
-    //         "x": "train",
-    //         "y": 267
-    //       },
-    //       {
-    //         "x": "subway",
-    //         "y": 178
-    //       },
-    //       {
-    //         "x": "bus",
-    //         "y": 246
-    //       },
-    //       {
-    //         "x": "car",
-    //         "y": 299
-    //       },
-    //       {
-    //         "x": "moto",
-    //         "y": 268
-    //       },
-    //       {
-    //         "x": "bicycle",
-    //         "y": 99
-    //       },
-    //       {
-    //         "x": "others",
-    //         "y": 276
-    //       }
-    //     ]
-    //   }
-    // ]
-
-
     if (this.state.linedata) {
-      return (this.renderLine())
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>{this.renderLine()}</Widget>)
     } else {
-      return (<div>loading..</div>)
+      return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>Need data source.</Widget>)
     }
-
 
   }
 }

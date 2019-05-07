@@ -26,13 +26,14 @@ var version = config.version; //
 
 var compression = require('compression')
 
-import * as express from 'express'
+import express = require('express');
+
+
 
 const app = express()
 var http = require('http');
 var https = require('https');
 var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
 import * as accounts from './accounts'
 
 import * as events from "events";
@@ -45,17 +46,10 @@ const { VM } = require('vm2');
 
 var db = mongojs(config.mongoConnection, config.mongoCollections);
 
-
-
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
-import { userInfo } from 'os';
-
 import * as stats from "./stats"
-import { utils } from 'mocha';
-
-
-
+//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -76,15 +70,23 @@ app.use('/u/:username/view', express.static('../client/dist'))
 // PLUGINS
 
 eventHub.on("device", (data: any) => {
-  //log("----")
-
-
-
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
+
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
 })
+
+eventHub.on("notification", (notification: any, device: any) => {
+  if (notification != undefined || notification != null) {
+    io.to(device.apikey).emit('pushNotification', notification)
+    io.to(device.apikey).emit("notification");
+    io.to(device.key).emit('notificationState');
+  } else {
+    io.to(device).emit("notification");
+    io.to(device).emit('notificationState');
+  }
+});
 
 //app.use(express.json())
 app.use(safeParser);
@@ -115,6 +117,7 @@ db.on('connect', function () {
 //####################################################################
 // USERS LAST SEEN / ACTIVE
 app.use((req: any, res: any, next: any) => {
+
   if (req.user) {
 
     if (req.user.level == 0) {
@@ -139,8 +142,6 @@ app.use((req: any, res: any, next: any) => {
 app.get('/', (req: any, res: any) => {
 
   //redirect main page people to https.
-
-
   if (req.protocol == "http") {
     trex.log("HTTP VISITOR")
     if (config.ssl) {
@@ -151,11 +152,11 @@ app.get('/', (req: any, res: any) => {
 
   if (req.user) {
     if (req.user.level > 0) {
-      fs.readFile('../public/react.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err, data: any) => {
         res.end(data.toString())
       })
     } else {
-      fs.readFile('../public/react.html', (err: Error, data: any) => {
+      fs.readFile('../public/react.html', (err, data: any) => {
         res.end(data.toString())
       })
     }
@@ -168,19 +169,19 @@ app.get('/', (req: any, res: any) => {
 stats.init(app, db);
 
 app.get('/admin/accounts', (req: any, res: any) => {
-  fs.readFile('../public/admin_accounts.html', (err: Error, data: any) => {
+  fs.readFile('../public/admin_accounts.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get("/recover/:recoverToken", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get("/accounts/secure", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
@@ -193,49 +194,76 @@ app.get('/signout', (req: any, res: any) => {
 app.post('/signin', accounts.signInFromWeb(db));
 
 app.get("/u/:username", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
+const webpush = require("web-push");
+
+const publicVapidKey =
+  "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
+const privateVapidKey = "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90";
+
+webpush.setVapidDetails(
+  "mailto:prototype@iotnxt.com",
+  publicVapidKey,
+  privateVapidKey
+);
+
+app.post("/subscribe", (req: any, res: any) => {
+  const subscription = req.body;
+  res.status(201).json({});
+
+  const payload = JSON.stringify({ title: "Push Test" });
+
+  webpush
+    .sendNotification(subscription, payload)
+    .then((response: any) => {
+      // io.to(req.user.apikey).emit('pushNotification', { title: "Push Test" })
+    })
+    .catch((err: any) => console.error(err));
+});
+
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/notifications", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 
 app.get('/settings', (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 });
 
 app.get('/view/:id', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
 app.get('/view/:id/:mode', (req: express.Request | any, res: express.Response | any) => {
   trex.log("client is viewing: " + JSON.stringify(req.params));
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
-
-
 
 app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
   trex.log("fbp:");
-  fs.readFile('../public/react.html', (err: Error, data: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
-
-
-
 
 app.get('/api/v3/version', (req: any, res: any) => {
   res.json(version);
@@ -247,6 +275,14 @@ app.get('/api/v3/account', (req: any, res: any) => {
   delete cleanUser.password;
   res.json(cleanUser);
 })
+
+app.get('/api/v3/account/stats', (req: any, res: any) => {
+  stats.accountStats(req.user, (err: Error, stats: any) => {
+    if (err) { res.json(err); }
+    res.json(stats)
+  })
+})
+
 
 // This is to update the workflow on a device.
 app.post("/api/v3/workflow", (req: any, res: any) => {
@@ -263,8 +299,6 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
   }
 })
 
-
-
 app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -273,19 +307,32 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   // find history by key
   if (req.body.key) {
     resolved = true;
-    console.log("key!")
     db.states.findOne({ key: req.body.key }, (e: Error, device: any) => {
       if (req.body.datapath) {
         var query: any = { apikey: device.apikey, devid: device.devid }
         query["payload." + req.body.datapath] = { $exists: true }
         var result: any = []
-        db.packets.find(query, (packetError: Error, packets: any) => {
-          for (var p of packets) {
+        db.packets.find(query).sort({ "_id": -1 }).limit(50, (packetError: Error, rawpackets: any) => {
+          if (packetError) { res.json(packetError); console.log(packetError); }
+
+          var packets: any = []
+
+          for (var p in rawpackets) {
+            var found = 0;
+            for (var o in packets) {
+              if (rawpackets[p]["_created_on"] == packets[o]["_created_on"]) {
+                found++;
+              }
+            }
+            if (found == 0) { packets.push(rawpackets[p]) }
+          }
+
+          for (var pa of packets) {
             var clean: any = {}
             //clean[req.body.datapath] = _.get(p, "payload." + req.body.datapath, "notfound");
             //clean["_created_on"] = p["_created_on"]
-            clean["x"] = p["_created_on"]
-            clean["y"] = _.get(p, "payload." + req.body.datapath, "notfound");
+            clean["x"] = pa["_created_on"]
+            clean["y"] = _.get(pa, "payload." + req.body.datapath, "notfound");
             result.push(clean)
           }
           res.json(result);
@@ -317,7 +364,7 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
   }
 });
 
-app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
+app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
 
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
@@ -341,7 +388,6 @@ app.post("/api/v3/boundaryPackets", (req: any, res: any, next: any) => {
         var payload = rawpackets[p];
         var devicepacket: any;
         var t = {
-          meta: { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method },
           id: payload.payload.id,
           timestamp: payload.payload.timestamp
         }
@@ -400,6 +446,17 @@ app.get("/admin/processusers", (req: any, res: any) => {
   })
 })
 
+app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
+  var scryptParameters = scrypt.paramsSync(0.1);
+
+  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
+    for (var i in result) {
+      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
+      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
+    }
+  })
+});
+
 app.get("/admin/processusersseen", (req: any, res: any) => {
   if (req.user.level < 100) { res.end("no permission"); return; }
 
@@ -435,13 +492,11 @@ app.get("/admin/processstates", (req: any, res: any) => {
   })
 })
 
-
-
 app.post("/api/v3/view", (req: any, res: any, next: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
 
-  if (req.username) {
+  if (req.body.username) {
     //
 
     if (req.body.username != req.user.username) {
@@ -459,9 +514,8 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
       if (user) {
         ///
         if (req.body.id) {
-          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-
-            if (state == null) { res.json({ "error": "id not found" }); return; }
+          db.states.findOne({ $and: [{ apikey: user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
+            if (state == null || state == "" || state == undefined || state.length == 0) { res.json({ "error": "id not found" }); return; }
 
             if (state) {
               var viewState = state.payload;
@@ -499,27 +553,20 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     }
   }
 
-
-
 });
 
-app.post("/api/v3/account/secure", (req: any, res: any, next: any) => {
-  var scryptParameters = scrypt.paramsSync(0.1);
-
-  db.users.find({ encrypted: { $exists: false } }, (err: Error, result: any) => {
-    for (var i in result) {
-      var newpass = scrypt.kdfSync(result[i].password, scryptParameters);
-      db.users.update({ email: result[i].email }, { $set: { password: newpass, encrypted: true } })
-    }
-  })
+app.post("/api/v3/state", (req: any, res: any) => {
+  findstate(req, res);
 });
-app.post("/api/v3/state", (req: any, res: any, next: any) => {
+
+async function findstate(req: any, res: any) {
+
 
   if (req.body.username) {
-
     if (req.body.username != req.user.username) {
+
       if (req.user.level < 100) {
-        db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
+        await db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
             if (give.public == false || give.public == null || give.public == undefined || !give.public || give.public == "") {
               if (found == null) {
@@ -531,14 +578,15 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
       }
     }
 
-
-
-    db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
+    await db.users.findOne({ username: req.body.username }, (dbError: Error, user: any) => {
       if (user) {
-        //log(user)
         if (req.body.id) {
-          db.states.findOne({ apikey: user.apikey, devid: req.body.id }, (err: Error, state: any) => {
-            res.json(state);
+          db.states.findOne({ $and: [{ apikey: user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
+            if (state == null || state == undefined) {
+              res.json({ error: "Device " + req.body.id + " was not found." })
+            } else {
+              res.json(state);
+            }
           })
         } else {
           res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
@@ -551,20 +599,14 @@ app.post("/api/v3/state", (req: any, res: any, next: any) => {
 
     if (req.body.id) {
       db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+
         res.json(state);
       })
     } else {
       res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
     }
-
   }
-
-
-
-
-});
-
-
+}
 
 app.post('/api/v3/publicStates', (req: any, res: any) => {
   if (req.user.level == 0) {
@@ -604,6 +646,8 @@ app.post('/api/v3/shared', (req: any, res: any) => {
   db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
     if (states.access) {
       res.json(states)
+    } else {
+      res.json({ result: "No Devices" })
     }
   })
 })
@@ -633,7 +677,9 @@ app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
 //preview devices
 
 // new in 5.0.34:
-app.post("/api/v3/states", (req: any, res: any) => {
+app.post("/api/v3/states", (req: any, res: any, packet: any) => {
+  // checkExsisting(req, res)
+
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
@@ -714,6 +760,27 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
   })
 })
 
+app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
+  if (req.user.level == 100) {
+    db.states.aggregate([{
+      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+    },
+    { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
+    ], (err: Error, result: any) => {
+      res.json(result)
+    })
+  }
+  else if (req.user.level == 0) {
+    db.states.aggregate([{
+      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+    },
+    { $unwind: '$fromUsers' }, { $match: { public: true } },
+    ], (err: Error, result: any) => {
+      res.json(result)
+    })
+  }
+})
+
 app.post("/api/v3/dashboard", (req: any, res: any) => {
 
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
@@ -741,16 +808,16 @@ app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
     delete device["_last_seen"]
     delete device["selectedIcon"]
     delete device["layout"]
-    device["_created_on"] = new Date();
+    device.boundaryLayer["_created_on"] = new Date();
     db.packets.save(dev, (errSave: Error, resSave: any) => {
 
       dev["_last_seen"] = new Date();
+      dev.payload["timestamp"] = new Date();
       db.states.update({ key: req.body.key }, dev)
       // update user account activity timestamp
       db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
         user["_last_seen"] = new Date();
         db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
-          console.log(r2)
           if (e2) {
             res.json(e2)
           } else if (r2) {
@@ -806,10 +873,10 @@ function addRawBody(req: any, res: any, buf: any, encoding: any) {
 ///////// END
 
 app.get("/api/v3/getlocation", (req: any, res: any) => {
-  console.log("-------")
-  console.log(req.ip)
+  //console.log("-------")
+  //console.log(req.ip)
   var geoIPLoc = geoip.lookup(req.ip);
-  console.log(geoIPLoc)
+  // console.log(geoIPLoc)
   res.json(geoIPLoc)
 });
 
@@ -821,11 +888,88 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
   handleState(req, res, next);
 });
 
+app.post("/api/v3/sort", (req: any, res: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $set: { sort: req.body.sort } }, (err: Error, response: any) => {
+    if (err) res.json(err);
+    if (response) res.json({ result: "added sort" });
+  })
+});
+
+app.get("/api/v3/getsort", (req: any, res: any) => {
+  db.users.findOne({ apikey: req.user.apikey }, (err: Error, response: any) => {
+    if (err) res.json(err);
+    if (response) res.json({ sort: response.sort });
+  })
+});
+
+// function checkExsisting(req: any, res: any) {
+//   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
+
+//     function findNotified(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].notified == undefined || array[i].notified == null) {
+
+//           array[i].notified = false;
+
+//           io.to(req.user.username).emit("info", info)
+
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.to(req.user).emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
+
+//     function findSeen(array: any) {
+//       var t = [];
+//       for (var i = 0; i < array.length; i++) {
+//         if (array[i].seen == undefined || array[i].seen == null) {
+
+//           array[i].seen = false;
+
+//           io.to(req.user.username).emit("info", info)
+
+//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+//             io.to(req.user).emit("notification")
+//             if (err) res.json(err);
+//             if (updated) res.json(updated);
+//           })
+//         }
+//         t.push(array[i]);
+//       }
+//     }
+
+//     findNotified(state.notifications);
+//     findSeen(state.notifications);
+//   })
+// }
+
 function handleState(req: any, res: any, next: any) {
+  var hrstart = process.hrtime()
+  //checkExisting(req, res, db);
+
   if (req.body === undefined) { return; }
 
   if ((req.user) && (req.user.level) > 0) {
+    if (req.body.id == "") { res.json({ "error": "id may not be empty" }) }
+
     if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
+
+    if (typeof req.body.id != "string") {
+      res.json({ "error": "id must be a string" })
+    }
+    if (req.body.id.indexOf(" ") != -1) {
+      res.json({ "error": "id may not contain spaces" })
+    }
+
+    if (req.body.id.match(/^[a-z0-9_]+$/i) == null) {
+      res.json({ "error": "id may only contain a-z A-Z 0-9 and _" });
+    }
+
     if (typeof req.body.id != "string") { res.status(400).json({ "error": "parameter id must be of type string" }); return; }
     if (!req.body.data) { res.status(400).json({ "error": "data parameter missing" }); return; }
     if (req.body.id == null) { res.json({ "error": "id parameter null" }); return; }
@@ -837,48 +981,80 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
+
+
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+          if (info.newdevice) {
+
+            // var newDeviceNotification = {
+            //   type: "NEW DEVICE ADDED",
+            //   device: req.body.id,
+            //   created: packet._created_on,
+            //   notified: true,
+            //   seen: false
+            // }
+
+            // createNotification(db, newDeviceNotification, req, Result);
+            // io.to(req.user.username).emit("info", info);
+          }
+
+          // disabled for now:
+
+          // var message = "";
+          // var AlarmNotification = {
+          //   type: "ALARM",
+          //   device: req.body.id,
+          //   created: Date.now(),
+          //   message: message,
+          //   notified: true,
+          //   seen: false
+          // }
+
+          // if (Result.workflowCode != undefined) {
+          //   if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
+          //     AlarmNotification.message = Result.workflowCode.substring(
+          //       Result.workflowCode.lastIndexOf('alarm1("') + 8,
+          //       Result.workflowCode.lastIndexOf('")')
+          //     )
+          //     createNotification(db, AlarmNotification, req, Result);
+          //   }
+          // } else if (Result.boundaryLayer != undefined) {
+          //   if (Result.boundaryLayer.inbound == false) {
+          //     AlarmNotification.message = "has gone out of its boundary";
+          //     createNotification(db, AlarmNotification, req, Result);
+          //   }
+          // }
+        })
 
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
 
-        if (info.newdevice) {
-
-          var newDeviceNotification = {
-            type: "New Device Added",
-            device: req.body.id,
-            created: packet._created_on
-          }
-
-          io.to(req.user.username).emit("info", info)
-
-          if (req.user.notifications) {
-            req.user.notifications.push(newDeviceNotification)
-          } else {
-            req.user.notifications = [newDeviceNotification]
-          }
-
-          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            io.to(req.user).emit("notification")
-            if (err) res.json(err);
-            if (updated) res.json(updated);
-
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id },
+          (findErr: Error, findResult: any) => {
+            if (findResult.notification24 == true) {
+              db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+                //console.log(result)
+                //console.log(err)
+              })
+            }
           })
-        }
+
+
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
-            });
+            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => { });
           }
         }
-        // iotnxtUpdateDevice(packet, (err:Error, result:any)=>{
-        //   if (err) log("couldnt publish")
-        // }); 
 
         res.json({ result: "success" });
+
+        var hrend = process.hrtime(hrstart)
+        // log('Execution time (hr): ')
+        // log(hrend);
       })
     })
   } else {
@@ -890,10 +1066,7 @@ function handleState(req: any, res: any, next: any) {
     DB QUERY
 */
 
-
-
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
-
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { log(err); cb(err, undefined); return; }
 
@@ -934,11 +1107,27 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
 
 }
 
+app.get("/api/v3/state", (req: any, res: any, packet: any) => {
 
-
-app.get("/api/v3/state", (req: any, res: any) => {
   db.states.find({ "payload.id": req.body.id }, (err: Error, state: any) => {
     res.json(state);
+  })
+});
+
+app.get("/api/v3/u/notifications", (req: any, res: any) => {
+  db.users.findOne({ apikey: req.user.apikey, notifications: req.user.notifications }, (err: Error, state: any) => {
+    res.json(state.notifications);
+  })
+});
+
+app.post("/api/v3/u/notifications/delete", (req: any, res: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $unset: { notifications: 1 } }, (err: Error, state: any) => {
+    if (err != null) {
+      console.log(err)
+    } else if (state) {
+      console.log(state)
+    }
+    res.json(state.notifications);
   })
 });
 
@@ -955,14 +1144,26 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
           userAgent: req.get('User-Agent'),
           method: req.method
         }
+        if (req.user.level < 100 && req.user.level > 0) {
 
-        if (req.body.id) {
-          db.states.remove({ apikey: user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
-            if (err) res.json(err);
-            if (removed) res.json(removed);
-          })
-        } else {
-          res.json({ result: "auth failed" });
+          if (req.body.id) {
+            db.states.remove({ apikey: user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+              if (err) res.json(err);
+              if (removed) res.json(removed);
+            })
+          } else {
+            res.json({ result: "auth failed" });
+          }
+        }
+        else if (req.user.level >= 100) {
+          if (req.body.id) {
+            db.states.remove({ key: req.body.key, devid: req.body.id }, (err: Error, removed: any) => {
+              if (err) res.json(err);
+              if (removed) res.json(removed);
+            })
+          } else {
+            res.json({ result: "auth failed" });
+          }
         }
       }
     })
@@ -976,18 +1177,30 @@ app.post("/api/v3/state/delete", (req: any, res: any) => {
         userAgent: req.get('User-Agent'),
         method: req.method
       }
-
-      if (req.body.id) {
-        db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
-          if (err) res.json(err);
-          if (removed) res.json(removed);
-        })
+      if (req.user.level < 100 && req.user.level > 0) {
+        if (req.body.id) {
+          db.states.remove({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, removed: any) => {
+            if (err) res.json(err);
+            if (removed) res.json(removed);
+          })
+        }
+        else {
+          res.json({ result: "auth failed" });
+        }
       }
-    } else {
-      res.json({ result: "auth failed" });
+      else if (req.user.level >= 100) {
+        if (req.body.id) {
+          db.states.remove({ key: req.body.key, devid: req.body.id }, (err: Error, removed: any) => {
+            if (err) res.json(err);
+            if (removed) res.json(removed);
+          })
+        }
+        else {
+          res.json({ result: "auth failed" });
+        }
+      }
     }
   }
-
 })
 
 app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
@@ -1001,6 +1214,7 @@ app.post("/api/v3/account/recoveraccount", (req: any, res: any) => {
   })
 
 })
+
 
 
 app.post("/api/v3/state/clear", (req: any, res: any) => {
@@ -1033,6 +1247,18 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
     }
   })
 })
+
+app.post("/api/v3/allUsers", (req: any, res: any) => {
+  db.users.find({
+    $or: [{ 'username': { '$regex': req.body.search } }, { 'email': { '$regex': req.body.search } }],
+    level: { $gte: 1 },
+    "username": { "$exists": true },
+    "$expr": { "$ne": [{ "$strLenCP": "$username" }, 32] } // default random usernames are 32 so we skip these.. usernames shouldnt be this long anyways. I know its kinda a hack.
+  }, { username: 1, "_created_on": 1 }, //only return data we need
+    (err: Error, resp: any) => {
+      res.json(resp)
+    })
+});
 
 app.post("/api/v3/state/query", (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
@@ -1070,10 +1296,6 @@ app.post("/api/v3/state/query", (req: any, res: any) => {
 
 });
 
-
-
-
-
 app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   var definitions: any = [];
@@ -1087,13 +1309,6 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 
   res.json({ definitions })
 })
-
-
-
-
-
-
-
 
 export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
 
@@ -1144,8 +1359,6 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           sandbox: sandbox
         });
 
-
-
         // Sync
         try {
           vm.run(state.workflowCode);
@@ -1154,7 +1367,7 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
           //if (alreadyExitScript == false) { 
           log("VM WORKFLOW ERROR!")
-          console.error(err);
+          //console.error(err);
           alreadyExitScript = true;
           packet.err = err.toString();
           cb(undefined, packet);
@@ -1168,37 +1381,8 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
       // NO DEVICE YET
       cb(undefined, packet);
     }
-
-
   })
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// app.use((req,res,next)=>{
-//   res.json({error:"invalid_route"})
-// })
 
 var server;
 
@@ -1208,77 +1392,55 @@ if (config.ssl) {
   server = http.createServer(app);
 }
 
-
 /* ############################################################################## */
 
-var io = require('socket.io')(server);
-
-io.on('connection', function (socket: any) {
-  //trex.log(socket);
-
-  //utilsLib.log(socket.id)
-  //trex.log(socket.handshake)
-  //trex.log('socket connected...');
-  setTimeout(function () {
-    socket.emit("connect", { hello: "world" })
-  }, 5000)
-
-  socket.on('join', function (path: string) {
-    socket.join(path);
-  });
-
-  socket.on('post', (data: any) => {
-    //trex.log("socket posted");
-    //log(data);
-
-    for (var key in socket.rooms) {
-      if (socket.rooms.hasOwnProperty(key)) {
-
-        var testkey = key;
-
-        if (key.split("|").length == 2) { testkey = key.split("|")[0] }
-
-        var packet = {
-          id: data.id,
-          data: data.data,
-          meta: { method: "socketioclient" }
-        }
-
-        handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
-
-
-
-        // state.validApiKey(db, testkey, (err: Error, result: any) => {
-        //   if (err) { log(err); return; }
-        //   if (result) {
-
-        //     if (result.valid) {
-        //       /*--------------------------------------------------------*/
-        //       var meta = {}
-
-        //       state.postState(db, result.user, data, meta, (packet: any) => { })
-        //       /*--------------------------------------------------------*/
-        //     } else {
-
-        //     }
-
-        //   }
-
-
-
-
-        // })
-
-      }
-    }
-  })
-
-
-  socket.on('disconnect', function () { })
+var io = require('socket.io')(server, {
+  transports: ['websocket', 'polling']
 });
 
+const bindListeners = (io: any) => {
+  io.on('connection', function (socket: any) {
+    setTimeout(function () {
+      socket.emit("connect", { hello: "world" })
+    }, 5000)
 
 
+    socket.on('join', function (path: string) {
+      socket.join(path);
+    });
+
+    socket.on('post', (data: any) => {
+      for (var key in socket.rooms) {
+        if (socket.rooms.hasOwnProperty(key)) {
+
+          var testkey = key;
+
+          if (key.split("|").length == 2) { testkey = key.split("|")[0] }
+
+          var packet = {
+            id: data.id,
+            data: data.data,
+            meta: { method: "socketioclient" }
+          }
+
+          handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
+
+        }
+      }
+    })
+    socket.on('disconnect', function () { })
+  });
+}
+
+if (config.redis) {
+  log("REDIS ENABLED")
+  const redis = require('socket.io-redis')
+  io.adapter(redis(config.redis))
+}
+
+bindListeners(io)
+
+/* ############################################################################## */
 
 if (config.ssl) {
   server.listen(443);
@@ -1307,12 +1469,7 @@ server.on('error', (e: any) => {
   } else {
     trex.log(e);
   }
-
 })
-
-
-
-
 
 process.on('unhandledRejection', log);
 process.on("uncaughtException", log);

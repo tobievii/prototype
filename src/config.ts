@@ -2,8 +2,10 @@ import * as fs from 'fs';
 
 import { log } from "./utils"
 
+var nodePackage = JSON.parse(fs.readFileSync("../package.json").toString());
+
 export var version = {
-    "version": "5.0.37",
+    "version": nodePackage.version,
     "description": "prototype"
 }
 

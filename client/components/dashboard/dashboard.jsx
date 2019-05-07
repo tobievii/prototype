@@ -17,9 +17,13 @@ import { Widget } from "./widget.jsx"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-import { MapDevices } from "../map.jsx"
+import { MapDevices } from "./map.jsx"
 
 import { ChartLine } from "./chart_line.jsx"
+import { WidgetButton } from "./widgetButton.jsx"
+import { WidgetBlank } from "./widget_blank.jsx"
+import { WidgetMesh } from "./widget_mesh.jsx"
+import { WidgetForm } from "./widget_form.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -141,13 +145,13 @@ export class Dashboard extends React.Component {
 
     if (e.dataname == "lat" || e.dataname == "lon" || e.dataname == "gps") {
       typel = "map"
-    } else if (typeof e.data == "boolean") {
-      if (e.data == true) {
-        typel = "booleanButtonTrue"
-      } else {
-        typel = "booleanButtonFalse"
-      }
-    } else if (typeof e.data == "string") {
+      // } else if (typeof e.data == "boolean") {
+      //   if (e.data == true) {
+      //     typel = "booleanButtonTrue"
+      //   } else {
+      //     typel = "booleanButtonFalse"
+      //   }
+    } else if (typeof e.data == "string" || typeof e.data == "boolean") {
       typel = "Blank"
     } else {
       typel = "Gauge"
@@ -157,11 +161,15 @@ export class Dashboard extends React.Component {
     this.setState({ layout: layout }, () => { })
   }
 
-  gridOnDragStart = () => {
-    //console.log("drag start"); 
+  gridOnDragStart = (evt) => {
+    //console.log(evt)
+    //evt.preventDefault();
+    //evt.stopPropagation();
   }
-  gridOnDrag = () => {
-    //console.log("drag"); 
+  gridOnDrag = (evt) => {
+    //console.log("drag start"); 
+    //evt.preventDefault();
+    //evt.stopPropagation();
   }
   gridOnDragStop = () => {
     //console.log("drag stop"); 
@@ -194,7 +202,6 @@ export class Dashboard extends React.Component {
 
     //if there are fewer or more widgets then we update the server
     if (layout.length != this.state.layout) {
-      console.log("widget count changed!")
       updated = true;
     }
 
@@ -207,11 +214,10 @@ export class Dashboard extends React.Component {
   }
 
   updateServer() {
-    console.log("dashboard update to server")
     fetch("/api/v3/dashboard", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-    }).then(response => response.json()).then(result => { console.log(result) })
+    }).then(response => response.json()).then(result => { })
       .catch(err => console.error(err.toString()));
   }
 
@@ -241,8 +247,8 @@ export class Dashboard extends React.Component {
           layout[w][option] = data;
         }
       }
-      console.log("widgetChange");
-      console.log({ option, data })
+      // console.log("widgetChange");
+      // console.log({ option, data })
       this.setState({ layout }, () => {
         this.updateServer();
       })
@@ -257,56 +263,174 @@ export class Dashboard extends React.Component {
     }
   }
 
+  setOptions = (data) => {
+    return (options) => {
+      // console.log("WIDGET OPTION CHANGE:")
+      // console.log({ data, options })
+
+      // find and update
+      var layout = _.clone(this.state.layout);
+      for (var w in layout) {
+        if (layout[w].i == data.i) {
+          if (layout[w].options) {
+            layout[w].options = _.merge(layout[w].options, options);
+          } else {
+            layout[w].options = options;
+          }
+        }
+      }
+
+      //update server db
+      this.setState({ layout }, () => { this.updateServer(); })
+    }
+  }
+
   // Depending on type prop of widget, this returns correct React component
   widgetType = (data) => {
+
+    var dash = {
+      change: this.widgetChange(data.i),
+      remove: this.widgetRemove(data.i),
+      setOptions: this.setOptions(data)
+    }
+
+
     if (data.type == "Calendar") {
-      return (<Calendar state={this.props.state} />)
+      return (<Calendar dash={dash}
+        data={data} state={this.props.state} />)
     }
 
     if (data.type == "NivoLine") {
-      return (<NivoLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+      return (<NivoLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "ChartLine") {
-      return (<ChartLine state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+      return (<ChartLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
-    if (data.type == "Blank") {
-      return (<div>{this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}</div>)
-    }
+    // if (data.type == "booleanButtonFalse") {
+    //   return (
+    //     <div align="center">
+    //       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+    //       <label class="switch">
+    //         <input type="checkbox" />
+    //         <span class="slider round"></span>
+    //       </label>
+    //     </div>
+    //   )
+    // }
 
-    if (data.type == "booleanButtonFalse") {
-      return (
-        <div align="center">
-          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-          <div className="switch">
-            <span className="slider round"></span>
-          </div>
-        </div>
-      )
-    }
-
-    if (data.type == "booleanButtonTrue") {
-      return (
-        <div align="center">
-          {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
-          <div className="switch">
-            <span className="slider round switchActive"></span>
-          </div>
-        </div>
-      )
-    }
+    // if (data.type == "booleanButtonTrue") {
+    //   return (
+    //     <div align="center">
+    //       {this.objectByString(this.props.state.payload, data.datapath.slice(5)).toString()}
+    //       <label class="switch">
+    //         <input type="checkbox" />
+    //         <span class="slider round"></span>
+    //       </label>
+    //     </div>
+    //   )
+    // }
 
     if (data.type == "ThreeDWidget") {
-      return (<ThreeDWidget />)
+      return (<ThreeDWidget
+        dash={dash}
+        data={data}
+      />)
     }
 
     if (data.type == "Gauge") {
-      return (<ProtoGauge value={this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])} />)
+      var value;
+      try {
+        value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
+      } catch (e) { }
+      return (<ProtoGauge
+        dash={dash}
+        data={data}
+        value={value} />)
     }
+
+    if (data.type == "mesh") {
+      var value;
+      try {
+        value = this.objectByString(this.props.state.payload, data.datapath.split("root.")[1])
+      } catch (e) { }
+      return (<WidgetMesh
+        state={this.props.state}
+        dash={dash}
+        data={data}
+        value={value} />)
+    }
+
     if (data.type == "map") {
-      return (<MapDevices username={this.props.username} acc={this.props.acc} deviceCall={this.props.state} devices={this.props.devices} widget={true} showBoundary={this.state.showB} />)
+      return (<MapDevices
+        dash={dash}
+        data={data}
+        username={this.props.username}
+        acc={this.props.acc}
+        deviceCall={this.props.state}
+        devices={this.props.devices}
+        widget={true}
+        showBoundary={this.state.showB}
+        PopUpLink={false} />)
     }
+
+    if (data.type == "widgetButton") {
+      return (<WidgetButton
+        state={this.props.state}
+        dash={dash}
+        data={data}
+      />)
+    }
+
+
+    if (data.type == "form") {
+      return (<WidgetForm
+        state={this.props.state}
+        dash={dash}
+        data={data}
+      />)
+    }
+
+    // ADD WIDGETS ABOVE THIS LINE
+    //////////
+
+    if (data.type.toUpperCase() == "BLANK") {
+      var a;
+      try {
+        a = JSON.stringify(this.objectByString(this.props.state.payload, data.datapath.slice(5))).toString()
+      } catch (err) { a = "" }
+      return (<WidgetBlank
+        dash={dash}
+        data={data}
+        value={a} />)
+    }
+
+    //////////
+  }
+
+  addWidget = () => {
+    var layout = _.clone(this.state.layout)
+    layout.push({ i: this.generateDifficult(32), x: 0, y: 0, w: 2, h: 5, type: "widgetButton", datapath: "", dataname: "" })
+    this.setState({ layout: layout }, () => { })
+  }
+
+  titlebarButtons = () => {
+    return (
+      <div>
+        <div className="deviceViewButton" style={{ float: "right" }} title="Save layout [CTRL+S]" >
+          <i className="fas fa-save"></i>
+        </div>
+        <div className="deviceViewButton" onClick={this.addWidget} style={{ float: "right" }} title="Add widget [CTRL+A]" >
+          <i className="fas fa-plus-square"></i>
+        </div>
+      </div>)
   }
 
   generateDashboard = () => {
@@ -317,6 +441,7 @@ export class Dashboard extends React.Component {
         <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
           <div>
             <div className="deviceViewTitle">dashboard</div>
+            {this.titlebarButtons()}
             <div style={{ clear: "both" }} />
           </div>
           <GridLayout
@@ -330,29 +455,29 @@ export class Dashboard extends React.Component {
             onResizeStop={this.gridOnResizeStop}
             layout={this.state.layout}
             cols={this.state.grid.cols}
+            draggableHandle=".widgetGrab"   // drag handle class
             rowHeight={this.state.grid.rowHeight}
             width={this.state.grid.width}>
             {
               this.state.layout.map((data, i) => {
                 return (
-                  <div className="dashboardBlock" key={data.i} >
-                    <Widget label={data.dataname}
+                  <div className="dashboardBlock" key={data.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }} >
+                    {this.widgetType(data)}
+                    {/* <Widget label={data.dataname}
                       change={this.widgetChange(data.i)}
                       remove={this.widgetRemove(data.i)}
-                      showBoundary={this.showBoundary}>
-                      {this.widgetType(data)}
-                    </Widget>
+                      showBoundary={this.showBoundary}>  
+                    </Widget> */}
                   </div>)
               })
             }
           </GridLayout>
         </div>
-
       )
     }
   }
 
-  loading() {
+  loading = () => {
     if (this.props.state) {
 
       if (this.props.state.layout) {
@@ -368,7 +493,7 @@ export class Dashboard extends React.Component {
 
         if (this.settingLayout == false) {
           this.settingLayout = true;
-          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { console.log("state") })
+          this.setState({ layout: [{ i: "0", x: 0, y: 0, w: 8, h: 4, type: "Calendar", dataname: "calendar" }] }, () => { })
         }
 
         return (<div>loading</div>)
@@ -383,15 +508,19 @@ export class Dashboard extends React.Component {
 
   }
 
-  render() {
+  render = () => {
     if (this.state.layout) {
+
       return (
-        <div style={{ minHeight: 50, textAlign: "center" }} onDragOver={(e) => this.onDragOver(e)} onDrop={(e) => this.onDrop(e, "complete")} >
+        <div
+          style={{ minHeight: 50 }}
+          onDragOver={(e) => this.onDragOver(e)}
+          onDrop={(e) => this.onDrop(e, "complete")} >
           {this.generateDashboard()}
         </div>
       )
     } else {
-      return this.loading()
+      return this.loading();
     }
 
   }

@@ -20,16 +20,17 @@ import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
+import { NotificationsView } from "./components/notificationsView.jsx";
 
 
 import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
-import { Dashboard } from "./components/dashboard/dashboard.jsx"
-
 import socketio from "socket.io-client";
-var socket = socketio();
+var socket = socketio({ transports: ['websocket', 'polling'] });
+const publicVapidKey =
+    "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
 
 const test = {
     un: undefined,
@@ -54,19 +55,79 @@ class App extends Component {
         p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
 
         socket.on("connect", a => {
-            socket.on("post", a => {
-            })
-            socket.on("notification", (account) => {
+            socket.on("notification", a => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })
             })
+
         });
 
         p.getStates((states) => { this.setState({ states }) })
 
-        //socket.on("connect", a => { console.log("socket connected"); });
-        //socket.on("post", socketDataIn => { this.socketHandler(socketDataIn); });
+        this.serviceworkerfunction();
+    }
+
+    serviceworkerfunction = () => {
+        if ('serviceWorker' in navigator) {
+            if (supportsServiceWorkers(location, navigator)) {
+                workerInit().catch(err => console.error(err));
+            }
+        }
+
+        function supportsServiceWorkers(location, navigator) {
+            if (location.hostname === `localhost` || location.protocol === `https:`) {
+                return `serviceWorker` in navigator
+            }
+            return false
+        }
+
+        async function workerInit() {
+            const register = await navigator.serviceWorker.register('/serviceworker.js', {
+                scope: "/"
+            });
+
+            socket.on("pushNotification", a => {
+                var message = "has been successfuly added to PROTOTYP3.";
+                if (a.type == "ALARM") {
+                    message = a.message;
+                } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
+                    message = "hasn't sent data in the last 24hours";
+                }
+                register.showNotification(a.type, {
+                    body: '"' + a.device + '" ' + message,
+                    icon: "./iotnxtLogo.png"
+                });
+            })
+
+            const subscription = await register.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
+
+            await fetch("/subscribe", {
+                method: "POST",
+                body: JSON.stringify(subscription),
+                headers: {
+                    "content-type": "application/json"
+                }
+            });
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, "+")
+                .replace(/_/g, "/");
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
     }
 
     // socketHandler = (socketDataIn) => {
@@ -120,19 +181,19 @@ class App extends Component {
                 return (
                     <div>
                         {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
-                        <Footer />
+                        <Footer loggedIn={true} />
                     </div>
                 )
             } else {
                 return (
                     <div>
                         <Account account={this.state.account} />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} />
                         <Landing />
-                        <Footer />
+                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} />
+                        <Footer loggedIn={false} />
                     </div>)
             }
         } else {
@@ -159,7 +220,7 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} />
+                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
                 <Footer />
             </div>
 
@@ -188,6 +249,12 @@ class App extends Component {
         )
     }
 
+    notifications = ({ match }) => {
+        return (
+            <NotificationsView />
+        )
+    }
+
     render() {
         return (
             <div className="App">
@@ -202,6 +269,7 @@ class App extends Component {
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
+                        <Route path="/notifications" component={this.notifications} account={this.state.account} />
                     </div>
                 </Router>
             </div>

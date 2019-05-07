@@ -4,6 +4,8 @@ var nodemailer = require("nodemailer")
 var randomString = require('random-string');
 var mongojs = require('mongojs')
 var ObjectId = mongojs.ObjectId;
+var io = require('socket.io')(server);
+var server;
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
@@ -204,6 +206,14 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //Shared Device email
   app.post("/api/v3/admin/shareDevice", (req: any, res: any) => {
     var today = new Date();
+    var shareDeviceNotification = {
+      type: "A DEVICE WAS SHARED WITH YOU", //req.body.email
+      device: req.body.dev,
+      created: today,
+      notified: true,
+      seen: false
+    }
+
     today.setHours(today.getHours() + 2);
     try {
       getRegistration(db, (err: Error, result: any) => {
@@ -228,12 +238,28 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
           html: req.body.html
         }
 
-        smtpTransport.sendMail(mail, (err: any, info: any) => {
+        smtpTransport.sendMail(mail, (err: any, info: any, packet: any) => {
           if (err) { log(err); return; }
           if (info) {
 
             res.json({ err: {}, result: { mail: "sent" } })
             db.users.findOne({ email: req.body.email }, { _id: 1 }, (err: Error, result: any) => {
+              db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
+                var t = result.notifications;
+                if (result.notifications) {
+                  t.push(shareDeviceNotification)
+                } else {
+                  t = [shareDeviceNotification]
+                }
+                db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+                  console.log(updated)
+                  io.to(req.body.email).emit("info", info)
+                  if (err) res.json(err);
+                  if (updated) res.json(updated);
+                })
+              })
+
+
               db.users.findOne({ email: req.body.email }, { uuid: 1, _id: 0 }, (err: Error, visitor: any) => {
 
                 db.states.update({ devid: req.body.dev, apikey: req.user.apikey }, { $push: { access: visitor.uuid } })
