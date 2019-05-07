@@ -115,7 +115,7 @@ All values are optional. See /src/config.ts for defaults values.
   },
   "httpPort": 80,
   "httpsPort": 443,
-  "mongoConnection": "mongodb://testuser:testpass@mongotest.iotnxt.io:27017/prototype"
+  "mongoConnection": "testuser:testpass@mongotest.iotnxt.io:27017/prototype"
 }
 ```
 
