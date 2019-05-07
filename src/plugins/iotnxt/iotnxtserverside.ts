@@ -30,7 +30,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // INITIALIZE ROUTES
 
   app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-    addgateway(db, req.body, (err: Error, result: any) => {
+    addgateway(db, req, (err: Error, result: any) => {
       if (err) res.json({ err: err.toString() });
       connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
       res.json(result);
@@ -193,6 +193,7 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 
 
         iotnxtqueue.on("request", (request: any) => {
+          //console.log(request);
 
           for (var key in request.deviceGroups) {
             if (request.deviceGroups.hasOwnProperty(key)) {
@@ -211,8 +212,9 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 
               var deviceData = { apikey: apikey, packet: requestClean }
 
-
-              eventHub.emit("device", { apikey: apikey, packet: requestClean })
+              var emitsend = { apikey: apikey.toLowerCase(), packet: requestClean }
+              //console.log(emitsend);
+              eventHub.emit("device", emitsend)
 
             }
           }
@@ -230,11 +232,14 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
 }
 
 
-function addgateway(db: any, gateway: any, cb: any) {
+function addgateway(db: any, req: any, cb: any) {
+  var gateway = req.body;
   gateway.default = false; // defaults to not the default
   gateway.connected = false;
   gateway.unique = generateDifficult(64);
   gateway.type = "gateway"
+  gateway["_created_on"] = new Date();
+  gateway["_created_by"] = req.user["_id"];
   db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result); });
 }
 
