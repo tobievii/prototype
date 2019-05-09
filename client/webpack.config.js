@@ -12,7 +12,7 @@ module.exports = options => {
     },
     resolve: {
       // Add `.ts` and `.tsx` as a resolvable extension.
-      extensions: [".ts", ".tsx", ".js"]
+      extensions: [".ts", ".tsx", ".js", ".md"]
     },
     watchOptions: {
       poll: true,
@@ -21,47 +21,47 @@ module.exports = options => {
     plugins: [new MonacoWebpackPlugin()],
     module: {
       rules: [{
-          test: /\.scss$/,
-          use: [
-            "style-loader", // creates style nodes from JS strings
-            "css-loader", // translates CSS into CommonJS
-            "sass-loader" // compiles Sass to CSS, using Node Sass by default
-          ]
+        test: /\.scss$/,
+        use: [
+          "style-loader", // creates style nodes from JS strings
+          "css-loader", // translates CSS into CommonJS
+          "sass-loader" // compiles Sass to CSS, using Node Sass by default
+        ]
+      },
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader"
+      },
+      {
+        test: /.js$/,
+        exclude: /node_modules/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+          },
+        },],
+      },
+      {
+        test: /.jsx$/,
+        exclude: /node_modules/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+          },
+        },],
+      },
+      {
+        test: /\.css$/,
+        use: [{
+          loader: "style-loader"
         },
         {
-          test: /\.tsx?$/,
-          loader: "ts-loader"
-        },
-        {
-          test: /.js$/,
-          exclude: /node_modules/,
-          use: [{
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
-          }, ],
-        },
-        {
-          test: /.jsx$/,
-          exclude: /node_modules/,
-          use: [{
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
-          }, ],
-        },
-        {
-          test: /\.css$/,
-          use: [{
-              loader: "style-loader"
-            },
-            {
-              loader: "css-loader"
-            }
-          ]
+          loader: "css-loader"
         }
+        ]
+      }
 
       ],
     },

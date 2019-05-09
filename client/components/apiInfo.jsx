@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import * as $ from "jquery";
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
 
