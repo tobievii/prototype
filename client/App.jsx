@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -10,13 +9,10 @@ import { AddDevice } from "./components/addDevice.jsx";
 import { Account } from "./public/account.jsx"
 // not logged in content:
 import { Landing } from "./public/landing.jsx"
-
-
 import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-import { Verify } from "./components/verify.jsx";
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";

@@ -218,11 +218,13 @@ export class Dashboard extends React.Component {
   }
 
   updateServer() {
-    fetch("/api/v3/dashboard", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-    }).then(response => response.json()).then(result => { })
-      .catch(err => console.error(err.toString()));
+    if (this.props.state != undefined && this.props.state.key != undefined) {
+      fetch("/api/v3/dashboard", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
+      }).then(response => response.json()).then(result => { })
+        .catch(err => console.error(err.toString()));
+    }
   }
 
   widgetRemove = (id) => {

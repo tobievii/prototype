@@ -1,32 +1,18 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
-import * as $ from "jquery";
 import * as _ from "lodash"
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
-import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
-
-import { DataView } from "./dataView.jsx"
-
-import moment from 'moment'
 
 library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
 
-import MonacoEditor from "react-monaco-editor";
+const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
 
-import * as p from "../prototype.ts"
-
-import socketio from "socket.io-client";
-
-
-
-export class Editor extends React.Component {
+export class Editor extends Component {
 
     loadingState = 0;
 
@@ -294,17 +280,19 @@ export class Editor extends React.Component {
                         </div> */}
 
                         <div style={{ backgroundColor: "red", height: "100%" }}>
-                            <MonacoEditor
-                                height="2000"
-                                width="6000"
-                                language="javascript"
-                                theme="vs-dark"
-                                value={this.state.code}
-                                options={options}
-                                onChange={this.onChange}
-                                automaticLayout={true}
-                                editorDidMount={this.editorDidMount}
-                            />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <MonacoEditor
+                                    height="2000"
+                                    width="6000"
+                                    language="javascript"
+                                    theme="vs-dark"
+                                    value={this.state.code}
+                                    options={options}
+                                    onChange={this.onChange}
+                                    automaticLayout={true}
+                                    editorDidMount={this.editorDidMount}
+                                />
+                            </Suspense>
                         </div>
                     </div>
                 );
