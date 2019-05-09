@@ -135,6 +135,9 @@ export class ShareList extends Component {
             var temp = [];
             var newDeviceList = [];
             var statsl = this.state.stats.userList;
+            for (var i in statsl) {
+                statsl[i].icon = "far fa-square"
+            }
             statsl.map((person, i) => {
                 temp = [...temp, person.email]
                 if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
