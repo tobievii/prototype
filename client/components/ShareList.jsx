@@ -56,7 +56,6 @@ export class ShareList extends Component {
         checkboxstate: "",
         qresponse: { mail: "failed" },
         show: " ",
-        checkboxIcon: "far fa-square",
         showselected: "none"
     };
 
@@ -308,7 +307,6 @@ export class ShareList extends Component {
     }
 
     selectedUserCount = () => {
-        console.log(this.state.SelectedUsers)
         if (this.state.SelectedUsers.length == 0) {
             return (
                 <div></div>

@@ -764,24 +764,24 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
 })
 
 app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
-  if (req.user.level == 100) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
-  }
-  else if (req.user.level == 0) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { public: true } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
-  }
+  // if (req.user.level == 100) {
+  //   db.states.aggregate([{
+  //     $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  //   },
+  //   { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
+  //   ], (err: Error, result: any) => {
+  //     res.json(result)
+  //   })
+  // }
+  // else if (req.user.level == 0) {
+  db.states.aggregate([{
+    $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  },
+  { $unwind: '$fromUsers' }, { $match: { public: true } },
+  ], (err: Error, result: any) => {
+    res.json(result)
+  })
+  //}
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
