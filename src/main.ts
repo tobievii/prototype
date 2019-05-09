@@ -168,32 +168,32 @@ app.get('/', (req: any, res: any) => {
 
 stats.init(app, db);
 
-app.get('/admin/accounts', (req: any, res: any) => {
+app.get('/admin/accounts', (req, res) => {
   fs.readFile('../public/admin_accounts.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get("/recover/:recoverToken", (req: any, res: any) => {
+app.get("/recover/:recoverToken", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get("/accounts/secure", (req: any, res: any) => {
+app.get("/accounts/secure", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get('/signout', (req: any, res: any) => {
+app.get('/signout', (req, res) => {
   res.clearCookie("uuid");
   res.redirect('/');
 });
 
 app.post('/signin', accounts.signInFromWeb(db));
 
-app.get("/u/:username", (req: any, res: any) => {
+app.get("/u/:username", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })

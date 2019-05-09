@@ -1328,5 +1328,15 @@ PLUGIN
   padding: 20px;
 }
 
+pre {
+  border-radius: 4px;
+  border: 1px solid #2A2A2A;
+  background: #1E1E1E;
+  padding: 10px;
+}
+
+pre code {
+  color: #ccc;  
+}
 
 @import 'mobile.scss'

@@ -21,3 +21,6 @@ plugins.push(mqttPlugin);
 plugins.push(httpPlugin);
 plugins.push(notifications);
 plugins.push(teltonika);
+
+import hf2111a from "./HF2111A/plugin_HF2111A"
+plugins.push(hf2111a);
