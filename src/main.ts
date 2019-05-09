@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+// import { createNotification } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -411,7 +411,7 @@ app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   } else {
-    res.json({ error: "Pease select a device to view device information/dashboard." })
+    res.json({ error: "Please select a device to view device information/dashboard." })
   }
 });
 
@@ -526,7 +526,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             }
           })
         } else {
-          res.json({ error: "Pease select a device to view device information/dashboard." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
         ///
       }
@@ -549,7 +549,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
       })
     } else {
-      res.json({ error: "Pease select a device to view device information/dashboard." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 
@@ -589,7 +589,7 @@ async function findstate(req: any, res: any) {
             }
           })
         } else {
-          res.json({ error: "Pease select a device to view device information/dashboard." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
       }
     })
@@ -603,7 +603,7 @@ async function findstate(req: any, res: any) {
         res.json(state);
       })
     } else {
-      res.json({ error: "Pease select a device to view device information/dashboard." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 }
@@ -995,7 +995,7 @@ function handleState(req: any, res: any, next: any) {
             //   seen: false
             // }
 
-            createNotification(db, newDeviceNotification, req.user, Result);
+            // createNotification(db, newDeviceNotification, req.user, Result);
             io.to(req.user.username).emit("info", info);
           }
 
@@ -1012,7 +1012,7 @@ function handleState(req: any, res: any, next: any) {
           if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req.user, Result);
+              // createNotification(db, AlarmNotification, req.user, Result);
             }
           }
 
