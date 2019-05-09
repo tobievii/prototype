@@ -1339,4 +1339,35 @@ pre code {
   color: #ccc;  
 }
 
+button {
+  color: rgba(255, 246, 235, 0.75);
+  padding: 8px 10px 8px 10px;
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+  margin-bottom: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  transition: background 0.2s;
+  margin: 10px;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:active {
+  color: #fff;
+  background: #f3353a;
+  outline: none;
+  transition: background 0.0s;
+}
+
 @import 'mobile.scss'

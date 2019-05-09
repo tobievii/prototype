@@ -28,7 +28,15 @@ export class SettingsPanel extends React.Component {
 
   }
 
+  runTest() {
+    return (e) => {
+      console.log("test")
 
+      fetch("/api/v3/plugins/hf2111a/test")
+        .then(res => res.json())
+        .then(test => this.setState({ test }))
+    }
+  }
 
 
   render() {
@@ -37,6 +45,13 @@ export class SettingsPanel extends React.Component {
     return (
       <div className="blockstyle">
         <h4>{name}</h4>
+
+        <div style={{ background: "#333" }}>
+          <button onClick={this.runTest()} style={{ float: "right" }}>test</button>
+          <div>{JSON.stringify(this.state.test)}</div>
+          <div style={{ clear: "both" }}></div>
+        </div>
+
 
         PORT: {this.state.info.port}
 
