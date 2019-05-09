@@ -186,9 +186,20 @@ export class AddDevice extends Component {
                     </div>
                 </div>
             )
-        } else {
+        } else if (this.state.popupInfo == "public") {
+            return (
+                <div style={{ width: "380px" }} align="center">
+                    <div style={{ width: "100%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }}>
+                        Please register above to be able to add a device.
+                    </div>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
+                </div>
+            )
+        }
+        else {
             return <div></div>
         }
+
     }
 
     getBLEDevices = () => {
@@ -245,9 +256,15 @@ export class AddDevice extends Component {
         // this.setState({ popupHeadingPrev: this.state.popupHeading }, () => {
         //     this.setState({ popupInfoPrev: this.state.popupInfo });
         // })
-        this.setState({ popupHeading: heading }, () => {
-            this.setState({ popupInfo: info });
-        })
+        if (this.props.account.level > 0) {
+            this.setState({ popupHeading: heading }, () => {
+                this.setState({ popupInfo: info });
+            })
+        } else {
+            this.setState({ popupHeading: "Registration Required" }, () => {
+                this.setState({ popupInfo: "public" });
+            })
+        }
     }
 
     ssid = (ssid) => {
@@ -279,7 +296,7 @@ export class AddDevice extends Component {
         return (
             <div >
                 <center>
-                    <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}>
+                    <Modal style={customStyles} isOpen={this.props.isOpen}>
                         <div style={{ background: "#131e27", padding: 12, width: "100%" }}>
                             <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10, float: "right" }}></span>
                             <span className={"fas fa-arrow-circle-left navLink"} onClick={() => { this.goBack() }} style={{}}></span>

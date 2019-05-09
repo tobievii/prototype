@@ -17,6 +17,7 @@ library.add(faUserPlus);
 library.add(faDice);
 const Cryptr = require("cryptr");
 const cryptr = new Cryptr("prototype");
+var openMenu = false;
 export class Account extends Component {
   state = {
     menu: 0,
@@ -87,7 +88,7 @@ export class Account extends Component {
   };
 
   onClickMenuTab = function (menu) {
-    return event => {
+    return (event) => {
       if (this.state.menu == menu) {
         this.setState({ menu: 0 });
       } else {
@@ -209,6 +210,10 @@ export class Account extends Component {
   drawRegisterButton = () => {
     if (this.state.registration) {
       if (this.state.registration.userRegistration) {
+        if (this.props.registrationPanel == true && openMenu == false) {
+          this.setState({ menu: 2 }, () => { openMenu = true; })
+        }
+
         return (
           <Media query="(max-width: 400px)">
             {matches =>

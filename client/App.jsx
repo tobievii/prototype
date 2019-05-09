@@ -40,13 +40,14 @@ const test = {
     ds: undefined
 }
 
-var publicS = undefined;
 var visitingG = undefined;
 
 class App extends Component {
     state = {
         devicesView: "dashboardDevices",
-        isOpen: false
+        isOpen: false,
+        registrationPanel: false,
+        public: undefined
     };
 
     constructor(props) {
@@ -74,6 +75,9 @@ class App extends Component {
             if (account.level > 0) {
                 socket.emit("join", account.apikey);
                 this.setState({ loggedIn: true })
+                this.setState({ public: false })
+            } else {
+                this.setState({ public: true })
             }
         })
     }
@@ -192,7 +196,6 @@ class App extends Component {
                 match.params.username = this.state.account.username;
             }
             if (this.state.account.level > 0) {
-                publicS = false;
                 var view = undefined;
 
                 if (this.state.devicesView == "dashboard") {
@@ -211,10 +214,9 @@ class App extends Component {
                     </div>
                 )
             } else {
-                publicS = true
                 return (
                     <div>
-                        <Account account={this.state.account} />
+                        <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
                         {this.deviceView(match)}
 
@@ -239,7 +241,7 @@ class App extends Component {
                     devices={test.ds}
                     sendProps={this.setProps}
                     account={this.state.account}
-                    public={publicS}
+                    public={this.state.public}
                     visiting={visitingG}
                 />
             </div>
@@ -294,6 +296,16 @@ class App extends Component {
         this.setState({ isOpen: true });
     }
 
+    addDevice = () => {
+        if (this.state.account) {
+            return (
+                <AddDevice register={() => { this.setState({ registrationPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+            )
+        } else {
+            return null
+        }
+    }
+
     render() {
         return (
             <div className="App">
@@ -301,7 +313,7 @@ class App extends Component {
                 <Router>
                     <div>
                         <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
-                        <AddDevice mainView={this.changeView} version={this.state.version} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+                        {this.addDevice()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route exact path="/uv/:username" component={this.userView} />

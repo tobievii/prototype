@@ -341,7 +341,7 @@ export class StatesViewer extends Component {
               })
             }).then(response => response.json()).then(resp => {
             }).catch(err => console.error(err.toString()));
-          }, 13000)
+          }, 10000)
         }
       })
     }
