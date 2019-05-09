@@ -88,12 +88,18 @@ class App extends Component {
             });
 
             socket.on("pushNotification", a => {
-                var message = "has been successfuly added to PROTOTYP3.";
-                if (a.type == "ALARM") {
+                var message = " ";
+
+                if (a.message == undefined || a.message == null) {
+                    if (a.type == "NEW DEVICE ADDED" || a.type == "New dewvice added") {
+                        message = "has been successfuly added to PROTOTYP3.";
+                    } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
+                        message = "hasn't sent data in the last 24hours";
+                    }
+                } else {
                     message = a.message;
-                } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
-                    message = "hasn't sent data in the last 24hours";
                 }
+
                 register.showNotification(a.type, {
                     body: '"' + a.device + '" ' + message,
                     icon: "./iotnxtLogo.png"

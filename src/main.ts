@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-// import { createNotification } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -949,7 +949,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
-  //checkExisting(req, res, db);
+  checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
 
@@ -987,15 +987,15 @@ function handleState(req: any, res: any, next: any) {
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
           if (info.newdevice) {
 
-            // var newDeviceNotification = {
-            //   type: "NEW DEVICE ADDED",
-            //   device: req.body.id,
-            //   created: packet._created_on,
-            //   notified: true,
-            //   seen: false
-            // }
+            var newDeviceNotification = {
+              type: "NEW DEVICE ADDED",
+              device: req.body.id,
+              created: packet._created_on,
+              notified: true,
+              seen: false
+            }
 
-            // createNotification(db, newDeviceNotification, req.user, Result);
+            createNotification(db, newDeviceNotification, req.user, Result);
             io.to(req.user.username).emit("info", info);
           }
 
@@ -1012,7 +1012,7 @@ function handleState(req: any, res: any, next: any) {
           if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              // createNotification(db, AlarmNotification, req.user, Result);
+              createNotification(db, AlarmNotification, req.user, Result);
             }
           }
 
