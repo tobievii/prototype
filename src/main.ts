@@ -49,7 +49,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -411,7 +411,7 @@ app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    res.json({ error: "Please select a device to view device information/dashboard." })
   }
 });
 
@@ -526,7 +526,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
         ///
       }
@@ -549,7 +549,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 
@@ -589,7 +589,7 @@ async function findstate(req: any, res: any) {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
       }
     })
@@ -603,7 +603,7 @@ async function findstate(req: any, res: any) {
         res.json(state);
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 }
@@ -782,7 +782,6 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
-
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
@@ -950,7 +949,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
-  //checkExisting(req, res, db);
+  checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
 
@@ -988,44 +987,35 @@ function handleState(req: any, res: any, next: any) {
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
           if (info.newdevice) {
 
-            // var newDeviceNotification = {
-            //   type: "NEW DEVICE ADDED",
-            //   device: req.body.id,
-            //   created: packet._created_on,
-            //   notified: true,
-            //   seen: false
-            // }
+            var newDeviceNotification = {
+              type: "NEW DEVICE ADDED",
+              device: req.body.id,
+              created: packet._created_on,
+              notified: true,
+              seen: false
+            }
 
-            // createNotification(db, newDeviceNotification, req, Result);
-            // io.to(req.user.username).emit("info", info);
+            createNotification(db, newDeviceNotification, req.user, Result);
+            io.to(req.user.username).emit("info", info);
           }
 
-          // disabled for now:
+          var message = "";
+          var AlarmNotification = {
+            type: "ALARM",
+            device: req.body.id,
+            created: Date.now(),
+            message: message,
+            notified: true,
+            seen: false
+          }
 
-          // var message = "";
-          // var AlarmNotification = {
-          //   type: "ALARM",
-          //   device: req.body.id,
-          //   created: Date.now(),
-          //   message: message,
-          //   notified: true,
-          //   seen: false
-          // }
+          if (Result.boundaryLayer != undefined) {
+            if (Result.boundaryLayer.inbound == false) {
+              AlarmNotification.message = "has gone out of its boundary";
+              createNotification(db, AlarmNotification, req.user, Result);
+            }
+          }
 
-          // if (Result.workflowCode != undefined) {
-          //   if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
-          //     AlarmNotification.message = Result.workflowCode.substring(
-          //       Result.workflowCode.lastIndexOf('alarm1("') + 8,
-          //       Result.workflowCode.lastIndexOf('")')
-          //     )
-          //     createNotification(db, AlarmNotification, req, Result);
-          //   }
-          // } else if (Result.boundaryLayer != undefined) {
-          //   if (Result.boundaryLayer.inbound == false) {
-          //     AlarmNotification.message = "has gone out of its boundary";
-          //     createNotification(db, AlarmNotification, req, Result);
-          //   }
-          // }
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
@@ -1346,9 +1336,15 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           }
         }
 
+        var options = {
+          apikey: state.apikey,
+          devid: state.devid
+        }
+
         for (var plugin of plugins) {
           if (plugin.workflow) {
-            sandbox[plugin.name] = plugin.workflow;
+            var workflow = plugin.workflow;
+            sandbox[plugin.name] = new workflow(options);
           }
         }
 
