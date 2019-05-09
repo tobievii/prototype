@@ -777,7 +777,15 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
   db.states.aggregate([{
     $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
   },
-  { $unwind: '$fromUsers' }, { $match: { public: true } },
+  { $unwind: '$fromUsers' }, { $match: { public: true } }, {
+    $project: {
+      uuid: 0, apikey: 0, 'meta.user': 0, 'fromUsers._id': 0, 'fromUsers.uuid': 0,
+      'fromUsers.email': 0, 'fromUsers.apikey': 0, 'fromUsers.password': 0, 'fromUsers.recover': 0, 'fromUsers.notifications': 0, 'fromUsers.lastSeen': 0,
+      'fromUsers.created': 0, 'fromUsers.level': 0, 'fromUsers.shared': 0, 'fromUsers.encrypted': 0, 'fromUsers.sort': 0, 'fromUsers._created_on': 0,
+      'fromUsers.userAgent': 0, 'fromUsers._last_seen': 0, 'fromUsers.emailverified': 0, 'fromUsers.settingsMenuTab': 0, 'fromUsers.ip': 0, 'fromUsers.ipLoc': 0, _id: 0,
+      "meta.uuid": 0, public: 0, notification24: 0
+    }
+  }
   ], (err: Error, result: any) => {
     res.json(result)
   })
