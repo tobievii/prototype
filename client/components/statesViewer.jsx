@@ -210,36 +210,36 @@ export class StatesViewer extends Component {
             for (var s in states) {
               states[s].selected = false
             }
-            if (this.props.account.level >= 100) {
-              fetch("/api/v3/states/usernameToDevice", {
-                method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-              }).then(response => response.json()).then(serverresponse => {
-                for (var s in serverresponse) {
-                  serverresponse[s].selected = false
-                }
-                this.setState({ devicesServer: serverresponse }, () => {
-                  for (var device in this.state.devicesServer) {
-                    this.socket.emit("join", this.state.devicesServer[device].key);
-                  }
+            // if (this.props.account.level >= 100) {
+            //   fetch("/api/v3/states/usernameToDevice", {
+            //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
+            //   }).then(response => response.json()).then(serverresponse => {
+            //     for (var s in serverresponse) {
+            //       serverresponse[s].selected = false
+            //     }
+            //     this.setState({ devicesServer: serverresponse }, () => {
+            //       for (var device in this.state.devicesServer) {
+            //         this.socket.emit("join", this.state.devicesServer[device].key);
+            //       }
 
-                  this.setState({ devicesView: serverresponse }, () => {
-                    //this.socketConnectDevices();
-                    this.sort();
-                  })
-                })
-              }).catch(err => console.error(err.toString()));
-            }
-            else if (this.props.account.level < 100) {
-              this.setState({ devicesServer: states }, () => {
+            //       this.setState({ devicesView: serverresponse }, () => {
+            //         //this.socketConnectDevices();
+            //         this.sort();
+            //       })
+            //     })
+            //   }).catch(err => console.error(err.toString()));
+            // }
+            //else if (this.props.account.level < 100) {
+            this.setState({ devicesServer: states }, () => {
 
-                for (var device in this.state.devicesServer) {
-                  this.socket.emit("join", this.state.devicesServer[device].key);
-                }
-                this.setState({ devicesView: states }, () => {
-                  this.sort();
-                })
+              for (var device in this.state.devicesServer) {
+                this.socket.emit("join", this.state.devicesServer[device].key);
+              }
+              this.setState({ devicesView: states }, () => {
+                this.sort();
               })
-            }
+            })
+            //}
           })
         }
       })
@@ -294,7 +294,7 @@ export class StatesViewer extends Component {
           states[s].selected = false
         }
 
-        if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
+        if (this.props.account.level == 0) {
           fetch("/api/v3/states/usernameToDevice", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
           }).then(response => response.json()).then(serverresponse => {

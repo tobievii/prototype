@@ -714,25 +714,25 @@ input[type="color"] {
 
 // CHECKBOX STYLE
 
-input[type=checkbox] { 
-  appearance: none;  
-  -webkit-appearance: none;
-  -moz-appearance: none; 
-  outline: none;
-} 
-input[type=checkbox]:before {
-  font-family: FontAwesome;
-  display: inline-block;
-  width: 20px;
-  font-size: 22px;
-  outline: none;
-}
+// input[type=checkbox] { 
+//   appearance: none;  
+//   -webkit-appearance: none;
+//   -moz-appearance: none; 
+//   outline: none;
+// } 
+// input[type=checkbox]:before {
+//   font-family: FontAwesome;
+//   display: inline-block;
+//   width: 20px;
+//   font-size: 22px;
+//   outline: none;
+// }
 
-input[type=checkbox]:before { content: "\f096"; } 
-input[type=checkbox]:before { letter-spacing: 10px; } 
+// input[type=checkbox]:before { content: "\f096"; } 
+// input[type=checkbox]:before { letter-spacing: 10px; } 
 
-input[type=checkbox]:checked:before { content: "\f046"; } 
-input[type=checkbox]:checked:before { letter-spacing: 10px; } 
+// input[type=checkbox]:checked:before { content: "\f046"; } 
+// input[type=checkbox]:checked:before { letter-spacing: 10px; } 
 
 // END CHECKBOX STYLE
 
