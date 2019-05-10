@@ -220,28 +220,29 @@ export class AddDevice extends Component {
 
     getBlutoothDevices = () => {
         this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
-        fetch("/api/v3/scanbluetoothDevices", {
-            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        }).then(response => response.json()).then(resp => {
-            this.setState({ bleDevices: resp })
-            this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
-        }).catch(err => {
-            console.error(err.toString())
-            this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
-        });
+        // fetch("/api/v3/scanbluetoothDevices", {
+        //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        // }).then(response => response.json()).then(resp => {
+        //     this.setState({ bleDevices: resp })
+        //     this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
+        // }).catch(err => {
+        //     console.error(err.toString())
+        //     this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
+        // });
     }
 
     getPairedDevices = () => {
-        this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
-        fetch("/api/v3/getPairedDevices", {
-            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        }).then(response => response.json()).then(resp => {
-            this.setState({ pairedDevices: resp })
-            this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
-        }).catch(err => {
-            console.error(err.toString())
-            this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
-        });
+        this.changePopup("SELECT BLUETOOTH", "selectBluetooth");
+        //this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
+        // fetch("/api/v3/getPairedDevices", {
+        //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        // }).then(response => response.json()).then(resp => {
+        //     this.setState({ pairedDevices: resp })
+        //     this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
+        // }).catch(err => {
+        //     console.error(err.toString())
+        //     this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
+        // });
     }
 
 

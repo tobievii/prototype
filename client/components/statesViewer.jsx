@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import './react-confirm-alert/src/react-confirm-alert.css'
-import { library, noAuto } from '@fortawesome/fontawesome-svg-core'
+import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
 import * as _ from "lodash"
 import * as p from "../prototype.ts"
@@ -8,7 +8,6 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 import { MapDevices } from "./dashboard/map.jsx"
 import Media from "react-media";
-import { DeviceView } from "./deviceView.jsx";
 import { confirmAlert } from 'react-confirm-alert';
 
 library.add(faSort)
@@ -358,7 +357,9 @@ export class StatesViewer extends Component {
   // }
 
   componentWillMount = () => {
-    this.getDevices("initial load");
+    setTimeout(() => {
+      this.getDevices("initial load");
+    }, 500);
   }
 
   componentWillUnmount = () => {
@@ -482,9 +483,13 @@ export class StatesViewer extends Component {
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     this.setState({ sort: value });
 
+
+  }
+
+  componentWillUnmount = () => {
     fetch("/api/v3/sort", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ sort: value })
+      body: JSON.stringify({ sort: this.state.sort })
     }).then(response => response.json()).then(serverresponse => {
     }).catch(err => console.error(err.toString()));
   }

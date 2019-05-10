@@ -26,11 +26,6 @@ export class Notification extends Component {
     super(props);
   }
 
-  // componentDidMount = () => {
-
-  //   this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
-  // }
-
   newDevice = () => {
 
     if (this.props.notification.type === "New Device Added") {
@@ -280,7 +275,7 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
+              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "1px", top: 25, zIndex: 1000 }}>
                 {account.notifications.slice(Math.max(account.notifications.length - 5, 1)).reverse().map((notification, i) => <Notification key={notification.device + i} notification={notification} account={account}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
