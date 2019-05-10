@@ -427,10 +427,18 @@ export class StatesViewer extends Component {
       var newDeviceList = []
       for (var device of this.state.devicesServer) {
         if (this.state.search.length > 0) {
-          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
-            newDeviceList.push(device)
+          if (device.meta.user != null || device.meta.user != undefined) {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
           }
-        } else {
+          else {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
+          }
+        }
+        else {
           newDeviceList.push(device)
         }
       }
