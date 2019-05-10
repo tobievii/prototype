@@ -202,20 +202,27 @@ export class StatesViewerMenu extends Component {
     }
 
     addDevice = () => {
-        if (window.innerWidth > 667) {
-            return (
-                <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer" }} onClick={this.inputDeviceShow}></i>
-                    <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "25%", marginRight: "5px" }} required />
-                        WIFI password: <input name="wifipass" type="text" style={{ width: "25%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required />{this.addButton()}</div>
-                </div >
-            )
+        if (this.props.public == false || this.props.visiting == false) {
+            if (window.innerWidth > 667) {
+                return (
+                    <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer" }} onClick={this.inputDeviceShow}></i>
+                        <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "25%", marginRight: "5px" }} required />
+                            WIFI password: <input name="wifipass" type="text" style={{ width: "25%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required />{this.addButton()}</div>
+                    </div >
+                )
+            }
+            else if (window.innerWidth < 667) {
+                return (
+                    <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
+                        <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
+                            WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
+                    </div >
+                )
+            }
         }
-        else if (window.innerWidth < 667) {
+        else {
             return (
-                <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
-                    <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
-                        WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
-                </div >
+                <div></div>
             )
         }
     }
