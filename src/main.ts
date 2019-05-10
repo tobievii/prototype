@@ -7,6 +7,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
+const requestIp = require('request-ip');
 
 import * as scrypt from "scrypt"
 
@@ -267,6 +268,12 @@ app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
 
 app.get('/api/v3/version', (req: any, res: any) => {
   res.json(version);
+})
+
+app.get('/api/v3/publicip', (req: any, res: any) => {
+  const clientIp = requestIp.getClientIp(req);
+  // console.log(clientIp)
+  res.json(clientIp);
 })
 
 app.get('/api/v3/account', (req: any, res: any) => {
