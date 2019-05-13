@@ -201,31 +201,33 @@ export class DeviceView extends Component {
 
   deleteDevice = (id) => {
     // deletes a device's state and packet history
-    if (this.state.trashClicked >= 0) {
-      this.setState({ trashClicked: 1 })
-      confirmAlert({
-        customUI: ({ onClose }) => {
-          return (
-            <div className='protoPopup' align="center">
-              <h1>Are you sure?</h1>
-              <p>Deleting a device is irreversible</p>
-              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
+    if (this.props.public != true) {
+      if (this.state.trashClicked >= 0) {
+        this.setState({ trashClicked: 1 })
+        confirmAlert({
+          customUI: ({ onClose }) => {
+            return (
+              <div className='protoPopup' align="center">
+                <h1>Are you sure?</h1>
+                <p>Deleting a device is irreversible</p>
+                <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
-                {
-                  fetch("/api/v3/state/delete", {
-                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id, username: this.props.username, key: this.state.state.key })
-                  }).then(response => response.json()).then(serverresponse => {
-                    onClose();
-                  }).catch(err => console.error(err.toString()));
-                }
-              }}>Yes, Delete it!</button>
-            </div>
-          )
-        }
-      })
-      return;
+                <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
+                  {
+                    fetch("/api/v3/state/delete", {
+                      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                      body: JSON.stringify({ id: id, username: this.props.username, key: this.state.state.key })
+                    }).then(response => response.json()).then(serverresponse => {
+                      onClose();
+                    }).catch(err => console.error(err.toString()));
+                  }
+                }}>Yes, Delete it!</button>
+              </div>
+            )
+          }
+        })
+        return;
+      }
     }
   };
 
@@ -275,33 +277,34 @@ export class DeviceView extends Component {
 
   clearState = () => {
     //clears state, but retains history and workflow
+    if (this.props.public != true) {
+      if (this.state.clearStateClicked >= 0) {
+        this.setState({ clearStateClicked: 1 });
+        confirmAlert({
+          customUI: ({ onClose }) => {
+            return (
+              <div className='protoPopup' align="center">
+                <h1>Are you sure?</h1>
+                <p>Clearing A State is irreversible</p>
+                <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
-    if (this.state.clearStateClicked >= 0) {
-      this.setState({ clearStateClicked: 1 });
-      confirmAlert({
-        customUI: ({ onClose }) => {
-          return (
-            <div className='protoPopup' align="center">
-              <h1>Are you sure?</h1>
-              <p>Clearing A State is irreversible</p>
-              <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
-
-              <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
-                //this.handleClickDelete()
-                {
-                  fetch("/api/v3/state/clear", {
-                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: this.state.devid, username: this.props.username })
-                  }).then(response => response.json()).then(serverresponse => {
-                    onClose();
-                  }).catch(err => console.error(err.toString()));
-                }
-              }}>Yes, Clear it!</button>
-            </div>
-          )
-        }
-      })
-      return;
+                <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
+                  //this.handleClickDelete()
+                  {
+                    fetch("/api/v3/state/clear", {
+                      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                      body: JSON.stringify({ id: this.state.devid, username: this.props.username })
+                    }).then(response => response.json()).then(serverresponse => {
+                      onClose();
+                    }).catch(err => console.error(err.toString()));
+                  }
+                }}>Yes, Clear it!</button>
+              </div>
+            )
+          }
+        })
+        return;
+      }
     }
   };
 
@@ -470,6 +473,34 @@ export class DeviceView extends Component {
     }
   }
 
+  deleteClearButtons = () => {
+    if (this.props.public == true) {
+      return (
+        <span>
+          <div className="" style={{ width: "auto", float: "right", fontSize: 18, marginRight: 10, marginLeft: 15, cursor: "not-allowed" }}>
+            <FontAwesomeIcon icon="trash" title="Delete device" />
+          </div>
+
+          <div className="" style={{ width: "auto", float: "right", fontSize: 18, cursor: "not-allowed" }}>
+            <FontAwesomeIcon icon="eraser" title="Clear device info" />
+          </div>
+        </span>
+      )
+    } else {
+      return (
+        <span>
+          <div className="" style={{ width: "auto", float: "right", fontSize: 18, marginRight: 10, marginLeft: 15, cursor: "pointer" }} onClick={() => this.deleteDevice(this.props.devid)}>
+            <FontAwesomeIcon icon="trash" title="Delete device" />
+          </div>
+
+          <div className="" style={{ width: "auto", float: "right", fontSize: 18, cursor: "pointer" }} onClick={this.clearState}>
+            <FontAwesomeIcon icon="eraser" title="Clear device info" />
+          </div>
+        </span>
+      )
+    }
+  }
+
 
   render() {
     return (
@@ -484,13 +515,7 @@ export class DeviceView extends Component {
               <div className="col-7 noDisplay" >
                 <div className="" style={{ display: this.state.shareDisplay }}>
 
-                  <div className="" style={{ width: "auto", float: "right", fontSize: 18, marginRight: 10, marginLeft: 15, cursor: "pointer" }} onClick={() => this.deleteDevice(this.props.devid)}>
-                    <FontAwesomeIcon icon="trash" />
-                  </div>
-
-                  <div className="" style={{ width: "auto", float: "right", fontSize: 18, cursor: "pointer" }} onClick={this.clearState}>
-                    <FontAwesomeIcon icon="eraser" />
-                  </div>
+                  {this.deleteClearButtons()}
 
                   <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
 

@@ -556,27 +556,27 @@ export class StatesViewer extends Component {
     this.showBoundaryPath(false);
     this.props.deviceClicked(device.device);
 
-    for (var devices in newDeviceList) {
-      if (newDeviceList[devices].selectedIcon == true) {
-        newDeviceList[devices].selectedIcon = false;
-      }
-    }
+    // for (var devices in newDeviceList) {
+    //   if (newDeviceList[devices].selectedIcon == true) {
+    //     newDeviceList[devices].selectedIcon = false;
+    //   }
+    // }
 
-    for (var dev in newDeviceList) {
-      if (newDeviceList[dev].key == device.e.key) {
-        if (!device.n) {
-          newDeviceList[dev].selectedIcon = false;
-        } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
-          newDeviceList[dev].selectedIcon = true;
-        } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
-          newDeviceList[dev].selectedIcon = true;
-        }
-      }
-    }
+    // for (var dev in newDeviceList) {
+    //   if (newDeviceList[dev].key == device.e.key) {
+    //     if (!device.n) {
+    //       newDeviceList[dev].selectedIcon = false;
+    //     } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
+    //       newDeviceList[dev].selectedIcon = true;
+    //     } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
+    //       newDeviceList[dev].selectedIcon = true;
+    //     }
+    //   }
+    // }
 
-    this.setState({ devicesView: newDeviceList });
-    this.setState({ devicePressed: device.device });
-    this.setState({ boundary: device.n });
+    // this.setState({ devicesView: newDeviceList });
+    // this.setState({ devicePressed: device.device });
+    // this.setState({ boundary: device.n });
   }
 
   deleteSelectedDevices = () => {

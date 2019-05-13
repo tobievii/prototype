@@ -122,8 +122,8 @@ export class AddDevice extends Component {
         } else if (this.state.popupInfo == "bluetooth") {
             return (
                 <div >
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth") }}>SCAN FOR DEVICE</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT BLUETOOTH", "selectBluetooth"); this.getPairedDevices() }}>SELECT BLUETOOTH DEVICE</button>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SCAN BLE DEVICES", "scanBluetooth") }}>SCAN FOR DEVICE</button>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT PAIRED BLE", "selectBluetooth"); /*this.getPairedDevices()*/ }}>SELECT BLUETOOTH DEVICE</button>
                 </div>
             )
         } else if (this.state.popupInfo == "scanBluetooth") {
@@ -233,15 +233,15 @@ export class AddDevice extends Component {
 
     getPairedDevices = () => {
         this.changePopup("SELECT BLUETOOTH", "selectBluetooth");
-        //this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
+        // this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
         // fetch("/api/v3/getPairedDevices", {
         //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         // }).then(response => response.json()).then(resp => {
         //     this.setState({ pairedDevices: resp })
-        //     this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
+        //     this.changePopup("SELECT PAIRED BLE", "selectBluetooth")
         // }).catch(err => {
         //     console.error(err.toString())
-        //     this.changePopup("SELECT BLUETOOTH", "selectBluetooth")
+        //     this.changePopup("SELECT PAIRED BLE", "selectBluetooth")
         // });
     }
 
@@ -299,7 +299,7 @@ export class AddDevice extends Component {
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
                         <div style={{ background: "#131e27", padding: 12, width: "100%" }}>
-                            <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel() }} style={{ paddingRight: 10, float: "right" }}></span>
+                            <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel(); /*this.setState({ popupInfo: "default" }); this.setState({ popupHeading: "ADD DEVICE" })*/ }} style={{ paddingRight: 10, float: "right" }}></span>
                             <span className={"fas fa-arrow-circle-left navLink"} onClick={() => { this.goBack() }} style={{}}></span>
                             <span style={{ float: "right", marginRight: "40%" }}>{this.state.popupHeading}</span>
                         </div>
