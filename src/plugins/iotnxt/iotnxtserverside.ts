@@ -13,6 +13,11 @@ var file = "/src/plugins/iotnxt/iotnxtserverside.ts"
 
 var enablePackets = false;
 
+var kue = require('kue')
+  , jobs = kue.createQueue();
+
+var sequence = 0;
+
 export function handlePacket(db: any, packet: any, cb: any) {
   if (enablePackets) {
     iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
@@ -101,41 +106,51 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // });
 
 
+  setInterval(
+    function () {
+      sequence += 1;
+      (function (sequence) {
+        var job = jobs.create('IOTNXT Connecting queues.',
+          // CONNECT ALL GATEWAYS AT INIT
+          log("IOTNXT Connecting queues." + sequence),
+          getgateways(db, (err: Error, gateways: any) => {
+            if (gateways) {
+              for (var g in gateways) {
+                connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
+              }
+            }
 
 
+            //retry every now and then
+            setInterval(() => {
+              log("IOTNXT auto retry gateways.")
+              getgateways(db, (err: Error, gateways: any) => {
+                if (gateways) {
+                  for (var g in gateways) {
+                    if (gateways[g].connected == false) {
+                      connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
+                    }
+                  }
+                }
+              });
+            }, 60 * 1000 * 5) // 5minutes
 
+            // enable packets after 5 seconds.
+            setTimeout(() => {
+              log("IOTNXT Enabling packets.")
+              enablePackets = true;
+            }, 5000)
+          })).save(function () {
+            if (!null) console.log(job.id);
+          });
 
-  // CONNECT ALL GATEWAYS AT INIT
-  log("IOTNXT Connecting queues.")
-  getgateways(db, (err: Error, gateways: any) => {
-    if (gateways) {
-      for (var g in gateways) {
-        connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
-      }
+        job.on('complete', function () {
+          console.log('job ' + sequence + ' completed!')
+        });
+      })(sequence);
     }
-  });
-
-  //retry every now and then
-  setInterval(() => {
-    log("IOTNXT auto retry gateways.")
-    getgateways(db, (err: Error, gateways: any) => {
-      if (gateways) {
-        for (var g in gateways) {
-          if (gateways[g].connected == false) {
-            connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
-          }
-        }
-      }
-    });
-  }, 60 * 1000 * 5) // 5minutes
-
-  // enable packets after 5 seconds.
-  setTimeout(() => {
-    log("IOTNXT Enabling packets.")
-    enablePackets = true;
-  }, 5000)
-
-
+    , 5000
+  );
 
   // RETRY EVERY 10 SECONDS
   // setInterval(()=>{
