@@ -38,8 +38,6 @@ export class Registration extends React.Component {
   }
 
   updateOptions = () => {
-    console.log(this.state)
-
 
     fetch("/api/v3/admin/registration", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -72,24 +70,49 @@ export class Registration extends React.Component {
 
   }
 
+  email = () => {
+    if (this.state.userEmailVerify == true) {
+      return (
+        <i className="fas fa-check-square"
+          checked={this.state.userEmailVerify}
+          onClick={this.checkBox("userEmailVerify")} />
+      )
+    }
+    else if (this.state.userEmailVerify == false) {
+      return (
+        <i className="far fa-square"
+          checked={this.state.userEmailVerify}
+          onClick={this.checkBox("userEmailVerify")} />
+      )
+    }
+  }
+
+  register = () => {
+    if (this.state.userRegistration == true) {
+      return (
+        <i className="fas fa-check-square"
+          checked={this.state.userRegistration}
+          onClick={this.checkBox("userRegistration")} />
+      )
+    }
+    else if (this.state.userRegistration == false) {
+      return (
+        <i className="far fa-square"
+          checked={this.state.userRegistration}
+          onClick={this.checkBox("userRegistration")} />
+      )
+    }
+  }
+
   render() {
     if (this.props.level >= 100) {
       return (
         <div className="adminBlocks" >
           <div><h4>REGISTRATION</h4></div>
-
-          <div><input className="medium-checkbox" type="checkbox"
-            checked={this.state.userRegistration}
-            onChange={this.checkBox("userRegistration")} /> Enable public user registration</div>
-
-          <div><input className="medium-checkbox" type="checkbox"
-            checked={this.state.userEmailVerify}
-            onChange={this.checkBox("userEmailVerify")} /> Require email verification</div>
-
+          <div>{this.register()} Enable public user registration</div>
+          <div>{this.email()} Require email verification</div>
           {this.setupNodemailer()}
-
           <button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={this.updateOptions} >APPLY</button>
-
           <div style={{ clear: "both" }} />
         </div>
       )

@@ -5,15 +5,65 @@ export const name = "notifications"
 export const workflowDefinitions = [
   "var " + name + " = { ",
   "warning: (message:string)",
-  "alarm1: (message:string)",
+  "alarm: (message:string)",
   "info: (message:string)",
   "}"
 ];
 
 var timer: any;
-var io: any;
+var eventHubGlobal: any;
+var dbGlobal: any;
 
-export const workflow = { warning, alarm1, info }
+export function workflow(options: any) {
+  this.alarm1 = function (message: string) {
+    var AlarmNotification = {
+      type: "ALARM",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+
+  this.warning = function warning(message: string) {
+    console.log(message);
+
+    var AlarmNotification = {
+      type: "WARNING",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+
+  this.info = function info(message: string) {
+    console.log(message);
+
+    var AlarmNotification = {
+      type: "INFO",
+      device: options.devid,
+      created: Date.now(),
+      message: message,
+      notified: true,
+      seen: false
+    }
+
+    dbGlobal.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
+      createNotification(dbGlobal, AlarmNotification, result, { apikey: options.apikey });
+    })
+  }
+}
 
 function Timer(fn: any, t: any) {
   var timerObj: any = setInterval(fn, t);
@@ -67,7 +117,7 @@ function getWarningNotification(db: any) {
         };
 
         db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-          io.emit("notification", WarningNotificationL, device);
+          eventHubGlobal.emit("notification", WarningNotificationL, device);
         })
       })
     }
@@ -108,8 +158,8 @@ function msToHMS(ms: any) {
 }
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
-  io = eventHub;
-
+  eventHubGlobal = eventHub;
+  dbGlobal = db;
   app.post("/api/v3/notifications/seen", (req: any, res: any) => {
     deviceSeen(db, req.user);
     res.json({ result: "done" })
@@ -125,54 +175,19 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   }, 5000);
 }
 
-export function warning(message: string) {
-  console.log(message);
-}
+export function createNotification(db: any, notification: any, user: any, device: any) {
+  eventHubGlobal.emit("notification", notification, device);
 
-export function alarm1(message: string) {
-  console.log(message);
-}
-
-export function info(message: string) {
-  console.log(message);
-}
-
-export function createNotification(db: any, notification: any, req: any, device: any) {
-  if (notification.type == "ALARM") {
-    io.emit("notification", notification, device);
-
-    if (req.user.notifications) {
-      req.user.notifications.push(notification)
-    } else {
-      req.user.notifications = [notification]
-    }
-    db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-
-      for (var a of result.notifications) {
-        if (a.type == 'ALARM' && a.device == req.body.id) {
-          db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-            if (err !== null) {
-              console.log(err)
-            } else if (updated)
-              console.log(updated)
-          })
-        }
-      }
-    })
-  } else if (notification.type == "NEW DEVICE ADDED") {
-    io.emit("notification", notification, device);
-
-    if (req.user.notifications) {
-      req.user.notifications.push(notification)
-    } else {
-      req.user.notifications = [notification]
-    }
-
-    db.users.update({ apikey: req.user.apikey }, req.user, (err: Error, updated: any) => {
-      if (err) console.log(err);
-      if (updated) console.log(updated);
-    })
+  if (user.notifications) {
+    user.notifications.push(notification)
+  } else {
+    user.notifications = [notification]
   }
+
+  db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+    if (err) console.log(err);
+    if (updated) console.log(updated);
+  })
 }
 
 export function deviceSeen(db: any, user: any) {
@@ -187,7 +202,7 @@ export function deviceSeen(db: any, user: any) {
       final.push(notifications[notification]);
     }
 
-    io.emit("notification", undefined, user.apikey);
+    eventHubGlobal.emit("notification", undefined, user.apikey);
 
     db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
     })
@@ -195,9 +210,6 @@ export function deviceSeen(db: any, user: any) {
 }
 
 export function checkExisting(req: any, res: any, db: any) {
-  // timer.reset(500);
-  // timer.stop();
-  // timer.start();
 
   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
 
@@ -208,10 +220,10 @@ export function checkExisting(req: any, res: any, db: any) {
 
           array[i].notified = false;
 
-          io.emit("info", info)
+          eventHubGlobal.emit("info", info)
 
           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-            io.emit("notification")
+            eventHubGlobal.emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
           })
@@ -227,10 +239,10 @@ export function checkExisting(req: any, res: any, db: any) {
 
           array[i].seen = false;
 
-          io.emit("info", info)
+          eventHubGlobal.emit("info", info)
 
           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-            io.emit("notification")
+            eventHubGlobal.emit("notification")
             if (err) res.json(err);
             if (updated) res.json(updated);
           })

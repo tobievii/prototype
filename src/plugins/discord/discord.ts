@@ -13,8 +13,8 @@ export const workflowDefinitions = [
   "}"
 ];
 
-export const workflow = {
-  sendmsg: sendmsg
+export function workflow(options: any) {
+  this.sendmsg = sendmsg;
 }
 
 export function sendmsg(channelId: string, message: string) {

@@ -121,7 +121,6 @@ export function connectPort(userPort: any, eventHub: any) {
   var server = net.createServer((client: any) => {
     var device = new Teltonika(client, {});
     device.on("data", (data: any) => {
-      console.log(data);
       eventHub.emit("device", {
         apikey: userPort.apikey,
         packet: { id: data.id, data: data.data, meta: { method: "teltonika" } }

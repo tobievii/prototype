@@ -297,10 +297,6 @@ export class Editor extends Component {
                     </div>
                 );
             }
-
-
-
-
         }
     }
 }

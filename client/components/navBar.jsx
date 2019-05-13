@@ -47,6 +47,7 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
+      
     } else if (this.props.notification.type == "INFO") {
       this.props.notification.type = "INFO"
     }

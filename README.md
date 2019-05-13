@@ -115,7 +115,7 @@ All values are optional. See /src/config.ts for defaults values.
   },
   "httpPort": 80,
   "httpsPort": 443,
-  "mongoConnection": "mongodb://testuser:testpass@mongotest.iotnxt.io:27017/prototype"
+  "mongoConnection": "testuser:testpass@mongotest.iotnxt.io:27017/prototype"
 }
 ```
 
@@ -463,4 +463,34 @@ git push origin branch_name
 # Repeat above steps whenever you need to update your repository with the work that has occurred upstream since the last merge was performed.
 
 
+```
+
+
+# Cluster
+
+http://pm2.keymetrics.io/
+
+```
+sudo npm i pm2 -g
+pm2 start main.js -i 0
+```
+
+# Redis
+
+https://tecadmin.net/install-redis-ubuntu/
+```
+# install
+sudo apt-get install redis-server
+
+# run
+sudo systemctl enable redis-server.service
+```
+
+Add redis to iotconfig.json
+
+```json
+"redis": {
+  "host": "localhost",
+  "port": 6379
+}
 ```

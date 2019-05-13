@@ -714,36 +714,25 @@ input[type="color"] {
 
 // CHECKBOX STYLE
 
-input[type=checkbox] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  outline: none;
-}
+// input[type=checkbox] { 
+//   appearance: none;  
+//   -webkit-appearance: none;
+//   -moz-appearance: none; 
+//   outline: none;
+// } 
+// input[type=checkbox]:before {
+//   font-family: FontAwesome;
+//   display: inline-block;
+//   width: 20px;
+//   font-size: 22px;
+//   outline: none;
+// }
 
-input[type=checkbox]:before {
-  font-family: FontAwesome;
-  display: inline-block;
-  width: 20px;
-  font-size: 22px;
-  outline: none;
-}
+// input[type=checkbox]:before { content: "\f096"; } 
+// input[type=checkbox]:before { letter-spacing: 10px; } 
 
-input[type=checkbox]:before {
-  content: "\f096";
-}
-
-input[type=checkbox]:before {
-  letter-spacing: 10px;
-}
-
-input[type=checkbox]:checked:before {
-  content: "\f046";
-}
-
-input[type=checkbox]:checked:before {
-  letter-spacing: 10px;
-}
+// input[type=checkbox]:checked:before { content: "\f046"; } 
+// input[type=checkbox]:checked:before { letter-spacing: 10px; } 
 
 // END CHECKBOX STYLE
 
@@ -1421,6 +1410,48 @@ PLUGIN
 .sucess:hover {
   background: rgba(19, 196, 84, 0.6) !important;
   color: White;
+}
+
+pre {
+  border-radius: 4px;
+  border: 1px solid #2A2A2A;
+  background: #1E1E1E;
+  padding: 10px;
+}
+
+pre code {
+  color: #ccc;  
+}
+
+button {
+  color: rgba(255, 246, 235, 0.75);
+  padding: 8px 10px 8px 10px;
+  box-sizing: border-box;
+  font-weight: 100;
+  font-size: 15px;
+  margin-bottom: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  transition: background 0.2s;
+  margin: 10px;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:active {
+  color: #fff;
+  background: #f3353a;
+  outline: none;
+  transition: background 0.0s;
 }
 
 

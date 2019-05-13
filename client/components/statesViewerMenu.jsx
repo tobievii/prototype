@@ -65,6 +65,12 @@ export class StatesViewerMenu extends Component {
 
     sortClickHandler = (action) => {
         return (e) => {
+            fetch("/api/v3/sort", {
+                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ sort: action })
+            }).then(response => response.json()).then(serverresponse => {
+            }).catch(err => console.error(err.toString()));
+
             this.setState({ sort: action })
             this.props.sort(action);
         }

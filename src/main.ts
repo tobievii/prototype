@@ -7,6 +7,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
+const requestIp = require('request-ip');
 
 import * as scrypt from "scrypt"
 
@@ -28,7 +29,7 @@ var compression = require('compression')
 
 import express = require('express');
 
-var sprintf = require("sprintf-js").sprintf;
+
 
 const app = express()
 var http = require('http');
@@ -71,12 +72,9 @@ app.use('/u/:username/view', express.static('../client/dist'))
 // PLUGINS
 
 eventHub.on("device", (data: any) => {
-  //log("----")
-
-
-
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
+
 eventHub.on("plugin", (data: any) => {
   io.sockets.emit('plugin', data);
 })
@@ -172,25 +170,25 @@ app.get('/', (req: any, res: any) => {
 
 stats.init(app, db);
 
-app.get('/admin/accounts', (req: any, res: any) => {
+app.get('/admin/accounts', (req, res) => {
   fs.readFile('../public/admin_accounts.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get("/recover/:recoverToken", (req: any, res: any) => {
+app.get("/recover/:recoverToken", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get("/accounts/secure", (req: any, res: any) => {
+app.get("/accounts/secure", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
 })
 
-app.get('/signout', (req: any, res: any) => {
+app.get('/signout', (req, res) => {
   res.clearCookie("uuid");
   res.redirect('/');
 });
@@ -223,7 +221,7 @@ app.get('/signout', (req: any, res: any) => {
 
 app.post('/signin', accounts.signInFromWeb(db));
 
-app.get("/u/:username", (req: any, res: any) => {
+app.get("/u/:username", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
@@ -309,6 +307,12 @@ app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
 
 app.get('/api/v3/version', (req: any, res: any) => {
   res.json(version);
+})
+
+app.get('/api/v3/publicip', (req: any, res: any) => {
+  const clientIp = requestIp.getClientIp(req);
+  // console.log(clientIp)
+  res.json(clientIp);
 })
 
 app.get('/api/v3/account', (req: any, res: any) => {
@@ -453,7 +457,7 @@ app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    res.json({ error: "Please select a device to view device information/dashboard." })
   }
 });
 
@@ -568,7 +572,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
         ///
       }
@@ -591,7 +595,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 
@@ -631,7 +635,7 @@ async function findstate(req: any, res: any) {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
       }
     })
@@ -645,7 +649,7 @@ async function findstate(req: any, res: any) {
         res.json(state);
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 }
@@ -803,28 +807,35 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
 })
 
 app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
-  if (req.user.level == 100) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
+  // if (req.user.level == 100) {
+  //   db.states.aggregate([{
+  //     $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  //   },
+  //   { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
+  //   ], (err: Error, result: any) => {
+  //     res.json(result)
+  //   })
+  // }
+  // else if (req.user.level == 0) {
+  db.states.aggregate([{
+    $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  },
+  { $unwind: '$fromUsers' }, { $match: { public: true } }, {
+    $project: {
+      uuid: 0, apikey: 0, 'meta.user': 0, 'fromUsers._id': 0, 'fromUsers.uuid': 0,
+      'fromUsers.email': 0, 'fromUsers.apikey': 0, 'fromUsers.password': 0, 'fromUsers.recover': 0, 'fromUsers.notifications': 0, 'fromUsers.lastSeen': 0,
+      'fromUsers.created': 0, 'fromUsers.level': 0, 'fromUsers.shared': 0, 'fromUsers.encrypted': 0, 'fromUsers.sort': 0, 'fromUsers._created_on': 0,
+      'fromUsers.userAgent': 0, 'fromUsers._last_seen': 0, 'fromUsers.emailverified': 0, 'fromUsers.settingsMenuTab': 0, 'fromUsers.ip': 0, 'fromUsers.ipLoc': 0, _id: 0,
+      "meta.uuid": 0, public: 0, notification24: 0
+    }
   }
-  else if (req.user.level == 0) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { public: true } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
-  }
+  ], (err: Error, result: any) => {
+    res.json(result)
+  })
+  //}
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
-
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
@@ -991,6 +1002,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 // }
 
 function handleState(req: any, res: any, next: any) {
+  var hrstart = process.hrtime()
   checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
@@ -1022,11 +1034,10 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
-    var hrstart = process.hrtime()
+
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
           if (info.newdevice) {
 
@@ -1038,7 +1049,7 @@ function handleState(req: any, res: any, next: any) {
               seen: false
             }
 
-            createNotification(db, newDeviceNotification, req, Result);
+            createNotification(db, newDeviceNotification, req.user, Result);
             io.to(req.user.username).emit("info", info);
           }
 
@@ -1052,20 +1063,13 @@ function handleState(req: any, res: any, next: any) {
             seen: false
           }
 
-          if (Result.workflowCode != undefined) {
-            if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
-              AlarmNotification.message = Result.workflowCode.substring(
-                Result.workflowCode.lastIndexOf('alarm1("') + 8,
-                Result.workflowCode.lastIndexOf('")')
-              )
-              createNotification(db, AlarmNotification, req, Result);
-            }
-          } else if (Result.boundaryLayer != undefined) {
+          if (Result.boundaryLayer != undefined) {
             if (Result.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req, Result);
+              createNotification(db, AlarmNotification, req.user, Result);
             }
           }
+
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
@@ -1076,8 +1080,8 @@ function handleState(req: any, res: any, next: any) {
           (findErr: Error, findResult: any) => {
             if (findResult.notification24 == true) {
               db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-                console.log(result)
-                console.log(err)
+                //console.log(result)
+                //console.log(err)
               })
             }
           })
@@ -1086,16 +1090,15 @@ function handleState(req: any, res: any, next: any) {
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
-            });
+            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => { });
           }
         }
 
         res.json({ result: "success" });
 
         var hrend = process.hrtime(hrstart)
-
-        log(sprintf('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000))
+        // log('Execution time (hr): ')
+        // log(hrend);
       })
     })
   } else {
@@ -1108,7 +1111,6 @@ function handleState(req: any, res: any, next: any) {
 */
 
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
-
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { log(err); cb(err, undefined); return; }
 
@@ -1388,9 +1390,15 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           }
         }
 
+        var options = {
+          apikey: state.apikey,
+          devid: state.devid
+        }
+
         for (var plugin of plugins) {
           if (plugin.workflow) {
-            sandbox[plugin.name] = plugin.workflow;
+            var workflow = plugin.workflow;
+            sandbox[plugin.name] = new workflow(options);
           }
         }
 
@@ -1436,39 +1444,53 @@ if (config.ssl) {
 
 /* ############################################################################## */
 
-var io = require('socket.io')(server);
-
-io.on('connection', function (socket: any) {
-  setTimeout(function () {
-    socket.emit("connect", { hello: "world" })
-  }, 5000)
-
-
-  socket.on('join', function (path: string) {
-    socket.join(path);
-  });
-
-  socket.on('post', (data: any) => {
-    for (var key in socket.rooms) {
-      if (socket.rooms.hasOwnProperty(key)) {
-
-        var testkey = key;
-
-        if (key.split("|").length == 2) { testkey = key.split("|")[0] }
-
-        var packet = {
-          id: data.id,
-          data: data.data,
-          meta: { method: "socketioclient" }
-        }
-
-        handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
-
-      }
-    }
-  })
-  socket.on('disconnect', function () { })
+var io = require('socket.io')(server, {
+  transports: ['websocket', 'polling']
 });
+
+const bindListeners = (io: any) => {
+  io.on('connection', function (socket: any) {
+    setTimeout(function () {
+      socket.emit("connect", { hello: "world" })
+    }, 5000)
+
+
+    socket.on('join', function (path: string) {
+      socket.join(path);
+    });
+
+    socket.on('post', (data: any) => {
+      for (var key in socket.rooms) {
+        if (socket.rooms.hasOwnProperty(key)) {
+
+          var testkey = key;
+
+          if (key.split("|").length == 2) { testkey = key.split("|")[0] }
+
+          var packet = {
+            id: data.id,
+            data: data.data,
+            meta: { method: "socketioclient" }
+          }
+
+          handleDeviceUpdate(testkey, packet, { socketio: true }, (e: Error, r: any) => { });
+
+        }
+      }
+    })
+    socket.on('disconnect', function () { })
+  });
+}
+
+if (config.redis) {
+  log("REDIS ENABLED")
+  const redis = require('socket.io-redis')
+  io.adapter(redis(config.redis))
+}
+
+bindListeners(io)
+
+/* ############################################################################## */
 
 if (config.ssl) {
   server.listen(443);
