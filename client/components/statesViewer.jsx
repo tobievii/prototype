@@ -431,10 +431,18 @@ export class StatesViewer extends Component {
       var newDeviceList = []
       for (var device of this.state.devicesServer) {
         if (this.state.search.length > 0) {
-          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
-            newDeviceList.push(device)
+          if (device.meta.user != null || device.meta.user != undefined) {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
           }
-        } else {
+          else {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
+          }
+        }
+        else {
           newDeviceList.push(device)
         }
       }
@@ -629,7 +637,7 @@ export class StatesViewer extends Component {
       } else if (this.state.view == "map") {
         return (
           <div style={{ paddingTop: 25, margin: 30 }} >
-            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} public={this.props.public} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
+            <StatesViewerMenu deviceCall={this.state.devicePressed} boundary={this.state.boundary} public={this.props.public} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} public={this.props.public} />
             <div className="rowList">
               {this.returnDeviceList()}
               <div className="mapContainer">
