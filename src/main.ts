@@ -64,7 +64,8 @@ app.use('/view', express.static('../client/dist'))
 app.use('/u/:username/view', express.static('../client/dist'))
 
 
-
+// const bluetooth = require('node-bluetooth');
+// const device = new bluetooth.DeviceINQ();
 
 
 //####################################################################
@@ -192,9 +193,41 @@ app.get('/signout', (req, res) => {
   res.redirect('/');
 });
 
+// app.get('/api/v3/scanbluetoothDevices', (req: any, res: any) => {
+//   var devices: any = [];
+//   var done = false;
+//   device
+//     .on('finished', () => { done = true })
+//     .on('found', function found(address: any, name: any) {
+//       // console.log('Found: ' + address + ' with name ' + name);
+//       devices.push({ address: address, name: name })
+//     }).scan();
+
+//   var timerObj = setInterval(() => {
+//     if (done == true) {
+//       clearInterval(timerObj);
+//       res.json(devices)
+//     }
+//   }, 5000)
+// });
+
+// app.get('/api/v3/getPairedDevices', (req: any, res: any) => {
+//   device.listPairedDevices((devices: any) => {
+//     // console.log(devices)
+//     res.json(devices);
+//   });
+
+// });
+
 app.post('/signin', accounts.signInFromWeb(db));
 
 app.get("/u/:username", (req, res) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/uv/:username", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
@@ -227,6 +260,12 @@ app.post("/subscribe", (req: any, res: any) => {
 });
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/uv/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })

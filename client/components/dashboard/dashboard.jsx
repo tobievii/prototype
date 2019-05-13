@@ -35,6 +35,10 @@ var mapDetails = {
 
 export class Dashboard extends React.Component {
 
+  constructor(props) {
+    super(props);
+  }
+
   settingLayout = false;
 
   state = {
@@ -214,11 +218,13 @@ export class Dashboard extends React.Component {
   }
 
   updateServer() {
-    fetch("/api/v3/dashboard", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-    }).then(response => response.json()).then(result => { })
-      .catch(err => console.error(err.toString()));
+    if (this.props.state != undefined && this.props.state.key != undefined) {
+      fetch("/api/v3/dashboard", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
+      }).then(response => response.json()).then(result => { })
+        .catch(err => console.error(err.toString()));
+    }
   }
 
   widgetRemove = (id) => {
@@ -434,9 +440,18 @@ export class Dashboard extends React.Component {
   }
 
   generateDashboard = () => {
+
+
     if (!this.props.state) {
       return (<div>loading..</div>)
     } else {
+
+      if (this.props.state.devid != this.state.device) {
+        this.settingLayout = false;
+        this.setState({ device: this.props.state.devid })
+        this.setState({ layout: this.props.state.layout })
+      }
+
       return (
         <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
           <div>
@@ -485,6 +500,7 @@ export class Dashboard extends React.Component {
         if (this.settingLayout == false) {
           this.settingLayout = true;
           //console.log(this.props.state.layout)
+          this.setState({ device: this.props.state.devid })
           this.setState({ layout: this.props.state.layout })
         }
 
@@ -498,11 +514,7 @@ export class Dashboard extends React.Component {
 
         return (<div>loading</div>)
       }
-
-
-
     } else {
-      //console.log("no props yet")
       return (<div>no props</div>)
     }
 

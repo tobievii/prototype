@@ -42,7 +42,7 @@ export class UserProfile extends Component {
         }
 
         return (
-            <div className="panel" style={{ marginTop: "70px", overflow: "auto" }}>
+            <div className="panel" style={{ marginTop: "60px", overflow: "auto", marginLeft: 10, marginRight: 10 }}>
                 <div className="avatarProfile" style={{ marginTop: "3px" }}> <img src={avatar} /></div>
                 <h3> {this.props.user.username} </h3>
                 {this.showInfor()}
