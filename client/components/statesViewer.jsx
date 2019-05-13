@@ -433,10 +433,18 @@ export class StatesViewer extends Component {
       var newDeviceList = []
       for (var device of this.state.devicesServer) {
         if (this.state.search.length > 0) {
-          if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
-            newDeviceList.push(device)
+          if (device.meta.user != null || device.meta.user != undefined) {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase()) || device.meta.user.email.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
           }
-        } else {
+          else {
+            if (device.devid.toString().toLowerCase().includes(this.state.search.toLowerCase())) {
+              newDeviceList.push(device)
+            }
+          }
+        }
+        else {
           newDeviceList.push(device)
         }
       }
@@ -718,7 +726,21 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu mainView={this.props.mainView} deviceCall={this.state.devicePressed} boundary={this.state.boundary} public={this.props.public} acc={this.props.account} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
+            <StatesViewerMenu 
+            mainView={this.props.mainView} 
+            deviceCall={this.state.devicePressed} 
+            boundary={this.state.boundary} 
+            public={this.props.public} 
+            acc={this.props.account} 
+            search={this.search} 
+            selectAll={this.selectAll} 
+            devices={this.state.devicesView} 
+            sort={this.sort} 
+            view={this.changeView} 
+            selectCount={this.state.selectCount} 
+            deleteSelected={this.deleteSelectedDevices} 
+            visiting={this.props.visiting} 
+            public={this.props.public} />
             <div className={"rowList " + this.props.mainView}>
               {this.returnDeviceList()}
               {this.displayMap()}
