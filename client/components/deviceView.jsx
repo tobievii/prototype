@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, PureComponent } from "react";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -48,7 +48,7 @@ const customStyles = {
 
 var viewController = "";
 
-export class DeviceView extends Component {
+export class DeviceView extends PureComponent {
   state = {
     devid: undefined,
     lastTimestamp: "no idea",
@@ -113,25 +113,27 @@ export class DeviceView extends Component {
 
     var merge = true; //default is to merge
 
-    if (packet.options) {
-      if (packet.options["_merge"] === false) {
-        merge = false;
+    if (packet.id == this.state.state.devid && packet.id == this.props.devid) {
+      if (packet.options) {
+        if (packet.options["_merge"] === false) {
+          merge = false;
+        }
       }
-    }
 
-    if (merge) {
-      view = _.merge(view, packet)
-      state.payload = _.merge(state.payload, packet);
-    } else {
-      delete view.data;
-      delete state.payload.data;
-      state.payload = _.merge(state.payload, packet);
-      view = _.merge(view, packet)
-    }
+      if (merge) {
+        view = _.merge(view, packet)
+        state.payload = _.merge(state.payload, packet);
+      } else {
+        delete view.data;
+        delete state.payload.data;
+        state.payload = _.merge(state.payload, packet);
+        view = _.merge(view, packet)
+      }
 
-    // should be same as DB.states for this device.
-    state["_last_seen"] = packet.timestamp;
-    this.setState({ view, state })
+      // should be same as DB.states for this device.
+      state["_last_seen"] = packet.timestamp;
+      this.setState({ view, state })
+    }
   }
 
   updateTime = () => {
@@ -184,7 +186,7 @@ export class DeviceView extends Component {
           }
         })
       }).catch(err => console.error(err.toString()));
-    }, 100);
+    }, 1);
   }
 
   componentWillUnmount = () => {
@@ -465,7 +467,7 @@ export class DeviceView extends Component {
     if (this.props.mainView != "dashboard") {
       viewController = "";
       return (
-        <StatesViewer deviceClicked={() => { this.getDeviceDV(); this.dashboardColumn() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} />
+        <StatesViewer deviceClicked={() => { this.getDeviceDV() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} />
       )
     } else {
       viewController = "changeDisplay";

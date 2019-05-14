@@ -1,5 +1,6 @@
-import React, { Component } from "react";
-import SyntaxHighlighter from 'react-syntax-highlighter';
+import React, { Component, Suspense } from "react";
+const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
+
 import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
 
 export class ApiInfo extends Component {
@@ -80,7 +81,7 @@ export class ApiInfo extends Component {
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "' + this.props.apikey + '|yourDevice001"); // your api key | device id';
 
     return (
-      <div className="apiInfo" style={{ paddingTop: 0, margin: "0 25px", marginTop: "50px" }} >
+      <div className="apiInfo" style={{ paddingTop: 0, margin: "0 25px", marginTop: "25px" }} >
 
         <div className="row apiInfoMenu">
           <div className={this.getMenuClasses(1)} onClick={this.onClickMenuTab(1)} >APIKEY</div>
@@ -89,7 +90,6 @@ export class ApiInfo extends Component {
           <div className={this.getMenuClasses(4)} onClick={this.onClickMenuTab(4)} >MQTT</div>
           <div className={this.getMenuClasses(5)} onClick={this.onClickMenuTab(5)} >PYTHON</div>
         </div>
-
 
         <div className="row" style={this.getMenuPageStyle(1)}>
           <div className="col-md-12 commanderBgPanel" ><br />
@@ -151,7 +151,9 @@ export class ApiInfo extends Component {
               </div>
               <div className="col-md-12">
                 <h6>BODY ( Content-Type: "application/json" )</h6>
-                <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
+                </Suspense>
               </div>
             </div>
           </div>
@@ -206,10 +208,15 @@ export class ApiInfo extends Component {
 
             <p>Download <a href="https://nodejs.org/en/">Node.js</a> and duplicate the code below in a <b>test.js</b> file. This code will connect to your account and stream data to your terminal. We use this method to keep a connection open to the server and will be ready to receive data when needed. This example will stream data from all your devices if configured correctly.</p>
 
-            <SyntaxHighlighter language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIo}</SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIo}</SyntaxHighlighter>
+            </Suspense>
 
             <p>On line 5 you can alternatively connect to a specific device by using the | (pipe) character in between your api key and the device id:</p>
-            <SyntaxHighlighter startingLineNumber={5} language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIoSingleDevice}</SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter startingLineNumber={5} language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIoSingleDevice}</SyntaxHighlighter>
+            </Suspense>
+
             {/* <pre className="commanderBgPanel" >{ 'var socket = require("socket.io-client")("https://prototype.iotnxt.io");\n\nsocket.on("connect", function(data) {\n\tconsole.log("connected.");\n\tsocket.emit("join", "'+this.props.apikey+'"); // your api key\n\n\tsocket.on("post", data => {\n\t\tconsole.log(data);\n\t});\n});' }</pre> */}
 
             <p>Install the socket.io-client dependency from the same folder.</p>
@@ -226,14 +233,18 @@ export class ApiInfo extends Component {
 
             <p className="commanderBgPanel" id="postSample" >{curlPostSample}</p>
 
-
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{codeStringRealtimeSocketIoResult}</SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{codeStringRealtimeSocketIoResult}</SyntaxHighlighter>
+            </Suspense>
 
             <h4>SENDING DATA</h4>
 
             <p>Once socket.io is connected and you've "joined" using your API key, you can now start sending data. The format of the packet is identical to the HTTP REST post method.</p>
 
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{'socket.emit("post", {id: "yourDevice001", data: { temperature: 25.0 } } )'}</SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{'socket.emit("post", {id: "yourDevice001", data: { temperature: 25.0 } } )'}</SyntaxHighlighter>
+            </Suspense>
+
           </div>
         </div>
 
@@ -243,9 +254,12 @@ export class ApiInfo extends Component {
             <h4 className="spot">MQTT</h4>
             <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
 
-            <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
-              {"var mqtt = require('mqtt');\nvar config = { apikey: \"" + this.props.apikey + "\" };\nvar client  = mqtt.connect('mqtt://" + window.location.hostname + "', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
-            </SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
+                {"var mqtt = require('mqtt');\nvar config = { apikey: \"" + this.props.apikey + "\" };\nvar client  = mqtt.connect('mqtt://" + window.location.hostname + "', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
+              </SyntaxHighlighter>
+            </Suspense>
+
           </div>
         </div>
 
@@ -254,13 +268,15 @@ export class ApiInfo extends Component {
             <h4 className="spot">Python</h4>
             <p>This code is for python users </p>
 
-            <SyntaxHighlighter language="python" style={tomorrowNightBright}>
-              {'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'}
-            </SyntaxHighlighter>
+            <Suspense fallback={<div>Loading...</div>}>
+              <SyntaxHighlighter language="python" style={tomorrowNightBright}>
+                {'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'}
+              </SyntaxHighlighter>
 
-            <SyntaxHighlighter language="python" style={tomorrowNightBright}>
-              {'import json\nimport urllib.request\n\t"data" = {\n\t\t"id": "python3device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib.request.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib.request.urlopen(req, json.dumps(data).encode("utf8"))'}
-            </SyntaxHighlighter>
+              <SyntaxHighlighter language="python" style={tomorrowNightBright}>
+                {'import json\nimport urllib.request\n\t"data" = {\n\t\t"id": "python3device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib.request.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib.request.urlopen(req, json.dumps(data).encode("utf8"))'}
+              </SyntaxHighlighter>
+            </Suspense>
           </div>
         </div>
       </div >
