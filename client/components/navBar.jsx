@@ -369,13 +369,6 @@ export class NavBar extends Component {
     }
   }
 
-  icon = () => {
-    return (
-      <i className="fab fa-google"></i>
-    )
-  }
-
-
   googleSearch = () => {
     return (this.state.focusTwo ?
       <span>
