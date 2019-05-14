@@ -35,17 +35,25 @@ var sequence = 0;
 //   }
 // });
 
+
+
 export function handlePacket(db: any, packet: any, cb: any) {
   if (enablePackets) {
-    iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
-      if (err) console.log(err);
-      if (result) {
-        cb(packet);
-      }
-    })
+    var job1 = jobs.create('I AM DOING SOMETHING',
+      iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
+        if (err) console.log(err);
+        if (result) {
+          cb(packet);
+        }
+      })).priority('high').save(function () {
+        if (!null) console.log(job1.id);
+      });
   } else {
     cb(packet);
   }
+  job1.on('complete', function () {
+    console.log('job ' + sequence + ' DONE!')
+  });
 }
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
