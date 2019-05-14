@@ -377,11 +377,12 @@ export class NavBar extends Component {
   }
 
   buttonOne = () => {
-    return (this.state.focusOne ? <button onClick={() => { this.handleInputFocus(); }} title="Search on PROTOTYP3" className="fas fa-search" /> : null)
+    <i class="fas fa-toggle-on"></i>
+    return (this.state.focusOne ? <button onClick={() => { this.handleInputFocus(); }} title="Search on PROTOTYP3" className="fas fa-toggle-off" /> : null)
   }
 
   buttonTwo = () => {
-    return (this.state.focusTwo ? <button onClick={() => { this.handleInputFocus(); }} title="Search on Google" className="fab fa-google" /> : null)
+    return (this.state.focusTwo ? <button onClick={() => { this.handleInputFocus(); }} title="Search on Google" className="fas fa-toggle-on" /> : null)
   }
 
   searchUser = () => {
