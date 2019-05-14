@@ -47,11 +47,11 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
-    }else if (this.props.notification.type == "INFO") {
+    } else if (this.props.notification.type == "INFO") {
       this.props.notification.type = "INFO"
     }
 
-    if (this.props.notification.type == "NEW DEVICE ADDED"  || this.props.notification.type == "INFO") {
+    if (this.props.notification.type == "NEW DEVICE ADDED" || this.props.notification.type == "INFO") {
       return (
 
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
@@ -141,7 +141,9 @@ export class NavBar extends Component {
       showNav: "",
       showSearch: "none",
       searchIcon: "none",
-      allUsers: []
+      allUsers: [],
+      focusOne: true,
+      focusTwo: false
     }
 
     this.showMenu = this.showMenu.bind(this);
@@ -198,6 +200,14 @@ export class NavBar extends Component {
       }
     }
   }
+
+  handleInputFocusOne = () => {
+    this.setState({ focusOne: !this.state.focusOne });
+  };
+
+  handleInputFocusTwo = () => {
+    this.setState({ focusTwo: !this.state.focusTwo });
+  };
 
   goSettings = (account) => {
 
@@ -359,6 +369,31 @@ export class NavBar extends Component {
     }
   }
 
+  icon = () => {
+    return (
+      <i className="fab fa-google"></i>
+    )
+  }
+
+
+  googleSearch = () => {
+    return (this.state.focusTwo ?
+      <span>
+        <input form="google" type="search" background="fab fa-google" q="q" name="q" title="Search microrobotics" alt="Search Text" maxLength="256px" placeholder="google your device" style={{ marginLeft: "20px", marginTop: "15px", width: "300px" }} />
+        <input form="google" type="hidden" id="cx" name="cx" value="010037255825381096055:z_pvuntdnqw" style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} />
+      </span>
+      : null
+    )
+  }
+
+  buttonOne = () => {
+    return (this.state.focusOne ? <button onClick={() => { this.handleInputFocusOne(); this.handleInputFocusTwo(); }} title="Search on PROTOTYP3" className="fas fa-search" /> : null)
+  }
+  buttonTwo = () => {
+    return (this.state.focusTwo ? <button onClick={() => { this.handleInputFocusOne(); this.handleInputFocusTwo(); }} title="Search on Google" className="fab fa-google" /> : null)
+
+  }
+
   searchUser = () => {
     if (this.state.allUsers.length == 0) {
       return null
@@ -398,7 +433,8 @@ export class NavBar extends Component {
 
       if (this.props.account) {
         if (this.props.account.level > 0) {
-          return (<input type="search" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />)
+          return (this.state.focusOne ? <input type="search" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "15px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />
+            : null)
         }
         else if (this.props.account.level == 0) {
           return null
@@ -445,9 +481,12 @@ export class NavBar extends Component {
               {this.findpeople()}
               {this.account(this.props.account)}
               {this.searchUser()}
+              {this.googleSearch()}
+              {this.buttonOne()}
+              {this.buttonTwo()}
+              <form id="google" method="get" title="Search Form" action="https://cse.google.com/cse/publicurl" style={{ marginLeft: "20px", marginTop: "5px", width: "300px" }} />
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} maxLength="32" />
             {this.searchUser()}
           </div>
         </div>
