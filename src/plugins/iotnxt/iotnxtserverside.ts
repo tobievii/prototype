@@ -18,6 +18,23 @@ var kue = require('kue')
 
 var sequence = 0;
 
+// var Redis = require('ioredis');
+// var kue = require('kue');
+
+// // using https://github.com/72squared/vagrant-redis-cluster
+
+// var queue = kue.createQueue({
+//   redis: {
+//     createClientFactory: function () {
+//       return new Redis.Cluster([{
+//         port: 7000
+//       }, {
+//         port: 7001
+//       }]);
+//     }
+//   }
+// });
+
 export function handlePacket(db: any, packet: any, cb: any) {
   if (enablePackets) {
     iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
@@ -110,7 +127,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     function () {
       sequence += 1;
       (function (sequence) {
-        var job = jobs.create('IOTNXT Connecting queues.',
+        var job = jobs.create('IOTNXT Connecting queues TEST.',
           // CONNECT ALL GATEWAYS AT INIT
           log("IOTNXT Connecting queues." + sequence),
           getgateways(db, (err: Error, gateways: any) => {
@@ -123,16 +140,16 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
             //retry every now and then
             setInterval(() => {
-              log("IOTNXT auto retry gateways.")
-              getgateways(db, (err: Error, gateways: any) => {
-                if (gateways) {
-                  for (var g in gateways) {
-                    if (gateways[g].connected == false) {
-                      connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
+              log("IOTNXT auto retry gateways."),
+                getgateways(db, (err: Error, gateways: any) => {
+                  if (gateways) {
+                    for (var g in gateways) {
+                      if (gateways[g].connected == false) {
+                        connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
+                      }
                     }
                   }
-                }
-              });
+                });
             }, 60 * 1000 * 5) // 5minutes
 
             // enable packets after 5 seconds.
@@ -140,7 +157,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
               log("IOTNXT Enabling packets.")
               enablePackets = true;
             }, 5000)
-          })).save(function () {
+          })).priority('high').save(function () {
             if (!null) console.log(job.id);
           });
 
