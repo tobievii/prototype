@@ -114,7 +114,7 @@ All values are optional. See /src/config.ts for defaults values.
   },
   "httpPort": 80,
   "httpsPort": 443,
-  "mongoConnection": "mongodb://testuser:testpass@mongotest.iotnxt.io:27017/prototype"
+  "mongoConnection": "testuser:testpass@mongotest.iotnxt.io:27017/prototype"
 }
 ```
 
@@ -486,6 +486,7 @@ Add redis to iotconfig.json
 }
 ```
 
+
 # Setup as a service
 
 Create service config file:
@@ -539,3 +540,4 @@ sudo journalctl -u prototype -f
 ```
 
 source: https://www.axllent.org/docs/view/nodejs-service-with-systemd/
+

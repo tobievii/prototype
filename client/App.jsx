@@ -1,21 +1,18 @@
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "./prototype.scss"
 
 import { NavBar } from "./components/navBar.jsx";
+import { AddDevice } from "./components/addDevice.jsx";
 import { Account } from "./public/account.jsx"
 // not logged in content:
 import { Landing } from "./public/landing.jsx"
-
-
 import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-import { Verify } from "./components/verify.jsx";
 import { ApiInfo } from "./components/apiInfo.jsx";
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
@@ -39,18 +36,18 @@ const test = {
     ds: undefined
 }
 
+var visitingG = undefined;
+
 class App extends Component {
-    state = {};
+    state = {
+        devicesView: "dashboardDevices",
+        isOpen: false,
+        registrationPanel: false,
+        public: undefined
+    };
 
     constructor(props) {
         super(props);
-        p.getAccount(account => {
-            this.setState({ account });
-            if (account.level > 0) {
-                socket.emit("join", account.apikey);
-                this.setState({ loggedIn: true })
-            }
-        })
 
         p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
 
@@ -66,6 +63,19 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
+    }
+
+    componentWillMount = () => {
+        p.getAccount(account => {
+            this.setState({ account });
+            if (account.level > 0) {
+                socket.emit("join", account.apikey);
+                this.setState({ loggedIn: true })
+                this.setState({ public: false })
+            } else {
+                this.setState({ public: true })
+            }
+        })
     }
 
     serviceworkerfunction = () => {
@@ -88,12 +98,18 @@ class App extends Component {
             });
 
             socket.on("pushNotification", a => {
-                var message = "has been successfuly added to PROTOTYP3.";
-                if (a.type == "ALARM") {
+                var message = " ";
+
+                if (a.message == undefined || a.message == null) {
+                    if (a.type == "NEW DEVICE ADDED" || a.type == "New dewvice added") {
+                        message = "has been successfuly added to PROTOTYP3.";
+                    } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
+                        message = "hasn't sent data in the last 24hours";
+                    }
+                } else {
                     message = a.message;
-                } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
-                    message = "hasn't sent data in the last 24hours";
                 }
+
                 register.showNotification(a.type, {
                     body: '"' + a.device + '" ' + message,
                     icon: "./iotnxtLogo.png"
@@ -176,12 +192,24 @@ class App extends Component {
     }
 
     home = ({ match }) => {
+        visitingG = false;
         if (this.state.account) {
+            if (match.params.username == undefined) {
+                match.params.username = this.state.account.username;
+            }
             if (this.state.account.level > 0) {
+                var view = undefined;
+
+                if (this.state.devicesView == "dashboard") {
+                    view = this.deviceView(match);
+                } else if (this.state.devicesView == "devices") {
+                    view = <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
+                } else if (this.state.devicesView == "dashboardDevices") {
+                    view = this.deviceView(match);
+                }
                 return (
                     <div>
-                        {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />
+                        {view}
                         <ApiInfo apikey={this.state.account.apikey} />
                         <Stats />
                         <Footer loggedIn={true} />
@@ -190,9 +218,10 @@ class App extends Component {
             } else {
                 return (
                     <div>
-                        <Account account={this.state.account} />
+                        <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} />
+                        {this.deviceView(match)}
+
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -201,26 +230,32 @@ class App extends Component {
         }
     }
 
-    deviceView = ({ match }) => {
+    deviceView = (match) => {
         return (
             <div>
                 <DeviceView
+                    openModal={this.openModal}
+                    mainView={this.state.devicesView}
                     devid={match.params.devid}
                     username={match.params.username}
                     acc={test.acc}
                     deviceCall={test.dc}
                     devices={test.ds}
+                    sendProps={this.setProps}
                     account={this.state.account}
+                    public={this.state.public}
+                    visiting={visitingG}
                 />
             </div>
         )
     }
 
     userView = ({ match }) => {
+        visitingG = true;
         return (
             <div>
                 <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
+                {this.deviceView(match)}
                 <Footer />
             </div>
 
@@ -255,18 +290,37 @@ class App extends Component {
         )
     }
 
+    changeView = (view) => {
+        this.setState({ devicesView: view });
+    }
+
+    openModal = () => {
+        this.setState({ isOpen: true });
+    }
+
+    addDevice = () => {
+        if (this.state.account) {
+            return (
+                <AddDevice register={() => { this.setState({ registrationPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+            )
+        } else {
+            return null
+        }
+    }
+
     render() {
         return (
             <div className="App">
 
                 <Router>
                     <div>
-                        <NavBar version={this.state.version} account={this.state.account} />
+                        <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
+                        {this.addDevice()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
-                        <Route path="/view/:devid" component={this.deviceView} />
-                        <Route exact path="/u/:username" component={this.userView} />
-                        <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
+                        <Route exact path="/uv/:username" component={this.userView} />
+                        <Route exact path="/u/:username/view/:devid" component={this.home} />
+                        <Route exact path="/uv/:username/view/:devid" component={this.userView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />

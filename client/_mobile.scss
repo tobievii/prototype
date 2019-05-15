@@ -2,6 +2,10 @@ $break-small: 320px;
 $break-large: 1200px;
 
 @media(max-width: 600px) {
+    .mock-up {
+        display: block;
+    }
+
     .mapContainer {
         height: 350px;
         margin-top: 70px;

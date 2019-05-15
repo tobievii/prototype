@@ -7,6 +7,7 @@ var randomString = require('random-string');
 import * as fs from 'fs';
 import * as geoip from 'geoip-lite'
 const publicIp = require('public-ip');
+const requestIp = require('request-ip');
 
 import * as scrypt from "scrypt"
 
@@ -49,7 +50,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 import { plugins } from "./plugins/config"
 import * as stats from "./stats"
-//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -63,7 +64,8 @@ app.use('/view', express.static('../client/dist'))
 app.use('/u/:username/view', express.static('../client/dist'))
 
 
-
+// const bluetooth = require('node-bluetooth');
+// const device = new bluetooth.DeviceINQ();
 
 
 //####################################################################
@@ -191,9 +193,41 @@ app.get('/signout', (req, res) => {
   res.redirect('/');
 });
 
+// app.get('/api/v3/scanbluetoothDevices', (req: any, res: any) => {
+//   var devices: any = [];
+//   var done = false;
+//   device
+//     .on('finished', () => { done = true })
+//     .on('found', function found(address: any, name: any) {
+//       // console.log('Found: ' + address + ' with name ' + name);
+//       devices.push({ address: address, name: name })
+//     }).scan();
+
+//   var timerObj = setInterval(() => {
+//     if (done == true) {
+//       clearInterval(timerObj);
+//       res.json(devices)
+//     }
+//   }, 5000)
+// });
+
+// app.get('/api/v3/getPairedDevices', (req: any, res: any) => {
+//   device.listPairedDevices((devices: any) => {
+//     // console.log(devices)
+//     res.json(devices);
+//   });
+
+// });
+
 app.post('/signin', accounts.signInFromWeb(db));
 
 app.get("/u/:username", (req, res) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/uv/:username", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
@@ -226,6 +260,12 @@ app.post("/subscribe", (req: any, res: any) => {
 });
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
+
+app.get("/uv/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
@@ -267,6 +307,12 @@ app.get('/fbp', (req: express.Request | any, res: express.Response | any) => {
 
 app.get('/api/v3/version', (req: any, res: any) => {
   res.json(version);
+})
+
+app.get('/api/v3/publicip', (req: any, res: any) => {
+  const clientIp = requestIp.getClientIp(req);
+  // console.log(clientIp)
+  res.json(clientIp);
 })
 
 app.get('/api/v3/account', (req: any, res: any) => {
@@ -411,7 +457,7 @@ app.post("/api/v3/devicePathPackets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   } else {
-    res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+    res.json({ error: "Please select a device to view device information/dashboard." })
   }
 });
 
@@ -526,7 +572,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
         ///
       }
@@ -549,7 +595,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
 
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 
@@ -589,7 +635,7 @@ async function findstate(req: any, res: any) {
             }
           })
         } else {
-          res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+          res.json({ error: "Please select a device to view device information/dashboard." })
         }
       }
     })
@@ -603,7 +649,7 @@ async function findstate(req: any, res: any) {
         res.json(state);
       })
     } else {
-      res.json({ error: "No id parameter provided to filter states by id. Use GET /api/v3/states instead for all states data." })
+      res.json({ error: "Please select a device to view device information/dashboard." })
     }
   }
 }
@@ -761,28 +807,35 @@ app.get("/api/v3/states/full", (req: any, res: any) => {
 })
 
 app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
-  if (req.user.level == 100) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
+  // if (req.user.level == 100) {
+  //   db.states.aggregate([{
+  //     $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  //   },
+  //   { $unwind: '$fromUsers' }, { $match: { apikey: req.user.apikey } },
+  //   ], (err: Error, result: any) => {
+  //     res.json(result)
+  //   })
+  // }
+  // else if (req.user.level == 0) {
+  db.states.aggregate([{
+    $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
+  },
+  { $unwind: '$fromUsers' }, { $match: { public: true } }, {
+    $project: {
+      uuid: 0, apikey: 0, 'meta.user': 0, 'fromUsers._id': 0, 'fromUsers.uuid': 0,
+      'fromUsers.email': 0, 'fromUsers.apikey': 0, 'fromUsers.password': 0, 'fromUsers.recover': 0, 'fromUsers.notifications': 0, 'fromUsers.lastSeen': 0,
+      'fromUsers.created': 0, 'fromUsers.level': 0, 'fromUsers.shared': 0, 'fromUsers.encrypted': 0, 'fromUsers.sort': 0, 'fromUsers._created_on': 0,
+      'fromUsers.userAgent': 0, 'fromUsers._last_seen': 0, 'fromUsers.emailverified': 0, 'fromUsers.settingsMenuTab': 0, 'fromUsers.ip': 0, 'fromUsers.ipLoc': 0, _id: 0,
+      "meta.uuid": 0, public: 0, notification24: 0
+    }
   }
-  else if (req.user.level == 0) {
-    db.states.aggregate([{
-      $lookup: { from: "users", localField: "meta.user.email", foreignField: "email", as: "fromUsers" }
-    },
-    { $unwind: '$fromUsers' }, { $match: { public: true } },
-    ], (err: Error, result: any) => {
-      res.json(result)
-    })
-  }
+  ], (err: Error, result: any) => {
+    res.json(result)
+  })
+  //}
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
-
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
@@ -950,7 +1003,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
-  //checkExisting(req, res, db);
+  checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
 
@@ -988,44 +1041,35 @@ function handleState(req: any, res: any, next: any) {
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
           if (info.newdevice) {
 
-            // var newDeviceNotification = {
-            //   type: "NEW DEVICE ADDED",
-            //   device: req.body.id,
-            //   created: packet._created_on,
-            //   notified: true,
-            //   seen: false
-            // }
+            var newDeviceNotification = {
+              type: "NEW DEVICE ADDED",
+              device: req.body.id,
+              created: packet._created_on,
+              notified: true,
+              seen: false
+            }
 
-            // createNotification(db, newDeviceNotification, req, Result);
-            // io.to(req.user.username).emit("info", info);
+            createNotification(db, newDeviceNotification, req.user, Result);
+            io.to(req.user.username).emit("info", info);
           }
 
-          // disabled for now:
+          var message = "";
+          var AlarmNotification = {
+            type: "ALARM",
+            device: req.body.id,
+            created: Date.now(),
+            message: message,
+            notified: true,
+            seen: false
+          }
 
-          // var message = "";
-          // var AlarmNotification = {
-          //   type: "ALARM",
-          //   device: req.body.id,
-          //   created: Date.now(),
-          //   message: message,
-          //   notified: true,
-          //   seen: false
-          // }
+          if (Result.boundaryLayer != undefined) {
+            if (Result.boundaryLayer.inbound == false) {
+              AlarmNotification.message = "has gone out of its boundary";
+              createNotification(db, AlarmNotification, req.user, Result);
+            }
+          }
 
-          // if (Result.workflowCode != undefined) {
-          //   if (Result.workflowCode.includes('notifications.alarm1(') && newpacket.err == undefined || newpacket.err == '') {
-          //     AlarmNotification.message = Result.workflowCode.substring(
-          //       Result.workflowCode.lastIndexOf('alarm1("') + 8,
-          //       Result.workflowCode.lastIndexOf('")')
-          //     )
-          //     createNotification(db, AlarmNotification, req, Result);
-          //   }
-          // } else if (Result.boundaryLayer != undefined) {
-          //   if (Result.boundaryLayer.inbound == false) {
-          //     AlarmNotification.message = "has gone out of its boundary";
-          //     createNotification(db, AlarmNotification, req, Result);
-          //   }
-          // }
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
@@ -1346,9 +1390,15 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
           }
         }
 
+        var options = {
+          apikey: state.apikey,
+          devid: state.devid
+        }
+
         for (var plugin of plugins) {
           if (plugin.workflow) {
-            sandbox[plugin.name] = plugin.workflow;
+            var workflow = plugin.workflow;
+            sandbox[plugin.name] = new workflow(options);
           }
         }
 

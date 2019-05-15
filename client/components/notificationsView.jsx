@@ -51,7 +51,7 @@ export class NotificationsView extends Component {
         if (this.state.notifications !== undefined || this.state.notifications.length !== 0) {
 
             var notify = this.state.notifications.reverse().map((notification, i) => {
-                if (notification.type == "CONNECTION DOWN 24HR WARNING") {
+                if (notification.type == "CONNECTION DOWN 24HR WARNING" || notification.type == "WARNING") {
                     return (
                         <div className="warningNotificationItem" key={notification.device + i}>
                             <i className="fas fa-bullhorn"></i>
@@ -74,12 +74,12 @@ export class NotificationsView extends Component {
                 if (notification.type == "New Device Added") {
                     notification.type = "NEW DEVICE ADDED"
                 }
-                if (notification.type == "NEW DEVICE ADDED") {
+                if (notification.type == "NEW DEVICE ADDED" || notification.type == "INFO") {
                     return (
                         <div className="newNotificationItem" key={notification.device + i}>
                             <i className="fas fa-exclamation-circle"></i>
                             <span className="newdevice" >{notification.type}</span><br />
-                            <span className="devicename">{notification.device} has been added</span><br />
+                            <span className="devicename">{notification.device}  {notification.message}</span><br />
                             <span className="lastseen">{moment(notification.created).fromNow()}</span>
                         </div>
                     )
