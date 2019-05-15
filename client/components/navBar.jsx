@@ -446,9 +446,10 @@ export class NavBar extends Component {
           <div className="arrow-up">
             <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
               <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
+                {/*Must move changeViews to dashboard 
                 <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
                   <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
-                </div>
+                </div> */}
                 <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
                   <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
                 </div>

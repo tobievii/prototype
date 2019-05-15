@@ -443,8 +443,8 @@ export class StatesViewerItem extends Component {
     return (
       <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }} onClick={this.adjustMapView(this.props.device)}>
         <div>
-        <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
-        <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
+          <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
+          <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
         </div>
       </Link >
     )
@@ -480,7 +480,6 @@ export class StatesViewerItem extends Component {
               </div>
               <div style={{ paddingTop: "7px" }}>
                 {this.stateListIcons(viewUsed, this.props.device)}
-                {this.mapIcon()}
               </div>
 
               <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
@@ -511,4 +510,4 @@ export class StatesViewerItem extends Component {
       }
     }
   }
-  }   
+}   
