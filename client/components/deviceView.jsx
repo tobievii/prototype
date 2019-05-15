@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from "react";
+import React, { PureComponent, Suspense } from "react";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -11,7 +11,7 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-
+const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
 import moment from 'moment'
 
 library.add(faHdd);
@@ -23,10 +23,11 @@ import * as p from "../prototype.ts"
 
 import socketio from "socket.io-client";
 
-import { Dashboard } from "./dashboard/dashboard.jsx"
+
 import { Editor } from "./editor.jsx"
 import { StatesViewer } from "./statesViewer.jsx";
 var loggedInUser = "";
+
 const customStyles = {
   content: {
     top: '50%',
@@ -400,14 +401,15 @@ export class DeviceView extends PureComponent {
   dashboardColumn = () => {
     return (<div className={this.state.dashboard} >
       {this.editorBlock()}
-
-      <Dashboard
-        username={this.props.username}
-        acc={this.props.acc}
-        deviceCall={this.state.state}
-        devices={this.state.devicesServer}
-        state={this.state.state}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Dashboard
+          username={this.props.username}
+          acc={this.props.acc}
+          deviceCall={this.state.state}
+          devices={this.state.devicesServer}
+          state={this.state.state}
+        />
+      </Suspense>
     </div>)
   }
 

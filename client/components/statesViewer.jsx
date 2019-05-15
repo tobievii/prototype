@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import './react-confirm-alert/src/react-confirm-alert.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
@@ -6,7 +6,9 @@ import * as _ from "lodash"
 import * as p from "../prototype.ts"
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
-import { MapDevices } from "./dashboard/map.jsx"
+
+const MapDevices = React.lazy(() => import('./dashboard/map'))
+
 import Media from "react-media";
 import { confirmAlert } from 'react-confirm-alert';
 
@@ -363,7 +365,7 @@ export class StatesViewer extends Component {
   componentWillMount = () => {
     setTimeout(() => {
       this.getDevices("initial load");
-    }, 500);
+    }, 50);
   }
 
   componentWillUnmount = () => {
@@ -687,7 +689,9 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       return (
         <div className="mapContainer">
-          <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+          </Suspense>
         </div>
       )
     } else {
@@ -726,21 +730,21 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu 
-            mainView={this.props.mainView} 
-            deviceCall={this.state.devicePressed} 
-            boundary={this.state.boundary} 
-            public={this.props.public} 
-            acc={this.props.account} 
-            search={this.search} 
-            selectAll={this.selectAll} 
-            devices={this.state.devicesView} 
-            sort={this.sort} 
-            view={this.changeView} 
-            selectCount={this.state.selectCount} 
-            deleteSelected={this.deleteSelectedDevices} 
-            visiting={this.props.visiting} 
-            public={this.props.public} />
+            <StatesViewerMenu
+              mainView={this.props.mainView}
+              deviceCall={this.state.devicePressed}
+              boundary={this.state.boundary}
+              public={this.props.public}
+              acc={this.props.account}
+              search={this.search}
+              selectAll={this.selectAll}
+              devices={this.state.devicesView}
+              sort={this.sort}
+              view={this.changeView}
+              selectCount={this.state.selectCount}
+              deleteSelected={this.deleteSelectedDevices}
+              visiting={this.props.visiting}
+              public={this.props.public} />
             <div className={"rowList " + this.props.mainView}>
               {this.returnDeviceList()}
               {this.displayMap()}

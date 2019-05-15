@@ -3,7 +3,7 @@ const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
 
 import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
 
-export class ApiInfo extends Component {
+class ApiInfo extends Component {
   state = {
     apiMenu: 1
   };
@@ -283,3 +283,5 @@ export class ApiInfo extends Component {
     );
   }
 }
+
+export default ApiInfo;

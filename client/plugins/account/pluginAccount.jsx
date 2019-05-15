@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { SetUsername } from "./pluginAccount_username.jsx"
 

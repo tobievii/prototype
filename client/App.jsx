@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -13,7 +13,9 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-import { ApiInfo } from "./components/apiInfo.jsx";
+// import { ApiInfo } from "./components/apiInfo.jsx";
+const ApiInfo = lazy(() => import('./components/apiInfo'))
+
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
@@ -210,7 +212,9 @@ class App extends Component {
                 return (
                     <div>
                         {view}
-                        <ApiInfo apikey={this.state.account.apikey} />
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <ApiInfo apikey={this.state.account.apikey} />
+                        </Suspense>
                         <Stats />
                         <Footer loggedIn={true} />
                     </div>
@@ -233,19 +237,21 @@ class App extends Component {
     deviceView = (match) => {
         return (
             <div>
-                <DeviceView
-                    openModal={this.openModal}
-                    mainView={this.state.devicesView}
-                    devid={match.params.devid}
-                    username={match.params.username}
-                    acc={test.acc}
-                    deviceCall={test.dc}
-                    devices={test.ds}
-                    sendProps={this.setProps}
-                    account={this.state.account}
-                    public={this.state.public}
-                    visiting={visitingG}
-                />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <DeviceView
+                        openModal={this.openModal}
+                        mainView={this.state.devicesView}
+                        devid={match.params.devid}
+                        username={match.params.username}
+                        acc={test.acc}
+                        deviceCall={test.dc}
+                        devices={test.ds}
+                        sendProps={this.setProps}
+                        account={this.state.account}
+                        public={this.state.public}
+                        visiting={visitingG}
+                    />
+                </Suspense>
             </div>
         )
     }
