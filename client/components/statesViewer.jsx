@@ -170,7 +170,8 @@ export class StatesViewer extends Component {
     devicePressed: undefined,
     boundary: undefined,
     showB: false,
-    buttonColour: " "
+    buttonColour: " ",
+    tempdev: []
   };
 
   socket = undefined;
@@ -260,7 +261,39 @@ export class StatesViewer extends Component {
   }
 
   getDevices = (functionCall) => {
-    if (this.props.public == true) {
+
+    if (this.props.visiting == true && this.props.public == false) {
+      fetch('/api/v3/user/' + this.props.username, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      }).then(response => response.json()).then((user) => {
+        p.statesByUsername(this.props.username, (states) => {
+          for (var s in states) {
+            states[s].selected = false
+            if (states[s].meta.user.email !== user.email) {
+              states.splice(s)
+            }
+          }
+
+          this.setState({ devicesServer: states }, () => {
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
+            this.setState({ devicesView: states }, () => {
+              this.setState({ devicePressed: states[0] });
+              if (functionCall == "initial load") {
+                this.sort();
+              }
+            })
+          })
+        })
+      }).catch(err => console.error(err.toString()))
+    }
+
+    if (this.props.public == true || this.props.account.level == 0) {
       p.publicStates((states) => {
         for (var s in states) {
           states[s].selected = false
@@ -287,44 +320,24 @@ export class StatesViewer extends Component {
         }).catch(err => console.error(err.toString()));
       })
     }
-    else {
+    else if (this.props.public == false && this.props.visiting == false) {
       p.statesByUsername(this.props.username, (states) => {
         for (var s in states) {
           states[s].selected = false
         }
 
-        if (this.props.account.level == 0) {
-          fetch("/api/v3/states/usernameToDevice", {
-            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-          }).then(response => response.json()).then(serverresponse => {
-            for (var s in serverresponse) {
-              serverresponse[s].selected = false
+        this.setState({ devicesServer: states }, () => {
+          for (var device in this.state.devicesServer) {
+            this.socket.emit("join", this.state.devicesServer[device].key);
+          }
+          this.setState({ devicesView: states }, () => {
+            this.setState({ devicePressed: states[0] });
+            if (functionCall == "initial load") {
+              this.sort();
             }
-            this.setState({ devicesServer: serverresponse }, () => {
-              for (var device in this.state.devicesServer) {
-                this.socket.emit("join", this.state.devicesServer[device].key);
-              }
-              this.setState({ devicesView: serverresponse }, () => {
-                this.setState({ devicePressed: serverresponse[0] });
-                if (functionCall == "initial load") {
-                  this.sort();
-                }
-              })
-            })
-          }).catch(err => console.error(err.toString()));
-        } else {
-          this.setState({ devicesServer: states }, () => {
-            for (var device in this.state.devicesServer) {
-              this.socket.emit("join", this.state.devicesServer[device].key);
-            }
-            this.setState({ devicesView: states }, () => {
-              this.setState({ devicePressed: states[0] });
-              if (functionCall == "initial load") {
-                this.sort();
-              }
-            })
           })
-        }
+        })
+
 
         if (states.length == 0) {
           var url = window.location.origin + "/api/v3/data/post";
@@ -726,21 +739,21 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu 
-            mainView={this.props.mainView} 
-            deviceCall={this.state.devicePressed} 
-            boundary={this.state.boundary} 
-            public={this.props.public} 
-            acc={this.props.account} 
-            search={this.search} 
-            selectAll={this.selectAll} 
-            devices={this.state.devicesView} 
-            sort={this.sort} 
-            view={this.changeView} 
-            selectCount={this.state.selectCount} 
-            deleteSelected={this.deleteSelectedDevices} 
-            visiting={this.props.visiting} 
-            public={this.props.public} />
+            <StatesViewerMenu
+              mainView={this.props.mainView}
+              deviceCall={this.state.devicePressed}
+              boundary={this.state.boundary}
+              public={this.props.public}
+              acc={this.props.account}
+              search={this.search}
+              selectAll={this.selectAll}
+              devices={this.state.devicesView}
+              sort={this.sort}
+              view={this.changeView}
+              selectCount={this.state.selectCount}
+              deleteSelected={this.deleteSelectedDevices}
+              visiting={this.props.visiting}
+              public={this.props.public} />
             <div className={"rowList " + this.props.mainView}>
               {this.returnDeviceList()}
               {this.displayMap()}

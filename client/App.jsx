@@ -43,7 +43,8 @@ class App extends Component {
         devicesView: "dashboardDevices",
         isOpen: false,
         registrationPanel: false,
-        public: undefined
+        public: undefined,
+        visituser: undefined
     };
 
     constructor(props) {
@@ -238,6 +239,7 @@ class App extends Component {
                     mainView={this.state.devicesView}
                     devid={match.params.devid}
                     username={match.params.username}
+                    visituser={this.state.visituser}
                     acc={test.acc}
                     deviceCall={test.dc}
                     devices={test.ds}
@@ -250,11 +252,15 @@ class App extends Component {
         )
     }
 
+    passUserInfo = (info) => {
+        this.setState({ visituser: info })
+    }
+
     userView = ({ match }) => {
         visitingG = true;
         return (
             <div>
-                <UserPage username={match.params.username} />
+                <UserPage visitu={this.passUserInfo} username={match.params.username} />
                 {this.deviceView(match)}
                 <Footer />
             </div>

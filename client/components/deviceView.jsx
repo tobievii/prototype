@@ -465,7 +465,7 @@ export class DeviceView extends Component {
     if (this.props.mainView != "dashboard") {
       viewController = "";
       return (
-        <StatesViewer deviceClicked={() => { this.getDeviceDV(); this.dashboardColumn() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} />
+        <StatesViewer deviceClicked={() => { this.getDeviceDV(); this.dashboardColumn() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} visituser={this.props.visituser} />
       )
     } else {
       viewController = "changeDisplay";
@@ -514,7 +514,6 @@ export class DeviceView extends Component {
               </div>
               <div className="col-7 noDisplay" >
                 <div className="" style={{ display: this.state.shareDisplay }}>
-
                   {this.deleteClearButtons()}
 
                   <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
