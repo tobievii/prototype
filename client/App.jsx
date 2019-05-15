@@ -279,9 +279,26 @@ class App extends Component {
     }
 
     settings = ({ match }) => {
-        return (
-            <SettingsView />
-        )
+        if (this.state.account) {
+            if (this.state.account.level > 0) {
+                return (
+                    <SettingsView />
+                )
+            } else {
+                return (
+                    <div>
+                        return (
+                    <div>
+                            <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
+                            <Landing />
+                            {this.deviceView(match)}
+                            <Footer loggedIn={false} />
+                        </div>)
+                    </div>)
+            }
+        } else {
+            return null
+        }
     }
 
     notifications = ({ match }) => {
