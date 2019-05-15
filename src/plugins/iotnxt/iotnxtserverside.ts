@@ -18,25 +18,6 @@ var kue = require('kue')
 
 var sequence = 0;
 
-// var Redis = require('ioredis');
-// var kue = require('kue');
-
-// // using https://github.com/72squared/vagrant-redis-cluster
-
-// var queue = kue.createQueue({
-//   redis: {
-//     createClientFactory: function () {
-//       return new Redis.Cluster([{
-//         port: 7000
-//       }, {
-//         port: 7001
-//       }]);
-//     }
-//   }
-// });
-
-
-
 export function handlePacket(db: any, packet: any, cb: any) {
   if (enablePackets) {
     var job1 = jobs.create('I AM DOING SOMETHING',

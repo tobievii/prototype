@@ -8,6 +8,8 @@ export class DevicePluginPanel extends React.Component {
     serverGateways: [],
   }
 
+  settingLayout = false;
+
   getAccount = () => {
     fetch("/api/v3/account").then(res => res.json()).then(user => {
       this.setState({ user })
@@ -15,6 +17,7 @@ export class DevicePluginPanel extends React.Component {
   }
 
   getDevice() {
+    console.log(this.props.stateId)
     if (this.props.stateId) {
       fetch("/api/v3/state", {
         method: 'POST',
@@ -26,18 +29,16 @@ export class DevicePluginPanel extends React.Component {
       }).then(response => response.json()).then((data) => {
         if (data.plugins_iotnxt_gateway) {
           this.setState({ deviceGateway: data.plugins_iotnxt_gateway })
+          this.setState({ deviceId: data.devid })
         } else {
-
           this.setState({ deviceGateway: {} })
+          this.setState({ deviceId: data.devid })
         }
       }).catch(err => console.error(this.props.url, err.toString()))
     } else {
       console.log(this.props)
     }
-
   }
-
-
 
   getServerGateways() {
     //SERVER GATEWAYS
@@ -55,6 +56,15 @@ export class DevicePluginPanel extends React.Component {
   }
 
   renderDeviceGateway = () => {
+
+    if (this.settingLayout == false) {
+      this.settingLayout = true;
+      this.getServerGateways();
+      this.getAccount();
+      this.getDevice();
+    } else if (this.settingLayout == true && this.state.deviceId != this.props.stateId) {
+      this.settingLayout = false;
+    }
 
     if (this.state.deviceGateway) {
       if (this.state.deviceGateway.GatewayId) {
