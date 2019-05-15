@@ -280,7 +280,7 @@ export class StatesViewer extends Component {
             }
 
             this.setState({ devicesView: serverresponse }, () => {
-              this.setState({ devicePressed: serverresponse[0] });
+              //this.setState({ devicePressed: serverresponse[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -307,7 +307,7 @@ export class StatesViewer extends Component {
                 this.socket.emit("join", this.state.devicesServer[device].key);
               }
               this.setState({ devicesView: serverresponse }, () => {
-                this.setState({ devicePressed: serverresponse[0] });
+                //this.setState({ devicePressed: serverresponse[0] });
                 if (functionCall == "initial load") {
                   this.sort();
                 }
@@ -320,7 +320,7 @@ export class StatesViewer extends Component {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
             this.setState({ devicesView: states }, () => {
-              this.setState({ devicePressed: states[0] });
+              //this.setState({ devicePressed: states[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -328,7 +328,7 @@ export class StatesViewer extends Component {
           })
         }
 
-        if (states.length == 0) {
+        if (states.length == 0 && this.props.visiting == false) {
           var url = window.location.origin + "/api/v3/data/post";
           setTimeout(() => {
             fetch(url, {

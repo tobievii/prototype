@@ -204,8 +204,8 @@ class App extends Component {
 
                 if (this.state.devicesView == "dashboard") {
                     view = this.deviceView(match);
-                } else if (this.state.devicesView == "devices") {
-                    view = <StatesViewer openModal={this.openModal} mainView={this.state.devicesView} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
+                } else if (this.state.devicesView == "devices" || match.params.devid == undefined) {
+                    view = <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
                 } else if (this.state.devicesView == "dashboardDevices") {
                     view = this.deviceView(match);
                 }
@@ -261,7 +261,7 @@ class App extends Component {
         return (
             <div>
                 <UserPage username={match.params.username} />
-                {this.deviceView(match)}
+                <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
                 <Footer />
             </div>
 
@@ -324,9 +324,8 @@ class App extends Component {
                         {this.addDevice()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
-                        <Route exact path="/uv/:username" component={this.userView} />
+                        <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.home} />
-                        <Route exact path="/uv/:username/view/:devid" component={this.userView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />

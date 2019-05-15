@@ -47,7 +47,7 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
-      
+
     } else if (this.props.notification.type == "INFO") {
       this.props.notification.type = "INFO"
     }
@@ -145,7 +145,7 @@ export class NavBar extends Component {
       allUsers: [],
       popupHeading: "ADD DEVICE BY:",
       popupInfo: "default",
-      devicesView: "dashboardDevices"
+      devicesView: "devices"
     }
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
@@ -391,7 +391,7 @@ export class NavBar extends Component {
             <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden" }}>
               {this.state.allUsers.map((user, i) =>
                 <div style={{ height: "5%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                  <Link to={"/uv/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                  <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                     <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                   </Link>
                 </div>
@@ -404,7 +404,7 @@ export class NavBar extends Component {
           <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
             {this.state.allUsers.map((user, i) =>
               <div style={{ height: "20%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                <Link to={"/uv/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                   <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                 </Link>
               </div>

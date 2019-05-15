@@ -227,12 +227,6 @@ app.get("/u/:username", (req, res) => {
   })
 })
 
-app.get("/uv/:username", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err, data: any) => {
-    res.end(data.toString())
-  })
-})
-
 const webpush = require("web-push");
 
 const publicVapidKey =
@@ -260,12 +254,6 @@ app.post("/subscribe", (req: any, res: any) => {
 });
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
-  fs.readFile('../public/react.html', (err, data: any) => {
-    res.end(data.toString())
-  })
-})
-
-app.get("/uv/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
   })
