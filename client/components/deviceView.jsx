@@ -6,7 +6,7 @@ import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faHdd, faEraser, faDigitalTachograph } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
@@ -14,6 +14,7 @@ import { DataView } from "./dataView.jsx";
 const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
 import moment from 'moment'
 
+library.add(faDigitalTachograph)
 library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
@@ -505,6 +506,18 @@ export class DeviceView extends PureComponent {
     }
   }
 
+  setView = () => {
+    var view = undefined;
+
+    if (this.props.mainView == "dashboard") {
+      view = "dashboardDevices";
+    } else if (this.props.mainView == "dashboardDevices") {
+      view = "dashboard";
+    }
+
+    this.setState({ devicesView: view });
+    this.props.changeMainView(view)
+  }
 
   render() {
     return (
@@ -523,15 +536,20 @@ export class DeviceView extends PureComponent {
 
                   <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
 
-                    <i className="fas fa-share-alt"></i>
+                    <i className="fas fa-share-alt" title="Share device"></i>
                   </div>
 
                   <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 14, fontSize: 18, cursor: "pointer" }} className=""  >
-                    <i className="fas fa-edit"></i>
+                    <i className="fas fa-edit" title="Show/Hide text editor"></i>
                   </div>
                   <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 16, fontSize: 18, cursor: "pointer" }} className=""  >
-                    <i className="fas fa-database"></i>
+                    <i className="fas fa-database" title="Show/Hide device data"></i>
                   </div>
+
+                  <div className="" style={{ width: "auto", float: "right", marginRight: 16, fontSize: 20, cursor: "pointer" }} onClick={this.setView}>
+                    <FontAwesomeIcon icon="digital-tachograph" title="Show/Hide devices" />
+                  </div>
+
                   <div className="faded" style={{ width: "auto", float: "right", marginRight: 16, marginTop: 8, fontSize: 12 }}>{this.state.timeago}</div>
 
                   <ShareList devid={this.props.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />

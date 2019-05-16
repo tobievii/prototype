@@ -337,13 +337,13 @@ export class StatesViewerItem extends Component {
       if (!this.props.device.selectedIcon) {
         return (
           <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
-            <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>
+            <i className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
       } else {
         return (
           <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
-            <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Go To Device"></i>
+            <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
       }
@@ -402,10 +402,10 @@ export class StatesViewerItem extends Component {
       if (this.props.visiting == true) {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
             <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-            <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-            <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"share " + icon}><i title="Share device to users" className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"visibility " + icon}><i title="Share device public" className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             {this.mapIcon(viewUsed)}
           </div>
         )
@@ -414,10 +414,10 @@ export class StatesViewerItem extends Component {
 
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
+            <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
             {this.notifications(icon, device)}
-            <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
-            <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
+            <span className={"share " + icon}><i title="Share device to users" onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
+            <span className={"visibility " + icon}><i title="Share device public" onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
             {this.mapIcon(viewUsed)}
           </div>
         )
@@ -427,10 +427,10 @@ export class StatesViewerItem extends Component {
     else if (this.props.public == true) {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-          <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+          <span className={"share " + icon}><i title="Share device to users" className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+          <span className={"visibility " + icon}><i title="Share device public" className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
         </div>
       )

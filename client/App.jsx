@@ -231,6 +231,7 @@ class App extends Component {
                     <DeviceView
                         openModal={this.openModal}
                         mainView={this.state.devicesView}
+                        changeMainView={this.changeView}
                         devid={match.params.devid}
                         username={match.params.username}
                         acc={test.acc}
