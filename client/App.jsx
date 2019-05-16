@@ -290,16 +290,14 @@ class App extends Component {
                     <SettingsView />
                 )
             } else {
-                return (
-                    <div>
+                
                         return (
                     <div>
                             <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                             <Landing />
                             <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
                             <Footer loggedIn={false} />
-                        </div>)
-                    </div>)
+                        </div>)                   
             }
         } 
     }
