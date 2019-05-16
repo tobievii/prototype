@@ -200,18 +200,9 @@ class App extends Component {
                 match.params.username = this.state.account.username;
             }
             if (this.state.account.level > 0) {
-                var view = undefined;
-
-                if (this.state.devicesView == "dashboard") {
-                    view = this.deviceView(match);
-                } else if (this.state.devicesView == "devices" || match.params.devid == undefined) {
-                    view = <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />;
-                } else if (this.state.devicesView == "dashboardDevices") {
-                    view = this.deviceView(match);
-                }
                 return (
                     <div>
-                        {view}
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
                         <Suspense fallback={<div>Loading...</div>}>
                             <ApiInfo apikey={this.state.account.apikey} />
                         </Suspense>
@@ -224,8 +215,7 @@ class App extends Component {
                     <div>
                         <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        {this.deviceView(match)}
-
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -234,7 +224,7 @@ class App extends Component {
         }
     }
 
-    deviceView = (match) => {
+    deviceView = ({ match }) => {
         return (
             <div>
                 <Suspense fallback={<div>Loading...</div>}>
@@ -325,7 +315,7 @@ class App extends Component {
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route exact path="/u/:username" component={this.userView} />
-                        <Route exact path="/u/:username/view/:devid" component={this.home} />
+                        <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />
