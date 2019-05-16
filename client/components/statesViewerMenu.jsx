@@ -79,17 +79,15 @@ export class StatesViewerMenu extends Component {
     menuDeleteButton = () => {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
-                if (this.props.mainView == "devices") {
-                    if (this.props.selectCount > 0) {
-                        return (
-                            <div className="protoButton protoButtonClickable" style={{ background: "rgba(255,0,0, 0.6)", float: "left", margin: "2px 10px 0px 10px" }} title={this.props.selectCount + " selected."}
-                                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
-                        )
-                    } else {
-                        return (
-                            <div className="protoButton" style={{ float: "left", margin: "2px 10px 0px 10px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
-                        )
-                    }
+                if (this.props.selectCount > 0) {
+                    return (
+                        <div className="protoButton protoButtonClickable" style={{ background: "rgba(255,0,0, 0.6)", float: "left", margin: "2px 10px 0px 10px" }} title={this.props.selectCount + " selected."}
+                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+                    )
+                } else {
+                    return (
+                        <div className="protoButton" style={{ float: "left", margin: "2px 10px 0px 10px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                    )
                 }
             }
         }
@@ -106,7 +104,6 @@ export class StatesViewerMenu extends Component {
             }
         }
     }
-
 
     viewButtonClicked = (action) => {
         return (e) => {
@@ -146,100 +143,6 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-
-    inputDeviceShow = () => {
-        if (this.state.showAddDevice == "none") {
-            this.setState({ menu: "none" })
-            this.setState({ addIcon: "fas fa-minus-circle" })
-            this.setState({ showAddDevice: "" })
-        }
-        else if (this.state.showAddDevice == "") {
-
-            this.setState({ menu: "" })
-            this.setState({ addIcon: "fas fa-plus-circle" })
-            this.setState({ showAddDevice: "none" })
-        }
-    }
-
-    ssid = (ssid) => {
-        return (evt) => {
-            this.setState({ ssid: evt.target.value })
-        }
-    }
-
-    wifiPassword = (wifipass) => {
-        return (evt) => {
-            this.setState({ wifipass: evt.target.value })
-        }
-    }
-    bits = () => {
-        var data = Buffer.from(JSON.stringify({ wifi: { ssid: this.state.ssid, pass: this.state.wifipass } }))
-
-        for (var a = 0; a < data.length; a++) {
-            var byte = data[a].toString(2)
-            for (var b = 0; b <= 8 - byte.length; b++) {
-                byte = "0" + byte;
-            }
-            this.state.code.push(byte)
-        }
-        this.openModal()
-    }
-
-    addButton = () => {
-        if (window.innerWidth > 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ width: "15%", float: "right", marginLeft: "2%", cursor: "not-allowed", opacity: "0.4", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ width: "15%", float: "right", marginLeft: "2%", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
-        }
-
-        else if (window.innerWidth < 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ marginTop: "30px", width: "50%", float: "right", cursor: "not-allowed", opacity: "0.4", marginLeft: "400px", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ marginTop: "30px", width: "50%", float: "right", textAlign: "center", marginLeft: "400px", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
-        }
-    }
-
-    addDevice = () => {
-        if (this.props.public == false || this.props.visiting == false) {
-            if (window.innerWidth > 667) {
-                return (
-                    <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer" }} onClick={this.inputDeviceShow}></i>
-                        <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "25%", marginRight: "5px" }} required />
-                            WIFI password: <input name="wifipass" type="text" style={{ width: "25%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required />{this.addButton()}</div>
-                    </div >
-                )
-            }
-            else if (window.innerWidth < 667) {
-                return (
-                    <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
-                        <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
-                            WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
-                    </div >
-                )
-            }
-        }
-        else {
-            return (
-                <div></div>
-            )
-        }
-    }
-
-
     changeSearch = () => {
         if (searchButton == "icon") {
             searchButton = "filter"
@@ -251,13 +154,7 @@ export class StatesViewerMenu extends Component {
     }
 
     changeClass = () => {
-        if (searchButton == "icon" && this.props.mainView != "devices") {
-            return (
-                <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                    <i onClick={this.changeSearch} className="fas fa-search"></i>
-                </div>
-            )
-        } else if (searchButton == "filter" || this.props.mainView == "devices") {
+        if (this.props.mainView == "devices") {
             return (
                 <div>
                     <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
@@ -270,6 +167,35 @@ export class StatesViewerMenu extends Component {
                     </span>
                 </div>
             )
+        } else return null
+    }
+
+    filterSection = () => {
+        if (this.props.mainView != "devices") {
+            return (
+                <div className="row" style={{ padding: 5 }}>
+
+                    <div>
+                        <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
+                            <i style={{ marginTop: 13 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                        </span>
+                        <span style={{ padding: 0 }}>
+                            <form id="search" style={{ flex: "0 0 200px", textAlign: "left", float: "right", marginTop: 2 }}>
+                                <input name="query" type="search" onChange={this.props.search} style={{ width: "100%" }} placeholder="search for device..." />
+                            </form>
+                        </span>
+                    </div>
+
+                    <span className="col" style={{ flex: "0 0 100px" }} >
+                        <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
+                        <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
+                            {this.sortButtons()}
+                        </div>
+                    </span>
+                </div>
+            )
+        } else {
+            return null
         }
     }
 
@@ -282,28 +208,16 @@ export class StatesViewerMenu extends Component {
                             {this.selectBox()}
                         </div>
                     </span>
-
                     <span>
-
-
-
                         {this.changeClass()}
-
                     </span >
-
                     <span className={this.state.display} style={{ width: "80%", float: "right" }} >
                         <span className="col" >
                             {this.menuDeleteButton()}
                         </span>
-
-                        <span className="col" style={{ flex: "0 0 10px" }} >
-                            <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
-                            <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
-                                {this.sortButtons()}
-                            </div>
-                        </span>
                     </span>
                 </div >
+                {this.filterSection()}
             </div >
         )
     }

@@ -651,22 +651,6 @@ export class StatesViewer extends Component {
     )
   }
 
-  deleteButton = () => {
-    if (this.props.public == false) {
-      if (this.props.visiting == false) {
-        if (this.state.selectCount > 0) {
-          return (
-            <span className={"commanderBgPanel commanderBgPanelClickable " + this.state.buttonColour} onClick={() => this.clickDeleteConfirmation()} style={{ marginLeft: 3, padding: "15px 0px" }}>REMOVE DEVICE</span>
-          )
-        } else {
-          return (
-            <span className={"commanderBgPanel commanderBgPanelClickable " + this.state.buttonColour} style={{ opacity: 0.3, cursor: "not-allowed", marginLeft: 3, padding: "15px 0px" }} title="Select some devices first...">REMOVE DEVICE</span>
-          )
-        }
-      }
-    }
-  }
-
   clickDeleteConfirmation = () => {
     confirmAlert({
       customUI: ({ onClose }) => {
@@ -708,9 +692,11 @@ export class StatesViewer extends Component {
       return null
     } else {
       return (
-        <div className="buttonsSeperate" style={{ marginBottom: 7 }}>
-          <span className={"commanderBgPanel commanderBgPanelClickable sucess"} style={{ marginRight: 3, padding: "15px 0px" }} onClick={() => { this.props.openModal() }}> ADD DEVICE </span>
-          {this.deleteButton()}
+        <div className="buttonsSeperate" style={{ marginRight: "auto", marginLeft: "auto" }}>
+          <span className={"commanderBgPanel commanderBgPanelClickable sucess"} style={{ padding: "4px 0px" }} onClick={() => { this.props.openModal() }}>
+            <i className="fas fa-plus"></i>  ADD DEVICE
+          </span>
+          <div style={{ background: "#14222c", paddingTop: "3px" }} >DEVICE LIST</div>
         </div>
       )
     }
@@ -724,7 +710,7 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
+            <StatesViewerMenu openModal={() => this.props.openModal()} mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
             <div className="rowList2">
               {this.returnDeviceList()}
             </div>
@@ -735,6 +721,7 @@ export class StatesViewer extends Component {
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
             <StatesViewerMenu
+              openModal={() => this.props.openModal()}
               mainView={this.props.mainView}
               deviceCall={this.state.devicePressed}
               boundary={this.state.boundary}

@@ -308,7 +308,6 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-
                 <Router>
                     <div>
                         <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />

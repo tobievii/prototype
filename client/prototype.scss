@@ -1169,6 +1169,7 @@ input[type="color"] {
 
 .protoMenu {
   background: rgba(3, 4, 5, 0.15);
+  padding: 0px 10px !important;
 }
 
 /* BUTTONS */
@@ -1398,7 +1399,7 @@ PLUGIN
 .buttonsSeperate {
   // display: -ms-grid;
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 30% 70%;
   text-align: center;
 }
 
@@ -1407,9 +1408,13 @@ PLUGIN
   color: White;
 }
 
-.sucess:hover {
+.sucess {
   background: rgba(19, 196, 84, 0.6) !important;
   color: White;
+}
+
+.sucess:hover {
+  color: White !important;
 }
 
 pre {
@@ -1420,7 +1425,7 @@ pre {
 }
 
 pre code {
-  color: #ccc;  
+  color: #ccc;
 }
 
 button {
