@@ -300,6 +300,9 @@ class App extends Component {
                         </div>)                   
             }
         } 
+        else {
+            return null
+        }
     }
 
     notifications = ({ match }) => {
