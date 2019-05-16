@@ -2,15 +2,12 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt, faEye, faPlus, faTasks, faDigitalTachograph, faChartBar } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt, faEye, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons'
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import moment from 'moment'
-import { confirmAlert } from 'react-confirm-alert';
 
-library.add(faChartBar)
-library.add(faDigitalTachograph)
 library.add(faCog)
 library.add(faEye)
 library.add(faPlus)
@@ -19,6 +16,8 @@ library.add(faBell);
 library.add(faSignOutAlt)
 library.add(faUserEdit)
 library.add(faTasks)
+// library.add(faChartBar)
+// library.add(faDigitalTachograph)
 
 
 export class Notification extends Component {
@@ -47,7 +46,7 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
-      
+
     } else if (this.props.notification.type == "INFO") {
       this.props.notification.type = "INFO"
     }
@@ -125,7 +124,6 @@ export class Notification extends Component {
   }
 }
 
-
 export class NavBar extends Component {
 
   constructor(props) {
@@ -145,7 +143,7 @@ export class NavBar extends Component {
       allUsers: [],
       popupHeading: "ADD DEVICE BY:",
       popupInfo: "default",
-      devicesView: "dashboardDevices"
+      devicesView: "devices"
     }
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
@@ -339,7 +337,7 @@ export class NavBar extends Component {
           <div style={{ padding: "20px 20px 20px 20px 20px", float: "right", paddingRight: "20px", paddingTop: "18px" }}>
             <span className="navLink" style={{ float: "left", marginRight: "25px", display: this.state.searchIcon }}>{this.findPerson()}</span>
             <span className="navLink" style={{ float: "left", marginRight: "28px", fontSize: "17px" }}>{this.addDeviceButton()}</span>
-            <span className="navLink" style={{ float: "left", marginRight: "2px", fontSize: "18px" }}>{this.changeViews(account)}</span>
+            {/* <span className="navLink" style={{ float: "left", marginRight: "2px", fontSize: "18px" }}>{this.changeViews(account)}</span> */}
             <span className="navLink" style={{ float: "left" }}>{this.goSettings(account)}</span>
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
             <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
@@ -391,7 +389,7 @@ export class NavBar extends Component {
             <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden" }}>
               {this.state.allUsers.map((user, i) =>
                 <div style={{ height: "5%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                  <Link to={"/uv/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                  <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                     <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                   </Link>
                 </div>
@@ -404,7 +402,7 @@ export class NavBar extends Component {
           <div id="data" style={{ marginLeft: "43px", width: "80%", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden", marginTop: "-1px", display: this.state.showSearch }}>
             {this.state.allUsers.map((user, i) =>
               <div style={{ height: "20%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                <Link to={"/uv/" + user.username} onClick={this.out}><div>{user.username}<br></br>
+                <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
                   <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
                 </Link>
               </div>
@@ -433,39 +431,40 @@ export class NavBar extends Component {
     this.setState({ showSearch: "none" })
   }
 
-  setView = (view) => {
-    this.setState({ devicesView: view });
-    this.props.mainView(view)
-  }
+  // setView = (view) => {
+  //   this.setState({ devicesView: view });
+  //   this.props.mainView(view)
+  // }
 
-  changeViews = (account) => {
-    return (
-      <div className="dropdown">
-        <FontAwesomeIcon icon="eye" title="Change main view" onClick={() => this.showDropdownMenu("views")} />
-        {this.state.displayViews ? (
-          <div className="arrow-up">
-            <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
-              <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
-                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
-                  <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
-                </div>
-                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
-                  <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
-                </div>
-                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboardDevices")}>
-                  <FontAwesomeIcon icon="digital-tachograph" />  DASHBOARD WITH DEVICES
-                </div>
-              </div>
-            </div>
-          </div>
-        ) :
-          (
-            null
-          )
-        }
-      </div>
-    );
-  }
+  // changeViews = (account) => {
+  //   return (
+  //     <div className="dropdown">
+  //       <FontAwesomeIcon icon="eye" title="Change main view" onClick={() => this.showDropdownMenu("views")} />
+  //       {this.state.displayViews ? (
+  //         <div className="arrow-up">
+  //           <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
+  //             <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
+  //               {/*Must move changeViews to dashboard 
+  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
+  //                 <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
+  //               </div> */}
+  //               {/* <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
+  //                 <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
+  //               </div> */}
+  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboardDevices")}>
+  //                 <FontAwesomeIcon icon="digital-tachograph" />  DASHBOARD WITH DEVICES
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       ) :
+  //         (
+  //           null
+  //         )
+  //       }
+  //     </div>
+  //   );
+  // }
 
   addDeviceButton = () => {
     return (
