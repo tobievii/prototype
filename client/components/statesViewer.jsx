@@ -19,37 +19,35 @@ library.add(faSortAmountDown);
 
 import socketio from "socket.io-client";
 
-var testV = "device4"
+// export class Pagination extends Component {
 
-export class Pagination extends Component {
+//   onClick = (button) => {
+//     return evt => {
+//       this.props.onPageChange(button)
+//     }
+//   }
 
-  onClick = (button) => {
-    return evt => {
-      this.props.onPageChange(button)
-    }
-  }
+//   calcClass = (button) => {
+//     if (button.active) {
+//       return "pagination paginationActive"
+//     } else {
+//       return "pagination"
+//     }
 
-  calcClass = (button) => {
-    if (button.active) {
-      return "pagination paginationActive"
-    } else {
-      return "pagination"
-    }
+//   }
 
-  }
-
-  render() {
-    if (this.props.pages.length > 1) {
-      return (<div style={{ marginLeft: "8px" }}>
-        {
-          this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
-        }
-      </div>)
-    } else {
-      return (<div></div>)
-    }
-  }
-}
+//   render() {
+//     if (this.props.pages.length > 1) {
+//       return (<div style={{ marginLeft: "8px" }}>
+//         {
+//           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
+//         }
+//       </div>)
+//     } else {
+//       return (<div></div>)
+//     }
+//   }
+// }
 
 export class DeviceList extends Component {
 
@@ -85,9 +83,9 @@ export class DeviceList extends Component {
     activePage: 1
   }
 
-  onPageChange = (data) => {
-    this.setState({ activePage: data.text })
-  }
+  // onPageChange = (data) => {
+  //   this.setState({ activePage: data.text })
+  // }
 
   handleActionCall = (a) => {
     return (e) => {
@@ -102,21 +100,9 @@ export class DeviceList extends Component {
   }
 
   render() {
-
     if (this.props.devices == undefined) {
       return null
     }
-
-    var pagesNum = Math.ceil(this.props.devices.length / this.props.max);
-
-
-    //if (pagesNum < this.state.activePage) { this.setState({activePage : 1 })}
-
-    var pages = [];
-    for (var a = 1; a <= pagesNum; a++) {
-      pages.push({ text: a, active: (this.state.activePage == a) });
-    }
-
 
     if (this.props.devices.length == 0) {
       return (
@@ -133,11 +119,11 @@ export class DeviceList extends Component {
 
       var devicelist = _.clone(this.props.devices);
 
-      if (this.props.max) {
-        var start = this.props.max * (this.state.activePage - 1)
-        var end = this.props.max * this.state.activePage
-        devicelist = devicelist.slice(start, end);
-      }
+      // if (this.props.max) {
+      //   var start = this.props.max * (this.state.activePage - 1)
+      //   var end = this.props.max * this.state.activePage
+      //   devicelist = devicelist.slice(start, end);
+      // }
 
       if (devicelist.length == 0) {
         if (this.state.activePage != 1) {
@@ -148,7 +134,7 @@ export class DeviceList extends Component {
       return (
         <div>
           {devicelist.map(device => <StatesViewerItem mainView={this.props.mainView} public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.key)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />)}
-          <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+          {/* <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div> */}
         </div>
       )
     }
@@ -256,9 +242,6 @@ export class StatesViewer extends Component {
         this.handleDevicePacket(packet)
       })
     });
-
-    // setTimeout(() => {
-    // }, 500);
   }
 
   getDevices = (functionCall) => {
@@ -623,31 +606,20 @@ export class StatesViewer extends Component {
   }
 
   returnDeviceList = () => {
-    return (
-      <Media query="(max-width: 599px)">
-        {matches => {
-          var num = 0;
-          if (window.innerHeight >= 800 && window.innerHeight < 1007) {
-            num = 14;
-          } else if (window.innerHeight >= 1007 && window.innerHeight < 2014) {
-            num = 19;
-          }
+    var height = 0;
 
-          if (num == 0) {
-            matches ? (
-              num = 10
-            ) : (
-                num = 14
-              )
-          }
-          return (
-            <div >
-              <DeviceList mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={num} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
-            </div>
-          )
-        }
-        }
-      </Media>
+    if (this.props.mainView == "devices") {
+      height = 180;
+    } else {
+      height = 250;
+    }
+
+    return (
+      <div style={{ overflowY: "auto", height: window.innerHeight - height + "px" }}>
+        <div style={{ overflowY: "auto", padding: 5, paddingLeft: 0 }} >
+          <DeviceList mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
+        </div>
+      </div>
     )
   }
 
@@ -676,7 +648,7 @@ export class StatesViewer extends Component {
   displayMap = () => {
     if (this.props.mainView == "devices") {
       return (
-        <div className="mapContainer">
+        <div className="mapContainer" style={{ height: window.innerHeight - 142 + "px" }}>
           <Suspense fallback={<div>Loading...</div>}>
             <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
           </Suspense>
@@ -696,7 +668,7 @@ export class StatesViewer extends Component {
           <span className={"commanderBgPanel commanderBgPanelClickable sucess"} style={{ padding: "4px 0px" }} onClick={() => { this.props.openModal() }}>
             <i className="fas fa-plus"></i>  ADD DEVICE
           </span>
-          <div style={{ background: "#14222c", paddingTop: "3px" }} >DEVICE LIST</div>
+          <div style={{ background: "#1B2936", paddingTop: "3px" }} >DEVICE LIST</div>
         </div>
       )
     }
@@ -706,6 +678,8 @@ export class StatesViewer extends Component {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
     } else {
+      var count = 0;
+      var selected = 0;
       if (this.state.view == "list") {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
@@ -720,7 +694,7 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu
+            < StatesViewerMenu
               openModal={() => this.props.openModal()}
               mainView={this.props.mainView}
               deviceCall={this.state.devicePressed}
@@ -736,11 +710,33 @@ export class StatesViewer extends Component {
               deleteSelected={this.deleteSelectedDevices}
               visiting={this.props.visiting}
               public={this.props.public} />
-            <div className={"rowList " + this.props.mainView}>
-              {this.returnDeviceList()}
+            <div className={"rowList " + this.props.mainView} style={{ background: "#16202C" }}>
+              <div>
+                {this.returnDeviceList()}
+                <div className="container-fluid" style={{ padding: 0 }} >
+                  {
+                    this.state.devicesServer.map(device => {
+                      count++;
+                      if (device.selected == true) {
+                        selected++;
+                      }
+                      if (count == this.state.devicesServer.length) {
+                        return (
+                          <div className="row" style={{ background: "#0E1925", margin: "0px" }}>
+                            <div style={{ padding: 5, flex: "0 50%", paddingLeft: 10 }} >{selected} SELECTED</div>
+                            <div style={{ padding: 5, flex: "0 50%", textAlign: "right", paddingRight: 11 }} >{count} TOTAL</div>
+                          </div>
+                        )
+                      } else {
+                        return null
+                      }
+                    })
+                  }
+                </div>
+              </div>
               {this.displayMap()}
             </div>
-          </div>
+          </div >
         )
       }
     }

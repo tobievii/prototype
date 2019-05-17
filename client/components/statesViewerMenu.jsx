@@ -26,7 +26,22 @@ const customStyles = {
 export class StatesViewerMenu extends Component {
     constructor() {
         super();
-        this.state = { selectAll: false, sort: "", menu: "", view: "map", addIcon: "fas fa-plus-circle", display: "", showAddDevice: "none", addDeviceButton: "none", ssid: "", wifipass: "", code: [], modalIsOpen: false }
+        this.state = {
+            selectAll: false,
+            sort: "",
+            menu: "",
+            view: "map",
+            addIcon: "fas fa-plus-circle",
+            display: "",
+            showAddDevice: "none",
+            addDeviceButton: "none",
+            ssid: "",
+            wifipass: "",
+            code: [],
+            modalIsOpen: false,
+            sortAscending: <i className="fas fa-sort-up"></i>,
+            sortDescending: <i className="fas fa-sort-down"></i>,
+        }
 
         fetch("/api/v3/getsort", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -42,9 +57,9 @@ export class StatesViewerMenu extends Component {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
                 if (this.state.selectAll) {
-                    return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
+                    return (<span style={{ cursor: "pointer", margin: "8px 15px 0px 0px" }} onClick={this.selectBoxClickHandler(false)}><i className="fas fa-check-double" title="Deselect All" /> DESELECT ALL </span>)
                 } else {
-                    return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+                    return (<span style={{ cursor: "pointer", opacity: 0.3, margin: "8px 15px 0px 0px" }} onClick={this.selectBoxClickHandler(true)}><i className="fas fa-check-double" title="Select All" /> SELECT ALL </span>)
                 }
             }
         }
@@ -81,12 +96,12 @@ export class StatesViewerMenu extends Component {
             if (this.props.visiting == false) {
                 if (this.props.selectCount > 0) {
                     return (
-                        <div className="protoButton protoButtonClickable" style={{ background: "rgba(255,0,0, 0.6)", float: "left", margin: "2px 10px 0px 10px" }} title={this.props.selectCount + " selected."}
-                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
+                        <span className="protoButton protoButtonClickable" style={{ fontWeight: "normal", padding: "2px 5px", background: "rgba(255,0,0, 0.6)", float: "left", margin: "7px 15px 0px" }} title={this.props.selectCount + " selected."}
+                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash-alt" /> DELETE</span>
                     )
                 } else {
                     return (
-                        <div className="protoButton" style={{ float: "left", margin: "2px 10px 0px 10px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
+                        <span className="" style={{ float: "left", margin: "8px 15px 0px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash-alt" /> DELETE</span>
                     )
                 }
             }
@@ -158,7 +173,7 @@ export class StatesViewerMenu extends Component {
             return (
                 <div>
                     <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                        <i style={{ marginTop: 13 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                        <i style={{ marginTop: 12 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
                     </span>
                     <span style={{ padding: 0 }}>
                         <form id="search" style={{ flex: "0 0 240px", textAlign: "left", float: "right", marginTop: 2 }}>
@@ -174,24 +189,50 @@ export class StatesViewerMenu extends Component {
         if (this.props.mainView != "devices") {
             return (
                 <div className="row" style={{ padding: 5 }}>
+                    <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                        <i className="fas fa-sort"></i>
+                    </span>
 
-                    <div>
-                        <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                            <i style={{ marginTop: 13 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
-                        </span>
-                        <span style={{ padding: 0 }}>
-                            <form id="search" style={{ flex: "0 0 200px", textAlign: "left", float: "right", marginTop: 2 }}>
-                                <input name="query" type="search" onChange={this.props.search} style={{ width: "100%" }} placeholder="search for device..." />
-                            </form>
-                        </span>
-                    </div>
+                    <span className="col" style={{ flex: "0 0 60px", padding: "10px 2px 0px 12px" }}>
+                        <i className="fas fa-sort"></i> A-Z
+                    </span>
 
-                    <span className="col" style={{ flex: "0 0 100px" }} >
+                    <span className="col" style={{ flex: "0 0 10px", padding: "10px 3px 0px 5px" }}>
+                        <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                    </span>
+
+                    <span id="search" style={{ flex: "0 0 100px", textAlign: "left", float: "right", marginTop: 2 }}>
+                        <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "auto", border: "1px solid grey" }} placeholder="search for device..." />
+                    </span>
+
+                    <span className="col" style={{ flex: "0 0 100px", padding: "10px 2px 0px 8px" }}>
+                        <i className="fas fa-sort"></i> LATEST
+                    </span>
+
+                    <span style={{ textAlign: "right", paddingTop: 10 }}>
+                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                            <i className="fas fa-sort"></i>
+                        </span>
+
+                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                            <i className="fas fa-sort"></i>
+                        </span>
+
+                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                            <i className="fas fa-sort"></i>
+                        </span>
+
+                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                            <i className="fas fa-sort"></i>
+                        </span>
+                    </span>
+
+                    {/* <span className="col" style={{ flex: "0 0 100px" }} >
                         <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
                         <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
                             {this.sortButtons()}
                         </div>
-                    </span>
+                    </span> */}
                 </div>
             )
         } else {
@@ -201,20 +242,18 @@ export class StatesViewerMenu extends Component {
 
     render() {
         return (
-            < div className="container-fluid protoMenu" >
+            < div className="container-fluid protoMenu" style={{ background: "#101A24" }} >
                 <div className="row" style={{ padding: 5 }} >
                     <span>
-                        <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
+                        <div className="col" style={{ flex: "0 0 35px", padding: "9px 0 0 10px", display: this.state.menu }}>
                             {this.selectBox()}
                         </div>
                     </span>
-                    <span>
-                        {this.changeClass()}
-                    </span >
-                    <span className={this.state.display} style={{ width: "80%", float: "right" }} >
-                        <span className="col" >
+                    {this.changeClass()}
+                    <span className={this.state.display}>
+                        <div className="col" style={{ flex: "0 0 35px" }}>
                             {this.menuDeleteButton()}
-                        </span>
+                        </div>
                     </span>
                 </div >
                 {this.filterSection()}
