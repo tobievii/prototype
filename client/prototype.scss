@@ -607,6 +607,19 @@ input[type="color"] {
   text-transform: uppercase;
 }
 
+.btn-spot2 {
+  color: #eee;
+  background-color: #707070;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  padding: 10px 13px 6px 13px;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 .btn-spot:hover {
   color: #fff;
   background-color: #f3353a;
@@ -1420,7 +1433,7 @@ pre {
 }
 
 pre code {
-  color: #ccc;  
+  color: #ccc;
 }
 
 button {
