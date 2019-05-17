@@ -80,11 +80,11 @@ export class StatesViewerMenu extends Component {
 
     sortClickHandler = (action) => {
         return (e) => {
-            fetch("/api/v3/sort", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ sort: action })
-            }).then(response => response.json()).then(serverresponse => {
-            }).catch(err => console.error(err.toString()));
+            // fetch("/api/v3/sort", {
+            //     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            //     body: JSON.stringify({ sort: action })
+            // }).then(response => response.json()).then(serverresponse => {
+            // }).catch(err => console.error(err.toString()));
 
             this.setState({ sort: action })
             this.props.sort(action);
@@ -189,40 +189,40 @@ export class StatesViewerMenu extends Component {
         if (this.props.mainView != "devices") {
             return (
                 <div className="row" style={{ padding: 5 }}>
-                    <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                    <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
                         <i className="fas fa-sort"></i>
                     </span>
 
-                    <span className="col" style={{ flex: "0 0 60px", padding: "10px 2px 0px 12px" }}>
+                    <span className="col  filterButton" style={{ flex: "0 0 60px", padding: "10px 2px 0px 12px", cursor: "pointer" }} onClick={this.sortClickHandler("namedesc")}>
                         <i className="fas fa-sort"></i> A-Z
                     </span>
 
-                    <span className="col" style={{ flex: "0 0 10px", padding: "10px 3px 0px 5px" }}>
+                    <span className="col  filterButton" style={{ flex: "0 0 10px", padding: "10px 3px 0px 5px", cursor: "pointer" }}>
                         <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
                     </span>
 
-                    <span id="search" style={{ flex: "0 0 100px", textAlign: "left", float: "right", marginTop: 2 }}>
+                    <span id="search" style={{ flex: "0 0 100px", textAlign: "left", float: "right", marginTop: 2, cursor: "pointer" }}>
                         <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "auto", border: "1px solid grey" }} placeholder="search for device..." />
                     </span>
 
-                    <span className="col" style={{ flex: "0 0 100px", padding: "10px 2px 0px 8px" }}>
+                    <span className="col filterButton" style={{ flex: "0 0 100px", padding: "10px 2px 0px 8px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
                         <i className="fas fa-sort"></i> LATEST
                     </span>
 
                     <span style={{ textAlign: "right", paddingTop: 10 }}>
-                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
                             <i className="fas fa-sort"></i>
                         </span>
 
-                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
                             <i className="fas fa-sort"></i>
                         </span>
 
-                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
                             <i className="fas fa-sort"></i>
                         </span>
 
-                        <span className="col" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px" }}>
+                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
                             <i className="fas fa-sort"></i>
                         </span>
                     </span>
@@ -236,7 +236,28 @@ export class StatesViewerMenu extends Component {
                 </div>
             )
         } else {
-            return null
+            return (
+                // <span>
+                //     <span style={{ textAlign: "right", paddingTop: 10 }}>
+                //         <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
+                //             <i className="fas fa-sort"></i>
+                //         </span>
+
+                //         <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
+                //             <i className="fas fa-sort"></i>
+                //         </span>
+
+                //         <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
+                //             <i className="fas fa-sort"></i>
+                //         </span>
+
+                //         <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
+                //             <i className="fas fa-sort"></i>
+                //         </span>
+                //     </span>
+                // </span>
+                null
+            )
         }
     }
 
@@ -255,6 +276,7 @@ export class StatesViewerMenu extends Component {
                             {this.menuDeleteButton()}
                         </div>
                     </span>
+                    {/* {this.filterSection()} */}
                 </div >
                 {this.filterSection()}
             </div >

@@ -648,7 +648,7 @@ export class StatesViewer extends Component {
   displayMap = () => {
     if (this.props.mainView == "devices") {
       return (
-        <div className="mapContainer" style={{ height: window.innerHeight - 142 + "px" }}>
+        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
           <Suspense fallback={<div>Loading...</div>}>
             <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
           </Suspense>
@@ -684,8 +684,8 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            <StatesViewerMenu openModal={() => this.props.openModal()} mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
             <div className="rowList2">
+              <StatesViewerMenu openModal={() => this.props.openModal()} mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
               {this.returnDeviceList()}
             </div>
           </div>
@@ -694,37 +694,39 @@ export class StatesViewer extends Component {
         return (
           <div style={{ paddingTop: 25, margin: "30px 12px" }} >
             {this.deviceButtons()}
-            < StatesViewerMenu
-              openModal={() => this.props.openModal()}
-              mainView={this.props.mainView}
-              deviceCall={this.state.devicePressed}
-              boundary={this.state.boundary}
-              public={this.props.public}
-              acc={this.props.account}
-              search={this.search}
-              selectAll={this.selectAll}
-              devices={this.state.devicesView}
-              sort={this.sort}
-              view={this.changeView}
-              selectCount={this.state.selectCount}
-              deleteSelected={this.deleteSelectedDevices}
-              visiting={this.props.visiting}
-              public={this.props.public} />
             <div className={"rowList " + this.props.mainView} style={{ background: "#16202C" }}>
               <div>
-                {this.returnDeviceList()}
+                <div>
+                  < StatesViewerMenu
+                    openModal={() => this.props.openModal()}
+                    mainView={this.props.mainView}
+                    deviceCall={this.state.devicePressed}
+                    boundary={this.state.boundary}
+                    public={this.props.public}
+                    acc={this.props.account}
+                    search={this.search}
+                    selectAll={this.selectAll}
+                    devices={this.state.devicesView}
+                    sort={this.sort}
+                    view={this.changeView}
+                    selectCount={this.state.selectCount}
+                    deleteSelected={this.deleteSelectedDevices}
+                    visiting={this.props.visiting}
+                    public={this.props.public} />
+                  {this.returnDeviceList()}
+                </div>
                 <div className="container-fluid" style={{ padding: 0 }} >
                   {
-                    this.state.devicesServer.map(device => {
+                    this.state.devicesServer.map((device, i) => {
                       count++;
                       if (device.selected == true) {
                         selected++;
                       }
                       if (count == this.state.devicesServer.length) {
                         return (
-                          <div className="row" style={{ background: "#0E1925", margin: "0px" }}>
-                            <div style={{ padding: 5, flex: "0 50%", paddingLeft: 10 }} >{selected} SELECTED</div>
-                            <div style={{ padding: 5, flex: "0 50%", textAlign: "right", paddingRight: 11 }} >{count} TOTAL</div>
+                          <div key={i} className="row" style={{ background: "#0E1925", margin: "0px" }}>
+                            <div style={{ padding: 5, flex: "0 50%", paddingLeft: 10, opacity: 0.7 }} >{selected} SELECTED</div>
+                            <div style={{ padding: 5, flex: "0 50%", textAlign: "right", paddingRight: 11, opacity: 0.7 }} >{count} TOTAL</div>
                           </div>
                         )
                       } else {

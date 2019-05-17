@@ -1382,6 +1382,14 @@ PLUGIN
   padding: 20px;
 }
 
+.filterButton {
+  opacity: 0.7;
+}
+
+.filterButton:hover {
+  opacity: 1;
+}
+
 .mock-up {
   // display: -ms-grid;
   display: grid;

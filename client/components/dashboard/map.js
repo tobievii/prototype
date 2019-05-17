@@ -529,7 +529,7 @@ class MapDevices extends Component {
 
     return (
       <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(this.props.deviceCall)} deviceSelected={deviceSelected} widget={this.props.widget} >
-        <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
+        <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false} >
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
