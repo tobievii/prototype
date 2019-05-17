@@ -18,7 +18,7 @@ import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { SettingsView } from "./components/settingsView.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
-
+import { ChangePassword } from "./components/changePassword.jsx";
 
 import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
@@ -42,6 +42,7 @@ class App extends Component {
     state = {
         devicesView: "dashboardDevices",
         isOpen: false,
+        isOpen2: false,
         registrationPanel: false,
         public: undefined
     };
@@ -221,7 +222,7 @@ class App extends Component {
                         <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
                         {this.deviceView(match)}
-
+                        {this.changePassword()}
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -294,14 +295,29 @@ class App extends Component {
         this.setState({ devicesView: view });
     }
 
-    openModal = () => {
-        this.setState({ isOpen: true });
+    openModal = (origination) => {
+        if (origination == "ChangePassword") {
+            this.setState({ isOpen2: true });
+
+        } else if (origination == "addDevice") {
+            this.setState({ isOpen: true });
+        }
     }
 
     addDevice = () => {
         if (this.state.account) {
             return (
                 <AddDevice register={() => { this.setState({ registrationPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+            )
+        } else {
+            return null
+        }
+    }
+
+    changePassword = () => {
+        if (this.state.account) {
+            return (
+                <ChangePassword account={this.state.account} isOpen={this.state.isOpen2} closeModel={() => { this.setState({ isOpen2: false }) }} />
             )
         } else {
             return null
@@ -316,6 +332,7 @@ class App extends Component {
                     <div>
                         <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
                         {this.addDevice()}
+                        {this.changePassword()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route exact path="/uv/:username" component={this.userView} />
