@@ -96,7 +96,7 @@ export class SetUsername extends React.Component {
                 <h3> CHANGE PASSWORD </h3>
                 <button
                     className="btn-spot floatLeft"
-                    style={{ float: "right" }}
+                    style={{ float: "center" }}
                     onClick={this.changePassword}
                 >
                     CHANGE PASSWORD

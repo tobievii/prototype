@@ -266,7 +266,6 @@ export class ChangePassword extends Component {
                                 </span>
                                 <br></br>
                                 <br></br>
-                                <br></br>
                                 <div style={{ textAlign: "left" }}>
                                     {suggestions.map((s, index) =>
                                         <li key={index}>
