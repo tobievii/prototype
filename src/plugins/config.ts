@@ -11,6 +11,7 @@ import * as httpPlugin from "./http/pluginHTTP_serverside"
 import * as notifications from "./notifications/notifications"
 import * as teltonika from "./teltonika/plugin_teltonika"
 
+
 plugins.push(account)
 plugins.push(admin)
 // plugins.push(serialports)
@@ -24,3 +25,7 @@ plugins.push(teltonika);
 
 import hf2111a from "./HF2111A/plugin_HF2111A"
 plugins.push(hf2111a);
+
+
+import * as scheduler from "./scheduler/scheduler"
+plugins.push(scheduler);
