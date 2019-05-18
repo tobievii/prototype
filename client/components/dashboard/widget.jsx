@@ -4,12 +4,19 @@ import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
 import { OptionsTextarea } from "./options/options_textarea.jsx"
 import { OptionsCode } from "./options/options_code.jsx"
+import { OptionsBool } from "./options/options_bool.jsx"
+import { OptionsTime } from "./options/options_time.jsx"
+import { OptionsDropdown } from "./options/options_dropdown.jsx"
 
 export class Widget extends React.Component {
   state = {
     menuVisible: false,
     boundaryVisible: false
   }
+
+  // componentWillUpdate = (update) => {
+  //   console.log()
+  // }
 
   removeWidget = () => {
     if (this.props.dash.remove) { this.props.dash.remove() }
@@ -23,6 +30,9 @@ export class Widget extends React.Component {
         if (option.type == "color") { return (<OptionsColor key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "textarea") { return (<OptionsTextarea key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "code") { return (<OptionsCode key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "bool") { return (<OptionsBool key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "time") { return (<OptionsTime key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "dropdown") { return (<OptionsDropdown key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 
@@ -62,6 +72,7 @@ export class Widget extends React.Component {
             <option>mesh</option>
             <option>map</option>
             <option>form</option>
+            <option>scheduler</option>
             {/* <option>button</option> */}
             <option>widgetButton</option>
           </select></div>

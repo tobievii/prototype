@@ -909,9 +909,43 @@ input[type="color"] {
   padding: 5px;
 }
 
+
+
+////////////////////////////////////
+
+.widget_button {
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.1s;
+}
+
+.widget_button:hover {
+  opacity: 1;
+}
+
+.widget_button:active {
+  transition: all 0.1s;
+  opacity: 0.5;
+  color: rgb(122, 112, 106);
+}
+
+
 .linkPointer {
   cursor: pointer;
 }
+
+.widget_toggleTrue {
+  color: rgb(0, 255, 255);
+  transition: all 0.75s;
+}
+
+.widget_toggleFalse {
+  color: rgb(122, 112, 106);
+  transition: all 0.75s;
+}
+
+//////////////////////////////////////
+
 
 // .trash i:hover {
 //   color: #f00 !important;
@@ -1429,13 +1463,13 @@ button {
   box-sizing: border-box;
   font-weight: 100;
   font-size: 15px;
-  margin-bottom: 2px;
+  
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
+  border-radius: 1.5px;
   border: none;
   outline: none;
   transition: background 0.2s;
-  margin: 10px;
+  
 }
 
 button:hover {

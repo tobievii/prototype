@@ -21,6 +21,7 @@ import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
 import { WidgetMesh } from "./widget_mesh.jsx"
 import { WidgetForm } from "./widget_form.jsx"
+import { WidgetScheduler } from "./widget_scheduler.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -399,6 +400,14 @@ class Dashboard extends React.Component {
 
     if (data.type == "form") {
       return (<WidgetForm
+        state={this.props.state}
+        dash={dash}
+        data={data}
+      />)
+    }
+
+    if (data.type == "scheduler") {
+      return (<WidgetScheduler
         state={this.props.state}
         dash={dash}
         data={data}

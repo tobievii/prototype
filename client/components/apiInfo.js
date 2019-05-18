@@ -5,7 +5,18 @@ import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
 
 class ApiInfo extends Component {
   state = {
-    apiMenu: 1
+    apiMenu: 1,
+    testPacket: {
+      "id": "yourDevice001",
+      "data": {
+        "temperature": 24.54,
+        "doorOpen": false,
+        "gps": {
+          "lat": 25.123,
+          "lon": 28.125
+        }
+      }
+    }
   };
 
   handleCopyClipboard() {
@@ -43,6 +54,16 @@ class ApiInfo extends Component {
       var apiMenu = num;
       this.setState({ apiMenu })
     }
+  }
+
+  sendHttpRestTest = () => {
+    console.log("TEST")
+    fetch("/api/v3/data/post", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(this.state.testPacket)
+    }).then(response => response.json()).then(resp => {
+      console.log(resp);
+    }).catch(err => console.error(err.toString()));
   }
 
   render() {
@@ -149,11 +170,15 @@ class ApiInfo extends Component {
                 <h6>URL</h6>
                 <pre className="commanderBgPanel">{apiCall.path + "/api/v3/data/post"}</pre>
               </div>
+
               <div className="col-md-12">
                 <h6>BODY ( Content-Type: "application/json" )</h6>
                 <Suspense fallback={<div>Loading...</div>}>
                   <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
                 </Suspense>
+              </div>
+              <div className="col-md-12">
+                <button onClick={this.sendHttpRestTest}>TEST</button>
               </div>
             </div>
           </div>

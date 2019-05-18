@@ -40,7 +40,7 @@
        x2="1090.1364"
        y2="271.98972"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.24493753,0,0,0.81622508,-0.58773019,-444.69135)" />
+       gradientTransform="matrix(0.67171156,0,0,2.1592005,-120.81302,-1026.6773)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -49,18 +49,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.35355339"
-     inkscape:cx="1779.2556"
-     inkscape:cy="249.19308"
+     inkscape:zoom="1"
+     inkscape:cx="2098.7441"
+     inkscape:cy="577.23783"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer6"
      showgrid="false"
      units="px"
-     inkscape:window-width="2779"
-     inkscape:window-height="1467"
-     inkscape:window-x="754"
-     inkscape:window-y="376"
-     inkscape:window-maximized="0"
+     inkscape:window-width="3840"
+     inkscape:window-height="2037"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
      showguides="false"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -80,10 +80,15 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="ref"
+     style="display:inline" />
   <g
      inkscape:groupmode="layer"
      id="layer3"
@@ -91,12 +96,12 @@
      style="display:inline"
      transform="translate(0.04101563,0.83147937)">
     <rect
-       style="display:inline;opacity:1;fill:url(#linearGradient1687);fill-opacity:1;stroke:none;stroke-width:0.26620936;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:url(#linearGradient1687);fill-opacity:1;stroke:none;stroke-width:0.71701556;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4588"
-       width="267.25909"
-       height="445.45502"
-       x="-0.83147937"
-       y="-445.414"
+       width="732.92578"
+       height="1178.384"
+       x="-121.48148"
+       y="-1028.5889"
        transform="rotate(90)" />
   </g>
   <g
@@ -383,13 +388,6 @@
          x="135.97955"
          id="tspan1546"
          sodipodi:role="line"></tspan></text>
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer4"
-     inkscape:label="DeviceList"
-     style="display:inline"
-     transform="translate(0.04101563,0.83147937)">
     <rect
        style="display:inline;fill:#101c28;fill-opacity:1;stroke:none;stroke-width:0.14001605;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect1127"
@@ -1425,18 +1423,18 @@
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="swatches"
-     style="display:none"
+     style="display:inline"
      transform="translate(0.04101563,0.83147937)">
     <rect
        style="display:inline;opacity:1;fill:#d13230;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-opacity:1"
        id="rect4547-4"
        width="10.441592"
        height="10.441592"
-       x="614.82086"
-       y="28.381298" />
+       x="496.58081"
+       y="-88.36203" />
     <rect
-       y="28.3813"
-       x="593.93768"
+       y="-88.36203"
+       x="475.69763"
        height="10.441592"
        width="10.441592"
        id="rect4617"
@@ -1446,25 +1444,25 @@
        id="rect4619"
        width="10.441592"
        height="10.441592"
-       x="604.37927"
-       y="28.3813" />
+       x="486.13922"
+       y="-88.36203" />
     <rect
        style="display:inline;opacity:1;fill:#969b9f;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-opacity:1"
        id="rect4638"
        width="10.441592"
        height="10.441592"
-       x="583.49609"
-       y="28.381298" />
+       x="465.25604"
+       y="-88.36203" />
     <rect
-       y="38.822891"
-       x="583.49609"
+       y="-77.920441"
+       x="465.25604"
        height="10.441592"
        width="10.441592"
        id="rect39"
        style="display:inline;opacity:1;fill:#5d676f;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-opacity:1" />
     <rect
-       y="38.822891"
-       x="614.82086"
+       y="-77.920441"
+       x="496.58081"
        height="10.441592"
        width="10.441592"
        id="rect852"
@@ -1474,7 +1472,189 @@
        id="rect1059"
        width="10.441592"
        height="10.441592"
-       x="572.91272"
-       y="38.822891" />
+       x="454.67267"
+       y="-77.920441" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="PANEL[DASHBOARD]"
+     style="display:inline">
+    <rect
+       y="12.435376"
+       x="438.33908"
+       height="188.9881"
+       width="384.62842"
+       id="rect1253-2"
+       style="display:inline;opacity:1;fill:#0f1a27;fill-opacity:1;stroke-width:0.37066072" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path1255-9"
+       d="M 438.33882,12.43543 V 22.87696 H 822.96747 V 12.43543 Z"
+       style="display:inline;opacity:1;fill:#1b2835;fill-opacity:1;stroke-width:0.36816907" />
+    <text
+       id="text1259-1"
+       y="19.735258"
+       x="617.6272"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.94019985px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#eff0f0;fill-opacity:1;stroke:#eff0f0;stroke-width:0.2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:-0.34660417px;fill:#eff0f0;fill-opacity:1;stroke:#eff0f0;stroke-width:0.2;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         y="19.735258"
+         x="617.6272"
+         id="tspan1257-2"
+         sodipodi:role="line">DASHBOARD</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29875278px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.13246883"
+       x="814.70453"
+       y="19.643202"
+       id="text1265-0"><tspan
+         sodipodi:role="line"
+         id="tspan1263-9"
+         x="814.70453"
+         y="19.643202"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-family:'Font Awesome 5 Free';-inkscape-font-specification:'Font Awesome 5 Free Heavy';letter-spacing:-0.30917645px;fill:#ffffff;fill-opacity:1;stroke-width:0.13246883"></tspan></text>
+    <rect
+       y="12.435376"
+       x="438.33878"
+       height="10.441592"
+       width="42.948246"
+       id="rect1261-7-3"
+       style="display:inline;opacity:1;fill:#119752;fill-opacity:1;stroke:none;stroke-width:0.53660142;stroke-opacity:1" />
+    <text
+       id="text4561-6"
+       y="19.98982"
+       x="441.22592"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.94019985px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.148505"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:-0.34660417px;fill:#ffffff;fill-opacity:1;stroke-width:0.148505"
+         y="19.98982"
+         x="441.22592"
+         id="tspan4559-1"
+         sodipodi:role="line"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.36601591px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.24287464;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="448.4071"
+       y="19.534285"
+       id="text889-6-8"><tspan
+         sodipodi:role="line"
+         x="448.4071"
+         y="19.534285"
+         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.24287464;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="tspan887-9-7">ADD WIDGET</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer6"
+     inkscape:label="[WIDGET]"
+     style="display:inline">
+    <rect
+       style="display:inline;fill:#101418;fill-opacity:1;stroke:none;stroke-width:0.05750277;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4963"
+       width="57.549484"
+       height="57.591221"
+       x="441.8606"
+       y="26.503553" />
+    <rect
+       y="26.48657"
+       x="441.8436"
+       height="9.6369505"
+       width="57.583462"
+       id="rect5121"
+       style="display:inline;fill:#0b0e0f;fill-opacity:1;stroke:none;stroke-width:0.02352928;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.60805368px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#5d676f;stroke-width:0.1633064;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="444.60748"
+       y="33.119488"
+       id="text1121-7"><tspan
+         sodipodi:role="line"
+         x="444.60748"
+         y="33.119488"
+         style="font-size:4.93888903px;letter-spacing:-0.15875003px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.1633064;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="tspan1119-7">checkWeather</tspan></text>
+    <text
+       id="text4561-6-3"
+       y="32.999371"
+       x="492.10684"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.94019985px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:0.148505"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:-0.34660417px;fill:#737373;fill-opacity:1;stroke-width:0.148505"
+         y="32.999371"
+         x="492.10684"
+         id="tspan4559-1-7"
+         sodipodi:role="line"></tspan></text>
+    <path
+       style="display:inline;fill:#0b0e0f;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 498.16824,81.14604 v 1.37253 h -1.37252 v 0.66145 h 2.03398 v -2.03398 z"
+       id="rect5123"
+       inkscape:connector-curvature="0" />
+    <text
+       id="text1271-7"
+       y="56.312695"
+       x="456.63348"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.30546713px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.39136434"
+       xml:space="preserve"><tspan
+         id="tspan1269-3"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.39136434"
+         y="56.312695"
+         x="456.63348"
+         sodipodi:role="line">10:00am</tspan></text>
+    <text
+       id="text4644-9-2"
+       y="65.538574"
+       x="456.71893"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.46827412px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.42854953;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         id="tspan4642-0-0"
+         style="font-size:10.18337536px;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.42854953;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         y="65.538574"
+         x="456.71893"
+         sodipodi:role="line">DAILY</tspan></text>
+    <text
+       id="text4561-6-3-7"
+       y="43.487148"
+       x="492.35049"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.94019985px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono';letter-spacing:0px;word-spacing:0px;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.148505"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:-0.34660417px;fill:#ffffff;fill-opacity:1;stroke-width:0.148505"
+         y="43.487148"
+         x="492.35049"
+         id="tspan4559-1-7-8"
+         sodipodi:role="line"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.14772892px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.16862835;stroke-opacity:1"
+       x="470.55832"
+       y="75.594452"
+       id="text5231"><tspan
+         sodipodi:role="line"
+         x="470.55832"
+         y="75.594452"
+         style="text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.16862835;stroke-opacity:1"
+         id="tspan5229">GET LATEST WEATHER DATA</tspan></text>
+    <text
+       id="text5235"
+       y="42.255203"
+       x="444.56299"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.14772892px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#737373;fill-opacity:1;stroke:none;stroke-width:0.16862835;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         id="tspan5233"
+         style="text-align:start;text-anchor:start;fill:#737373;fill-opacity:1;stroke:none;stroke-width:0.16862835;stroke-opacity:1"
+         y="42.255203"
+         x="444.56299"
+         sodipodi:role="line">SCHEDULER</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.14772892px;line-height:1.25;font-family:'Share Tech Mono';-inkscape-font-specification:'Share Tech Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.16862835;stroke-opacity:1"
+       x="490.98474"
+       y="42.255203"
+       id="text5239"><tspan
+         sodipodi:role="line"
+         x="490.98474"
+         y="42.255203"
+         style="text-align:end;text-anchor:end;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.16862835;stroke-opacity:1"
+         id="tspan5237">ENABLED</tspan></text>
   </g>
 </svg>
