@@ -20,11 +20,11 @@ export class OptionsBool extends React.Component {
     });
   }
 
-  componentWillUpdate = (a, b, c) => {
-    console.log("update")
-    console.log([a, b, c]);
-    console.log(this.props.option.value)
-  }
+  // componentWillUpdate = (a, b, c) => {
+  //   console.log("update")
+  //   console.log([a, b, c]);
+  //   console.log(this.props.option.value)
+  // }
 
   render() {
     return (<div className="widgetMenuItem" onDrag={this.noDrag}
@@ -32,7 +32,7 @@ export class OptionsBool extends React.Component {
       {this.props.option.name}:
       <input
         type="checkbox"
-        defaultChecked={this.state.value}
+        defaultChecked={this.props.option.value}
         onChange={this.onChange} >
       </input>
     </div>)

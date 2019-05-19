@@ -31,11 +31,12 @@ export class OptionsInput extends React.Component {
     return (<div className="widgetMenuItem">
 
       <div className="row">
-        <div className="col-6">
+        <div className="col-4">
           {this.props.option.name}:
         </div>
-        <div className="col-6">
+        <div className="col-8">
           <input
+            style={{ width: "100%" }}
             type="text"
             value={this.state.value}
             onKeyPress={this.onKeyPress}

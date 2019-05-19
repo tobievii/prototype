@@ -30,21 +30,32 @@ export class WidgetScheduler extends React.Component {
     this.props.dash.setOptions(update);
   }
 
+
+  scheduler = () => {
+    console.log("scheduler update")
+    fetch("/api/v3/scheduler/widget", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ props: this.props, state: this.state })
+    }).then(response => response.json()).then(resp => {
+      console.log(resp);
+    }).catch(err => console.error(err.toString()));
+  }
+
   setOptions = (options) => {
-    console.log(options);
-    this.setState(options);
-    // this.setState(_.merge(this.state, options), () => {
-    //   this.updatedOptions();
-    // })
+    //this.setState(options);
+
+    this.setState(_.merge(this.state, options), () => {
+      this.updatedOptions();
+    })
 
     // update dash and server
     this.props.dash.setOptions(options);
+    this.scheduler();
   }
 
   updatedOptions = () => {
     var options = [
       { name: "description", type: "input", value: this.state.description },
-      { name: "enabled", type: "bool", value: this.state.enabled },
       { name: "startTime", type: "time", value: this.state.startTime },
       { name: "command", type: "code", value: this.state.command },
       { name: "repeatAmount", type: "input", value: this.state.repeatAmount },
@@ -61,7 +72,13 @@ export class WidgetScheduler extends React.Component {
         this.setOptions();
       });
     } else {
-      var update = { startTime: new Date() }
+      //defaults
+      var update = {
+        startTime: new Date(),
+        repeatAmount: 5,
+        repeatEvery: "second",
+        command: JSON.stringify({ "foo": true }),
+      }
       this.setState(update);
       this.updateParent(update);
     }
@@ -75,16 +92,16 @@ export class WidgetScheduler extends React.Component {
     var start = new Date(this.state.startTime).getTime();
     var now = new Date().getTime();
     var diff = (now - start)
-    console.log(diff);
+
 
     var intervalMS = (this.state.repeatAmount * this.state.repeatEveryOptionsMS[this.state.repeatEvery]);
     var count = diff / intervalMS;
     var next = Math.ceil(count);
-    console.log(next);
+
 
     var nextMS = start + (next * intervalMS)
     var nextTime = new Date(nextMS);
-    console.log(nextTime)
+
     //console.log(moment(this.state.startTime).unix());
 
     this.setState({ nextTime: nextTime.toUTCString() })
@@ -98,11 +115,18 @@ export class WidgetScheduler extends React.Component {
     }
   }
 
-
-
   update = (update) => {
-    this.setState(update);
-    this.updateParent(update);
+
+    console.log("update run")
+    this.setState(update, () => {
+      this.updatedOptions();
+      this.updateParent(update);
+      this.scheduler();
+    });
+
+
+
+
   }
 
   render() {

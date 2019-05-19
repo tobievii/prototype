@@ -27,8 +27,8 @@ export class OptionsDropdown extends React.Component {
     return (<div className="widgetMenuItem" >
 
       <div className="row" >
-        <div className="col-6" >{this.props.option.name}:</div>
-        <div className="col-6" >
+        <div className="col-4" >{this.props.option.name}:</div>
+        <div className="col-8" >
           <select name={this.props.option.name} onChange={this.onChange} value={this.props.option.value}>
             {this.props.option.options.map((op, i) => {
               return (<option key={i} value={op}>{op}</option>)
