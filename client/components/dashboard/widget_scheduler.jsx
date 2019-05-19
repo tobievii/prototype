@@ -3,6 +3,7 @@ import { Widget } from "./widget.jsx"
 
 import moment from 'moment'
 
+require('moment-countdown');
 export class WidgetScheduler extends React.Component {
 
   state = {
@@ -123,11 +124,9 @@ export class WidgetScheduler extends React.Component {
       this.updateParent(update);
       this.scheduler();
     });
-
-
-
-
   }
+
+
 
   render() {
     if (this.state.startTime) {
@@ -145,18 +144,20 @@ export class WidgetScheduler extends React.Component {
         <div style={{ fontSize: "75%", fontWeight: "bold", padding: "0px 5px" }}>REPEATS EVERY {this.state.repeatAmount} {this.state.repeatEvery.toUpperCase() + "S"}</div>
 
         <div style={{ padding: "0px 5px" }}>
-          <b>NEXT</b><br />
+
           <span style={{ fontSize: "75%" }}>
+            {/* <b>{moment(this.state.nextTime).fromNow().toUpperCase()}</b><br /> */}
+            <b>{moment(this.state.nextTime).countdown().toString()}</b><br />
+
             {this.state.nextTime}<br />
-            {moment(this.state.nextTime).fromNow()}
           </span>
         </div>
 
-        <div style={{ padding: 5 }}><b>START</b><br />
+        {/* <div style={{ padding: 5 }}><b>START</b><br />
           <span style={{ fontSize: "85%" }}>{moment(this.state.startTime).fromNow()}<br /></span>
           <span style={{ fontSize: "85%" }}>{moment(this.state.startTime).format('HH:MMa dddd')} <br /></span>
           <span style={{ fontSize: "85%" }}>{moment(this.state.startTime).format('MMM D YYYY')}</span>
-        </div>
+        </div> */}
 
 
       </Widget >

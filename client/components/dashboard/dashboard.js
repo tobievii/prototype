@@ -295,7 +295,8 @@ class Dashboard extends React.Component {
     var dash = {
       change: this.widgetChange(data.i),
       remove: this.widgetRemove(data.i),
-      setOptions: this.setOptions(data)
+      setOptions: this.setOptions(data),
+      type: data.type
     }
 
 

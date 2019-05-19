@@ -291,24 +291,24 @@ export class StatesViewerItem extends Component {
   }
 
   displayDeviceInfo = () => {
-    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
-      return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
-          <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
-    else {
-      return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
-          <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
+    // if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
+    //   return (
+    //     <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+    //       <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
+    //         <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
+    //       </div>
+    //     </Link>
+    //   )
+    // }
+    // else {
+    return (
+      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+        <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
+          <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+        </div>
+      </Link>
+    )
+    //}
   }
 
   selectbox = () => {
