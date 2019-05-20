@@ -463,7 +463,7 @@ export class DeviceView extends PureComponent {
   }
 
   openModal = () => {
-    this.props.openModal();
+    this.props.openModal("addDevice");
   }
 
   views = () => {
@@ -471,7 +471,7 @@ export class DeviceView extends PureComponent {
       viewController = "";
       return (
 
-        <StatesViewer deviceClicked={() => { this.getDeviceDV()}} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} visituser={this.props.visituser} />
+        <StatesViewer deviceClicked={() => { this.getDeviceDV() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} visituser={this.props.visituser} />
       )
     } else {
       viewController = "changeDisplay";
