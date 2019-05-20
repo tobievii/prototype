@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent, Suspense } from "react";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
@@ -6,14 +6,15 @@ import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faHdd, faEraser } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faHdd, faEraser, faDigitalTachograph } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-
+const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
 import moment from 'moment'
 
+library.add(faDigitalTachograph)
 library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
@@ -23,10 +24,11 @@ import * as p from "../prototype.ts"
 
 import socketio from "socket.io-client";
 
-import { Dashboard } from "./dashboard/dashboard.jsx"
+
 import { Editor } from "./editor.jsx"
 import { StatesViewer } from "./statesViewer.jsx";
 var loggedInUser = "";
+
 const customStyles = {
   content: {
     top: '50%',
@@ -48,7 +50,7 @@ const customStyles = {
 
 var viewController = "";
 
-export class DeviceView extends Component {
+export class DeviceView extends PureComponent {
   state = {
     devid: undefined,
     lastTimestamp: "no idea",
@@ -113,25 +115,27 @@ export class DeviceView extends Component {
 
     var merge = true; //default is to merge
 
-    if (packet.options) {
-      if (packet.options["_merge"] === false) {
-        merge = false;
+    if (packet.id == this.state.state.devid && packet.id == this.props.devid) {
+      if (packet.options) {
+        if (packet.options["_merge"] === false) {
+          merge = false;
+        }
       }
-    }
 
-    if (merge) {
-      view = _.merge(view, packet)
-      state.payload = _.merge(state.payload, packet);
-    } else {
-      delete view.data;
-      delete state.payload.data;
-      state.payload = _.merge(state.payload, packet);
-      view = _.merge(view, packet)
-    }
+      if (merge) {
+        view = _.merge(view, packet)
+        state.payload = _.merge(state.payload, packet);
+      } else {
+        delete view.data;
+        delete state.payload.data;
+        state.payload = _.merge(state.payload, packet);
+        view = _.merge(view, packet)
+      }
 
-    // should be same as DB.states for this device.
-    state["_last_seen"] = packet.timestamp;
-    this.setState({ view, state })
+      // should be same as DB.states for this device.
+      state["_last_seen"] = packet.timestamp;
+      this.setState({ view, state })
+    }
   }
 
   updateTime = () => {
@@ -184,7 +188,7 @@ export class DeviceView extends Component {
           }
         })
       }).catch(err => console.error(err.toString()));
-    }, 100);
+    }, 1);
   }
 
   componentWillUnmount = () => {
@@ -398,14 +402,15 @@ export class DeviceView extends Component {
   dashboardColumn = () => {
     return (<div className={this.state.dashboard} >
       {this.editorBlock()}
-
-      <Dashboard
-        username={this.props.username}
-        acc={this.props.acc}
-        deviceCall={this.state.state}
-        devices={this.state.devicesServer}
-        state={this.state.state}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Dashboard
+          username={this.props.username}
+          acc={this.props.acc}
+          deviceCall={this.state.state}
+          devices={this.state.devicesServer}
+          state={this.state.state}
+        />
+      </Suspense>
     </div>)
   }
 
@@ -465,7 +470,8 @@ export class DeviceView extends Component {
     if (this.props.mainView != "dashboard") {
       viewController = "";
       return (
-        <StatesViewer deviceClicked={() => { this.getDeviceDV(); this.dashboardColumn() }} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} />
+
+        <StatesViewer deviceClicked={() => { this.getDeviceDV()}} openModal={this.openModal} mainView={this.props.mainView} sendProps={this.props.sendProps} username={this.props.username} account={this.props.account} public={this.props.public} visiting={this.props.visiting} visituser={this.props.visituser} />
       )
     } else {
       viewController = "changeDisplay";
@@ -501,6 +507,18 @@ export class DeviceView extends Component {
     }
   }
 
+  setView = () => {
+    var view = undefined;
+
+    if (this.props.mainView == "dashboard") {
+      view = "dashboardDevices";
+    } else if (this.props.mainView == "dashboardDevices") {
+      view = "dashboard";
+    }
+
+    this.setState({ devicesView: view });
+    this.props.changeMainView(view)
+  }
 
   render() {
     return (
@@ -514,20 +532,24 @@ export class DeviceView extends Component {
               </div>
               <div className="col-7 noDisplay" >
                 <div className="" style={{ display: this.state.shareDisplay }}>
-
                   {this.deleteClearButtons()}
 
                   <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
 
-                    <i className="fas fa-share-alt"></i>
+                    <i className="fas fa-share-alt" title="Share device"></i>
                   </div>
 
                   <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 14, fontSize: 18, cursor: "pointer" }} className=""  >
-                    <i className="fas fa-edit"></i>
+                    <i className="fas fa-edit" title="Show/Hide text editor"></i>
                   </div>
                   <div onClick={this.hideData} style={{ width: "auto", float: "right", marginRight: 16, fontSize: 18, cursor: "pointer" }} className=""  >
-                    <i className="fas fa-database"></i>
+                    <i className="fas fa-database" title="Show/Hide device data"></i>
                   </div>
+
+                  <div className="" style={{ width: "auto", float: "right", marginRight: 16, fontSize: 20, cursor: "pointer" }} onClick={this.setView}>
+                    <FontAwesomeIcon icon="digital-tachograph" title="Show/Hide devices" />
+                  </div>
+
                   <div className="faded" style={{ width: "auto", float: "right", marginRight: 16, marginTop: 8, fontSize: 12 }}>{this.state.timeago}</div>
 
                   <ShareList devid={this.props.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />

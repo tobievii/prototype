@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 
-export class DevicePluginPanel extends React.Component {
+export class DevicePluginPanel extends React.PureComponent {
   state = {
     deviceGateway: {},
     accountGateway: {},
@@ -56,6 +56,12 @@ export class DevicePluginPanel extends React.Component {
   }
 
   renderDeviceGateway = () => {
+    if (this.settingLayout == false) {
+      this.getDevice();
+      this.settingLayout = true;
+    } else if (this.settingLayout == true && this.state.deviceId != this.props.stateId) {
+      this.settingLayout = false;
+    }
 
     if (this.settingLayout == false) {
       this.settingLayout = true;
@@ -107,18 +113,13 @@ export class DevicePluginPanel extends React.Component {
     }).then(response => response.json()).then((data) => {
       this.getDevice();
     }).catch(err => console.error(this.props.url, err.toString()))
-
   }
-
-
 
   componentWillMount = () => {
     this.getServerGateways();
     this.getAccount();
     this.getDevice();
   }
-
-
 
   render() {
     return (
@@ -139,7 +140,6 @@ export class DevicePluginPanel extends React.Component {
             })
           }
         </select>
-
       </div>
     )
   }
