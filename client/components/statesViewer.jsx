@@ -490,6 +490,42 @@ export class StatesViewer extends Component {
       }).reverse();
     }
 
+    if (value == "selected") {
+      newDeviceList.sort((a, b) => {
+        if (a.selected == true && b.selected == false) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+    }
+
+    if (value == "alarm") {
+      console.log(value)
+    }
+
+    if (value == "warning") {
+      newDeviceList.sort((a, b) => {
+        if (a.notification24 == true && b.notification24 == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+    }
+
+    if (value == "shared") {
+      newDeviceList.sort((a, b) => {
+        if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+    }
+
+    if (value == "public") {
+      newDeviceList.sort((a, b) => {
+        if (a.public == true && b.public == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+    }
+
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     this.setState({ sort: value });
 
@@ -624,7 +660,7 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       height = 180;
     } else {
-      height = 250;
+      height = 245;
     }
 
     return (

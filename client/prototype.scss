@@ -747,6 +747,14 @@ input[type="color"] {
   cursor: pointer;
 }
 
+.sortup:hover {
+  color: red;
+}
+
+.sortdown:hover {
+  color: greenyellow;
+}
+
 .cross {
   color: white !important;
   background: red;
@@ -1421,6 +1429,25 @@ div.rowList.dashboardDevices {
 /*
 PLUGIN 
 */
+.input-icons i {
+  position: absolute;
+}
+
+.input-icons {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.icon {
+  padding: 10px;
+  min-width: 40px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+}
 
 .blockstyle {
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -1431,7 +1458,12 @@ PLUGIN
 }
 
 .filterButton {
-  opacity: 0.7;
+  opacity: 0.5;
+}
+
+.filterSection {
+  display: grid;
+  grid-template-columns: 5% 10% 50% 15% 5% 5% 5% 5%;
 }
 
 .filterButton:hover {

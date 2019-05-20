@@ -188,43 +188,46 @@ export class StatesViewerMenu extends Component {
     filterSection = () => {
         if (this.props.mainView != "devices") {
             return (
-                <div className="row" style={{ padding: 5 }}>
-                    <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
-                        <i className="fas fa-sort"></i>
+                <div className="row filterSection" style={{ padding: 5, paddingRight: 15 }}>
+                    <span className="col fa-stack" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer", verticalAlign: "middle" }} onClick={this.sortClickHandler("selected")}>
+                        {/* <i className="fas fa-sort" title="Sort by selected devices"></i> */}
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="Selected devices on top"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="Selected devices last" style={{ opacity: 0.5 }}></i>
                     </span>
 
-                    <span className="col  filterButton" style={{ flex: "0 0 60px", padding: "10px 2px 0px 12px", cursor: "pointer" }} onClick={this.sortClickHandler("namedesc")}>
-                        <i className="fas fa-sort"></i> A-Z
+                    <span className="col  fa-stack" style={{ flex: "0 0 60px", padding: "10px 2px 0px 12px", cursor: "pointer" }} onClick={this.sortClickHandler("namedesc")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="Device name ascending"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="Device name descending" style={{ opacity: 0.5 }}></i>
                     </span>
 
-                    <span className="col  filterButton" style={{ flex: "0 0 10px", padding: "10px 3px 0px 5px", cursor: "pointer" }}>
-                        <i onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+                    <span id="search" style={{ textAlign: "left", marginTop: 2, cursor: "pointer" }}>
+                        {/* <i className="fas fa-search searchIcon"></i> */}
+                        <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "30px", border: "1px solid grey", fontSize: 14 }} placeholder="search for device..." />
                     </span>
 
-                    <span id="search" style={{ flex: "0 0 100px", textAlign: "left", float: "right", marginTop: 2, cursor: "pointer" }}>
-                        <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "auto", border: "1px solid grey" }} placeholder="search for device..." />
+                    <span className="col  fa-stack" style={{ flex: "0 0 100px", padding: "10px 2px 0px 8px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="last seen"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="last seen" style={{ opacity: 0.5 }}></i>
                     </span>
 
-                    <span className="col filterButton" style={{ flex: "0 0 100px", padding: "10px 2px 0px 8px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
-                        <i className="fas fa-sort"></i> LATEST
+                    <span className="col  fa-stack" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer", textAlign: "left" }} onClick={this.sortClickHandler("alarm")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="alarm notifications"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="alarm notifications" style={{ opacity: 0.5 }}></i>
                     </span>
 
-                    <span style={{ textAlign: "right", paddingTop: 10 }}>
-                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
-                            <i className="fas fa-sort"></i>
-                        </span>
+                    <span className="col  fa-stack" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer", textAlign: "left" }} onClick={this.sortClickHandler("warning")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="warnings notifications"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="warnings notifications" style={{ opacity: 0.5 }}></i>
+                    </span>
 
-                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
-                            <i className="fas fa-sort"></i>
-                        </span>
+                    <span className="col  fa-stack" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer", textAlign: "left" }} onClick={this.sortClickHandler("shared")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="shared devices"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="shared devices" style={{ opacity: 0.5 }}></i>
+                    </span>
 
-                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
-                            <i className="fas fa-sort"></i>
-                        </span>
-
-                        <span className="col filterButton" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer" }}>
-                            <i className="fas fa-sort"></i>
-                        </span>
+                    <span className="col  fa-stack" style={{ flex: "0 0 10px", padding: "10px 2px 0px 12px", cursor: "pointer", textAlign: "left" }} onClick={this.sortClickHandler("public")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="public devices"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="public devices" style={{ opacity: 0.5 }}></i>
                     </span>
 
                     {/* <span className="col" style={{ flex: "0 0 100px" }} >

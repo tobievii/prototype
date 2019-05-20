@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import Modal from 'react-modal';
-import { truncate } from "fs";
 
 const customStyles = {
     content: {
