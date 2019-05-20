@@ -20,86 +20,126 @@ var sequence = 0;
 
 export function handlePacket(db: any, packet: any, cb: any) {
   if (enablePackets) {
-    var job1 = jobs.create('I AM DOING SOMETHING',
+    var myhandlepacket = jobs.create('Handle Packet',
       iotnxtUpdateDevice(db, packet, (err: Error, result: any) => {
         if (err) console.log(err);
         if (result) {
           cb(packet);
         }
       })).priority('high').save(function () {
-        if (!null) console.log(job1.id);
+        if (!null) console.log(myhandlepacket.id);
       });
   } else {
     cb(packet);
   }
-  job1.on('complete', function () {
+  myhandlepacket.on('complete', function () {
     console.log('job ' + sequence + ' DONE!')
   });
 }
 
+jobs.process('Confirm', function (myhandlepacket: { data: any; }, done: { (): void; (arg0: any): void; }) {
+  console.log(myhandlepacket.data);
+  setTimeout(function () {
+    console.log('Packet Handled');
+    try {
+      done();
+      throw new Error('Failed to handle the packet! Please check if packet is in the correct format.');
+    }
+    catch (err) {
+      done(err);
+    }
+  }, 3000);
+});
+
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
   // INITIALIZE ROUTES
+  setInterval(
+    function () {
+      sequence += 1;
+      (function (sequence) {
+        var mygateway = jobs.create('MyGateway.',
+          app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
+            addgateway(db, req, (err: Error, result: any) => {
+              if (err) res.json({ err: err.toString() });
+              connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
+              res.json(result);
+            });
+          }),
 
-  app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-    addgateway(db, req, (err: Error, result: any) => {
-      if (err) res.json({ err: err.toString() });
-      connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
-      res.json(result);
-    });
-  });
+          app.post("/api/v3/iotnxt/removegateway", (req: any, res: any) => {
+            if (req.user.level < 100) { res.json({ err: "permission denied" }); return; }
+            removegateway(db, req.body, (err: Error, result: any) => {
+              if (err) res.json({ err: err.toString() });
+              res.json(result);
+            });
+          }),
 
-  app.post("/api/v3/iotnxt/removegateway", (req: any, res: any) => {
-    if (req.user.level < 100) { res.json({ err: "permission denied" }); return; }
-    removegateway(db, req.body, (err: Error, result: any) => {
-      if (err) res.json({ err: err.toString() });
-      res.json(result);
-    });
-  });
+          app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
+            getgateways(db, (err: Error, gateways: any) => {
+              if (err) res.json({ err: err.toString() });
 
-  app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
-    getgateways(db, (err: Error, gateways: any) => {
-      if (err) res.json({ err: err.toString() });
+              for (var g in gateways) {
+                delete gateways[g].Secret
+              }
 
-      for (var g in gateways) {
-        delete gateways[g].Secret
-      }
+              res.json(gateways);
+            });
+          }),
 
-      res.json(gateways);
-    });
-  });
+          app.post("/api/v3/iotnxt/setgatewayserverdefault", (req: any, res: any) => {
+            if (req.user.level < 100) { res.json({ err: "permission denied" }); return; }
+            setgatewayserverdefault(db, req.body, req.user, (err: Error, result: any) => {
+              if (err) res.json({ err: err.toString() });
+              res.json(result);
+            });
+          }),
 
-  app.post("/api/v3/iotnxt/setgatewayserverdefault", (req: any, res: any) => {
-    if (req.user.level < 100) { res.json({ err: "permission denied" }); return; }
-    setgatewayserverdefault(db, req.body, req.user, (err: Error, result: any) => {
-      if (err) res.json({ err: err.toString() });
-      res.json(result);
-    });
-  });
+          app.get("/api/v3/iotnxt/cleargatewayaccountdefault", (req: any, res: any) => {
+            cleargatewayaccountdefault(db, req.user, (err: Error, result: any) => {
+              if (err) res.json({ err: err.toString() });
+              res.json(result);
+            })
+          }),
 
-  app.get("/api/v3/iotnxt/cleargatewayaccountdefault", (req: any, res: any) => {
-    cleargatewayaccountdefault(db, req.user, (err: Error, result: any) => {
-      if (err) res.json({ err: err.toString() });
-      res.json(result);
-    })
-  })
+          app.post("/api/v3/iotnxt/setgatewayaccountdefault", (req: any, res: any) => {
+            setgatewayaccountdefault(db, req.body, req.user, (err: Error, result: any) => {
+              if (err) res.json({ err: err.toString() });
+              res.json(result);
+            })
+          }),
 
-  app.post("/api/v3/iotnxt/setgatewayaccountdefault", (req: any, res: any) => {
-    setgatewayaccountdefault(db, req.body, req.user, (err: Error, result: any) => {
-      if (err) res.json({ err: err.toString() });
-      res.json(result);
-    })
-  })
-
-  app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
-    var gateway = {
-      GatewayId: req.body.GatewayId,
-      HostAddress: req.body.HostAddress
+          app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
+            var gateway = {
+              GatewayId: req.body.GatewayId,
+              HostAddress: req.body.HostAddress
+            }
+            setgatewaydevice(db, req.body.key, req.user.level, req.user.apikey, req.body.id, gateway, (err: Error, result: any) => {
+              res.json(result);
+            })
+          }).save(function () {
+            if (!null) console.log(mygateway.id);
+          }));
+        mygateway.on('complete', function () {
+          console.log('job ' + sequence + ' completed!')
+        });
+      })(sequence);
     }
-    setgatewaydevice(db, req.body.key, req.user.level, req.user.apikey, req.body.id, gateway, (err: Error, result: any) => {
-      res.json(result);
-    })
-  });
+    , 5000
+  );
 
+  jobs.process('Confirm', function (mygateway: { data: any; }, done: { (): void; (arg0: any): void; }) {
+    console.log(mygateway.data);
+    setTimeout(function () {
+      console.log('My Gateway');
+      try {
+        done();
+        throw new Error('Error handling gateway action.');
+      }
+      catch (err) {
+        done(err);
+      }
+    }, 3000);
+  });
 
 
 
@@ -116,7 +156,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     function () {
       sequence += 1;
       (function (sequence) {
-        var job = jobs.create('IOTNXT Connecting queues TEST.',
+        var connectqueues = jobs.create('IOTNXT Connecting jobs queues.',
           // CONNECT ALL GATEWAYS AT INIT
           log("IOTNXT Connecting queues." + sequence),
           getgateways(db, (err: Error, gateways: any) => {
@@ -147,10 +187,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
               enablePackets = true;
             }, 5000)
           })).priority('high').save(function () {
-            if (!null) console.log(job.id);
+            if (!null) console.log(connectqueues.id);
           });
 
-        job.on('complete', function () {
+        connectqueues.on('complete', function () {
           console.log('job ' + sequence + ' completed!')
         });
       })(sequence);
@@ -171,6 +211,20 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //   });
   // },10000)
 }
+
+jobs.process('Confirm', function (connectqueues: { data: any; }, done: { (): void; (arg0: any): void; }) {
+  console.log(connectqueues.data);
+  setTimeout(function () {
+    console.log('Connect Queues');
+    try {
+      done();
+      throw new Error('Failed to connect to the queue.');
+    }
+    catch (err) {
+      done(err);
+    }
+  }, 3000);
+});
 
 
 function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) {
@@ -209,10 +263,6 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
         })
 
         /////////
-
-
-
-
         iotnxtqueue.on("request", (request: any) => {
           //console.log(request);
 
@@ -236,22 +286,14 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
               var emitsend = { apikey: apikey.toLowerCase(), packet: requestClean }
               //console.log(emitsend);
               eventHub.emit("device", emitsend)
-
             }
           }
-
-
         });
-
-
-
       }
-
     });
   }
   );
 }
-
 
 function addgateway(db: any, req: any, cb: any) {
   var gateway = req.body;
@@ -300,8 +342,6 @@ function removegateway(db: any, data: any, cb: any) {
 
 }
 
-
-
 function setgatewayserverdefault(db: any, gateway: any, user: any, cb: any) {
   if (user.level > 50) {
     db.plugins_iotnxt.update({ type: "gateway", default: true }, { "$set": { default: false } }, (err: Error, result: any) => {
@@ -315,7 +355,6 @@ function setgatewayserverdefault(db: any, gateway: any, user: any, cb: any) {
   } else {
     cb({ err: "permission denied. user level too low" })
   }
-
 }
 
 // clears user default gateway
@@ -416,14 +455,10 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
               if (results == deviceStates.length) {
                 cb(gateway, deviceTree);
               }
-
             }
             );
           } //for
         }
-
-
-
       });
     }
   });
@@ -545,10 +580,7 @@ function iotnxtUpdateDevice(db: any, packet: any, cb: any) {
         }
       });
     }
-
   })
-
-
 }
 
 function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
@@ -583,10 +615,6 @@ function iotnxtUpdateDevicePublish(gateway: any, packet: any, cb: any) {
   }
 }
 
-
-
-
-
 function generateDifficult(count: number) {
   var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
   var str = '';
@@ -609,6 +637,5 @@ export function difference(object: any, base: any) {
       }
     });
   }
-
   return changes(object, base);
 }
