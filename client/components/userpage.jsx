@@ -75,6 +75,7 @@ export class UserPage extends Component {
             }
         }).then(response => response.json()).then((user) => {
             //console.log(user);
+            this.props.visitu(user)
             this.setState({ user })
         }).catch(err => console.error(err.toString()))
     }

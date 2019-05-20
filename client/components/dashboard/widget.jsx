@@ -4,12 +4,21 @@ import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
 import { OptionsTextarea } from "./options/options_textarea.jsx"
 import { OptionsCode } from "./options/options_code.jsx"
+import { OptionsBool } from "./options/options_bool.jsx"
+import { OptionsTime } from "./options/options_time.jsx"
+import { OptionsDropdown } from "./options/options_dropdown.jsx"
 
 export class Widget extends React.Component {
   state = {
     menuVisible: false,
     boundaryVisible: false
   }
+
+  // componentWillUpdate = (update) => {
+  //   console.log()
+  // }
+
+
 
   removeWidget = () => {
     if (this.props.dash.remove) { this.props.dash.remove() }
@@ -23,6 +32,9 @@ export class Widget extends React.Component {
         if (option.type == "color") { return (<OptionsColor key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "textarea") { return (<OptionsTextarea key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "code") { return (<OptionsCode key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "bool") { return (<OptionsBool key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "time") { return (<OptionsTime key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "dropdown") { return (<OptionsDropdown key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 
@@ -39,33 +51,36 @@ export class Widget extends React.Component {
         position: "absolute",
         zIndex: 100,
         width: "auto",
+        minWidth: 250,
         fontSize: 14
       }} >
-        <div className="widgetMenuItem widgetMenuItemButton" onClick={this.removeWidget} >
-          <i className="fas fa-trash-alt"></i> REMOVE</div>
 
-        <div className="widgetMenuItem" >Change Type:
-          <select onChange={(e) => {
-            // console.log(e.target.value);
-            this.props.dash.change("type", e.target.value)
-          }}>
-
-            {/* You can add widgets to the dropdown below:
-                Please keep the below names the same as the .jsx file for the widget for sanity. */}
-            <option unselectable="true">select</option>
-            <option>Calendar</option>
-            <option>NivoLine</option>
-            <option>ChartLine</option>
-            <option>Blank</option>
-            <option>ThreeDWidget</option>
-            <option>Gauge</option>
-            <option>mesh</option>
-            <option>map</option>
-            <option>form</option>
-            {/* <option>button</option> */}
-            <option>widgetButton</option>
-          </select></div>
-
+        <div className="row">
+          <div className="col-6">
+            <div className="widgetMenuItem" style={{ width: "100%" }} >
+              <select
+                value={this.props.dash.type}
+                onChange={(e) => { this.props.dash.change("type", e.target.value) }}
+              >
+                <option>Calendar</option>
+                <option>NivoLine</option>
+                <option>ChartLine</option>
+                <option>Blank</option>
+                <option>ThreeDWidget</option>
+                <option>Gauge</option>
+                <option>mesh</option>
+                <option>map</option>
+                <option>form</option>
+                <option>scheduler</option>
+                <option>widgetButton</option>
+              </select></div>
+          </div>
+          <div className="col-6">
+            <div className="widgetMenuItem widgetMenuItemButton" onClick={this.removeWidget} style={{ width: "100%" }} >
+              <i className="fas fa-trash-alt"></i> REMOVE
+            </div>
+          </div>
+        </div>
         {this.optionsPanel()}
       </div>)
     } else {

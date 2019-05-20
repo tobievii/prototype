@@ -28,15 +28,25 @@ export class OptionsInput extends React.Component {
   }
 
   render() {
-    return (<div className="widgetMenuItem" onDrag={this.noDrag}
-      onDragStart={this.noDrag} >
-      {this.props.option.name}:
-      <input
-        type="text"
-        value={this.state.value}
-        onKeyPress={this.onKeyPress}
-        onChange={this.onChange} >
-      </input>
+    return (<div className="widgetMenuItem">
+
+      <div className="row">
+        <div className="col-4">
+          {this.props.option.name}:
+        </div>
+        <div className="col-8">
+          <input
+            style={{ width: "100%" }}
+            type="text"
+            value={this.state.value}
+            onKeyPress={this.onKeyPress}
+            onChange={this.onChange} >
+          </input>
+        </div>
+      </div>
+
+
+
     </div>)
   }
 }

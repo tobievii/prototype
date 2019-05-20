@@ -58,6 +58,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/plugins/efento/nbiot_pb.js",
   ]
 }

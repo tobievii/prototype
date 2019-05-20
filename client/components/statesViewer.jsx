@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import './react-confirm-alert/src/react-confirm-alert.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
@@ -6,7 +6,9 @@ import * as _ from "lodash"
 import * as p from "../prototype.ts"
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
-import { MapDevices } from "./dashboard/map.jsx"
+
+const MapDevices = React.lazy(() => import('./dashboard/map'))
+
 import Media from "react-media";
 import { confirmAlert } from 'react-confirm-alert';
 import { ChangePassword } from "../components/changePassword.jsx";
@@ -174,7 +176,8 @@ export class StatesViewer extends Component {
     boundary: undefined,
     showB: false,
     buttonColour: " ",
-    isOpen: false
+    isOpen: false,
+    tempdev: []
   };
 
   socket = undefined;
@@ -264,7 +267,39 @@ export class StatesViewer extends Component {
   }
 
   getDevices = (functionCall) => {
-    if (this.props.public == true) {
+
+    if (this.props.visiting == true && this.props.public == false) {
+      fetch('/api/v3/user/' + this.props.username, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      }).then(response => response.json()).then((user) => {
+        p.statesByUsername(this.props.username, (states) => {
+          for (var s in states) {
+            states[s].selected = false
+            if (states[s].meta.user.email !== user.email) {
+              states.splice(s)
+            }
+          }
+
+          this.setState({ devicesServer: states }, () => {
+            for (var device in this.state.devicesServer) {
+              this.socket.emit("join", this.state.devicesServer[device].key);
+            }
+            this.setState({ devicesView: states }, () => {
+              this.setState({ devicePressed: states[0] });
+              if (functionCall == "initial load") {
+                this.sort();
+              }
+            })
+          })
+        })
+      }).catch(err => console.error(err.toString()))
+    }
+
+    if (this.props.public == true || this.props.account.level == 0) {
       p.publicStates((states) => {
         for (var s in states) {
           states[s].selected = false
@@ -282,7 +317,7 @@ export class StatesViewer extends Component {
             }
 
             this.setState({ devicesView: serverresponse }, () => {
-              this.setState({ devicePressed: serverresponse[0] });
+              //this.setState({ devicePressed: serverresponse[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -291,46 +326,26 @@ export class StatesViewer extends Component {
         }).catch(err => console.error(err.toString()));
       })
     }
-    else {
+    else if (this.props.public == false && this.props.visiting == false) {
       p.statesByUsername(this.props.username, (states) => {
         for (var s in states) {
           states[s].selected = false
         }
 
-        if (this.props.account.level == 0) {
-          fetch("/api/v3/states/usernameToDevice", {
-            method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
-          }).then(response => response.json()).then(serverresponse => {
-            for (var s in serverresponse) {
-              serverresponse[s].selected = false
+        this.setState({ devicesServer: states }, () => {
+          for (var device in this.state.devicesServer) {
+            this.socket.emit("join", this.state.devicesServer[device].key);
+          }
+          this.setState({ devicesView: states }, () => {
+            this.setState({ devicePressed: states[0] });
+            if (functionCall == "initial load") {
+              this.sort();
             }
-            this.setState({ devicesServer: serverresponse }, () => {
-              for (var device in this.state.devicesServer) {
-                this.socket.emit("join", this.state.devicesServer[device].key);
-              }
-              this.setState({ devicesView: serverresponse }, () => {
-                this.setState({ devicePressed: serverresponse[0] });
-                if (functionCall == "initial load") {
-                  this.sort();
-                }
-              })
-            })
-          }).catch(err => console.error(err.toString()));
-        } else {
-          this.setState({ devicesServer: states }, () => {
-            for (var device in this.state.devicesServer) {
-              this.socket.emit("join", this.state.devicesServer[device].key);
-            }
-            this.setState({ devicesView: states }, () => {
-              this.setState({ devicePressed: states[0] });
-              if (functionCall == "initial load") {
-                this.sort();
-              }
-            })
           })
-        }
+        })
 
-        if (states.length == 0) {
+
+        if (states.length == 0 && this.props.visiting == false) {
           var url = window.location.origin + "/api/v3/data/post";
           setTimeout(() => {
             fetch(url, {
@@ -367,7 +382,7 @@ export class StatesViewer extends Component {
   componentWillMount = () => {
     setTimeout(() => {
       this.getDevices("initial load");
-    }, 500);
+    }, 50);
   }
   componentDidMount = () => {
     this.changePassword()
@@ -582,29 +597,33 @@ export class StatesViewer extends Component {
     var newDeviceList = _.clone(this.state.devicesView)
 
     this.showBoundaryPath(false);
-    this.props.deviceClicked(device.device);
 
-    // for (var devices in newDeviceList) {
-    //   if (newDeviceList[devices].selectedIcon == true) {
-    //     newDeviceList[devices].selectedIcon = false;
-    //   }
-    // }
+    if (this.props.mainView == "dashboardDevices") {
+      this.props.deviceClicked(device.device);
+    } else {
 
-    // for (var dev in newDeviceList) {
-    //   if (newDeviceList[dev].key == device.e.key) {
-    //     if (!device.n) {
-    //       newDeviceList[dev].selectedIcon = false;
-    //     } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
-    //       newDeviceList[dev].selectedIcon = true;
-    //     } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
-    //       newDeviceList[dev].selectedIcon = true;
-    //     }
-    //   }
-    // }
+      for (var devices in newDeviceList) {
+        if (newDeviceList[devices].selectedIcon == true) {
+          newDeviceList[devices].selectedIcon = false;
+        }
+      }
 
-    // this.setState({ devicesView: newDeviceList });
-    // this.setState({ devicePressed: device.device });
-    // this.setState({ boundary: device.n });
+      for (var dev in newDeviceList) {
+        if (newDeviceList[dev].key == device.e.key) {
+          if (!device.n) {
+            newDeviceList[dev].selectedIcon = false;
+          } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
+            newDeviceList[dev].selectedIcon = true;
+          } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
+            newDeviceList[dev].selectedIcon = true;
+          }
+        }
+      }
+
+      this.setState({ devicesView: newDeviceList });
+      this.setState({ devicePressed: device.device });
+      this.setState({ boundary: device.n });
+    }
   }
 
   deleteSelectedDevices = () => {
@@ -704,7 +723,9 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       return (
         <div className="mapContainer">
-          <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+          </Suspense>
         </div>
       )
     } else {
