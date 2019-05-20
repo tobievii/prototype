@@ -122,6 +122,13 @@ export class ChangePassword extends Component {
         }
     }
 
+    dbUpdate = () => {
+        fetch("/api/v3/passChanged", {
+            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        }).then(response => response.json()).then(serverresponse => {
+        }).catch(err => console.error(err.toString()));
+    }
+
     checkpassword = () => {
         if (this.state.confirm != "" && this.state.password != "") {
             if (this.state.confirm != this.state.password) {
@@ -148,6 +155,7 @@ export class ChangePassword extends Component {
                         this.setState({ message: "Your new password cannot match your current password" })
                     } else {
                         this.setState({ message: "Password has successfully been changed" })
+                        this.dbUpdate()
                         this.alert()
                     }
 

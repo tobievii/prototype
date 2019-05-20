@@ -724,7 +724,7 @@ app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any, packet: any) => {
-  // checkExsisting(req, res)
+  changePassword(req, res)
 
   if (req.body) {
     // find state by username
@@ -955,51 +955,25 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
   })
 });
 
-// function checkExsisting(req: any, res: any) {
-//   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
+app.post("/api/v3/passChanged", (req: any, res: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $set: { passChange: true } }, (err: Error, updated: any) => {
+    if (err) res.json(err);
+    if (updated) res.json(updated);
+  })
+})
 
-//     function findNotified(array: any) {
-//       var t = [];
-//       for (var i = 0; i < array.length; i++) {
-//         if (array[i].notified == undefined || array[i].notified == null) {
-
-//           array[i].notified = false;
-
-//           io.to(req.user.username).emit("info", info)
-
-//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-//             io.to(req.user).emit("notification")
-//             if (err) res.json(err);
-//             if (updated) res.json(updated);
-//           })
-//         }
-//         t.push(array[i]);
-//       }
-//     }
-
-//     function findSeen(array: any) {
-//       var t = [];
-//       for (var i = 0; i < array.length; i++) {
-//         if (array[i].seen == undefined || array[i].seen == null) {
-
-//           array[i].seen = false;
-
-//           io.to(req.user.username).emit("info", info)
-
-//           db.users.update({ apikey: req.user.apikey }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-//             io.to(req.user).emit("notification")
-//             if (err) res.json(err);
-//             if (updated) res.json(updated);
-//           })
-//         }
-//         t.push(array[i]);
-//       }
-//     }
-
-//     findNotified(state.notifications);
-//     findSeen(state.notifications);
-//   })
-// }
+function changePassword(req: any, res: any) {
+  db.users.findOne({ apikey: req.user.apikey }, (err: Error, user: any) => {
+    if (user.email == "admin@localhost.com") {
+      if (user.passChange == undefined || user.passChange == null) {
+        db.users.update({ apikey: req.user.apikey }, { $set: { passChange: false } }, (err: Error, updated: any) => {
+          if (err) res.json(err);
+          if (updated) res.json(updated);
+        })
+      }
+    }
+  })
+}
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
