@@ -22,6 +22,7 @@ import { SettingsView } from "./components/settingsView.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 import { ChangePassword } from "./components/changePassword.jsx";
 
+
 import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
@@ -217,8 +218,6 @@ class App extends Component {
                     <div>
                         <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        {this.deviceView(match)}
-                        {this.changePassword()}
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
                         <Footer loggedIn={false} />
                     </div>)
