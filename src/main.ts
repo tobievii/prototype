@@ -775,9 +775,20 @@ app.post("/api/v3/states", (req: any, res: any, packet: any) => {
             db.states.find({ apikey: user.apikey }, (er: Error, states: any[]) => {
               var cleanStates: any = []
               for (var a in states) {
-                var cleanState = _.clone(states[a])
-                delete cleanState["apikey"]
-                cleanStates.push(cleanState);
+                // filter out bad device ids
+                if (states[a].devid.match(/^[a-z0-9_]+$/i) == null) {
+                  console.log({
+                    device: {
+                      devid: states[a].devid
+                    },
+                    "error": "id may only contain a-z A-Z 0-9 and _"
+                  });
+                } else {
+                  var cleanState = _.clone(states[a])
+                  delete cleanState["apikey"]
+                  cleanStates.push(cleanState);
+                }
+                //end filter
               }
               res.json(cleanStates)
             })

@@ -27,6 +27,41 @@ export function postState(
     event = new Date(request.timestamp);
   }
 
+  /// checks
+
+  if (request.id == "") {
+    var error = { "error": "id may not be empty" }
+    console.log(error);
+    cb(error); return
+  }
+
+  if (!request.id) {
+    var error = { "error": "id parameter missing" };
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (typeof request.id != "string") {
+    var error = { "error": "id must be a string" };
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (request.id.indexOf(" ") != -1) {
+    var error = { "error": "id may not contain spaces" }
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (request.id.match(/^[a-z0-9_]+$/i) == null) {
+    var error = { "error": "id may only contain a-z A-Z 0-9 and _" }
+    console.log(error);
+    cb(error); return;
+  }
+
+  ////
+
+
   request.timestamp = event.toJSON();
 
   var packet: any = {

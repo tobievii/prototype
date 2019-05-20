@@ -45,7 +45,8 @@ class App extends Component {
         devicesView: "dashboardDevices",
         isOpen: false,
         registrationPanel: false,
-        public: undefined
+        public: undefined,
+        visituser: undefined
     };
 
     constructor(props) {
@@ -227,6 +228,7 @@ class App extends Component {
     deviceView = ({ match }) => {
         return (
             <div>
+
                 <Suspense fallback={<div>Loading...</div>}>
                     <DeviceView
                         openModal={this.openModal}
@@ -234,6 +236,7 @@ class App extends Component {
                         changeMainView={this.changeView}
                         devid={match.params.devid}
                         username={match.params.username}
+                        visituser={this.state.visituser}
                         acc={test.acc}
                         deviceCall={test.dc}
                         devices={test.ds}
@@ -247,11 +250,16 @@ class App extends Component {
         )
     }
 
+    passUserInfo = (info) => {
+        this.setState({ visituser: info })
+    }
+
     userView = ({ match }) => {
-        visitingG = true;
+       visitingG = true;
         return (
             <div>
-                <UserPage username={match.params.username} />
+
+                <UserPage visitu={this.passUserInfo} username={match.params.username} />
                 <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
                 <Footer />
             </div>
@@ -276,9 +284,25 @@ class App extends Component {
     }
 
     settings = ({ match }) => {
-        return (
-            <SettingsView />
-        )
+        if (this.state.account) {
+            if (this.state.account.level > 0) {
+                return (
+                    <SettingsView />
+                )
+            } else {
+                
+                        return (
+                    <div>
+                            <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
+                            <Landing />
+                            <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
+                            <Footer loggedIn={false} />
+                        </div>)                   
+            }
+        } 
+        else {
+            return null
+        }
     }
 
     notifications = ({ match }) => {

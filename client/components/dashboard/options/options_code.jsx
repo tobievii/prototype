@@ -67,7 +67,7 @@ export class OptionsCode extends React.Component {
 
       <MonacoEditor
         width="400"
-        height="500"
+        height="125"
         language="json"
         theme="vs-dark"
         value={this.state.value}
