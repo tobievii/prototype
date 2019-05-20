@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import Modal from 'react-modal';
+import { truncate } from "fs";
 
 const customStyles = {
     content: {
@@ -28,10 +29,8 @@ const customStyles = {
 export class AddDevice extends Component {
 
     state = {
-        popupHeading: "ADD DEVICE BY:",
-        popupHeadingPrev: "ADD DEVICE BY:",
+        popupHeading: "ADD DEVICE BY",
         popupInfo: "default",
-        popupInfoPrev: "default",
         devicesView: "dashboardDevices",
         ssid: "",
         wifipass: "",
@@ -44,162 +43,151 @@ export class AddDevice extends Component {
         super(props);
     }
 
-    // componentDidMount = () => {
-    //     this.getPairedDevices();
-    // }
-
-    setView = (view) => {
-        this.setState({ devicesView: view });
-        this.props.mainView(view)
-    }
-
-    changeViews = (account) => {
+    orOption = () => {
         return (
-            <div className="dropdown">
-                <FontAwesomeIcon icon="eye" onClick={() => this.showDropdownMenu("views")} />
-                {this.state.displayViews ? (
-                    <div className="arrow-up">
-                        <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
-                            <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
-                                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
-                                    <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
-                    </div>
-                                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
-                                    <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
-                    </div>
-                                <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboardDevices")}>
-                                    <FontAwesomeIcon icon="digital-tachograph" />  DASHBOARD WITH DEVICES
-                    </div>
-                            </div>
-                        </div>
-                    </div>
-                ) :
-                    (
-                        null
-                    )
-                }
+            <div style={{ background: "#0E1A26", padding: "10px 30px", fontSize: "25px", textAlign: "center" }}>
+                OR
             </div>
-        );
+        )
     }
 
     popupInfo = () => {
-        if (this.state.popupInfo == "default") {
-            return (
-                <div >
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => this.changePopup("ADD DEVICE BY TYPE", "type")}>TYPE</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => this.changePopup("ADD DEVICE BY CONFIG", "configuration")}>CONFIGURATION</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => this.changePopup("ADD DEVICE BY SERIAL NUMBER", "serial")}>SERIAL NUMBER</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => this.changePopup("ADD DEVICE BY TEMPORARY CODE", "temp_code")}>TEMPORARY CODE</button>
+        return (
+            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                <div style={{}}>
+                    Search for your device, service and/or protocol:
                 </div>
-            )
-        } else if (this.state.popupInfo == "type") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <select className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="000000000000">
-                        <option unselectable="true">SELECT DEVICE</option>
-                        <option>TELTONIKA</option>
-                        <option>ESP32</option>
-                        <option>ARDUINO UNO</option>
-                    </select>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "configuration") {
-            return (
-                <div style={{ width: "380px" }}>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("ADD DEVICE BY WIFI CONFIG", "wifi") }}>WIFI</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("ADD DEVICE BY BLUETOOTH CONFIG", "bluetooth") }}>BLUETOOTH</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "wifi") {
-            return (
-                <div>
-                    SSID      : <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 43, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.ssid("ssid")} placeholder="NETWORK NAME"></input><br /><br />
-                    PASSWORD  : <input type="password" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 8, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.wifiPassword("password")} placeholder="PASSWORD"></input><br /><br />
-                    <button className="commanderBgPanel commanderBgPanelClickable" onClick={this.bits} style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.bits() }}>ADD</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "bluetooth") {
-            return (
-                <div >
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SCAN BLE DEVICES", "scanBluetooth") }}>SCAN FOR DEVICE</button>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT PAIRED BLE", "selectBluetooth"); /*this.getPairedDevices()*/ }}>SELECT BLUETOOTH DEVICE</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "scanBluetooth") {
-            return (
-                <div align="left" style={{ textAlign: "left" }}>
-                    {
-                        this.getBLEDevices()
-                    }
-                    <br /><br />
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "5px 0px" }} onClick={this.getBlutoothDevices}>
-                        REFRESH <i className="fas fa-redo NavLink"></i>
-                    </button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "selectBluetooth") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <select className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="Select device">
-                        <option unselectable="true">SELECT DEVICE</option>
-                        {
-                            this.state.pairedDevices.map((device) => {
-                                return (
-                                    <option key={device.address}>{device.name}</option>
-                                )
-                            })
-                        }
-                    </select>
-                </div>
-            )
-        } else if (this.state.popupInfo == "serial") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="0000-0000-0000"></input>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "temp_code") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="000000000000"></input>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
-                </div>
-            )
-        } else if (this.state.popupInfo == "scanDevices") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <div className="commanderBgPanel ">
-                        <span>Scanning</span><span style={{}} className="spinner-demo spinner-demo2"></span>
+                <div className="row addDevice">
+                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
                     </div>
-                </div>
-            )
-        } else if (this.state.popupHeading == "WIFI information") {
-            return (
-                <div align="center">
-                    <div className="commanderBgPanel commanderBgPanelClickable" >{
-                        this.state.code.map((user, i) => {
-                            return <div id={user} key={i} className="commanderBgPanel" style={{ float: "center" }}>{user}</div>
-                        })
-                    }
-                    </div>
-                </div>
-            )
-        } else if (this.state.popupInfo == "public") {
-            return (
-                <div style={{ width: "380px" }} align="center">
-                    <div style={{ width: "100%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }}>
-                        Please register above to be able to add a device.
-                    </div>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
-                </div>
-            )
-        }
-        else {
-            return <div></div>
-        }
 
+                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                        <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} placeholder="Type to filter options" />
+                        <datalist id="devices">
+                            <option value="Arduino (Serialport)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            <option value="ESP32 (Wifi + MQTT)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                        </datalist>
+                    </div>
+
+                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
+                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { }}>
+                            NEXT <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        )
+
+        // else if (this.state.popupInfo == "type") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <select className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="000000000000">
+        //                 <option unselectable="true">SELECT DEVICE</option>
+        //                 <option>TELTONIKA</option>
+        //                 <option>ESP32</option>
+        //                 <option>ARDUINO UNO</option>
+        //             </select>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "configuration") {
+        //     return (
+        //         <div style={{ width: "380px" }}>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("ADD DEVICE BY WIFI CONFIG", "wifi") }}>WIFI</button>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("ADD DEVICE BY BLUETOOTH CONFIG", "bluetooth") }}>BLUETOOTH</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "wifi") {
+        //     return (
+        //         <div>
+        //             SSID      : <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 43, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.ssid("ssid")} placeholder="NETWORK NAME"></input><br /><br />
+        //             PASSWORD  : <input type="password" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "70%", marginLeft: 8, marginBottom: 10, padding: "7px 0px", textAlign: "left", color: "white" }} onChange={this.wifiPassword("password")} placeholder="PASSWORD"></input><br /><br />
+        //             <button className="commanderBgPanel commanderBgPanelClickable" onClick={this.bits} style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.bits() }}>ADD</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "bluetooth") {
+        //     return (
+        //         <div >
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SCAN BLE DEVICES", "scanBluetooth") }}>SCAN FOR DEVICE</button>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.changePopup("SELECT PAIRED BLE", "selectBluetooth"); /*this.getPairedDevices()*/ }}>SELECT BLUETOOTH DEVICE</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "scanBluetooth") {
+        //     return (
+        //         <div align="left" style={{ textAlign: "left" }}>
+        //             {
+        //                 this.getBLEDevices()
+        //             }
+        //             <br /><br />
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "5px 0px" }} onClick={this.getBlutoothDevices}>
+        //                 REFRESH <i className="fas fa-redo NavLink"></i>
+        //             </button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "selectBluetooth") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <select className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="Select device">
+        //                 <option unselectable="true">SELECT DEVICE</option>
+        //                 {
+        //                     this.state.pairedDevices.map((device) => {
+        //                         return (
+        //                             <option key={device.address}>{device.name}</option>
+        //                         )
+        //                     })
+        //                 }
+        //             </select>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "serial") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="0000-0000-0000"></input>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "temp_code") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }} placeholder="000000000000"></input>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { }}>ADD</button>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "scanDevices") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <div className="commanderBgPanel ">
+        //                 <span>Scanning</span><span style={{}} className="spinner-demo spinner-demo2"></span>
+        //             </div>
+        //         </div>
+        //     )
+        // } else if (this.state.popupHeading == "WIFI information") {
+        //     return (
+        //         <div align="center">
+        //             <div className="commanderBgPanel commanderBgPanelClickable" >{
+        //                 this.state.code.map((user, i) => {
+        //                     return <div id={user} key={i} className="commanderBgPanel" style={{ float: "center" }}>{user}</div>
+        //                 })
+        //             }
+        //             </div>
+        //         </div>
+        //     )
+        // } else if (this.state.popupInfo == "public") {
+        //     return (
+        //         <div style={{ width: "380px" }} align="center">
+        //             <div style={{ width: "100%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }}>
+        //                 Please register above to be able to add a device.
+        //             </div>
+        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
+        //         </div>
+        //     )
+        // }
     }
 
     getBLEDevices = () => {
@@ -218,55 +206,68 @@ export class AddDevice extends Component {
         }
     }
 
+    serialDevice = () => {
+        return (
+            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                <div style={{}}>
+                    Add device by SERIAL NUMBER or TEMPORARY CODE:
+                    </div>
+                <div className="row addDevice">
+                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                    </div>
+
+                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                        <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", padding: "8px 8px", color: "white" }} placeholder="Enter code" />
+                    </div>
+
+                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
+                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { }}>
+                            ADD <i className="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        )
+    }
+
     getBlutoothDevices = () => {
-        this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
         // fetch("/api/v3/scanbluetoothDevices", {
         //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         // }).then(response => response.json()).then(resp => {
         //     this.setState({ bleDevices: resp })
-        //     this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
         // }).catch(err => {
         //     console.error(err.toString())
-        //     this.changePopup("SCAN BLUETOOTH DEVICES", "scanBluetooth");
         // });
     }
 
     getPairedDevices = () => {
-        this.changePopup("SELECT BLUETOOTH", "selectBluetooth");
-        // this.changePopup("SCAN BLUETOOTH DEVICES", "scanDevices");
         // fetch("/api/v3/getPairedDevices", {
         //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         // }).then(response => response.json()).then(resp => {
         //     this.setState({ pairedDevices: resp })
-        //     this.changePopup("SELECT PAIRED BLE", "selectBluetooth")
         // }).catch(err => {
         //     console.error(err.toString())
-        //     this.changePopup("SELECT PAIRED BLE", "selectBluetooth")
         // });
     }
 
-
-    goBack = () => {
-        this.setState({ popupHeading: this.state.popupHeadingPrev }, () => {
-            this.setState({ popupInfo: this.state.popupInfoPrev });
-        })
-    }
-
-    changePopup = (heading, info) => {
-        // commenting this out till setSteps are uncovered. 
-        // this.setState({ popupHeadingPrev: this.state.popupHeading }, () => {
-        //     this.setState({ popupInfoPrev: this.state.popupInfo });
-        // })
-        if (this.props.account.level > 0) {
-            this.setState({ popupHeading: heading }, () => {
-                this.setState({ popupInfo: info });
-            })
-        } else {
-            this.setState({ popupHeading: "Registration Required" }, () => {
-                this.setState({ popupInfo: "public" });
-            })
-        }
-    }
+    // changePopup = (heading, info) => {
+    //     // commenting this out till setSteps are uncovered. 
+    //     // this.setState({ popupHeadingPrev: this.state.popupHeading }, () => {
+    //     //     this.setState({ popupInfoPrev: this.state.popupInfo });
+    //     // })
+    //     if (this.props.account.level > 0) {
+    //         this.setState({ popupHeading: heading }, () => {
+    //             this.setState({ popupInfo: info });
+    //         })
+    //     } else {
+    //         this.setState({ popupHeading: "Registration Required" }, () => {
+    //             this.setState({ popupInfo: "public" });
+    //         })
+    //     }
+    // }
 
     ssid = (ssid) => {
         return (evt) => {
@@ -298,16 +299,23 @@ export class AddDevice extends Component {
             <div >
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <div style={{ background: "#131e27", padding: 12, width: "100%" }}>
-                            <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel(); /*this.setState({ popupInfo: "default" }); this.setState({ popupHeading: "ADD DEVICE" })*/ }} style={{ paddingRight: 10, float: "right" }}></span>
-                            <span className={"fas fa-arrow-circle-left navLink"} onClick={() => { this.goBack() }} style={{}}></span>
-                            <span style={{ float: "right", marginRight: "40%" }}>{this.state.popupHeading}</span>
+                        <div style={{ background: "#1C2834", padding: 12, width: "100%" }}>
+                            <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); /*this.setState({ popupInfo: "default" }); this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
+                            <span style={{ marginRight: "40%", textAlign: "center" }}>{this.state.popupHeading}</span>
                         </div>
-                        <center>
-                            <div className='protoPopup'>
-                                {this.popupInfo()}
+                        <div style={{ color: "rgba(174, 231, 241, 0.55)" }}>
+                            {/* <div className='protoPopup'> */}
+                            <div style={{ background: "#0E1A26", padding: "10px 30px" }}>
+                                There are many ways to link data depending on what hardware you are using.
+                                <p>This wizard will help guide you through the process.</p>
                             </div>
-                        </center>
+                            {this.popupInfo()}
+                            {this.orOption()}
+                            {this.serialDevice()}
+                        </div>
+                        <div style={{ background: "#0E1A26", padding: "10px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
+                            Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}>support</span>
+                        </div>
                     </Modal>
                 </center>
             </div >
