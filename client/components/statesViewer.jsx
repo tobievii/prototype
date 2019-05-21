@@ -11,6 +11,7 @@ const MapDevices = React.lazy(() => import('./dashboard/map'))
 
 import Media from "react-media";
 import { confirmAlert } from 'react-confirm-alert';
+import { ChangePassword } from "../components/changePassword.jsx";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -80,6 +81,8 @@ export class DeviceList extends Component {
     //   }, 2000)
     // }
   }
+
+
 
   state = {
     activePage: 1
@@ -173,6 +176,7 @@ export class StatesViewer extends Component {
     boundary: undefined,
     showB: false,
     buttonColour: " ",
+    isOpen: false,
     tempdev: []
   };
 
@@ -379,6 +383,19 @@ export class StatesViewer extends Component {
     setTimeout(() => {
       this.getDevices("initial load");
     }, 50);
+  }
+  componentDidMount = () => {
+    this.changePassword()
+  }
+  openModal = (origination) => {
+    this.setState({ isOpen: true });
+  }
+
+  changePassword = () => {
+    if (this.props.account.passChange == false) {
+      window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
+      this.openModal();
+    }
   }
 
   componentWillUnmount = () => {
@@ -740,6 +757,11 @@ export class StatesViewer extends Component {
             <StatesViewerMenu mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
             <div className="rowList2">
               {this.returnDeviceList()}
+              <ChangePassword
+                account={this.props.account}
+                isOpen={this.state.isOpen}
+                closeModel={() => { this.setState({ isOpen: false }) }}
+              />
             </div>
           </div>
         )
@@ -765,6 +787,11 @@ export class StatesViewer extends Component {
             <div className={"rowList " + this.props.mainView}>
               {this.returnDeviceList()}
               {this.displayMap()}
+              <ChangePassword
+                account={this.props.account}
+                isOpen={this.state.isOpen}
+                closeModel={() => { this.setState({ isOpen: false }) }}
+              />
             </div>
           </div>
         )
