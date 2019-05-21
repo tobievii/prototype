@@ -19,7 +19,6 @@ export function handlePacket(db: any, packet: any, cb: any) {
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
-
   app.get("/verify/:id", (req: any, res: any) => {
     db.users.findOne({ "_id": ObjectId(req.params.id) }, (err: Error, user: any) => {
       if (err) { log(err); return; }
@@ -39,12 +38,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
             res.redirect("/")
           }
         })
-
-
       }
     })
-
-
   })
 
   //####################################################################
@@ -89,7 +84,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     //####################################################################
 
   })
-
 
   //Reset password after link
   app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
@@ -159,8 +153,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   })
   //Changing password while logged in
 
-
-
   //####################################################################
   //Recover Password Link sent via email
   app.post("/api/v3/admin/recoverEmailLink", (req: any, res: any) => {
@@ -201,7 +193,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   })
   //Recover Password Link sent via email
   //####################################################################
-
 
   //####################################################################
   //Shared Device email
@@ -281,7 +272,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //Shared Device email
   //####################################################################
 
-
   app.get("/api/v3/admin/registration", (req: any, res: any) => {
     // public api to get information if server allows registration/requires email verification
     // if level > 100 then adds the server private email config.
@@ -342,7 +332,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 }
 
-
 function getRegistration(db: any, cb: any) {
   db.plugins_admin.findOne({ settings: "registration" }, cb);
 }
@@ -361,6 +350,3 @@ function updateRegistration(db: any, userInput: any, cb: any) {
 
   db.plugins_admin.update({ settings: "registration" }, cleanInput, { upsert: true }, cb);
 }
-
-
-
