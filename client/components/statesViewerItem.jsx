@@ -303,7 +303,7 @@ export class StatesViewerItem extends Component {
     // }
     // else {
     return (
-      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+      <Link className="col" style={{ padding: "0px 8px" }} to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
         <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
           <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
         </div>
@@ -318,14 +318,14 @@ export class StatesViewerItem extends Component {
         if (this.props.device.selected) {
 
           return (
-            <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+            <div className="col" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
             </div>
           )
         } else {
           return (
-            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-              <i className="statesViewerCheckBoxes fas fa-check" ></i>
+            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ fontSize: 14 }}></i>
             </div>
           )
         }
@@ -399,6 +399,7 @@ export class StatesViewerItem extends Component {
       icon = "icon";
       columSize = "200px"
     }
+
     if (this.props.public == false) {
       if (this.props.visiting == true) {
         return (
@@ -464,51 +465,31 @@ export class StatesViewerItem extends Component {
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
       var viewUsed = this.props.view
       var qr = { mail: "failedq" }
-      if (viewUsed == "list" && this.props.mainView == "devices") {
+      var lastseen = 3;
 
-        return (
-          <div className="container-fluid" style={{ marginBottom: 2 }}>
-            <div className="row statesViewerItem" style={this.calcStyle()} >
-
-              {this.selectbox()}
-              {
-                this.deviceInformation()
-              }
-
-              <div className="col changeTimeagoWidth" style={{ flex: "0 0 230px", textAlign: "right" }}>
-                <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
-                <span className="faded dataPreview" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
-              </div>
-              <div style={{ paddingTop: "7px" }}>
-                {this.stateListIcons(viewUsed, this.props.device)}
-              </div>
-
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
-
-            </div>
-          </div>
-        );
-      } else {
-        return (
-          <div className="container-fluid" style={{ marginBottom: 2 }}>
-            <div className="row statesViewerItemMap" style={this.calcStyle()} >
-
-              {this.selectbox()}
-
-              {this.displayDeviceInfo()}
-
-              <div className="col" align="right" style={{ marginTop: "4px" }}>
-                <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
-              </div>
-
-              {/* <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}> */}
-              {this.stateListIcons(viewUsed, this.state.device)}
-
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
-            </div>
-          </div>
-        )
+      if (this.props.mainView == "devices") {
+        lastseen = 10;
       }
+
+      return (
+        <div className="container-fluid" style={{ marginBottom: 2 }}>
+          <div className="row statesViewerItemMap" style={this.calcStyle()}>
+
+            {this.selectbox()}
+
+            {this.displayDeviceInfo()}
+
+            <div className="col" align="right" style={{ marginTop: "4px", paddingRight: lastseen }}>
+              <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
+            </div>
+
+            {/* <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}> */}
+            {this.stateListIcons(viewUsed, this.state.device)}
+
+            <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
+          </div>
+        </div>
+      )
     }
   }
 }   
