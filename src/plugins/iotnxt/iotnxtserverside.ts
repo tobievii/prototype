@@ -141,8 +141,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     }, 3000);
   });
 
-
-
   // getgateways(db, (err: Error, gateways: any) => {
   //   if (gateways) {
   //     for (var g in gateways) {
@@ -150,7 +148,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //     }
   //   }
   // });
-
 
   setInterval(
     function () {
@@ -165,7 +162,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
                 connectgateway(db, gateways[g], eventHub, (err: any, result: any) => { })
               }
             }
-
 
             //retry every now and then
             setInterval(() => {
@@ -226,7 +222,6 @@ jobs.process('Confirm', function (connectqueues: { data: any; }, done: { (): voi
   }, 3000);
 });
 
-
 function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) {
   log("IOTNXT Connecting to " + gatewayToconnect.GatewayId)
   calcDeviceTree(db, gatewayToconnect, (gateway: any, deviceTree: any) => {
@@ -250,7 +245,6 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
           connected: true,
           gateway: gateway
         });
-
         /////////
         iotnxtqueue.on("disconnect", () => {
           updategateway(db, gateway, { connected: false }, () => { })
@@ -261,7 +255,6 @@ function connectgateway(db: any, gatewayToconnect: any, eventHub: any, cb: any) 
             gateway: gateway
           });
         })
-
         /////////
         iotnxtqueue.on("request", (request: any) => {
           //console.log(request);
@@ -337,9 +330,7 @@ function getserverdefaultgateway(db: any, cb: any) {
 }
 
 function removegateway(db: any, data: any, cb: any) {
-
   db.plugins_iotnxt.remove({ type: "gateway", GatewayId: data.GatewayId, HostAddress: data.HostAddress }, cb);
-
 }
 
 function setgatewayserverdefault(db: any, gateway: any, user: any, cb: any) {
@@ -427,7 +418,6 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
 
               results++;
 
-
               if ((deviceGateway) && (gateway)) {
                 if (gateway.GatewayId == deviceGateway.GatewayId) {
                   var flatdata = recursiveFlat(device.payload.data);
@@ -450,7 +440,6 @@ function calcDeviceTree(db: any, gateway: any, cb: any) {
                   //end if
                 }
               }
-
               //console.log("results:"+results+" deviceStates.length:"+deviceStates.length)
               if (results == deviceStates.length) {
                 cb(gateway, deviceTree);
@@ -501,8 +490,6 @@ function connectIotnxt(deviceTree: any, gateway: any, cb: any) {
   if (gateway.HostAddress == undefined) {
     console.error("ERROR gateway.HostAddress undefined");
   }
-
-
 
   var iotnxtqueue = new iotnxt.IotnxtQueue(
     {
