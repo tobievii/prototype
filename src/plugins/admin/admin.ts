@@ -1,4 +1,4 @@
-import { log } from "../../utils"
+import { log, generate } from "../../utils"
 
 var nodemailer = require("nodemailer")
 var randomString = require('random-string');
@@ -133,12 +133,13 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     const decryptedString = cryptr.decrypt(req.body.current);
     const decryptedString2 = cryptr.decrypt(req.body.pass);
     var scryptParameters = scrypt.paramsSync(0.1);
+    var uuid = generate(128)
     db.users.findOne({ username: req.body.user }, (err: Error, found: any) => {
 
       scrypt.verifyKdf(found.password.buffer, decryptedString, function (err: Error, result: any) {
         if (result == true) {
           var newpass = scrypt.kdfSync(decryptedString2, scryptParameters);
-          db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass } }, (err: Error, response: any) => {
+          db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass, uuid: uuid } }, (err: Error, response: any) => {
             if (response) {
               if (response.nModified == 0) {
                 res.json(response)
