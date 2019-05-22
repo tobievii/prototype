@@ -57,7 +57,10 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
         })
         client.on("subscribe", (packet) => {
-            client.subscriptions.push(packet.subscribe)
+            // check if already subscribed
+            if (client.subscriptions.includes(packet.subscribe) == false) {
+                client.subscriptions.push(packet.subscribe)
+            }
         })
 
         client.on("publish", (publish) => {
