@@ -136,20 +136,16 @@ export class StatesViewerMenu extends Component {
         var statelistIcons = "110px";
         var lastseen = "95px"
 
-        var timedesc = this.props.sortValues.timedesc;
-
         if (this.props.mainView == "devices") {
             statelistIcons = "127px";
             lastseen = "80px";
         }
 
-
-
         return (
             <div className="row" style={{}}>
                 <div className="col fa-stack" style={{ flex: "0 0 30px", cursor: "pointer", verticalAlign: "middle", marginLeft: "3px", marginTop: 5 }} onClick={this.sortClickHandler("selected")} >
                     <i className="fas fa-stack-1x fa-sort-up filterButton" title="Selected devices on top"></i>
-                    <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="Selected devices last" style={{ opacity: 0.5 }}></i>
+                    <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="Selected devices last" style={{ opacity: 0.5 }}></i>
                 </div>
 
                 <div className="col" style={{ flex: "0 0 50px", padding: "0px", cursor: "pointer", marginRight: "3px", paddingTop: 5 }} onClick={this.sortClickHandler("namedesc")}>

@@ -58,6 +58,7 @@ export class StatesViewerItem extends Component {
   }
 
   setDevice = (device) => {
+    var alarmStates = [];
     if (device.public != undefined) {
       if (device.public == true) {
         this.setState({ opacityp: "1" })
@@ -81,6 +82,7 @@ export class StatesViewerItem extends Component {
     if (device.boundaryLayer != undefined || device.boundaryLayer != null) {
       if (device.boundaryLayer.inbound != true) {
         this.setState({ opacitya: "1" })
+        this.props.alarmStates.push(device);
       } else {
         this.setState({ opacitya: "0.2" })
       }
@@ -103,6 +105,7 @@ export class StatesViewerItem extends Component {
 
       if (notifications[s].type == "ALARM" && device.devid == notifications[s].device && notifications[s].seen == false) {
         this.setState({ opacitya: "1" })
+        this.props.alarmStates.push(device);
         this.setState({ alarmNotification: notifications[s] });
       }
     }

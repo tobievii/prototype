@@ -16,7 +16,9 @@ const customStyles = {
         backgroundColor: "rgba(0, 0, 0, 0.1)",
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto',
-        padding: "0"
+        padding: "0",
+        width: "765px",
+        height: "470px"
     },
     //bacground of Pop up Modal on search
     overlay: {
@@ -313,7 +315,7 @@ export class AddDevice extends Component {
                             {this.serialDevice()}
                         </div>
                         <div style={{ background: "#0E1A26", padding: "10px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
-                            Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}>support</span>
+                            Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
                         </div>
                     </Modal>
                 </center>
