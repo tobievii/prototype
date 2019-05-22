@@ -136,10 +136,14 @@ export class StatesViewerMenu extends Component {
         var statelistIcons = "110px";
         var lastseen = "95px"
 
+        var timedesc = this.props.sortValues.timedesc;
+
         if (this.props.mainView == "devices") {
             statelistIcons = "127px";
             lastseen = "80px";
         }
+
+
 
         return (
             <div className="row" style={{}}>
@@ -157,7 +161,7 @@ export class StatesViewerMenu extends Component {
                 </div>
 
                 <div className="col" id="search" style={{ textAlign: "left", cursor: "pointer", padding: "0px", margin: "2px 10px 4px 5px" }}>
-                    {/* <i className="fas fa-search searchIcon"></i> */}
+                    {/* <input className="fa" name="query" type="search" onChange={this.props.search} style={{ fontFamily: "Font Awesome 5 Free, Share Tech Mono, ShareTechMono-Regular", fontStyle: "normal", width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="&#xf002;" /> */}
                     <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="search for device..." />
                 </div>
 
@@ -166,7 +170,7 @@ export class StatesViewerMenu extends Component {
                         <i className="fas fa-stack-1x fa-sort-up filterButton" title="last seen"></i>
                         <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="last seen" style={{ opacity: 0.5 }}></i>
                     </span>
-                    <span>LATEST</span>
+                    <span className="filterButton">LATEST</span>
                 </div>
 
                 <div className="col" style={{ flex: "0 0 " + statelistIcons, padding: "0px", marginTop: 5 }}>

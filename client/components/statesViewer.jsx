@@ -159,7 +159,16 @@ export class StatesViewer extends Component {
     boundary: undefined,
     showB: false,
     buttonColour: " ",
-    tempdev: []
+    tempdev: [],
+    sortValues: {
+      timedesc: "asc",
+      namedesc: "asc",
+      selected: "asc",
+      alarm: "asc",
+      warning: "asc",
+      shared: "asc",
+      public: "asc"
+    }
   };
 
   socket = undefined;
@@ -452,6 +461,7 @@ export class StatesViewer extends Component {
   }
 
   sort = (sorttype) => {
+    var sv = _.clone(this.state.sortValues)
     var value;
     if (sorttype != undefined) {
       value = sorttype;
@@ -462,7 +472,7 @@ export class StatesViewer extends Component {
 
     var newDeviceList = _.clone(this.state.devicesView)
 
-    if (value == "timedesc") {
+    if (value == "timedesc" && this.state.sortValues.timedesc == "asc") {
       newDeviceList.sort((a, b) => {
         if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
           return 1
@@ -470,60 +480,125 @@ export class StatesViewer extends Component {
           return -1
         }
       }).reverse();
-    }
 
-    if (value == "namedesc") {
+      sv.timedesc = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "timedesc" && this.state.sortValues.timedesc == "des") {
       newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      })
-    }
-
-    if (value == "") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_created_on"]) > new Date(b["_created_on"])) {
+        if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
           return 1
         } else {
           return -1
         }
       }).reverse();
+
+      sv.timedesc = "asc"
+      this.setState({ sortValues: sv })
     }
 
-    if (value == "selected") {
+    if (value == "namedesc" && this.state.sortValues.namedesc == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      })
+
+      sv.namedesc = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "namedesc" && this.state.sortValues.namedesc == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.namedesc = "asc"
+      this.setState({ sortValues: sv })
+    }
+
+    if (value == "selected" && this.state.sortValues.selected == "asc") {
       newDeviceList.sort((a, b) => {
         if (a.selected == true && b.selected == false) {
           return 1
         } else { return -1 }
       }).reverse();
+
+      sv.selected = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "selected" && this.state.sortValues.selected == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.selected == false && b.selected == true) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.selected = "asc"
+      this.setState({ sortValues: sv })
     }
 
     if (value == "alarm") {
       console.log(value)
     }
 
-    if (value == "warning") {
+    if (value == "warning" && this.state.sortValues.warning == "asc") {
       newDeviceList.sort((a, b) => {
         if (a.notification24 == true && b.notification24 == undefined) {
           return 1
         } else { return -1 }
       }).reverse();
+
+      sv.warning = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "warning" && this.state.sortValues.warning == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.notification24 == undefined && b.notification24 == true) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.warning = "asc"
+      this.setState({ sortValues: sv })
     }
 
-    if (value == "shared") {
+    if (value == "shared" && this.state.sortValues.shared == "asc") {
       newDeviceList.sort((a, b) => {
         if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
           return 1
         } else { return -1 }
       }).reverse();
+
+      sv.shared = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "shared" && this.state.sortValues.shared == "des") {
+      newDeviceList.sort((a, b) => {
+        if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.shared = "asc"
+      this.setState({ sortValues: sv })
     }
 
-    if (value == "public") {
+
+    if (value == "public" && this.state.sortValues.public == "asc") {
       newDeviceList.sort((a, b) => {
         if (a.public == true && b.public == undefined) {
           return 1
         } else { return -1 }
       }).reverse();
+
+      sv.public = "des"
+      this.setState({ sortValues: sv })
+    } else if (value == "public" && this.state.sortValues.public == "des") {
+      newDeviceList.sort((a, b) => {
+        if (b.public == true && a.public == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.public = "asc"
+      this.setState({ sortValues: sv })
     }
 
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
@@ -706,7 +781,7 @@ export class StatesViewer extends Component {
           <span className="col commanderBgPanel commanderBgPanelClickable sucess" style={{ flex: "0 0 130px", padding: "4px 10px" }} onClick={() => { this.props.openModal() }}>
             <i className="fas fa-plus"></i>  ADD DEVICE
           </span>
-          <div className="col" align="center" style={{ background: "#1B2936", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
+          <div className="col" align="center" style={{ background: "#131e27", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
         </div>
       </div>
     )
@@ -725,6 +800,7 @@ export class StatesViewer extends Component {
               <div>
                 {this.deviceButtons()}
                 < StatesViewerMenu
+                  sortValues={this.state.sortValues}
                   openModal={() => this.props.openModal()}
                   mainView={this.props.mainView}
                   deviceCall={this.state.devicePressed}
