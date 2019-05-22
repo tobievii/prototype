@@ -955,7 +955,7 @@ app.get("/api/v3/getsort", (req: any, res: any) => {
 });
 
 app.post("/api/v3/passChanged", (req: any, res: any) => {
-  db.users.update({ apikey: req.user.apikey }, { $set: { passChange: true } }, (err: Error, updated: any) => {
+  db.users.update({ username: req.body.username }, { $set: { passChange: true } }, (err: Error, updated: any) => {
     if (err) res.json(err);
     if (updated) res.json(updated);
   })
