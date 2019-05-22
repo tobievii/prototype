@@ -392,9 +392,17 @@ export class StatesViewer extends Component {
   }
 
   changePassword = () => {
-    if (this.props.account.passChange == false) {
-      window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
-      this.openModal();
+    try {
+      if (this.props.account.passChange == false) {
+        window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
+        this.openModal();
+      }
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return
+      } else {
+        printError(e, false);
+      }
     }
   }
 
