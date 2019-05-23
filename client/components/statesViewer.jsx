@@ -11,6 +11,7 @@ const MapDevices = React.lazy(() => import('./dashboard/map'))
 
 import Media from "react-media";
 import { confirmAlert } from 'react-confirm-alert';
+import { ChangePassword } from "../components/changePassword.jsx";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -78,6 +79,8 @@ export class DeviceList extends Component {
     //   }, 2000)
     // }
   }
+
+
 
   state = {
     activePage: 1,
@@ -173,7 +176,9 @@ export class StatesViewer extends Component {
       warning: "asc",
       shared: "asc",
       public: "asc"
-    }
+    },
+    isOpen: false,
+    tempdev: []
   };
 
   socket = undefined;
@@ -388,6 +393,27 @@ export class StatesViewer extends Component {
     setTimeout(() => {
       this.getDevices("initial load");
     }, 50);
+  }
+  componentDidMount = () => {
+    this.changePassword()
+  }
+  openModal = (origination) => {
+    this.setState({ isOpen: true });
+  }
+
+  changePassword = () => {
+    try {
+      if (this.props.account.passChange == false) {
+        window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
+        this.openModal();
+      }
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return
+      } else {
+        printError(e, false);
+      }
+    }
   }
 
   componentWillUnmount = () => {
@@ -885,6 +911,11 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
+            <ChangePassword
+                account={this.props.account}
+                isOpen={this.state.isOpen}
+                closeModel={() => { this.setState({ isOpen: false }) }}
+              />
           </div>
         </div >
       )

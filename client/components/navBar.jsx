@@ -473,7 +473,7 @@ export class NavBar extends Component {
   }
 
   addButtonClicked = () => {
-    this.props.openModal();
+    this.props.openModal("addDevice");
   }
 
   render() {

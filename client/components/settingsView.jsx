@@ -63,7 +63,7 @@ export class SettingsView extends React.Component {
 
       if (plugins[this.state.activeMenu]) {
         var SettingsPanel = plugins[this.state.activeMenu].SettingsPanel
-        return <SettingsPanel />
+        return <SettingsPanel {...this.props} />
       } else {
         //default to 0 
         this.setState({ activeMenu: 0 })
