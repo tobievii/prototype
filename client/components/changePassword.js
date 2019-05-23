@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Modal from 'react-modal';
 import zxcvbn from "zxcvbn"
 const Cryptr = require('cryptr');
@@ -25,7 +25,7 @@ const customStyles = {
     }
 };
 
-export class ChangePassword extends Component {
+export default class ChangePassword extends React.PureComponent {
 
     state = {
         password: "",

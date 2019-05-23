@@ -27,7 +27,7 @@ const customStyles = {
     }
 };
 
-export class AddDevice extends Component {
+export default class AddDevice extends Component {
 
     state = {
         popupHeading: "ADD DEVICE BY",

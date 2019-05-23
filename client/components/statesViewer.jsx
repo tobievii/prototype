@@ -8,10 +8,8 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 
 const MapDevices = React.lazy(() => import('./dashboard/map'))
-
-import Media from "react-media";
+const ChangePassword = React.lazy(() => import('../components/changePassword'))
 import { confirmAlert } from 'react-confirm-alert';
-import { ChangePassword } from "../components/changePassword.jsx";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -849,7 +847,7 @@ export class StatesViewer extends Component {
     return (
       <div className="container-fluid" style={{ marginRight: "auto", marginLeft: "auto" }}>
         <div className="row" style={{}} >
-          <span className="col commanderBgPanel commanderBgPanelClickable sucess" style={{ flex: "0 0 130px", padding: "4px 10px" }} onClick={() => { this.props.openModal() }}>
+          <span className="col commanderBgPanel commanderBgPanelClickable sucess" style={{ flex: "0 0 130px", padding: "4px 10px" }} onClick={() => { this.props.openModal("addDevice") }}>
             <i className="fas fa-plus"></i>  ADD DEVICE
           </span>
           <div className="col" align="center" style={{ background: "#131e27", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
@@ -911,11 +909,13 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
-            <ChangePassword
+            <Suspense fallback={<div>Loading...</div>}>
+              <ChangePassword
                 account={this.props.account}
                 isOpen={this.state.isOpen}
                 closeModel={() => { this.setState({ isOpen: false }) }}
               />
+            </Suspense>
           </div>
         </div >
       )
