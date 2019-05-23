@@ -390,6 +390,27 @@ export class StatesViewer extends Component {
       this.getDevices("initial load");
     }, 50);
   }
+  componentDidMount = () => {
+    this.changePassword()
+  }
+  openModal = (origination) => {
+    this.setState({ isOpen: true });
+  }
+
+  changePassword = () => {
+    try {
+      if (this.props.account.email == "admin@localhost.com" && this.props.account.passChange == false) {
+        window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
+        this.openModal();
+      }
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return
+      } else {
+        printError(e, false);
+      }
+    }
+  }
 
   componentWillUnmount = () => {
     fetch("/api/v3/sort", {
