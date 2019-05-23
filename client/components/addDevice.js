@@ -45,45 +45,81 @@ export default class AddDevice extends Component {
     }
 
     orOption = () => {
-        return (
-            <div style={{ background: "#0E1A26", padding: "10px 30px", fontSize: "25px", textAlign: "center" }}>
-                OR
+        if (this.state.popupInfo == "default") {
+            return (
+                <div style={{ background: "#0E1A26", padding: "10px 30px", fontSize: "25px", textAlign: "center" }}>
+                    OR
             </div>
-        )
+            )
+        } else {
+            return null
+        }
+    }
+
+    addDevice = () => {
+        if (this.props.account.level < 1) {
+            this.setState({ popupInfo: "public" })
+        } else if (this.state.search == "Efento") {
+            this.setState({ popupInfo: "Efento" })
+        } else {
+            return null;
+        }
+    }
+
+    search = evt => {
+        this.setState({ search: evt.target.value.toString() })
     }
 
     popupInfo = () => {
-        return (
-            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                <div style={{}}>
-                    Search for your device, service and/or protocol:
+        if (this.state.popupInfo == "default") {
+            return (
+                <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                    <div style={{}}>
+                        Search for your device, service and/or protocol:
                 </div>
-                <div className="row addDevice">
-                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
-                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
-                    </div>
+                    <div className="row addDevice">
+                        <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                            <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                        </div>
 
-                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} placeholder="Type to filter options" />
-                        <datalist id="devices">
-                            <option value="Arduino (Serialport)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            <option value="ESP32 (Wifi + MQTT)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                        </datalist>
-                    </div>
+                        <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                            <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} placeholder="Type to filter options" />
+                            <datalist id="devices">
+                                <option value="Arduino (Serialport)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="ESP32 (Wifi + MQTT)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            </datalist>
+                        </div>
 
-                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { }}>
-                            NEXT <i className="fas fa-chevron-right"></i>
-                        </button>
+                        <div className="col" style={{ padding: 0, cursor: "pointer" }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                                NEXT <i className="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+
                     </div>
 
                 </div>
-
-            </div>
-        )
+            )
+        } else if (this.state.popupInfo == "public") {
+            return (
+                <div style={{ height: "190px" }} align="center">
+                    <div style={{ width: "100%", marginBottom: 10, marginTop: 100, padding: "8px 0px", textAlign: "center", color: "white" }}>
+                        Please register above to be able to add a device.
+                </div>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
+                </div>
+            )
+        } else if (this.state.popupInfo == "Efento") {
+            return (
+                <div style={{ width: "190px" }}>
+                    your aspikey is: {this.props.account.apikey}
+                    efento port: 5618
+                </div>
+            )
+        }
 
         // else if (this.state.popupInfo == "type") {
         //     return (
@@ -179,16 +215,7 @@ export default class AddDevice extends Component {
         //             </div>
         //         </div>
         //     )
-        // } else if (this.state.popupInfo == "public") {
-        //     return (
-        //         <div style={{ width: "380px" }} align="center">
-        //             <div style={{ width: "100%", marginBottom: 10, padding: "8px 0px", textAlign: "center", color: "white" }}>
-        //                 Please register above to be able to add a device.
-        //             </div>
-        //             <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "40%", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
-        //         </div>
-        //     )
-        // }
+
     }
 
     getBLEDevices = () => {
@@ -208,30 +235,34 @@ export default class AddDevice extends Component {
     }
 
     serialDevice = () => {
-        return (
-            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                <div style={{}}>
-                    Add device by SERIAL NUMBER or TEMPORARY CODE:
+        if (this.state.popupInfo == "default") {
+            return (
+                <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                    <div style={{}}>
+                        Add device by SERIAL NUMBER or TEMPORARY CODE:
                     </div>
-                <div className="row addDevice">
-                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
-                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
-                    </div>
+                    <div className="row addDevice">
+                        <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                            <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                        </div>
 
-                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", padding: "8px 8px", color: "white" }} placeholder="Enter code" />
-                    </div>
+                        <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                            <input className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%", padding: "8px 8px", color: "white" }} placeholder="Enter code" />
+                        </div>
 
-                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { }}>
-                            ADD <i className="fas fa-chevron-right"></i>
-                        </button>
+                        <div className="col" style={{ padding: 0, cursor: "pointer" }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                                ADD <i className="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+
                     </div>
 
                 </div>
-
-            </div>
-        )
+            )
+        } else {
+            return null
+        }
     }
 
     getBlutoothDevices = () => {
