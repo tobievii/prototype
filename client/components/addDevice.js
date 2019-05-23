@@ -107,9 +107,10 @@ export default class AddDevice extends Component {
             return (
                 <div style={{ height: "190px" }} align="center">
                     <div style={{ width: "100%", marginBottom: 10, marginTop: 100, padding: "8px 0px", textAlign: "center", color: "white" }}>
-                        Please register above to be able to add a device.
-                </div>
-                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>Register</button>
+                        Please login/register above to be able to add a device.
+                    </div>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", marginBottom: 10, padding: "8px 0px", marginRight: 5 }} onClick={() => { this.props.login() }}>LOGIN</button>
+                    <button className="commanderBgPanel commanderBgPanelClickable" style={{ width: "100px", marginBottom: 10, padding: "8px 0px" }} onClick={() => { this.props.register() }}>REGISTER</button>
                 </div>
             )
         } else if (this.state.popupInfo == "Efento") {
@@ -332,7 +333,7 @@ export default class AddDevice extends Component {
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
                         <div style={{ background: "#1C2834", padding: 12, width: "100%" }}>
-                            <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); /*this.setState({ popupInfo: "default" }); this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
+                            <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
                             <span style={{ marginRight: "40%", textAlign: "center" }}>{this.state.popupHeading}</span>
                         </div>
                         <div style={{ color: "rgba(174, 231, 241, 0.55)" }}>
