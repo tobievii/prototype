@@ -1,4 +1,4 @@
-import { log } from "../../utils"
+import { log, generate } from "../../utils"
 
 var nodemailer = require("nodemailer")
 var randomString = require('random-string');
@@ -19,7 +19,6 @@ export function handlePacket(db: any, packet: any, cb: any) {
 
 export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
-
   app.get("/verify/:id", (req: any, res: any) => {
     db.users.findOne({ "_id": ObjectId(req.params.id) }, (err: Error, user: any) => {
       if (err) { log(err); return; }
@@ -39,12 +38,8 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
             res.redirect("/")
           }
         })
-
-
       }
     })
-
-
   })
 
   //####################################################################
@@ -90,7 +85,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
   })
 
-
   //Reset password after link
   app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
     var today = new Date();
@@ -133,12 +127,13 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     const decryptedString = cryptr.decrypt(req.body.current);
     const decryptedString2 = cryptr.decrypt(req.body.pass);
     var scryptParameters = scrypt.paramsSync(0.1);
+    var uuid = generate(128)
     db.users.findOne({ username: req.body.user }, (err: Error, found: any) => {
 
       scrypt.verifyKdf(found.password.buffer, decryptedString, function (err: Error, result: any) {
         if (result == true) {
           var newpass = scrypt.kdfSync(decryptedString2, scryptParameters);
-          db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass } }, (err: Error, response: any) => {
+          db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass, uuid: uuid } }, (err: Error, response: any) => {
             if (response) {
               if (response.nModified == 0) {
                 res.json(response)
@@ -157,8 +152,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
     })
   })
   //Changing password while logged in
-
-
 
   //####################################################################
   //Recover Password Link sent via email
@@ -200,7 +193,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   })
   //Recover Password Link sent via email
   //####################################################################
-
 
   //####################################################################
   //Shared Device email
@@ -280,7 +272,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   //Shared Device email
   //####################################################################
 
-
   app.get("/api/v3/admin/registration", (req: any, res: any) => {
     // public api to get information if server allows registration/requires email verification
     // if level > 100 then adds the server private email config.
@@ -341,7 +332,6 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
 
 }
 
-
 function getRegistration(db: any, cb: any) {
   db.plugins_admin.findOne({ settings: "registration" }, cb);
 }
@@ -360,6 +350,3 @@ function updateRegistration(db: any, userInput: any, cb: any) {
 
   db.plugins_admin.update({ settings: "registration" }, cleanInput, { upsert: true }, cb);
 }
-
-
-

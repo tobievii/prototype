@@ -11,6 +11,7 @@ const MapDevices = React.lazy(() => import('./dashboard/map'))
 
 import Media from "react-media";
 import { confirmAlert } from 'react-confirm-alert';
+import { ChangePassword } from "../components/changePassword.jsx";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -78,6 +79,8 @@ export class DeviceList extends Component {
     //   }, 2000)
     // }
   }
+
+
 
   state = {
     activePage: 1,
@@ -173,7 +176,9 @@ export class StatesViewer extends Component {
       warning: "asc",
       shared: "asc",
       public: "asc"
-    }
+    },
+    isOpen: false,
+    tempdev: []
   };
 
   socket = undefined;
@@ -192,7 +197,6 @@ export class StatesViewer extends Component {
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
     }).then(response => response.json()).then(serverresponse => {
-      console.log(serverresponse)
       if (serverresponse.sort == null || serverresponse.sort == undefined) {
         serverresponse.sort = "";
       } else if (serverresponse.sortvalues == null || serverresponse.sortvalues == undefined) {
@@ -907,6 +911,11 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
+            <ChangePassword
+              account={this.props.account}
+              isOpen={this.state.isOpen}
+              closeModel={() => { this.setState({ isOpen: false }) }}
+            />
           </div>
         </div >
       )
