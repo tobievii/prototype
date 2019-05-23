@@ -18,41 +18,9 @@ library.add(faSortAmountDown);
 
 import socketio from "socket.io-client";
 
-// export class Pagination extends Component {
-
-//   onClick = (button) => {
-//     return evt => {
-//       this.props.onPageChange(button)
-//     }
-//   }
-
-//   calcClass = (button) => {
-//     if (button.active) {
-//       return "pagination paginationActive"
-//     } else {
-//       return "pagination"
-//     }
-
-//   }
-
-//   render() {
-//     if (this.props.pages.length > 1) {
-//       return (<div style={{ marginLeft: "8px" }}>
-//         {
-//           this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
-//         }
-//       </div>)
-//     } else {
-//       return (<div></div>)
-//     }
-//   }
-// }
-
 export class DeviceList extends Component {
 
   componentDidMount() {
-
-
     // if (this.props.public == true) {
     //   setTimeout(() => {
     //     return (
@@ -78,8 +46,6 @@ export class DeviceList extends Component {
     // }
   }
 
-
-
   state = {
     activePage: 1,
     alarmStates: []
@@ -99,9 +65,9 @@ export class DeviceList extends Component {
     this.props.alarmStates(this.state.alarmStates);
   }
 
-  handleMapAction = (device, action) => {
-    return (e, n) => {
-      this.props.mapactionCall({ device, action, e, n })
+  handleMapAction = (device) => {
+    return (e) => {
+      this.props.mapactionCall({ e })
     }
   }
 
@@ -184,14 +150,7 @@ export class StatesViewer extends Component {
 
   constructor(props) {
     super(props)
-    var un = this.props.username;
-    var acc = this.props.account;
-    var dc = this.state.devicePressed;
-    var ds = this.state.devicesServer;
-    // this.props.sendProps({ un, acc, dc, ds });
-
     this.socket = socketio({ transports: ['websocket', 'polling'] });
-
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
     }).then(response => response.json()).then(serverresponse => {
@@ -276,7 +235,7 @@ export class StatesViewer extends Component {
 
   getDevices = (functionCall) => {
 
-    if (this.props.visiting == true && this.props.public == false) {
+    if ((this.props.visiting == true || this.props.visiting == undefined) && this.props.account.level > 0) {
       fetch('/api/v3/user/' + this.props.username, {
         method: 'GET',
         headers: {
@@ -297,7 +256,6 @@ export class StatesViewer extends Component {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
             this.setState({ devicesView: states }, () => {
-              this.setState({ devicePressed: states[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -325,7 +283,6 @@ export class StatesViewer extends Component {
             }
 
             this.setState({ devicesView: serverresponse }, () => {
-              //this.setState({ devicePressed: serverresponse[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -345,13 +302,11 @@ export class StatesViewer extends Component {
             this.socket.emit("join", this.state.devicesServer[device].key);
           }
           this.setState({ devicesView: states }, () => {
-            this.setState({ devicePressed: states[0] });
             if (functionCall == "initial load") {
               this.sort();
             }
           })
         })
-
 
         if (states.length == 0 && this.props.visiting == false) {
           var url = window.location.origin + "/api/v3/data/post";
@@ -376,16 +331,6 @@ export class StatesViewer extends Component {
       })
     }
   }
-
-  // getNewDevice = () => {
-  //   if (this.busyGettingNewDevice == true) {
-  //     console.log("already busy.. please wait")
-  //   } else {
-  //     p.statesByUsername(this.props.username, (states) => {
-  //       console.log(states);
-  //     });
-  //   }
-  // }
 
   componentWillMount = () => {
     setTimeout(() => {
@@ -428,7 +373,7 @@ export class StatesViewer extends Component {
     var acc = this.props.account;
     var dc = this.state.devicePressed;
     var ds = this.state.devicesServer;
-    // this.props.sendProps({ un, acc, dc, ds })
+    this.props.sendProps({ un, acc, dc, ds })
     var data = Buffer.from(JSON.stringify({ wifi: { ssid: "devprotowifi", pass: "devprotowifi" } }))
   }
 
@@ -739,9 +684,9 @@ export class StatesViewer extends Component {
 
     this.showBoundaryPath(false);
 
-    if (this.props.mainView == "dashboardDevices") {
+    if (this.props.mainView == "dashboardDevices" && device.e.call == "device") {
       this.props.deviceClicked(device.device);
-    } else {
+    } else if (device.e.call == "map") {
 
       for (var devices in newDeviceList) {
         if (newDeviceList[devices].selectedIcon == true) {
@@ -750,21 +695,20 @@ export class StatesViewer extends Component {
       }
 
       for (var dev in newDeviceList) {
-        if (newDeviceList[dev].key == device.e.key) {
-          if (!device.n) {
+        if (newDeviceList[dev].key == device.e.device.key) {
+          if (!device.e.action) {
             newDeviceList[dev].selectedIcon = false;
-          } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
+          } else if (device.e.action && newDeviceList[dev].boundaryLayer == undefined) {
             newDeviceList[dev].selectedIcon = true;
-          } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
+          } else if (device.e.action && newDeviceList[dev].boundaryLayer != undefined) {
             newDeviceList[dev].selectedIcon = true;
           }
         }
       }
-
       this.setState({ devicesView: newDeviceList });
-      this.setState({ devicePressed: device.device });
-      this.setState({ boundary: device.n });
+      this.setState({ boundary: device.e.action });
     }
+    this.setState({ devicePressed: device.e.device });
   }
 
   deleteSelectedDevices = () => {
@@ -798,8 +742,12 @@ export class StatesViewer extends Component {
   }
 
   returnDeviceList = () => {
+    var size = 242;
+    if (this.props.public == true) {
+      size = 223
+    }
     return (
-      <div style={{ overflowY: "auto", height: window.innerHeight - 242 + "px" }}>
+      <div style={{ overflowY: "auto", height: window.innerHeight - size + "px" }}>
         <div style={{ overflowY: "auto", padding: "2px 0px" }} >
           <DeviceList alarmStates={this.updateAlarmStates} mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
         </div>

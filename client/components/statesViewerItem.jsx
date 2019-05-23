@@ -282,37 +282,26 @@ export class StatesViewerItem extends Component {
     }
   }
 
-  adjustMapView = (device) => {
+  adjustMapView = (device, call) => {
     var action;
     if (device.selectedIcon) {
       action = false;
     } else {
       action = true;
     }
-    return (e, n) => {
-      this.props.mapActionCall(device, action);
+    return (e) => {
+      this.props.mapActionCall({ device, action, call });
     }
   }
 
   displayDeviceInfo = () => {
-    // if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
-    //   return (
-    //     <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
-    //       <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
-    //         <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
-    //       </div>
-    //     </Link>
-    //   )
-    // }
-    // else {
     return (
-      <Link className="col" style={{ padding: "0px 8px" }} to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device)}>
+      <Link className="col" style={{ padding: "0px 8px" }} to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device, "device")}>
         <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
           <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
         </div>
       </Link>
     )
-    //}
   }
 
   selectbox = () => {
@@ -340,13 +329,13 @@ export class StatesViewerItem extends Component {
     if (this.props.mainView == "devices") {
       if (!this.props.device.selectedIcon) {
         return (
-          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
+          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device, "map")}>
             <i className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
       } else {
         return (
-          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
+          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device, "map")}>
             <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
@@ -440,19 +429,6 @@ export class StatesViewerItem extends Component {
         </div>
       )
     }
-  }
-
-  deviceInformation = () => {
-    var dataPreview = JSON.stringify(this.props.device.payload.data)
-
-    return (
-      <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }} onClick={this.adjustMapView(this.props.device)}>
-        <div>
-          <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
-          <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
-        </div>
-      </Link >
-    )
   }
 
   render() {
