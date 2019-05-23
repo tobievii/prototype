@@ -909,7 +909,6 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
-<<<<<<< HEAD
             <Suspense fallback={<div>Loading...</div>}>
               <ChangePassword
                 account={this.props.account}
@@ -917,13 +916,6 @@ export class StatesViewer extends Component {
                 closeModel={() => { this.setState({ isOpen: false }) }}
               />
             </Suspense>
-=======
-            <ChangePassword
-              account={this.props.account}
-              isOpen={this.state.isOpen}
-              closeModel={() => { this.setState({ isOpen: false }) }}
-            />
->>>>>>> 78212a90d11825346656301e6e9227ece6e1ce5c
           </div>
         </div >
       )
