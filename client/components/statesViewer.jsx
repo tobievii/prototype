@@ -192,7 +192,6 @@ export class StatesViewer extends Component {
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
     }).then(response => response.json()).then(serverresponse => {
-      console.log(serverresponse)
       if (serverresponse.sort == null || serverresponse.sort == undefined) {
         serverresponse.sort = "";
       } else if (serverresponse.sortvalues == null || serverresponse.sortvalues == undefined) {
