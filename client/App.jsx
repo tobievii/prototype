@@ -12,8 +12,7 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-// import { ApiInfo } from "./components/apiInfo.jsx";
-const ApiInfo = lazy(() => import('./components/apiInfo'))
+const ApiInfo = lazy(() => import('./components/apiInfo.js'))
 const SettingsView = lazy(() => import('./components/settingsView'))
 const AddDevice = lazy(() => import('./components/addDevice'))
 
