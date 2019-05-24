@@ -210,7 +210,7 @@ export class Editor extends Component {
 
         if (this.props.state) {
             if (this.props.state.workflowCode) {
-                console.log("got state! got code");
+                // console.log("got state! got code");
 
                 if (this.state.loaded == 0) {
                     var code = this.props.state.workflowCode;

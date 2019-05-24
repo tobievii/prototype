@@ -15,7 +15,7 @@ var eventHubGlobal: any;
 var dbGlobal: any;
 
 export function workflow(options: any) {
-  this.alarm1 = function (message: string) {
+  this.alarm = function (message: string) {
     var AlarmNotification = {
       type: "ALARM",
       device: options.devid,

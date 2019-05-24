@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { confirmAlert } from 'react-confirm-alert';
-import Media from "react-media";
 import Modal from 'react-modal';
 
 var searchButton = "icon"
@@ -26,7 +25,22 @@ const customStyles = {
 export class StatesViewerMenu extends Component {
     constructor() {
         super();
-        this.state = { selectAll: false, sort: "", menu: "", view: "map", addIcon: "fas fa-plus-circle", display: "", showAddDevice: "none", addDeviceButton: "none", ssid: "", wifipass: "", code: [], modalIsOpen: false }
+        this.state = {
+            selectAll: false,
+            sort: "",
+            menu: "",
+            view: "map",
+            addIcon: "fas fa-plus-circle",
+            display: "",
+            showAddDevice: "none",
+            addDeviceButton: "none",
+            ssid: "",
+            wifipass: "",
+            code: [],
+            modalIsOpen: false,
+            sortAscending: <i className="fas fa-sort-up"></i>,
+            sortDescending: <i className="fas fa-sort-down"></i>,
+        }
 
         fetch("/api/v3/getsort", {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -42,9 +56,9 @@ export class StatesViewerMenu extends Component {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
                 if (this.state.selectAll) {
-                    return (<i className="fas fa-check-square" onClick={this.selectBoxClickHandler(false)} title="Deselect All" ></i>)
+                    return (<span style={{ cursor: "pointer", margin: "5px 15px 0px 0px" }} onClick={this.selectBoxClickHandler(false)}><i className="fas fa-check-double" title="Deselect All" style={{ fontSize: 13 }} /> DESELECT ALL </span>)
                 } else {
-                    return (<i className="far fa-square" onClick={this.selectBoxClickHandler(true)} title="Select All" ></i>)
+                    return (<span style={{ cursor: "pointer", opacity: 0.3, margin: "5px 15px 0px 0px" }} onClick={this.selectBoxClickHandler(true)}><i className="fas fa-check-double" title="Select All" style={{ fontSize: 13 }} /> SELECT ALL </span>)
                 }
             }
         }
@@ -57,19 +71,13 @@ export class StatesViewerMenu extends Component {
         }
     }
 
-    sortButtons = () => {
-        if (this.state.sort == "") { return <i className="stateSortButton fas fa-sort-amount-down" title="latest created top" onClick={this.sortClickHandler("timedesc")} ></i> }
-        if (this.state.sort == "timedesc") { return <i className="stateSortButton fas fa-sort-numeric-down" title="last seen top" onClick={this.sortClickHandler("namedesc")} ></i> }
-        if (this.state.sort == "namedesc") { return <i className="stateSortButton fas fa-sort-alpha-down" title="alphabetical" onClick={this.sortClickHandler("")} ></i> }
-    }
-
     sortClickHandler = (action) => {
         return (e) => {
-            fetch("/api/v3/sort", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ sort: action })
-            }).then(response => response.json()).then(serverresponse => {
-            }).catch(err => console.error(err.toString()));
+            // fetch("/api/v3/sort", {
+            //     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            //     body: JSON.stringify({ sort: action })
+            // }).then(response => response.json()).then(serverresponse => {
+            // }).catch(err => console.error(err.toString()));
 
             this.setState({ sort: action })
             this.props.sort(action);
@@ -79,39 +87,17 @@ export class StatesViewerMenu extends Component {
     menuDeleteButton = () => {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
-                if (this.props.mainView == "devices") {
-                    if (this.props.selectCount > 0) {
-                        return (
-                            <div className="protoButton protoButtonClickable" style={{ background: "rgba(255,0,0, 0.6)", float: "left", margin: "2px 10px 0px 10px" }} title={this.props.selectCount + " selected."}
-                                onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash" /> DELETE</div>
-                        )
-                    } else {
-                        return (
-                            <div className="protoButton" style={{ float: "left", margin: "2px 10px 0px 10px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash" /> DELETE</div>
-                        )
-                    }
+                if (this.props.selectCount > 0) {
+                    return (
+                        <span className="protoButton protoButtonClickable" style={{ fontWeight: "normal", padding: "2px 5px", background: "rgba(255,0,0, 0.6)", float: "left", margin: "5px 15px 0px" }} title={this.props.selectCount + " selected."}
+                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash-alt" /> DELETE</span>
+                    )
+                } else {
+                    return (
+                        <span className="" style={{ float: "left", margin: "5px 15px 0px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash-alt" /> DELETE</span>
+                    )
                 }
             }
-        }
-    }
-
-    viewButton = () => {
-        if (this.props.mainView != "devices") {
-            return <i className="viewButton fas fa-list-ul" title="List View" style={{ color: "grey", marginTop: "10px", opacity: 0.3, cursor: "not-allowed" }} ></i>;
-        } else {
-            if (this.state.view == "list") {
-                return <i className="viewButton fas fa-map-marked-alt" title="Map View" style={{ color: "grey", marginTop: "10px", cursor: "pointer" }} onClick={this.viewButtonClicked("map")} ></i>;
-            } else if (this.state.view == "map") {
-                return <i className="viewButton fas fa-list-ul" title="List View" style={{ color: "grey", marginTop: "10px" }} onClick={this.viewButtonClicked("list")} ></i>;
-            }
-        }
-    }
-
-
-    viewButtonClicked = (action) => {
-        return (e) => {
-            this.setState({ view: action })
-            this.props.view(action);
         }
     }
 
@@ -146,164 +132,84 @@ export class StatesViewerMenu extends Component {
         }
     }
 
+    filterSection = () => {
+        var statelistIcons = "110px";
+        var lastseen = "95px"
 
-    inputDeviceShow = () => {
-        if (this.state.showAddDevice == "none") {
-            this.setState({ menu: "none" })
-            this.setState({ addIcon: "fas fa-minus-circle" })
-            this.setState({ showAddDevice: "" })
-        }
-        else if (this.state.showAddDevice == "") {
-
-            this.setState({ menu: "" })
-            this.setState({ addIcon: "fas fa-plus-circle" })
-            this.setState({ showAddDevice: "none" })
-        }
-    }
-
-    ssid = (ssid) => {
-        return (evt) => {
-            this.setState({ ssid: evt.target.value })
-        }
-    }
-
-    wifiPassword = (wifipass) => {
-        return (evt) => {
-            this.setState({ wifipass: evt.target.value })
-        }
-    }
-    bits = () => {
-        var data = Buffer.from(JSON.stringify({ wifi: { ssid: this.state.ssid, pass: this.state.wifipass } }))
-
-        for (var a = 0; a < data.length; a++) {
-            var byte = data[a].toString(2)
-            for (var b = 0; b <= 8 - byte.length; b++) {
-                byte = "0" + byte;
-            }
-            this.state.code.push(byte)
-        }
-        this.openModal()
-    }
-
-    addButton = () => {
-        if (window.innerWidth > 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ width: "15%", float: "right", marginLeft: "2%", cursor: "not-allowed", opacity: "0.4", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ width: "15%", float: "right", marginLeft: "2%", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
+        if (this.props.mainView == "devices") {
+            statelistIcons = "127px";
+            lastseen = "80px";
         }
 
-        else if (window.innerWidth < 667) {
-            if (this.state.wifipass == "" || this.state.ssid == "") {
-                return (
-                    <div className="protoButton" style={{ marginTop: "30px", width: "50%", float: "right", cursor: "not-allowed", opacity: "0.4", marginLeft: "400px", textAlign: "center" }}>ADD DEVICE</div>
-                )
-            }
-            else {
-                return (
-                    <div className="protoButton protoButtonClickable" style={{ marginTop: "30px", width: "50%", float: "right", textAlign: "center", marginLeft: "400px", textAlign: "center" }} onClick={this.bits}>ADD DEVICE</div>
-                )
-            }
-        }
-    }
-
-    addDevice = () => {
-        if (this.props.public == false || this.props.visiting == false) {
-            if (window.innerWidth > 667) {
-                return (
-                    <div><i className={this.state.addIcon} style={{ marginTop: "12px", color: "red", cursor: "pointer" }} onClick={this.inputDeviceShow}></i>
-                        <div style={{ float: "right", display: this.state.showAddDevice, width: "95%" }}>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "25%", marginRight: "5px" }} required />
-                            WIFI password: <input name="wifipass" type="text" style={{ width: "25%", marginRight: "5px" }} onChange={this.wifiPassword("wifipass")} required />{this.addButton()}</div>
-                    </div >
-                )
-            }
-            else if (window.innerWidth < 667) {
-                return (
-                    <div><i className={this.state.addIcon} style={{ color: "red", cursor: "pointer", position: "absolute", marginLeft: "20px", paddingBottom: "800px" }} onClick={this.inputDeviceShow} /><br></br>
-                        <div style={{ display: this.state.showAddDevice, width: "95%" }}> <div>WIFI ssid:<input type="text" name="ssid" onChange={this.ssid("ssid")} style={{ width: "50%", float: "right" }} required /></div><br></br>
-                            WIFI password: <input name="wifipass" type="text" style={{ width: "50%", float: "right" }} onChange={this.wifiPassword("wifipass")} required /><br></br>{this.addButton()}</div>
-                    </div >
-                )
-            }
-        }
-        else {
-            return (
-                <div></div>
-            )
-        }
-    }
-
-
-    changeSearch = () => {
-        if (searchButton == "icon") {
-            searchButton = "filter"
-            this.setState({ display: "menuIcons" })
-        } else if (searchButton == "filter") {
-            searchButton = "icon"
-            this.setState({ display: "" })
-        }
-    }
-
-    changeClass = () => {
-        if (searchButton == "icon" && this.props.mainView != "devices") {
-            return (
-                <div className="col" style={{ flex: "0 0 300px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                    <i onClick={this.changeSearch} className="fas fa-search"></i>
+        return (
+            <div className="row" style={{}}>
+                <div className="col fa-stack" style={{ flex: "0 0 30px", cursor: "pointer", verticalAlign: "middle", marginLeft: "3px", marginTop: 5 }} onClick={this.sortClickHandler("selected")} >
+                    <i className="fas fa-stack-1x fa-sort-up filterButton" title="Selected devices on top"></i>
+                    <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="Selected devices last" style={{ opacity: 0.5 }}></i>
                 </div>
-            )
-        } else if (searchButton == "filter" || this.props.mainView == "devices") {
-            return (
-                <div>
-                    <span className="col" style={{ flex: "0 0 50px", padding: "10px 10px 0 12px", display: this.state.menu }}>
-                        <i style={{ marginTop: 13 }} onClick={this.changeSearch} className="fas fa-search searchIcon"></i>
+
+                <div className="col" style={{ flex: "0 0 50px", padding: "0px", cursor: "pointer", marginRight: "3px", paddingTop: 5 }} onClick={this.sortClickHandler("namedesc")}>
+                    <span className="fa-stack" style={{ width: "20px", marginBottom: 2 }}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="Device name ascending"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="Device name descending" style={{ opacity: 0.5 }}></i>
                     </span>
-                    <span style={{ padding: 0 }}>
-                        <form id="search" style={{ flex: "0 0 240px", textAlign: "left", float: "right", marginTop: 2 }}>
-                            <input name="query" type="search" onChange={this.props.search} style={{ width: "100%" }} placeholder="search for device..." />
-                        </form>
-                    </span>
+                    <span className="filterButton" style={{ paddingTop: 3 }} >A-Z</span>
                 </div>
-            )
-        }
+
+                <div className="col" id="search" style={{ textAlign: "left", cursor: "pointer", padding: "0px", margin: "2px 10px 4px 5px" }}>
+                    {/* <input className="fa" name="query" type="search" onChange={this.props.search} style={{ fontFamily: "Font Awesome 5 Free, Share Tech Mono, ShareTechMono-Regular", fontStyle: "normal", width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="&#xf002;" /> */}
+                    <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="search for device..." />
+                </div>
+
+                <div className="col" style={{ flex: "0 0 " + lastseen, padding: "5px 0px 0px 3px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
+                    <span className="fa-stack" style={{ width: "20px", marginBottom: 2 }}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="last seen"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="last seen" style={{ opacity: 0.5 }}></i>
+                    </span>
+                    <span className="filterButton">LATEST</span>
+                </div>
+
+                <div className="col" style={{ flex: "0 0 " + statelistIcons, padding: "0px", marginTop: 5 }}>
+                    <div className="fa-stack" style={{ padding: "10px 2px 0px 12px", marginLeft: "6px", cursor: "pointer", width: "20px" }} onClick={this.sortClickHandler("alarm")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="alarm notifications"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="alarm notifications" style={{ opacity: 0.5 }}></i>
+                    </div>
+
+                    <div className="fa-stack" style={{ width: "20px", padding: "10px 2px 0px 12px", marginLeft: "2px", cursor: "pointer" }} onClick={this.sortClickHandler("warning")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="warnings notifications"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="warnings notifications" style={{ opacity: 0.5 }}></i>
+                    </div>
+
+                    <div className="fa-stack" style={{ width: "20px", padding: "10px 2px 0px 13px", marginLeft: "2px", cursor: "pointer" }} onClick={this.sortClickHandler("shared")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="shared devices"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="shared devices" style={{ opacity: 0.5 }}></i>
+                    </div>
+
+                    <div className="fa-stack" style={{ width: "20px", padding: "10px 2px 0px 14px", marginLeft: "2px", cursor: "pointer" }} onClick={this.sortClickHandler("public")}>
+                        <i className="fas fa-stack-1x fa-sort-up filterButton" title="public devices"></i>
+                        <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="public devices" style={{ opacity: 0.5 }}></i>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     render() {
         return (
-            < div className="container-fluid protoMenu" >
+            < div className="container-fluid protoMenu" style={{ background: "#101A24" }} >
                 <div className="row" style={{ padding: 5 }} >
                     <span>
-                        <div className="col" style={{ flex: "0 0 35px", padding: "10px 0 0 10px", display: this.state.menu }}>
+                        <div className="col" style={{ flex: "0 0 20px", padding: "5px 0 0 8px", display: this.state.menu }}>
                             {this.selectBox()}
                         </div>
                     </span>
-
-                    <span>
-
-
-
-                        {this.changeClass()}
-
-                    </span >
-
-                    <span className={this.state.display} style={{ width: "80%", float: "right" }} >
-                        <span className="col" >
+                    <span className={this.state.display}>
+                        <div className="col" style={{ flex: "0 0 35px" }}>
                             {this.menuDeleteButton()}
-                        </span>
-
-                        <span className="col" style={{ flex: "0 0 10px" }} >
-                            <div style={{ float: "right", marginLeft: "20px", display: this.state.menu }}>{this.viewButton()}</div>
-                            <div style={{ textAlign: "right", float: "right", marginTop: "7px", width: "20px", display: this.state.menu }}>
-                                {this.sortButtons()}
-                            </div>
-                        </span>
+                        </div>
                     </span>
                 </div >
+                {this.filterSection()}
             </div >
         )
     }

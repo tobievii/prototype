@@ -296,6 +296,9 @@ export class Account extends Component {
   };
 
   levelZero = () => {
+    if (this.props.loginPanel == true && openMenu == false) {
+      this.setState({ menu: 1 }, () => { openMenu = true; })
+    }
     return (
       <div
         className="navBar"

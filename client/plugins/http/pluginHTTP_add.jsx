@@ -40,7 +40,7 @@ export class AddRoute extends React.Component {
       this.props.formSubmit(this.state.form, (err, result) => {
 
         if (err) {
-          console.log(err);
+          // console.log(err);
           this.setState({ message: err, messageOpacity: 1.0 })
           setTimeout(() => {
             this.setState({ messageOpacity: 0 })

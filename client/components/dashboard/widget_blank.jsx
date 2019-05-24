@@ -15,7 +15,7 @@ export class WidgetBlank extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.state.devid, data: { click: true } })
     }).then(response => response.json()).then(resp => {
-      console.log(resp);
+      // console.log(resp);
     }).catch(err => console.error(err.toString()));
   }
 

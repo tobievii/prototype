@@ -33,12 +33,12 @@ export class WidgetScheduler extends React.Component {
 
 
   scheduler = () => {
-    console.log("scheduler update")
+    // console.log("scheduler update")
     fetch("/api/v3/scheduler/widget", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ props: this.props, state: this.state })
     }).then(response => response.json()).then(resp => {
-      console.log(resp);
+      // console.log(resp);
     }).catch(err => console.error(err.toString()));
   }
 

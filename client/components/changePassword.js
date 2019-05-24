@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Modal from 'react-modal';
 import zxcvbn from "zxcvbn"
 const Cryptr = require('cryptr');
@@ -25,7 +25,7 @@ const customStyles = {
     }
 };
 
-export class ChangePassword extends Component {
+export default class ChangePassword extends React.PureComponent {
 
     state = {
         password: "",
@@ -122,10 +122,11 @@ export class ChangePassword extends Component {
         }
     }
 
-    dbUpdate = () => {
+    dbUpdate = (username) => {
         fetch("/api/v3/passChanged", {
-            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            method: "POST", body: JSON.stringify({ username: username }), headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(serverresponse => {
+            this.alert()
         }).catch(err => console.error(err.toString()));
     }
 
@@ -155,8 +156,7 @@ export class ChangePassword extends Component {
                         this.setState({ message: "Your new password cannot match your current password" })
                     } else {
                         this.setState({ message: "Password has successfully been changed" })
-                        this.dbUpdate()
-                        this.alert()
+                        this.dbUpdate(this.props.account.username)
                     }
 
                 }).catch(err => console.error(err.toString()))
