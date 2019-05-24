@@ -25,11 +25,12 @@ goog.exportSymbol('proto.Slot.SlotType', null, global);
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Slot = function (opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.Slot.repeatedFields_, null);
-};
-goog.inherits(proto.Slot, jspb.Message);
-if (goog.DEBUG && !COMPILED) {
+export default class Measurements {
+  proto.Slot = function (opt_data) {
+    jspb.Message.initialize(this, opt_data, 0, -1, proto.Slot.repeatedFields_, null);
+  };
+  goog.inherits(proto.Slot, jspb.Message);
+  if(goog.DEBUG && !COMPILED) {
   proto.Slot.displayName = 'proto.Slot';
 }
 /**
@@ -705,7 +706,6 @@ proto.Measurements.prototype.getCloudToken = function () {
 proto.Measurements.prototype.setCloudToken = function (value) {
   jspb.Message.setProto3StringField(this, 16, value);
 };
-
-
-goog.object.extend(exports, proto);
+}
+export default proto;
 
