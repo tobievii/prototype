@@ -1,6 +1,7 @@
 import StringUtils from './StringUtils';
 import DateUtils from './DateUtils';
-import Measurements from './nbiot_pb.js';
+// import Measurements from './nbiot_pb.js';
+var Measurements, proto = require('./nbiot_pb');
 var Sample_offsets: any[] = [];
 
 export default class MeasurementManager {

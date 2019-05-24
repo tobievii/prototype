@@ -1,6 +1,6 @@
 import MeasurementManager from "./MeasurementManager";
 import * as events from "events";
-var Measurements = require('./nbiot_pb');
+var Measurements, proto = require('./nbiot_pb');
 var coap = require('coap');
 export const server = coap.createServer();
 export const name = "efento";
