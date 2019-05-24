@@ -21,7 +21,7 @@ export class SettingsPanel extends React.Component {
   };
 
   addroute = (form, cb) => {
-    console.log(form);
+    // console.log(form);
     fetch("/api/v3/http/addroute", {
       method: "POST",
       headers: {
@@ -55,7 +55,7 @@ export class SettingsPanel extends React.Component {
     this.getroutes();
 
     socket.on("plugin", (data) => {
-      console.log(data);
+      // console.log(data);
       this.getroutes();
     })
   };

@@ -462,7 +462,6 @@ class MapDevices extends Component {
                               method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                               body: JSON.stringify({ key: marker.key, boundaryLayer: b })
                             }).then(response => response.json()).then(result => {
-                              console.log(result);
                             }).catch(err => console.error(err.toString()));
                           });
                         }}
@@ -472,7 +471,6 @@ class MapDevices extends Component {
                             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                             body: JSON.stringify({ id: marker.devid })
                           }).then(response => response.json()).then(serverresponse => {
-                            console.log(serverresponse)
                           }).catch(err => console.error(err.toString()));
                         }}
                         draw={{

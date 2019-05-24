@@ -57,12 +57,12 @@ class ApiInfo extends Component {
   }
 
   sendHttpRestTest = () => {
-    console.log("TEST")
+    //console.log("TEST")
     fetch("/api/v3/data/post", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify(this.state.testPacket)
     }).then(response => response.json()).then(resp => {
-      console.log(resp);
+      //console.log(resp);
     }).catch(err => console.error(err.toString()));
   }
 

@@ -114,17 +114,18 @@ export default class AddDevice extends Component {
                 </div>
             )
         } else if (this.state.popupInfo == "Efento") {
+
             return (
-                <div style={{ width: "190px", paddingLeft: "20px", paddingBottom:"20px"   }}>
+                <div style={{ width: "190px", paddingLeft: "20px", paddingBottom: "20px" }}>
                     <br></br>
                     <h5>Efento</h5>
                     <br></br>
-                    API Key: 
+                    API Key:
                     <br></br>
                     {this.props.account.apikey}
                     <br></br>
                     <br></br>
-                    Port: 
+                    Port:
                     <br></br>
                     5618
                     <br></br>

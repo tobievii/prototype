@@ -184,7 +184,7 @@ export class StatesViewerItem extends Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: id })
     }).then(response => response.json()).then(serverresponse => {
-      console.log(serverresponse);
+      // console.log(serverresponse);
       this.setState({ deleted: true })
     }).catch(err => console.error(err.toString()));
   }

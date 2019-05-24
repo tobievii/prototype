@@ -13,7 +13,7 @@ export class ThreeDWidget extends Component {
 
         const width = this.mount.offsetWidth
         const height = this.mount.offsetHeight
-        console.log({ width, height })
+        // console.log({ width, height })
         //ADD SCENE
         this.scene = new THREE.Scene()
         //ADD CAMERA

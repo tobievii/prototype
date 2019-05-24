@@ -172,10 +172,6 @@ export class StatesViewer extends Component {
       this.setState({ sortvalues: serverresponse.sortvalues })
     }).catch(err => console.error(err.toString()));
 
-    fetch("/api/v3/publicip", {
-      method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-    }).catch(err => console.error(err.toString()));
-
     this.socket.on("connect", a => {
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
@@ -402,7 +398,7 @@ export class StatesViewer extends Component {
     }
 
     if (found == 0) {
-      console.log("recieved data for device not on our list yet.")
+      // console.log("recieved data for device not on our list yet.")
     } else {
       // update
       if (this.state.search.length > 0) {
@@ -745,7 +741,10 @@ export class StatesViewer extends Component {
     var size = 242;
     if (this.props.public == true) {
       size = 223
+    } else if (this.props.public == false && this.props.visiting == undefined) {
+      size = 217
     }
+
     return (
       <div style={{ overflowY: "auto", height: window.innerHeight - size + "px" }}>
         <div style={{ overflowY: "auto", padding: "2px 0px" }} >

@@ -14,7 +14,7 @@ export class OptionsTime extends React.Component {
       this.setState({ value: this.props.option.value })
       inval = new Date(this.props.option.value);
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       var newdate = new Date();
       this.setState({ value: newdate.toTimeString() })
       inval = newdate;
@@ -31,7 +31,7 @@ export class OptionsTime extends React.Component {
     var val = hours + ":" + minutes
 
 
-    console.log(val)
+    //console.log(val)
 
     this.setState({ HHMM: val })
   }
@@ -53,15 +53,15 @@ export class OptionsTime extends React.Component {
     //var a = new Date()
 
     return (e) => {
-      console.log("set")
-      console.log(this.state.HHMM)
+      // console.log("set")
+      // console.log(this.state.HHMM)
 
       var tempdate = new Date();
       tempdate.setHours(parseInt(this.state.HHMM.split(":")[0]))
       tempdate.setMinutes(parseInt(this.state.HHMM.split(":")[1]))
       tempdate.setSeconds(0);
 
-      console.log(tempdate)
+      // console.log(tempdate)
 
       this.setState({ value: tempdate }, this.apply)
     }

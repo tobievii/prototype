@@ -19,9 +19,9 @@ export class SettingsPanel extends React.Component {
     fetch("/api/v3/teltonika/info")
       .then(res => res.json())
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         if (result.port) {
-          console.log(result.port);
+          // console.log(result.port);
           this.setState({ port: result.port })
         }
       }).catch((err) => {
@@ -33,7 +33,7 @@ export class SettingsPanel extends React.Component {
     fetch("/api/v3/teltonika/reqport")
       .then(res => res.json())
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         if (result.port) {
           this.setState({ port: result.port });
         }

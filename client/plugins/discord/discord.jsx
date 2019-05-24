@@ -28,13 +28,13 @@ export class SettingsPanel extends React.Component {
 
 
     saveBot = () => {
-        console.log(this.state.form);
+        // console.log(this.state.form);
         fetch('/api/v3/discord/savebot', {
             method: 'POST',
             headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: JSON.stringify(this.state.form)
         }).then(response => response.json()).then((data) => {
-            console.log(data);
+            // console.log(data);
             //if (this.props.update) { this.props.update(); }
         }).catch(err => console.error(err.toString()))
 

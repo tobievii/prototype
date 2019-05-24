@@ -51,7 +51,6 @@ export class Account extends Component {
   };
 
   componentDidMount = () => {
-    console.log(this.props)
     this.generateRandomPass();
     this.getServerRegistrationOptions();
   };

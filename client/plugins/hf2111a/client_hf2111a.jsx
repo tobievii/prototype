@@ -30,7 +30,7 @@ export class SettingsPanel extends React.Component {
 
   runTest() {
     return (e) => {
-      console.log("test")
+      // console.log("test")
 
       fetch("/api/v3/plugins/hf2111a/test")
         .then(res => res.json())
