@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+message Slot{
+	  enum SlotType {
+		NO_SENSOR = 0;
+		TEMPERATURE = 1; // 0.1 degree 
+		HUMIDITY = 2;    // % RH; values outside 100% RH and negative shall be interpreted as sensor error
+		PRESSURE = 3;    // dPa; negative values shall be considered as sensor error
+		DIFERENTIAL_PRESSURE = 4; // Pa
+		RELAY = 5;
+	  }
+	  
+	  /* type of slot */
+	  SlotType type = 1;
+	  
+	  /* timestamp of first sample (oldest one) in seconds since UNIX EPOCH 01-01-1970 */
+	  int32 timestamp = 2;
+	  
+	  /* starting point for data sample calculation in format defined by type field*/
+	  sint32 start_point = 4;
+	  
+	  /* offset from starting point in format defined by type field; oldest sample first */
+	  repeated sint32 sample_offsets = 5 [packed=true] ;
+	  
+	  /* slot lower thresholdconfig */
+	  int32 lo_threshold = 6;
+	  
+	  /* slot higher thresholdconfig */
+	  int32 hi_threshold = 7;
+
+      /* slot differential thresholdconfig */
+      int32 diff_threshold = 8;
+  }
+
+message Measurements {
+
+  /* serial number of device */
+  bytes serial_num = 1;  
+  
+  /* true - battery ok, false - battery low */
+  bool battery_status = 2;  
+  
+  /* measurement period in seconds */
+  int32 measurement_period = 3;     
+
+  repeated Slot slots = 4;
+
+  /* seconds left to next measurement */
+  int32 next_measure = 5;
+
+  /* reason of transmission */
+  uint32 transfer_reason = 6;
+
+  string cloud_token = 16;
+}
+
+message Threshold {
+ /*Index of slot (0,1 or 2) for which the thresholds are being set*/
+		int32 slotIdx = 1;
+		
+ /*Slot lower threshold - if measurement for this slot drops below this threshold, the sensor
+will send the data the platform immediately*/
+		int32 threshold_lo = 2;
+		
+ /* Slot upper threshold - if measurement for this slot exceeds this threshold, the sensor
+will send the data the platform immediately*/
+		int32 threshold_hi = 3;
+		
+ /*Slot differential threshold - if absolute difference of current measurement and last
+measurement sent is larger than this value, the sensor will send the data immediately*/
+		int32 threshold_diff = 4;
+		
+}
+
+
+/*Message sent from a server to a device to configure thresholds values and measurement
+periods*/
+message Config {
+ /* Array which contains the values of the all thresholds*/
+		repeated Threshold thresholds = 1;
+ 
+ /*Measurement interval (in seconds) - defines how often sensor takes the measurements*/
+		uint32 measurement_period = 2;
+ 
+ /*Transmission interval (in seconds) */
+		uint32 sending_interval = 3;
+ 
+ /* BLE turnoff time (in seconds) - sets the value after which BLE will be turned off
+(counted from reception of this message). If set to 0xFFFFFFFF BLE will never be turned off.
+If BLE is turned off when receiving this message, it will be turned on for the defined period
+and turned off after that period. */
+		uint32 ble_turnoff_time = 4;
+ 
+ /* ACK interval (in seconds) - If set to 0xFFFFFFFF sensor will wait for ACK after each
+message. Otherwise, sensor will wait for server response only after a period of time specified
+by this field. E.g. 1 ACK every 24 hours = 24*60*60 = 86400*/
+		uint32 ack_interval = 5;
+ 
+ /* if this field is set to true, the device will respond with its statistics. Format of the
+response is described in DeviceInfo message in server device information payload section */
+		bool request_device_info = 6;
+ 
+ }
+ 
+ message RadioStats
+{
+/* signal strength in dBm (x10). To get real value divide signal strength by 10 */
+		sint32 signal_strength = 1;
+/* total power in dBm (x10). To get real value divide total power by 10 */
+		sint32 total_power = 2;
+/* TX power in dBm (x10). To get real value divide TX power by 10 */
+		sint32 tx_power = 3;
+/* cell ID */
+		uint32 cell_id = 4;
+/* ECL */
+		uint32 ecl = 5;
+/* SNR */
+		sint32 snr = 6;
+/* EARFCN */
+		uint32 earfcn = 7;
+/* PCI */
+		uint32 pci = 8;
+/* RSRQ */
+		sint32 rsrq = 9;
+/* total transmitted bytes */
+		uint32 total_tx_bytes = 10;
+/* total received bytes */
+		uint32 total_rx_bytes = 11;
+}
+
+message DeviceInfo
+{
+/* serial number of the device */
+		bytes serial_num = 1;
+/* battery voltage in millivolts */
+		uint32 battery_voltage = 2;
+/* software version */
+		uint32 sw_version = 3;
+/* up time in seconds (since reset) */
+		uint32 up_time = 4;
+/* message counters (since reset): there are 3 counters -
+index 0: counter of confirmable messages attempts
+index 1: counter of non-confirmable messages attempts
+index 2: counter of messages successfully sent*/
+repeated uint32 message_counter = 5 [packed=true];
+/* radio parameters */
+		RadioStats radio_statistics = 6;
+}
