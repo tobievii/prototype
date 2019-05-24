@@ -1,5 +1,7 @@
 import React, { Component, Suspense } from "react";
-const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
+const SyntaxHighlighter = React.lazy(() => {
+  return import('react-syntax-highlighter');
+});
 
 import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
 
