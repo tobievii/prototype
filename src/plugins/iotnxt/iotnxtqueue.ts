@@ -17,6 +17,24 @@ var mqttcfg = {
 }
 */
 
+var kue = require('kue')
+  , jobs = kue.createQueue();
+
+jobs.process('job', function (job: { data: any; }, done: { (): void; (arg0: any): void; }) {
+  console.log(job.data);
+  setTimeout(function () {
+    console.log('job done');
+    try {
+      done();
+      throw new Error('some problem happened');
+    }
+    catch (err) {
+      done(err);
+    }
+  }, 3000);
+});
+
+
 export class IotnxtQueue extends events.EventEmitter {
   RoutingKeyBase: any;
   connected: boolean = false;
