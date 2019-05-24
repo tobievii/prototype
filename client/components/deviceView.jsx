@@ -88,6 +88,7 @@ export class DeviceView extends PureComponent {
 
   constructor(props) {
     super(props);
+    console.log(props)
     this.socket = socketio({ transports: ['websocket', 'polling'] });
     this.state.devid = props.devid
     this.socket.on("connect", a => {

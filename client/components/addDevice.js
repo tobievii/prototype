@@ -56,10 +56,10 @@ export default class AddDevice extends Component {
         }
     }
 
-    addDevice = () => {
+    addDevice = (call) => {
         if (this.props.account.level < 1) {
             this.setState({ popupInfo: "public" })
-        } else if (this.state.search == "Efento") {
+        } else if (this.state.search == "Efento" && call == "select") {
             this.setState({ popupInfo: "Efento" })
         } else {
             return null;
@@ -94,7 +94,7 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("select") }}>
                                 NEXT <i className="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -116,23 +116,17 @@ export default class AddDevice extends Component {
         } else if (this.state.popupInfo == "Efento") {
 
             return (
-                <div style={{ width: "190px", paddingLeft: "20px", paddingBottom: "20px" }}>
+                <div style={{ background: "#16202C", paddingLeft: "20px", paddingBottom: "45px" }}>
                     <br></br>
-                    <h5>Efento</h5>
-                    <br></br>
-                    IP Address:
-                    <br></br>
-                    40.115.63.112
-                    <br></br>
-                    API Key:
-                    <br></br>
-                    {this.props.account.apikey}
-                    <br></br>
-                    <br></br>
-                    Port:
-                    <br></br>
-                    5618
-                    <br></br>
+                    <h5>Efento NB-IoT</h5>
+                    <br />
+                    Please enter the information below on your efento logger mobile application.
+                    <br /><br />
+                    Prototyp3's IP Address: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">40.115.63.112</span></span>
+                    <br /><br />
+                    Your API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
+                    <br /><br />
+                    Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
                 </div>
             )
         }
@@ -267,7 +261,7 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("code") }}>
                                 ADD <i className="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -347,9 +341,9 @@ export default class AddDevice extends Component {
             <div >
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <div style={{ background: "#1C2834", padding: 12, width: "100%" }}>
+                        <div style={{ background: "#1C2834", padding: 12, width: "100%" }} align="center">
                             <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
-                            <span style={{ marginRight: "40%", textAlign: "center" }}>{this.state.popupHeading}</span>
+                            <span style={{ textAlign: "center", opacity: 0.8 }}>{this.state.popupHeading}</span>
                         </div>
                         <div style={{ color: "rgba(174, 231, 241, 0.55)" }}>
                             {/* <div className='protoPopup'> */}
