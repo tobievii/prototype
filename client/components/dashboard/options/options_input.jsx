@@ -23,7 +23,7 @@ export class OptionsInput extends React.Component {
   }
 
   onChange = (event) => {
-    console.log(event.target.value)
+    //console.log(event.target.value)
     this.setState({ value: event.target.value });
   }
 

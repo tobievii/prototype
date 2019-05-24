@@ -8,10 +8,8 @@ import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 
 const MapDevices = React.lazy(() => import('./dashboard/map'))
-
-import Media from "react-media";
+const ChangePassword = React.lazy(() => import('../components/changePassword'))
 import { confirmAlert } from 'react-confirm-alert';
-import { ChangePassword } from "../components/changePassword.jsx";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -20,43 +18,9 @@ library.add(faSortAmountDown);
 
 import socketio from "socket.io-client";
 
-var testV = "device4"
-
-export class Pagination extends Component {
-
-  onClick = (button) => {
-    return evt => {
-      this.props.onPageChange(button)
-    }
-  }
-
-  calcClass = (button) => {
-    if (button.active) {
-      return "pagination paginationActive"
-    } else {
-      return "pagination"
-    }
-
-  }
-
-  render() {
-    if (this.props.pages.length > 1) {
-      return (<div style={{ marginLeft: "8px" }}>
-        {
-          this.props.pages.map((button, i) => <div key={i} onClick={this.onClick(button)} className={this.calcClass(button)} >{button.text}</div>)
-        }
-      </div>)
-    } else {
-      return (<div></div>)
-    }
-  }
-}
-
 export class DeviceList extends Component {
 
   componentDidMount() {
-
-
     // if (this.props.public == true) {
     //   setTimeout(() => {
     //     return (
@@ -82,15 +46,14 @@ export class DeviceList extends Component {
     // }
   }
 
-
-
   state = {
-    activePage: 1
+    activePage: 1,
+    alarmStates: []
   }
 
-  onPageChange = (data) => {
-    this.setState({ activePage: data.text })
-  }
+  // onPageChange = (data) => {
+  //   this.setState({ activePage: data.text })
+  // }
 
   handleActionCall = (a) => {
     return (e) => {
@@ -98,28 +61,20 @@ export class DeviceList extends Component {
     }
   }
 
-  handleMapAction = (device, action) => {
-    return (e, n) => {
-      this.props.mapactionCall({ device, action, e, n })
+  componentWillMount = () => {
+    this.props.alarmStates(this.state.alarmStates);
+  }
+
+  handleMapAction = (device) => {
+    return (e) => {
+      this.props.mapactionCall({ e })
     }
   }
 
   render() {
-
     if (this.props.devices == undefined) {
       return null
     }
-
-    var pagesNum = Math.ceil(this.props.devices.length / this.props.max);
-
-
-    //if (pagesNum < this.state.activePage) { this.setState({activePage : 1 })}
-
-    var pages = [];
-    for (var a = 1; a <= pagesNum; a++) {
-      pages.push({ text: a, active: (this.state.activePage == a) });
-    }
-
 
     if (this.props.devices.length == 0) {
       return (
@@ -136,11 +91,11 @@ export class DeviceList extends Component {
 
       var devicelist = _.clone(this.props.devices);
 
-      if (this.props.max) {
-        var start = this.props.max * (this.state.activePage - 1)
-        var end = this.props.max * this.state.activePage
-        devicelist = devicelist.slice(start, end);
-      }
+      // if (this.props.max) {
+      //   var start = this.props.max * (this.state.activePage - 1)
+      //   var end = this.props.max * this.state.activePage
+      //   devicelist = devicelist.slice(start, end);
+      // }
 
       if (devicelist.length == 0) {
         if (this.state.activePage != 1) {
@@ -150,8 +105,8 @@ export class DeviceList extends Component {
 
       return (
         <div>
-          {devicelist.map(device => <StatesViewerItem mainView={this.props.mainView} public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.key)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />)}
-          <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div>
+          {devicelist.map(device => <StatesViewerItem alarmStates={this.state.alarmStates} mainView={this.props.mainView} public={this.props.public} username={this.props.username} view={this.props.view} mapActionCall={this.handleMapAction(device)} actionCall={this.handleActionCall(device.key)} key={device.key} device={device} devID={device.devid} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />)}
+          {/* <div style={{ marginLeft: -9 }}> <Pagination pages={pages} className="row" onPageChange={this.onPageChange} /> </div> */}
         </div>
       )
     }
@@ -176,6 +131,16 @@ export class StatesViewer extends Component {
     boundary: undefined,
     showB: false,
     buttonColour: " ",
+    tempdev: [],
+    sortvalues: {
+      timedesc: "asc",
+      namedesc: "asc",
+      selected: "asc",
+      alarm: "asc",
+      warning: "asc",
+      shared: "asc",
+      public: "asc"
+    },
     isOpen: false,
     tempdev: []
   };
@@ -185,25 +150,26 @@ export class StatesViewer extends Component {
 
   constructor(props) {
     super(props)
-    var un = this.props.username;
-    var acc = this.props.account;
-    var dc = this.state.devicePressed;
-    var ds = this.state.devicesServer;
-    // this.props.sendProps({ un, acc, dc, ds });
-
     this.socket = socketio({ transports: ['websocket', 'polling'] });
-
     fetch("/api/v3/getsort", {
       method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
     }).then(response => response.json()).then(serverresponse => {
       if (serverresponse.sort == null || serverresponse.sort == undefined) {
         serverresponse.sort = "";
+      } else if (serverresponse.sortvalues == null || serverresponse.sortvalues == undefined) {
+        serverresponse.sortvalues = {
+          timedesc: "asc",
+          namedesc: "asc",
+          selected: "asc",
+          alarm: "asc",
+          warning: "asc",
+          shared: "asc",
+          public: "asc"
+        };
       }
-      this.setState({ sort: serverresponse.sort })
-    }).catch(err => console.error(err.toString()));
 
-    fetch("/api/v3/publicip", {
-      method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      this.setState({ sort: serverresponse.sort })
+      this.setState({ sortvalues: serverresponse.sortvalues })
     }).catch(err => console.error(err.toString()));
 
     this.socket.on("connect", a => {
@@ -261,14 +227,11 @@ export class StatesViewer extends Component {
         this.handleDevicePacket(packet)
       })
     });
-
-    // setTimeout(() => {
-    // }, 500);
   }
 
   getDevices = (functionCall) => {
 
-    if (this.props.visiting == true && this.props.public == false) {
+    if ((this.props.visiting == true || this.props.visiting == undefined) && this.props.account.level > 0) {
       fetch('/api/v3/user/' + this.props.username, {
         method: 'GET',
         headers: {
@@ -289,7 +252,6 @@ export class StatesViewer extends Component {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
             this.setState({ devicesView: states }, () => {
-              this.setState({ devicePressed: states[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -317,7 +279,6 @@ export class StatesViewer extends Component {
             }
 
             this.setState({ devicesView: serverresponse }, () => {
-              //this.setState({ devicePressed: serverresponse[0] });
               if (functionCall == "initial load") {
                 this.sort();
               }
@@ -337,13 +298,11 @@ export class StatesViewer extends Component {
             this.socket.emit("join", this.state.devicesServer[device].key);
           }
           this.setState({ devicesView: states }, () => {
-            this.setState({ devicePressed: states[0] });
             if (functionCall == "initial load") {
               this.sort();
             }
           })
         })
-
 
         if (states.length == 0 && this.props.visiting == false) {
           var url = window.location.origin + "/api/v3/data/post";
@@ -369,16 +328,6 @@ export class StatesViewer extends Component {
     }
   }
 
-  // getNewDevice = () => {
-  //   if (this.busyGettingNewDevice == true) {
-  //     console.log("already busy.. please wait")
-  //   } else {
-  //     p.statesByUsername(this.props.username, (states) => {
-  //       console.log(states);
-  //     });
-  //   }
-  // }
-
   componentWillMount = () => {
     setTimeout(() => {
       this.getDevices("initial load");
@@ -392,13 +341,26 @@ export class StatesViewer extends Component {
   }
 
   changePassword = () => {
-    if (this.props.account.passChange == false) {
-      window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
-      this.openModal();
+    try {
+      if (this.props.account.email == "admin@localhost.com" && this.props.account.passChange == false) {
+        window.alert("We've noticed that you haven't changed your default password. Please change it to continue")
+        this.openModal();
+      }
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return
+      } else {
+        printError(e, false);
+      }
     }
   }
 
   componentWillUnmount = () => {
+    fetch("/api/v3/sort", {
+      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ sort: this.state.sort, sortvalues: this.state.sortvalues })
+    }).then(response => response.json()).then(serverresponse => {
+    }).catch(err => console.error(err.toString()));
     this.socket.disconnect();
   }
 
@@ -407,7 +369,7 @@ export class StatesViewer extends Component {
     var acc = this.props.account;
     var dc = this.state.devicePressed;
     var ds = this.state.devicesServer;
-    // this.props.sendProps({ un, acc, dc, ds })
+    this.props.sendProps({ un, acc, dc, ds })
     var data = Buffer.from(JSON.stringify({ wifi: { ssid: "devprotowifi", pass: "devprotowifi" } }))
   }
 
@@ -436,7 +398,7 @@ export class StatesViewer extends Component {
     }
 
     if (found == 0) {
-      console.log("recieved data for device not on our list yet.")
+      // console.log("recieved data for device not on our list yet.")
     } else {
       // update
       if (this.state.search.length > 0) {
@@ -486,6 +448,8 @@ export class StatesViewer extends Component {
   }
 
   sort = (sorttype) => {
+    var sv = _.clone(this.state.sortvalues)
+    var alarmDevices = [];
     var value;
     if (sorttype != undefined) {
       value = sorttype;
@@ -496,7 +460,7 @@ export class StatesViewer extends Component {
 
     var newDeviceList = _.clone(this.state.devicesView)
 
-    if (value == "timedesc") {
+    if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
       newDeviceList.sort((a, b) => {
         if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
           return 1
@@ -504,37 +468,155 @@ export class StatesViewer extends Component {
           return -1
         }
       }).reverse();
-    }
 
-    if (value == "namedesc") {
+      sv.timedesc = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
       newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      })
-    }
-
-    if (value == "") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_created_on"]) > new Date(b["_created_on"])) {
+        if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
           return 1
         } else {
           return -1
         }
       }).reverse();
+
+      sv.timedesc = "asc"
+      this.setState({ sortvalues: sv })
+    }
+
+    if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      })
+
+      sv.namedesc = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.namedesc = "asc"
+      this.setState({ sortvalues: sv })
+    }
+
+    if (value == "selected" && this.state.sortvalues.selected == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.selected == true && b.selected == false) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.selected = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "selected" && this.state.sortvalues.selected == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.selected == false && b.selected == true) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.selected = "asc"
+      this.setState({ sortvalues: sv })
+    }
+
+    if (value == "alarm") {
+      var alarmstates = _.clone(this.state.alarmStates);
+      for (var device in newDeviceList) {
+        for (var c in alarmstates) {
+          if (alarmstates[c].key == newDeviceList[device].key) {
+            newDeviceList[device]["alarm"] = true;
+          }
+        }
+      }
+      if (this.state.sortvalues.alarm == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.alarm == true && b.alarm == undefined) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        sv.alarm = "des"
+        this.setState({ sortvalues: sv })
+      } else if (this.state.sortvalues.alarm == "des") {
+        newDeviceList.sort((a, b) => {
+          if (a.alarm == undefined && b.alarm == true) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        sv.alarm = "asc"
+        this.setState({ sortvalues: sv })
+      }
+    }
+
+    if (value == "warning" && this.state.sortvalues.warning == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.notification24 == true && b.notification24 == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.warning = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "warning" && this.state.sortvalues.warning == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.notification24 == undefined && b.notification24 == true) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.warning = "asc"
+      this.setState({ sortvalues: sv })
+    }
+
+    if (value == "shared" && this.state.sortvalues.shared == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.shared = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "shared" && this.state.sortvalues.shared == "des") {
+      newDeviceList.sort((a, b) => {
+        if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.shared = "asc"
+      this.setState({ sortvalues: sv })
+    }
+
+
+    if (value == "public" && this.state.sortvalues.public == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.public == true && b.public == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.public = "des"
+      this.setState({ sortvalues: sv })
+    } else if (value == "public" && this.state.sortvalues.public == "des") {
+      newDeviceList.sort((a, b) => {
+        if (b.public == true && a.public == undefined) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      sv.public = "asc"
+      this.setState({ sortvalues: sv })
     }
 
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     this.setState({ sort: value });
-
-  }
-
-  componentWillUnmount = () => {
-    fetch("/api/v3/sort", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ sort: this.state.sort })
-    }).then(response => response.json()).then(serverresponse => {
-    }).catch(err => console.error(err.toString()));
   }
 
   selectCountUpdate = () => {
@@ -598,9 +680,9 @@ export class StatesViewer extends Component {
 
     this.showBoundaryPath(false);
 
-    if (this.props.mainView == "dashboardDevices") {
+    if (this.props.mainView == "dashboardDevices" && device.e.call == "device") {
       this.props.deviceClicked(device.device);
-    } else {
+    } else if (device.e.call == "map") {
 
       for (var devices in newDeviceList) {
         if (newDeviceList[devices].selectedIcon == true) {
@@ -609,21 +691,20 @@ export class StatesViewer extends Component {
       }
 
       for (var dev in newDeviceList) {
-        if (newDeviceList[dev].key == device.e.key) {
-          if (!device.n) {
+        if (newDeviceList[dev].key == device.e.device.key) {
+          if (!device.e.action) {
             newDeviceList[dev].selectedIcon = false;
-          } else if (device.n && newDeviceList[dev].boundaryLayer == undefined) {
+          } else if (device.e.action && newDeviceList[dev].boundaryLayer == undefined) {
             newDeviceList[dev].selectedIcon = true;
-          } else if (device.n && newDeviceList[dev].boundaryLayer != undefined) {
+          } else if (device.e.action && newDeviceList[dev].boundaryLayer != undefined) {
             newDeviceList[dev].selectedIcon = true;
           }
         }
       }
-
       this.setState({ devicesView: newDeviceList });
-      this.setState({ devicePressed: device.device });
-      this.setState({ boundary: device.n });
+      this.setState({ boundary: device.e.action });
     }
+    this.setState({ devicePressed: device.e.device });
   }
 
   deleteSelectedDevices = () => {
@@ -652,49 +733,25 @@ export class StatesViewer extends Component {
     this.setState({ showB: action })
   }
 
-  returnDeviceList = () => {
-    return (
-      <Media query="(max-width: 599px)">
-        {matches => {
-          var num = 0;
-          if (window.innerHeight >= 800 && window.innerHeight < 1007) {
-            num = 14;
-          } else if (window.innerHeight >= 1007 && window.innerHeight < 2014) {
-            num = 19;
-          }
-
-          if (num == 0) {
-            matches ? (
-              num = 10
-            ) : (
-                num = 14
-              )
-          }
-          return (
-            <div >
-              <DeviceList mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} max={num} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
-            </div>
-          )
-        }
-        }
-      </Media>
-    )
+  updateAlarmStates = (states) => {
+    this.setState({ alarmStates: states })
   }
 
-  deleteButton = () => {
-    if (this.props.public == false) {
-      if (this.props.visiting == false) {
-        if (this.state.selectCount > 0) {
-          return (
-            <span className={"commanderBgPanel commanderBgPanelClickable " + this.state.buttonColour} onClick={() => this.clickDeleteConfirmation()} style={{ marginLeft: 3, padding: "15px 0px" }}>REMOVE DEVICE</span>
-          )
-        } else {
-          return (
-            <span className={"commanderBgPanel commanderBgPanelClickable " + this.state.buttonColour} style={{ opacity: 0.3, cursor: "not-allowed", marginLeft: 3, padding: "15px 0px" }} title="Select some devices first...">REMOVE DEVICE</span>
-          )
-        }
-      }
+  returnDeviceList = () => {
+    var size = 242;
+    if (this.props.public == true) {
+      size = 223
+    } else if (this.props.public == false && this.props.visiting == undefined) {
+      size = 217
     }
+
+    return (
+      <div style={{ overflowY: "auto", height: window.innerHeight - size + "px" }}>
+        <div style={{ overflowY: "auto", padding: "2px 0px" }} >
+          <DeviceList alarmStates={this.updateAlarmStates} mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
+        </div>
+      </div>
+    )
   }
 
   clickDeleteConfirmation = () => {
@@ -722,7 +779,7 @@ export class StatesViewer extends Component {
   displayMap = () => {
     if (this.props.mainView == "devices") {
       return (
-        <div className="mapContainer">
+        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
           <Suspense fallback={<div>Loading...</div>}>
             <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
           </Suspense>
@@ -734,68 +791,81 @@ export class StatesViewer extends Component {
   }
 
   deviceButtons = () => {
-    if (this.props.mainView == "devices") {
-      return null
-    } else {
-      return (
-        <div className="buttonsSeperate" style={{ marginBottom: 7 }}>
-          <span className={"commanderBgPanel commanderBgPanelClickable sucess"} style={{ marginRight: 3, padding: "15px 0px" }} onClick={() => { this.props.openModal() }}> ADD DEVICE </span>
-          {this.deleteButton()}
+    return (
+      <div className="container-fluid" style={{ marginRight: "auto", marginLeft: "auto" }}>
+        <div className="row" style={{}} >
+          <span className="col commanderBgPanel commanderBgPanelClickable sucess" style={{ flex: "0 0 130px", padding: "4px 10px" }} onClick={() => { this.props.openModal("addDevice") }}>
+            <i className="fas fa-plus"></i>  ADD DEVICE
+          </span>
+          <div className="col" align="center" style={{ background: "#131e27", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
         </div>
-      )
-    }
+      </div>
+    )
   }
 
   render() {
     if (this.state.deleted == true) {
       return (<div style={{ display: "none" }}></div>);
     } else {
-      if (this.state.view == "list") {
-        return (
-          <div style={{ paddingTop: 25, margin: "30px 12px" }} >
-            {this.deviceButtons()}
-            <StatesViewerMenu mainView={this.props.mainView} search={this.search} selectAll={this.selectAll} devices={this.state.devicesView} public={this.props.public} sort={this.sort} view={this.changeView} selectCount={this.state.selectCount} deleteSelected={this.deleteSelectedDevices} visiting={this.props.visiting} />
-            <div className="rowList2">
-              {this.returnDeviceList()}
+      var count = 0;
+      var selected = 0;
+      return (
+        <div style={{ paddingTop: 25, margin: "30px 12px" }} >
+          <div className={"rowList " + this.props.mainView} style={{ background: "#16202C" }}>
+            <div>
+              <div>
+                {this.deviceButtons()}
+                < StatesViewerMenu
+                  sortvalues={this.state.sortvalues}
+                  openModal={() => this.props.openModal()}
+                  mainView={this.props.mainView}
+                  deviceCall={this.state.devicePressed}
+                  boundary={this.state.boundary}
+                  public={this.props.public}
+                  acc={this.props.account}
+                  search={this.search}
+                  selectAll={this.selectAll}
+                  devices={this.state.devicesView}
+                  sort={this.sort}
+                  view={this.changeView}
+                  selectCount={this.state.selectCount}
+                  deleteSelected={this.deleteSelectedDevices}
+                  visiting={this.props.visiting}
+                  public={this.props.public} />
+                {this.returnDeviceList()}
+              </div>
+              <div className="container-fluid" style={{ padding: 0 }} >
+                {
+                  this.state.devicesServer.map((device, i) => {
+                    count++;
+                    if (device.selected == true) {
+                      selected++;
+                    }
+                    if (count == this.state.devicesServer.length) {
+                      return (
+                        <div key={i} className="row" style={{ background: "#0E1925", margin: "0px" }}>
+                          <div style={{ padding: 5, flex: "0 50%", paddingLeft: 10, opacity: 0.7 }} >{selected} SELECTED</div>
+                          <div style={{ padding: 5, flex: "0 50%", textAlign: "right", paddingRight: 11, opacity: 0.7 }} >{count} TOTAL</div>
+                        </div>
+                      )
+                    } else {
+                      return null
+                    }
+                  })
+                }
+              </div>
+            </div>
+            {this.displayMap()}
+            <Suspense fallback={<div>Loading...</div>}>
               <ChangePassword
                 account={this.props.account}
                 isOpen={this.state.isOpen}
                 closeModel={() => { this.setState({ isOpen: false }) }}
               />
-            </div>
+            </Suspense>
           </div>
-        )
-      } else if (this.state.view == "map") {
-        return (
-          <div style={{ paddingTop: 25, margin: "30px 12px" }} >
-            {this.deviceButtons()}
-            <StatesViewerMenu
-              mainView={this.props.mainView}
-              deviceCall={this.state.devicePressed}
-              boundary={this.state.boundary}
-              public={this.props.public}
-              acc={this.props.account}
-              search={this.search}
-              selectAll={this.selectAll}
-              devices={this.state.devicesView}
-              sort={this.sort}
-              view={this.changeView}
-              selectCount={this.state.selectCount}
-              deleteSelected={this.deleteSelectedDevices}
-              visiting={this.props.visiting}
-              public={this.props.public} />
-            <div className={"rowList " + this.props.mainView}>
-              {this.returnDeviceList()}
-              {this.displayMap()}
-              <ChangePassword
-                account={this.props.account}
-                isOpen={this.state.isOpen}
-                closeModel={() => { this.setState({ isOpen: false }) }}
-              />
-            </div>
-          </div>
-        )
-      }
+        </div >
+      )
     }
   }
 }

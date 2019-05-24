@@ -36,7 +36,7 @@ export class DevicePluginPanel extends React.PureComponent {
         }
       }).catch(err => console.error(this.props.url, err.toString()))
     } else {
-      console.log(this.props)
+      // console.log(this.props)
     }
   }
 

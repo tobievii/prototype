@@ -462,7 +462,6 @@ class MapDevices extends Component {
                               method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                               body: JSON.stringify({ key: marker.key, boundaryLayer: b })
                             }).then(response => response.json()).then(result => {
-                              console.log(result);
                             }).catch(err => console.error(err.toString()));
                           });
                         }}
@@ -472,7 +471,6 @@ class MapDevices extends Component {
                             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                             body: JSON.stringify({ id: marker.devid })
                           }).then(response => response.json()).then(serverresponse => {
-                            console.log(serverresponse)
                           }).catch(err => console.error(err.toString()));
                         }}
                         draw={{
@@ -529,7 +527,7 @@ class MapDevices extends Component {
 
     return (
       <Widget label="map" options={this.options} dash={this.props.dash} showBoundary={() => this.pathButtonClicked(this.props.deviceCall)} deviceSelected={deviceSelected} widget={this.props.widget} >
-        <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false}>
+        <Map className="map" center={position} zoom={details.zoom} doubleClickZoom={false} >
           <TileLayer
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

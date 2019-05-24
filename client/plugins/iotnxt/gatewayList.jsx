@@ -17,30 +17,30 @@ library.add(faCheckCircle);
 library.add(faTimesCircle);
 
 
-import { gridstyle, cellstyle, gridHeadingStyle, blockstyle} from "../../styles.jsx"
+import { gridstyle, cellstyle, gridHeadingStyle, blockstyle } from "../../styles.jsx"
 
 export class GatewayList extends React.Component {
   state = {};
 
   getaccount = () => {
-    fetch("/api/v3/account", {method: "GET"}).then(res=>res.json()).then(user=>{
+    fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
       if (user.plugins_iotnxt_gatewaydefault) {
-        this.setState( { 
-          accountgatewaydefault:user.plugins_iotnxt_gatewaydefault,
-          user : user
+        this.setState({
+          accountgatewaydefault: user.plugins_iotnxt_gatewaydefault,
+          user: user
         })
       } else {
-        this.setState( { accountgatewaydefault:undefined });
+        this.setState({ accountgatewaydefault: undefined });
       }
-    }).catch(err=>console.error(err.toString()))
+    }).catch(err => console.error(err.toString()))
   }
-  
+
   componentDidMount = () => {
-    this.getaccount()    
+    this.getaccount()
   }
 
   componentDidUpdate = () => {
-    
+
   }
 
 
@@ -64,8 +64,8 @@ export class GatewayList extends React.Component {
     };
   };
 
-  setgatewayserverdefault = gateway => {    
-    return event => {      
+  setgatewayserverdefault = gateway => {
+    return event => {
       fetch("/api/v3/iotnxt/setgatewayserverdefault", {
         method: "POST",
         headers: {
@@ -76,7 +76,7 @@ export class GatewayList extends React.Component {
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data);
+          // console.log(data);
           this.getaccount();
           if (this.props.update) {
             this.props.update();
@@ -88,18 +88,18 @@ export class GatewayList extends React.Component {
 
 
   setgatewayaccountdefault = (gateway, clear) => {
-    return event => {      
-      console.log(clear);
+    return event => {
+      // console.log(clear);
 
       if (clear) {
         fetch("/api/v3/iotnxt/cleargatewayaccountdefault").then(response => response.json())
-        .then(data => {
-          console.log(data);
-          this.getaccount();
-          if (this.props.update) {
-            this.props.update();
-          }
-        }).catch(err => console.error(err.toString()));
+          .then(data => {
+            // console.log(data);
+            this.getaccount();
+            if (this.props.update) {
+              this.props.update();
+            }
+          }).catch(err => console.error(err.toString()));
 
 
       } else fetch("/api/v3/iotnxt/setgatewayaccountdefault", {
@@ -121,9 +121,9 @@ export class GatewayList extends React.Component {
 
   renderDelete = (gateway) => {
     if (this.state.user) {
-      
+
       if (this.state.user.level > 99) {
-        
+
         return (
           <div
             onClick={this.removeGateway(gateway)}
@@ -140,39 +140,39 @@ export class GatewayList extends React.Component {
           </div>
         )
       } else {
-        return ( <div />)  
+        return (<div />)
       }
 
     } else {
-      return ( <div />)
+      return (<div />)
     }
-    
+
   }
 
 
   render() {
     if (this.props.gateways) {
       if (this.props.gateways.length > 0) {
-       
-        
-        
+
+
+
         return (
           <div style={blockstyle}>
             <div className="row" style={gridHeadingStyle}>
-              <div className="col-4" style={{paddingLeft:34}}>GatewayId</div>
-              <div className="col-1" style={{textAlign:"center"}}>ENV</div>
+              <div className="col-4" style={{ paddingLeft: 34 }}>GatewayId</div>
+              <div className="col-1" style={{ textAlign: "center" }}>ENV</div>
               <div className="col-6" />
             </div>
 
             {this.props.gateways.map(gateway => {
-              
+
               var accountdefault = false;
               if (this.state.accountgatewaydefault) {
                 if (this.state.accountgatewaydefault.GatewayId && this.state.accountgatewaydefault.GatewayId) {
-                  if (this.state.accountgatewaydefault.GatewayId == gateway.GatewayId && 
+                  if (this.state.accountgatewaydefault.GatewayId == gateway.GatewayId &&
                     this.state.accountgatewaydefault.HostAddress == gateway.HostAddress) {
-                      accountdefault = true;
-                    }
+                    accountdefault = true;
+                  }
                 }
               }
 
@@ -180,7 +180,7 @@ export class GatewayList extends React.Component {
                 <div key={gateway.GatewayId} className="row" style={gridstyle}>
                   <div className="col-4" style={{ padding: 10 }}>
 
-                    <div                      
+                    <div
                       title={
                         gateway.connected
                           ? "Connected"
@@ -192,16 +192,16 @@ export class GatewayList extends React.Component {
                         paddingTop: 1,
                         opacity: 0.9,
                         cursor: gateway.default ? "" : "pointer",
-                        color : gateway.connected ? "rgb(0, 222, 125)" : "rgb(255, 57, 67)"
+                        color: gateway.connected ? "rgb(0, 222, 125)" : "rgb(255, 57, 67)"
                       }}
                     >
-                      <FontAwesomeIcon icon={ gateway.connected ? "check-circle" : "times-circle" }  />
+                      <FontAwesomeIcon icon={gateway.connected ? "check-circle" : "times-circle"} />
                     </div>
 
                     {gateway.GatewayId}
                   </div>
-                  <div className="col-1" style={{padding: 10, textAlign:"center"}} >
-                    {gateway.HostAddress.split(".")[1].toUpperCase() }
+                  <div className="col-1" style={{ padding: 10, textAlign: "center" }} >
+                    {gateway.HostAddress.split(".")[1].toUpperCase()}
                   </div>
                   <div className="col-6" style={cellstyle} >
                     <div
@@ -242,15 +242,15 @@ export class GatewayList extends React.Component {
 
 
 
-                      
+
 
                   </div>
-                      
-                  <div className="col-1" style={{padding: 10, textAlign:"right"}} >
-                    { this.renderDelete(gateway) }
+
+                  <div className="col-1" style={{ padding: 10, textAlign: "right" }} >
+                    {this.renderDelete(gateway)}
                   </div>
-                    
-                  
+
+
 
                 </div>
               );

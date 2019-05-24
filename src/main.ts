@@ -941,7 +941,7 @@ app.post("/api/v3/data/post", (req: any, res: any, next: any) => {
 });
 
 app.post("/api/v3/sort", (req: any, res: any) => {
-  db.users.update({ apikey: req.user.apikey }, { $set: { sort: req.body.sort } }, (err: Error, response: any) => {
+  db.users.update({ apikey: req.user.apikey }, { $set: { sort: req.body.sort, sortvalues: req.body.sortvalues } }, (err: Error, response: any) => {
     if (err) res.json(err);
     if (response) res.json({ result: "added sort" });
   })
@@ -950,12 +950,12 @@ app.post("/api/v3/sort", (req: any, res: any) => {
 app.get("/api/v3/getsort", (req: any, res: any) => {
   db.users.findOne({ apikey: req.user.apikey }, (err: Error, response: any) => {
     if (err) res.json(err);
-    if (response) res.json({ sort: response.sort });
+    if (response) res.json({ sort: response.sort, sortvalues: response.sortvalues });
   })
 });
 
 app.post("/api/v3/passChanged", (req: any, res: any) => {
-  db.users.update({ apikey: req.user.apikey }, { $set: { passChange: true } }, (err: Error, updated: any) => {
+  db.users.update({ username: req.body.username }, { $set: { passChange: true } }, (err: Error, updated: any) => {
     if (err) res.json(err);
     if (updated) res.json(updated);
   })

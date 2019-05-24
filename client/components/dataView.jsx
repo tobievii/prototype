@@ -124,14 +124,9 @@ export class DataView extends React.Component {
                 <div style={{ clear: "both" }} />
               </div>)
           }
-
-
         })}
       </div>
     )
-
-
-
   }
 
   onDragStart = (e, name, i, data, level, path) => {
