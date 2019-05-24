@@ -19,7 +19,6 @@ export class SettingsPanel extends React.Component {
       if (data.level) {
         this.setState({ level: data.level })
       }
-      console.log(this.state)
     })
   }
 

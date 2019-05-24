@@ -52,7 +52,7 @@ export class ProtoGauge extends React.Component {
             if (this.props.value) {
 
                 if (typeof this.props.value != "number") {
-                    console.log("guage requires value of type number")
+                    //console.log("guage requires value of type number")
                     this.setState({ typeError: true })
                 } else {
                     //ANIMATE GAUGE

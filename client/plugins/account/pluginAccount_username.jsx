@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { ChangePassword } from "../../components/changePassword.jsx";
+import ChangePassword from "../../components/changePassword";
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('prototype');
 export class SetUsername extends React.Component {

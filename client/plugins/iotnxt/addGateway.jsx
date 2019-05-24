@@ -47,7 +47,7 @@ export class AddGatewayPanel extends React.Component {
     }
 
     addGateway = () => {
-        console.log(this.state)
+        // console.log(this.state)
 
         fetch('/api/v3/iotnxt/addgateway', {
             method: 'POST',
@@ -57,7 +57,7 @@ export class AddGatewayPanel extends React.Component {
             },
             body: JSON.stringify(this.state.addGatewayForm)
         }).then(response => response.json()).then((data) => {
-            console.log(data);
+            // console.log(data);
             if (this.props.update) { this.props.update(); }
         }).catch(err => console.error(err.toString()))
 

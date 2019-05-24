@@ -392,7 +392,7 @@ export class DeviceView extends PureComponent {
       }
     }
 
-    return (<div className="col-lg-3" style={{ overflowY: "auto", height: window.innerHeight - 156 + "px", display: this.state.dataview }}>
+    return (<div className="col-lg-3" style={{ overflowY: "auto", height: window.innerHeight - 150 + "px", display: this.state.dataview }}>
       <div style={{ paddingBottom: 25, paddingTop: 0 }}>{plugins}</div>
       <DataView data={this.state.state} />
 

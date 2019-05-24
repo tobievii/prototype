@@ -5,7 +5,6 @@ import "bootstrap/dist/css/bootstrap.css";
 import "./prototype.scss"
 
 import { NavBar } from "./components/navBar.jsx";
-import { AddDevice } from "./components/addDevice.jsx";
 import { Account } from "./public/account.jsx"
 // not logged in content:
 import { Landing } from "./public/landing.jsx"
@@ -15,13 +14,12 @@ import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
 // import { ApiInfo } from "./components/apiInfo.jsx";
 const ApiInfo = lazy(() => import('./components/apiInfo'))
+const SettingsView = lazy(() => import('./components/settingsView'))
+const AddDevice = lazy(() => import('./components/addDevice'))
 
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
-import { SettingsView } from "./components/settingsView.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
-import { ChangePassword } from "./components/changePassword.jsx";
-
 
 import Stats from "./components/stats.jsx"
 import Footer from "./public/footer.jsx"
@@ -47,6 +45,7 @@ class App extends Component {
         isOpen: false,
         isOpen2: false,
         registrationPanel: false,
+        loginPanel: false,
         public: undefined,
         visituser: undefined
     };
@@ -216,7 +215,7 @@ class App extends Component {
             } else {
                 return (
                     <div>
-                        <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
+                        <Account loginPanel={this.state.loginPanel} registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
                         <Footer loggedIn={false} />
@@ -228,28 +227,32 @@ class App extends Component {
     }
 
     deviceView = ({ match }) => {
-        return (
-            <div>
+        if (this.state.account) {
+            return (
+                <div>
 
-                <Suspense fallback={<div>Loading...</div>}>
-                    <DeviceView
-                        openModal={this.openModal}
-                        mainView={this.state.devicesView}
-                        changeMainView={this.changeView}
-                        devid={match.params.devid}
-                        username={match.params.username}
-                        visituser={this.state.visituser}
-                        acc={test.acc}
-                        deviceCall={test.dc}
-                        devices={test.ds}
-                        sendProps={this.setProps}
-                        account={this.state.account}
-                        public={this.state.public}
-                        visiting={visitingG}
-                    />
-                </Suspense>
-            </div>
-        )
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <DeviceView
+                            openModal={this.openModal}
+                            mainView={this.state.devicesView}
+                            changeMainView={this.changeView}
+                            devid={match.params.devid}
+                            username={match.params.username}
+                            visituser={this.state.visituser}
+                            acc={test.acc}
+                            deviceCall={test.dc}
+                            devices={test.ds}
+                            sendProps={this.setProps}
+                            account={this.state.account}
+                            public={this.state.public}
+                            visiting={visitingG}
+                        />
+                    </Suspense>
+                </div>
+            )
+        } else {
+            return null
+        }
     }
 
     passUserInfo = (info) => {
@@ -260,7 +263,6 @@ class App extends Component {
         visitingG = true;
         return (
             <div>
-
                 <UserPage visitu={this.passUserInfo} username={match.params.username} />
                 <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
                 <Footer />
@@ -289,17 +291,19 @@ class App extends Component {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
-                    <SettingsView />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <SettingsView />
+                    </Suspense>
                 )
             } else {
-
                 return (
                     <div>
-                        <Account registrationPanel={this.state.registrationPanel} account={this.state.account} />
+                        <Account registrationPanel={this.state.registrationPanel} loginPanel={this.state.loginPanel} account={this.state.account} />
                         <Landing />
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
                         <Footer loggedIn={false} />
-                    </div>)
+                    </div>
+                )
             }
         }
         else {
@@ -329,17 +333,9 @@ class App extends Component {
     addDevice = () => {
         if (this.state.account) {
             return (
-                <AddDevice register={() => { this.setState({ registrationPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
-            )
-        } else {
-            return null
-        }
-    }
-
-    changePassword = () => {
-        if (this.state.account) {
-            return (
-                <ChangePassword account={this.state.account} isOpen={this.state.isOpen2} closeModel={() => { this.setState({ isOpen2: false }) }} />
+                <Suspense fallback={<div>Loading...</div>}>
+                    <AddDevice register={() => { this.setState({ registrationPanel: true }) }} login={() => { this.setState({ loginPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+                </Suspense>
             )
         } else {
             return null
@@ -349,12 +345,10 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-
                 <Router>
                     <div>
                         <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
                         {this.addDevice()}
-                        {this.changePassword()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route exact path="/u/:username" component={this.userView} />

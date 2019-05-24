@@ -4,15 +4,16 @@ export class Verify extends Component {
   state = {}
 
   requestVerificationMail = () => {
-    console.log("verify")
-    
-    fetch("/api/v3/admin/requestverificationemail", { 
-      method: "GET", 
-      headers: { "Accept": "application/json", "Content-Type": "application/json" } })
+    // console.log("verify")
+
+    fetch("/api/v3/admin/requestverificationemail", {
+      method: "GET",
+      headers: { "Accept": "application/json", "Content-Type": "application/json" }
+    })
       .then(response => response.json())
       .then(data => {
-      console.log(data)
-    }).catch(err => console.error(err.toString()));
+        // console.log(data)
+      }).catch(err => console.error(err.toString()));
 
   }
 
@@ -34,7 +35,7 @@ export class Verify extends Component {
       return null;
     }
 
-    
+
   }
 
 }

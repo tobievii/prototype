@@ -43,7 +43,7 @@ export class Registration extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify(this.state)
     }).then(response => response.json()).then(data => {
-      console.log(data);
+      // console.log(data);
 
     }).catch(err => console.error(err.toString()));
 

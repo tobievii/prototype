@@ -5,37 +5,37 @@ import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import BootstrapTable from "react-bootstrap-table-next";
 import cellEditFactory from 'react-bootstrap-table2-editor';
 
-class CellEditor extends React.Component { 
+class CellEditor extends React.Component {
 
-  componentDidMount(){
+  componentDidMount() {
     this.text.focus();
   }
 
-  getValue(a,b,c) {
+  getValue(a, b, c) {
     return this.text.value
   }
 
   handleKeypress(e) {
     if (e.key === 'Enter') {
-      console.log('do validate');
+      // console.log('do validate');
     }
   }
 
   render() {
 
     var { value, onUpdate, ...rest } = this.props;
-    
+
     return [
       <div>
         <input
           {...rest}
           key="text"
-          ref= { node => this.text = node}
+          ref={node => this.text = node}
           type="text"
-          onKeyPress={ () => onUpdate(this.getValue()) }       
+          onKeyPress={() => onUpdate(this.getValue())}
         />
       </div>
-      
+
     ];
   }
 }
@@ -47,20 +47,20 @@ export class PayloadTable extends Component {
     tableData: []
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
-    console.log("----")
+    // console.log("----")
   }
 
-  handleOnUpdate  = (a,b,c,d,e) => {
-    console.log("handleOnUpdate")
+  handleOnUpdate = (a, b, c, d, e) => {
+    // console.log("handleOnUpdate")
   }
 
   onAfterSaveCell = (a, b, c, d, e) => {
-    
-    
+
+
     this.props.onSave();
-    
+
 
   }
 
@@ -73,7 +73,7 @@ export class PayloadTable extends Component {
         if (this.props.payload.data.params) {
           //console.log(this.props.payload.data.params);
           tableData = this.props.payload.data.params;
-          
+
         }
       }
     }
@@ -81,7 +81,7 @@ export class PayloadTable extends Component {
 
     const columns = [{ dataField: 'param', text: 'PARAMETER', editable: false },
     //{ dataField: 'desc', text: 'DESCRIPTION', editorRenderer: (editorProps, value, row, rowIndex, columnIndex) => ( <QualityRanger {...editorProps} value={value} /> ) },
-    { dataField: 'desc', text: 'DESCRIPTION', editorRenderer: (editorProps, value, row, rowIndex, columnIndex) => ( <CellEditor {...editorProps} value={value} onUpdate={this.handleOnUpdate}/> ) },
+    { dataField: 'desc', text: 'DESCRIPTION', editorRenderer: (editorProps, value, row, rowIndex, columnIndex) => (<CellEditor {...editorProps} value={value} onUpdate={this.handleOnUpdate} />) },
     //{ dataField: 'desc', text: 'DESCRIPTION' },
     { dataField: 'units', text: 'UNITS' },
     { dataField: 'asp', text: 'ASP' },
@@ -97,7 +97,7 @@ export class PayloadTable extends Component {
 
       //cellEdit={cellEditFactory({ mode: 'click' })}
       cellEdit={cellEditFactory({ mode: "click", blurToSave: true, afterSaveCell: this.onAfterSaveCell })}
-      //cellEdit={ { mode: "click", blurToSave: true, afterSaveCell: this.onAfterSaveCell } }
+    //cellEdit={ { mode: "click", blurToSave: true, afterSaveCell: this.onAfterSaveCell } }
 
     />;
   }
@@ -198,8 +198,8 @@ export class ParamsView extends Component {
   }
 
   onSaveHandler = () => {
-    console.log("-- handle Table update")
-    console.log(this.props);
+    // console.log("-- handle Table update")
+    // console.log(this.props);
     if (this.props.onSave) {
       this.props.onSave();
     }
@@ -210,7 +210,7 @@ export class ParamsView extends Component {
     var lastTimestamp = "";
     var packets = "";
     var socketDataIn = "socketDataIn";
-    console.log(this.props);
+    // console.log(this.props);
 
     return (
       <div className="container commanderBgPanel">
