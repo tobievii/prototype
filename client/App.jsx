@@ -227,6 +227,11 @@ class App extends Component {
 
     deviceView = ({ match }) => {
         if (this.state.account) {
+            if (this.state.account.username == match.params.username) {
+                visitingG = false;
+            } else {
+                visitingG = true;
+            }
             return (
                 <div>
 

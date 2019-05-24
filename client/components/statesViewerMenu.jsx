@@ -135,10 +135,12 @@ export class StatesViewerMenu extends Component {
     filterSection = () => {
         var statelistIcons = "110px";
         var lastseen = "95px"
+        var margin = "7px"
 
         if (this.props.mainView == "devices") {
             statelistIcons = "127px";
             lastseen = "80px";
+            margin = "8px"
         }
 
         return (
@@ -170,7 +172,7 @@ export class StatesViewerMenu extends Component {
                 </div>
 
                 <div className="col" style={{ flex: "0 0 " + statelistIcons, padding: "0px", marginTop: 5 }}>
-                    <div className="fa-stack" style={{ padding: "10px 2px 0px 12px", marginLeft: "6px", cursor: "pointer", width: "20px" }} onClick={this.sortClickHandler("alarm")}>
+                    <div className="fa-stack" style={{ padding: "10px 2px 0px 12px", marginLeft: margin, cursor: "pointer", width: "20px" }} onClick={this.sortClickHandler("alarm")}>
                         <i className="fas fa-stack-1x fa-sort-up filterButton" title="alarm notifications"></i>
                         <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="alarm notifications" style={{ opacity: 0.5 }}></i>
                     </div>
