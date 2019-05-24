@@ -119,6 +119,10 @@ export default class AddDevice extends Component {
                     <br></br>
                     <h5>Efento</h5>
                     <br></br>
+                    IP Address:
+                    <br></br>
+                    40.115.63.112
+                    <br></br>
                     API Key: 
                     <br></br>
                     {this.props.account.apikey}
