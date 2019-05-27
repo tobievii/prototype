@@ -341,9 +341,11 @@ export default class AddDevice extends Component {
             <div >
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <div style={{ background: "#1C2834", padding: 12, width: "100%" }} align="center">
-                            <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
-                            <span style={{ textAlign: "center", opacity: 0.8 }}>{this.state.popupHeading}</span>
+                        <div className="container-fluid" style={{ background: "#16202C" }}>
+                            <div className="row">
+                                <div className="col" style={{ textAlign: "center", opacity: 0.8, padding: "7px", paddingBottom: "5px", fontSize: "18px" }}>{this.state.popupHeading}</div>
+                                <div className="col fas fa-times cross" style={{ flex: "0 0 40px", padding: "10px 8px 0px 12px", fontSize: "20px" }} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></div>
+                            </div>
                         </div>
                         <div style={{ color: "rgba(174, 231, 241, 0.55)" }}>
                             {/* <div className='protoPopup'> */}
@@ -355,7 +357,7 @@ export default class AddDevice extends Component {
                             {this.orOption()}
                             {this.serialDevice()}
                         </div>
-                        <div style={{ background: "#0E1A26", padding: "10px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
+                        <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
                             Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
                         </div>
                     </Modal>
