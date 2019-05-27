@@ -66,8 +66,6 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
-
-
     }
 
     componentWillMount = () => {
