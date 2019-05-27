@@ -20,32 +20,6 @@ import socketio from "socket.io-client";
 
 export class DeviceList extends Component {
 
-  componentDidMount() {
-    // if (this.props.public == true) {
-    //   setTimeout(() => {
-    //     return (
-    //       toast(
-    //         <div>
-    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we've added a dummy device for you to get you started
-    //       </div>
-    //       )
-    //     )
-    //   }, 3000)
-    // }
-
-    // if (this.props.devices.length == 0) {
-    //   setTimeout(() => {
-    //     return (
-    //       toast(
-    //         <div>
-    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we'll add a dummy device shortly for you to get you started
-    //       </div>
-    //       )
-    //     )
-    //   }, 2000)
-    // }
-  }
-
   state = {
     activePage: 1,
     alarmStates: []
