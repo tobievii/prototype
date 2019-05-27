@@ -12,7 +12,6 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-// import { ApiInfo } from "./components/apiInfo.jsx";
 const ApiInfo = lazy(() => import('./components/apiInfo'))
 const SettingsView = lazy(() => import('./components/settingsView'))
 const AddDevice = lazy(() => import('./components/addDevice'))
@@ -67,6 +66,8 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
+
+
     }
 
     componentWillMount = () => {
@@ -227,7 +228,7 @@ class App extends Component {
     }
 
     deviceView = ({ match }) => {
-        if (this.state.account) {
+        if (this.state.account && this.state.public != undefined) {
             if (this.state.account.username == match.params.username) {
                 visitingG = false;
             } else {
@@ -266,14 +267,16 @@ class App extends Component {
 
     userView = ({ match }) => {
         visitingG = true;
-        return (
-            <div>
-                <UserPage visitu={this.passUserInfo} username={match.params.username} />
-                <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
-                <Footer />
-            </div>
+        if (this.state.account) {
+            return (
+                <div>
+                    <UserPage visitu={this.passUserInfo} username={match.params.username} />
+                    <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
+                    <Footer />
+                </div>
 
-        )
+            )
+        } else return <div>loading...</div>
     }
 
     recoverPassword = ({ match }) => {

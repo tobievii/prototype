@@ -152,7 +152,6 @@ export class DataView extends React.Component {
   }
 
   render() {
-
     if (this.props.data) {
       if (this.props.data.payload) {
         return (

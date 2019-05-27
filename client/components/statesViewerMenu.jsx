@@ -23,8 +23,8 @@ const customStyles = {
     }
 };
 export class StatesViewerMenu extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             selectAll: false,
             sort: "",

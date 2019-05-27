@@ -287,7 +287,7 @@ export class StatesViewer extends Component {
         }).catch(err => console.error(err.toString()));
       })
     }
-    else if (this.props.public == false && this.props.visiting == false) {
+    else if (this.props.account.level > 0 && this.props.visiting == false) {
       p.statesByUsername(this.props.username, (states) => {
         for (var s in states) {
           states[s].selected = false
@@ -739,9 +739,12 @@ export class StatesViewer extends Component {
 
   returnDeviceList = () => {
     var size = 242;
-    if (this.props.public == true) {
+
+    if (this.props.visiting == true) {
+      size = 220;
+    } else if (this.props.account.level < 1) {
       size = 223
-    } else if (this.props.public == false && this.props.visiting == undefined) {
+    } else if (this.props.account.level > 0 && this.props.visiting == undefined) {
       size = 217
     }
 
