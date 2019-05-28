@@ -28,7 +28,6 @@ const customStyles = {
 };
 
 export default class AddDevice extends Component {
-
     state = {
         popupHeading: "ADD DEVICE BY",
         popupInfo: "default",
@@ -56,10 +55,10 @@ export default class AddDevice extends Component {
         }
     }
 
-    addDevice = () => {
+    addDevice = (call) => {
         if (this.props.account.level < 1) {
             this.setState({ popupInfo: "public" })
-        } else if (this.state.search == "Efento") {
+        } else if (this.state.search == "Efento" && call == "select") {
             this.setState({ popupInfo: "Efento" })
         } else {
             return null;
@@ -94,7 +93,7 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("select") }}>
                                 NEXT <i className="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -116,23 +115,17 @@ export default class AddDevice extends Component {
         } else if (this.state.popupInfo == "Efento") {
 
             return (
-                <div style={{ width: "190px", paddingLeft: "20px", paddingBottom: "20px" }}>
+                <div style={{ background: "#16202C", paddingLeft: "20px", paddingBottom: "45px" }}>
                     <br></br>
-                    <h5>Efento</h5>
-                    <br></br>
-                    IP Address:
-                    <br></br>
-                    40.115.63.112
-                    <br></br>
-                    API Key:
-                    <br></br>
-                    {this.props.account.apikey}
-                    <br></br>
-                    <br></br>
-                    Port:
-                    <br></br>
-                    5618
-                    <br></br>
+                    <h5>Efento NB-IoT</h5>
+                    <br />
+                    Please enter the information below on your efento logger mobile application.
+                    <br /><br />
+                    Prototyp3's IP Address: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">40.115.63.112</span></span>
+                    <br /><br />
+                    Your API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
+                    <br /><br />
+                    Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
                 </div>
             )
         }
@@ -267,7 +260,7 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice() }}>
+                            <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("code") }}>
                                 ADD <i className="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -347,9 +340,11 @@ export default class AddDevice extends Component {
             <div >
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <div style={{ background: "#1C2834", padding: 12, width: "100%" }}>
-                            <span style={{ float: "right" }} className={"fas fa-times cross"} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></span>
-                            <span style={{ marginRight: "40%", textAlign: "center" }}>{this.state.popupHeading}</span>
+                        <div className="container-fluid" style={{ background: "#16202C" }}>
+                            <div className="row">
+                                <div className="col" style={{ textAlign: "center", opacity: 0.8, padding: "7px", paddingBottom: "5px", fontSize: "18px" }}>{this.state.popupHeading}</div>
+                                <div className="col fas fa-times cross" style={{ flex: "0 0 40px", padding: "10px 8px 0px 12px", fontSize: "20px" }} onClick={() => { this.props.closeModel(); if (this.props.account.level > 0) { this.setState({ popupInfo: "default" }); } /*this.setState({ popupHeading: "ADD DEVICE" })*/ }}></div>
+                            </div>
                         </div>
                         <div style={{ color: "rgba(174, 231, 241, 0.55)" }}>
                             {/* <div className='protoPopup'> */}
@@ -361,7 +356,7 @@ export default class AddDevice extends Component {
                             {this.orOption()}
                             {this.serialDevice()}
                         </div>
-                        <div style={{ background: "#0E1A26", padding: "10px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
+                        <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
                             Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
                         </div>
                     </Modal>

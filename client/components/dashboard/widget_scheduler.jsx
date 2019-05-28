@@ -42,7 +42,7 @@ export class WidgetScheduler extends React.Component {
     }).catch(err => console.error(err.toString()));
   }
 
-  setOptions = (options) => {
+  setOptions = (options, cb) => {
     //this.setState(options);
 
     this.setState(_.merge(this.state, options), () => {
@@ -50,8 +50,8 @@ export class WidgetScheduler extends React.Component {
     })
 
     // update dash and server
-    this.props.dash.setOptions(options);
-    this.scheduler();
+    this.props.dash.setOptions(options, cb);
+    //this.scheduler();
   }
 
   updatedOptions = () => {

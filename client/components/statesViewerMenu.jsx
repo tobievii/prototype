@@ -23,8 +23,8 @@ const customStyles = {
     }
 };
 export class StatesViewerMenu extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             selectAll: false,
             sort: "",
@@ -89,12 +89,12 @@ export class StatesViewerMenu extends Component {
             if (this.props.visiting == false) {
                 if (this.props.selectCount > 0) {
                     return (
-                        <span className="protoButton protoButtonClickable" style={{ fontWeight: "normal", padding: "2px 5px", background: "rgba(255,0,0, 0.6)", float: "left", margin: "5px 15px 0px" }} title={this.props.selectCount + " selected."}
-                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash-alt" /> DELETE</span>
+                        <span className="protoButton protoButtonClickable" style={{ fontWeight: "normal", padding: "1px 5px", background: "rgba(255,0,0, 0.6)", float: "left", margin: "5px 15px 0px" }} title={this.props.selectCount + " selected."}
+                            onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash-alt" /> REMOVE</span>
                     )
                 } else {
                     return (
-                        <span className="" style={{ float: "left", margin: "5px 15px 0px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash-alt" /> DELETE</span>
+                        <span className="" style={{ float: "left", margin: "5px 15px 0px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash-alt" /> REMOVE</span>
                     )
                 }
             }
@@ -135,20 +135,22 @@ export class StatesViewerMenu extends Component {
     filterSection = () => {
         var statelistIcons = "110px";
         var lastseen = "95px"
+        var margin = "7px"
 
         if (this.props.mainView == "devices") {
             statelistIcons = "127px";
             lastseen = "80px";
+            margin = "8px"
         }
 
         return (
             <div className="row" style={{}}>
-                <div className="col fa-stack" style={{ flex: "0 0 30px", cursor: "pointer", verticalAlign: "middle", marginLeft: "3px", marginTop: 5 }} onClick={this.sortClickHandler("selected")} >
+                <div className="col fa-stack" style={{ flex: "0 0 30px", cursor: "pointer", verticalAlign: "middle", marginLeft: "3px", marginTop: 3 }} onClick={this.sortClickHandler("selected")} >
                     <i className="fas fa-stack-1x fa-sort-up filterButton" title="Selected devices on top"></i>
                     <i className="fas fa-stack-1x fa-sort-down fa-inverse " title="Selected devices last" style={{ opacity: 0.5 }}></i>
                 </div>
 
-                <div className="col" style={{ flex: "0 0 50px", padding: "0px", cursor: "pointer", marginRight: "3px", paddingTop: 5 }} onClick={this.sortClickHandler("namedesc")}>
+                <div className="col" style={{ flex: "0 0 50px", padding: "0px", cursor: "pointer", marginRight: "3px", paddingTop: 3 }} onClick={this.sortClickHandler("namedesc")}>
                     <span className="fa-stack" style={{ width: "20px", marginBottom: 2 }}>
                         <i className="fas fa-stack-1x fa-sort-up filterButton" title="Device name ascending"></i>
                         <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="Device name descending" style={{ opacity: 0.5 }}></i>
@@ -156,12 +158,13 @@ export class StatesViewerMenu extends Component {
                     <span className="filterButton" style={{ paddingTop: 3 }} >A-Z</span>
                 </div>
 
-                <div className="col" id="search" style={{ textAlign: "left", cursor: "pointer", padding: "0px", margin: "2px 10px 4px 5px" }}>
+                <div className="col" id="search" style={{ textAlign: "left", cursor: "pointer", padding: "0px", margin: "2px 0px 4px 10px" }}>
                     {/* <input className="fa" name="query" type="search" onChange={this.props.search} style={{ fontFamily: "Font Awesome 5 Free, Share Tech Mono, ShareTechMono-Regular", fontStyle: "normal", width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="&#xf002;" /> */}
-                    <input name="query" type="search" onChange={this.props.search} style={{ width: "100%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="search for device..." />
+                    <i className="fas fa-search" style={{ marginRight: "5px", opacity: 0.5 }}></i>
+                    <input name="query" type="search" onChange={this.props.search} style={{ width: "85%", height: "35px", border: "1px solid rgba(169, 169, 169, 0.2)", fontSize: 14 }} placeholder="search for device..." />
                 </div>
 
-                <div className="col" style={{ flex: "0 0 " + lastseen, padding: "5px 0px 0px 3px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
+                <div className="col" style={{ flex: "0 0 " + lastseen, padding: "4px 0px 0px 3px", cursor: "pointer" }} onClick={this.sortClickHandler("timedesc")}>
                     <span className="fa-stack" style={{ width: "20px", marginBottom: 2 }}>
                         <i className="fas fa-stack-1x fa-sort-up filterButton" title="last seen"></i>
                         <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="last seen" style={{ opacity: 0.5 }}></i>
@@ -169,8 +172,8 @@ export class StatesViewerMenu extends Component {
                     <span className="filterButton">LATEST</span>
                 </div>
 
-                <div className="col" style={{ flex: "0 0 " + statelistIcons, padding: "0px", marginTop: 5 }}>
-                    <div className="fa-stack" style={{ padding: "10px 2px 0px 12px", marginLeft: "6px", cursor: "pointer", width: "20px" }} onClick={this.sortClickHandler("alarm")}>
+                <div className="col" style={{ flex: "0 0 " + statelistIcons, padding: "0px", marginTop: 4 }}>
+                    <div className="fa-stack" style={{ padding: "10px 2px 0px 12px", marginLeft: margin, cursor: "pointer", width: "20px" }} onClick={this.sortClickHandler("alarm")}>
                         <i className="fas fa-stack-1x fa-sort-up filterButton" title="alarm notifications"></i>
                         <i className="fas fa-stack-1x fa-sort-down fa-inverse" title="alarm notifications" style={{ opacity: 0.5 }}></i>
                     </div>
