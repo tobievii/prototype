@@ -378,7 +378,7 @@ class Dashboard extends React.Component {
 
     if (data.type == "map") {
       return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="spinner"></div>}>
           <MapDevices
             dash={dash}
             data={data}

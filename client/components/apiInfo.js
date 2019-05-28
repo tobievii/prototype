@@ -173,7 +173,7 @@ class ApiInfo extends Component {
 
               <div className="col-md-12">
                 <h6>BODY ( Content-Type: "application/json" )</h6>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div className="spinner"></div>}>
                   <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
                 </Suspense>
               </div>
@@ -233,12 +233,12 @@ class ApiInfo extends Component {
 
             <p>Download <a href="https://nodejs.org/en/">Node.js</a> and duplicate the code below in a <b>test.js</b> file. This code will connect to your account and stream data to your terminal. We use this method to keep a connection open to the server and will be ready to receive data when needed. This example will stream data from all your devices if configured correctly.</p>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIo}</SyntaxHighlighter>
             </Suspense>
 
             <p>On line 5 you can alternatively connect to a specific device by using the | (pipe) character in between your api key and the device id:</p>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter startingLineNumber={5} language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIoSingleDevice}</SyntaxHighlighter>
             </Suspense>
 
@@ -258,7 +258,7 @@ class ApiInfo extends Component {
 
             <p className="commanderBgPanel" id="postSample" >{curlPostSample}</p>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{codeStringRealtimeSocketIoResult}</SyntaxHighlighter>
             </Suspense>
 
@@ -266,7 +266,7 @@ class ApiInfo extends Component {
 
             <p>Once socket.io is connected and you've "joined" using your API key, you can now start sending data. The format of the packet is identical to the HTTP REST post method.</p>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{'socket.emit("post", {id: "yourDevice001", data: { temperature: 25.0 } } )'}</SyntaxHighlighter>
             </Suspense>
 
@@ -279,7 +279,7 @@ class ApiInfo extends Component {
             <h4 className="spot">MQTT</h4>
             <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
                 {"var mqtt = require('mqtt');\nvar config = { apikey: \"" + this.props.apikey + "\" };\nvar client  = mqtt.connect('mqtt://" + window.location.hostname + "', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
               </SyntaxHighlighter>
@@ -293,7 +293,7 @@ class ApiInfo extends Component {
             <h4 className="spot">Python</h4>
             <p>This code is for python users </p>
 
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="python" style={tomorrowNightBright}>
                 {'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'}
               </SyntaxHighlighter>

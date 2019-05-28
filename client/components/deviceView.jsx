@@ -402,7 +402,7 @@ export class DeviceView extends PureComponent {
   dashboardColumn = () => {
     return (<div className={this.state.dashboard} >
       {this.editorBlock()}
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="spinner"></div>}>
         <Dashboard
           username={this.props.username}
           acc={this.props.acc}

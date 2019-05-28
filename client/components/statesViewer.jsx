@@ -783,7 +783,7 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       return (
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<div className="spinner"></div>}>
             <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
           </Suspense>
         </div>
@@ -859,7 +859,7 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div className="spinner"></div>}>
               <ChangePassword
                 account={this.props.account}
                 isOpen={this.state.isOpen}

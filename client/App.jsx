@@ -204,7 +204,7 @@ class App extends Component {
                 return (
                     <div>
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
-                        <Suspense fallback={<div>Loading...</div>}>
+                        <Suspense fallback={<div className="spinner"></div>}>
                             <ApiInfo apikey={this.state.account.apikey} />
                         </Suspense>
                         <Stats />
@@ -235,7 +235,7 @@ class App extends Component {
             return (
                 <div>
 
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<div className="spinner"></div>}>
                         <DeviceView
                             openModal={this.openModal}
                             mainView={this.state.devicesView}
@@ -274,7 +274,7 @@ class App extends Component {
                 </div>
 
             )
-        } else return <div>loading...</div>
+        } else return <div className="spinner"></div>
     }
 
     recoverPassword = ({ match }) => {
@@ -297,7 +297,7 @@ class App extends Component {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<div className="spinner"></div>}>
                         <SettingsView />
                     </Suspense>
                 )
@@ -339,7 +339,7 @@ class App extends Component {
     addDevice = () => {
         if (this.state.account) {
             return (
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div className="spinner"></div>}>
                     <AddDevice register={() => { this.setState({ registrationPanel: true }) }} login={() => { this.setState({ loginPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
                 </Suspense>
             )
