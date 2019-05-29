@@ -78,7 +78,6 @@ export class DeviceHistory extends React.Component {
     render() {
 
         if (this.state.logdata) {
-            var timeago = moment(this.state.logdata.timestamp).fromNow()
             var columSize = "110px"
 
             return (
@@ -89,6 +88,7 @@ export class DeviceHistory extends React.Component {
                     style={{ height: "100%", overflowY: "scroll" }}
                 >
                     {this.state.logdata.map(function (logdata, i) {
+                        var timeago = moment(logdata.timestamp).fromNow()
                         return ([
 
                             <div className="container-fluid" style={{ marginBottom: 2 }}>
