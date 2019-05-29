@@ -370,6 +370,7 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
             result.push(clean)
           }
           res.json(result);
+          console.log(result)
         })
       }
     })
@@ -393,6 +394,42 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
       res.json(packets);
     })
   }
+
+  ///////////////////////////////////
+
+  // Packet History for log component
+  if (req.body.log) {
+    resolved = true
+    db.packets.find({ apikey: req.user.apikey }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+      // rawpackets = rawpackets.reverse();
+      var packets = []
+
+      for (var p in rawpackets) {
+        var payload = rawpackets[p].payload;
+        // payload.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+        packets.push(payload)
+      }
+      console.log(packets)
+
+      res.json(packets);
+    })
+  }
+
+  // db.packets.find({ apikey: req.user.apikey }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
+  //   rawpackets = rawpackets.reverse();
+  //   var packets = []
+
+  //   for (var p in rawpackets) {
+  //     var payload = rawpackets[p].payload;
+  //     payload.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
+  //     packets.push(payload)
+  //   }
+  //   res.json(packets);
+  //   console.log(payload)
+  // })
+
+  ////////////////////////////////////////
+
   if (resolved == false) {
     res.json({ error: "We require either an id or device key for this query" })
   }
