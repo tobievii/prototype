@@ -785,12 +785,15 @@ export class StatesViewer extends Component {
   };
 
   buttonOne = () => {
-    // <i class="fas fa-toggle-on"></i>
-    return (this.state.toggleOn ? <button onClick={() => { this.handleInputFocus(); }} title="Show map" className="fas fa-toggle-on" /> : null)
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOn ? <button onClick={() => { this.handleInputFocus(); }} title="Show map" className="fas fa-toggle-on" /> : null)
+    } else return null
   }
 
   buttonTwo = () => {
-    return (this.state.toggleOff ? <button onClick={() => { this.handleInputFocus(); }} title="Show device logs" className="fas fa-toggle-off" /> : null)
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOff ? <button onClick={() => { this.handleInputFocus(); }} title="Show device logs" className="fas fa-toggle-off" /> : null)
+    } else return null
   }
 
 
