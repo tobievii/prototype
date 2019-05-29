@@ -10,6 +10,7 @@ import { StatesViewerItem } from "./statesViewerItem.jsx"
 const MapDevices = React.lazy(() => import('./dashboard/map'))
 const ChangePassword = React.lazy(() => import('../components/changePassword'))
 import { confirmAlert } from 'react-confirm-alert';
+import { DeviceHistory } from "./dashboard/device_history.jsx"
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -116,7 +117,9 @@ export class StatesViewer extends Component {
       public: "asc"
     },
     isOpen: false,
-    tempdev: []
+    tempdev: [],
+    toggleOn: false,
+    toggleOff: true
   };
 
   socket = undefined;
@@ -752,17 +755,44 @@ export class StatesViewer extends Component {
 
   displayMap = () => {
     if (this.props.mainView == "devices") {
-      return (
+      return (this.state.toggleOff ?
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
           <Suspense fallback={<div>Loading...</div>}>
             <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
           </Suspense>
         </div>
+        : null
       )
-    } else {
-      return null
     }
   }
+
+  displayLog = () => {
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOn ?
+        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
+          <Suspense fallback={<div>Loading...</div>}>
+            <DeviceHistory public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+          </Suspense>
+        </div>
+        : null
+      )
+    }
+  }
+
+  handleInputFocus = () => {
+    this.setState({ toggleOn: !this.state.toggleOn });
+    this.setState({ toggleOff: !this.state.toggleOff });
+  };
+
+  buttonOne = () => {
+    // <i class="fas fa-toggle-on"></i>
+    return (this.state.toggleOn ? <button onClick={() => { this.handleInputFocus(); }} title="Show map" className="fas fa-toggle-on" /> : null)
+  }
+
+  buttonTwo = () => {
+    return (this.state.toggleOff ? <button onClick={() => { this.handleInputFocus(); }} title="Show device logs" className="fas fa-toggle-off" /> : null)
+  }
+
 
   deviceButtons = () => {
     return (
@@ -772,6 +802,8 @@ export class StatesViewer extends Component {
             <i className="fas fa-plus"></i>  ADD DEVICE
           </span>
           <div className="col" align="center" style={{ background: "#131e27", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
+          {this.buttonOne()}
+          {this.buttonTwo()}
         </div>
       </div>
     )
@@ -829,6 +861,7 @@ export class StatesViewer extends Component {
                 }
               </div>
             </div>
+            {this.displayLog()}
             {this.displayMap()}
             <Suspense fallback={<div>Loading...</div>}>
               <ChangePassword
