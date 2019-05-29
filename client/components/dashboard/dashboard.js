@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 
 import GridLayout from 'react-grid-layout';
 
@@ -15,7 +15,7 @@ import * as _ from "lodash"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-const MapDevices = React.lazy(() => import('./map'))
+import MapDevices from './map'
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
@@ -378,18 +378,17 @@ class Dashboard extends React.Component {
 
     if (data.type == "map") {
       return (
-        <Suspense fallback={<div>Loading...</div>}>
-          <MapDevices
-            dash={dash}
-            data={data}
-            username={this.props.username}
-            acc={this.props.acc}
-            deviceCall={this.props.state}
-            devices={this.props.devices}
-            widget={true}
-            showBoundary={this.state.showB}
-            PopUpLink={false} />
-        </Suspense>
+        <MapDevices
+          dash={dash}
+          data={data}
+          username={this.props.username}
+          acc={this.props.acc}
+          deviceCall={this.props.state}
+          devices={this.props.devices}
+          widget={true}
+          showBoundary={this.state.showB}
+          PopUpLink={false}
+        />
       )
     }
 

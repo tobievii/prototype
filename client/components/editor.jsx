@@ -280,7 +280,7 @@ export class Editor extends Component {
                         </div> */}
 
                         <div style={{ backgroundColor: "red", height: "100%" }}>
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<div className="spinner"></div>}>
                                 <MonacoEditor
                                     height="2000"
                                     width="6000"

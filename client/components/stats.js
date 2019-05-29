@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-
-import "../prototype.scss";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 export default class Stats extends React.Component {
