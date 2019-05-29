@@ -38,7 +38,7 @@ var updateScheduler = (db: any, request: any, eventHub: any, cb: Function) => {
   clearScheduler(request.props.data.i)
 
   if (request.state.enabled) {
-    startJobs(db, request.props.state, { i: request.props.data.i, options: request.state }, eventHub);
+    startJobs(db, request.props.state, { i: request.props.data.i, options: request.state }, eventHub, cb);
   }
 }
 
@@ -55,14 +55,14 @@ function getAllSchedulersAndStart(db: any, eventHub: any) {
       for (var device of devices) {
         for (var widget of device.layout) {
           if (widget.type == "scheduler") {
-            startJobs(db, device, widget, eventHub);
+            startJobs(db, device, widget, eventHub, () => { });
           }
         }
       }
     })
 }
 
-function startJobs(db: any, device: any, job: any, eventHub: any) {
+function startJobs(db: any, device: any, job: any, eventHub: any, cb: Function) {
   var start = new Date(job.options.startTime).getTime();
   var now = new Date().getTime();
   var diff = (now - start);
@@ -82,11 +82,11 @@ function startJobs(db: any, device: any, job: any, eventHub: any) {
   if (isNaN(intervalMS)) {
     return;
   }
-  startATask(db, msUntilNextTrigger, intervalMS, eventHub, device, job)
+  startATask(db, msUntilNextTrigger, intervalMS, eventHub, device, job, cb)
 }
 
 
-function startATask(db: any, nextMS: any, intervalMS: any, eventHub: any, device: any, job: any) {
+function startATask(db: any, nextMS: any, intervalMS: any, eventHub: any, device: any, job: any, cb: Function) {
 
   if (isNaN(nextMS)) { return; }
   if (isNaN(intervalMS)) { return; }
@@ -134,4 +134,5 @@ function startATask(db: any, nextMS: any, intervalMS: any, eventHub: any, device
     }, intervalMS)
   }, nextMS)
 
+  cb(); //DONE
 }
