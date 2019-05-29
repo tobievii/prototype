@@ -242,9 +242,9 @@ export class StatesViewer extends Component {
         p.statesByUsername(this.props.username, (states) => {
           for (var s in states) {
             states[s].selected = false
-            if (states[s].meta.user.email !== user.email) {
-              states.splice(s)
-            }
+            // if (states[s].meta.user.email !== user.email) {
+            //   states.splice(s)
+            // }
           }
 
           this.setState({ devicesServer: states }, () => {

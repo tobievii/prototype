@@ -90,13 +90,13 @@ export class ShareList extends Component {
     unshare = (remove) => {
         this.setState({ show: "noDisplayShare" });
         for (let i in this.state.userSearched) {
-            if (remove == this.state.userSearched[i].uuid) {
+            if (remove.email == this.state.userSearched[i].email || remove.uuid == this.state.userSearched[i].uuid) {
                 this.state.userSearched[i].shared = "no";
             }
         }
         fetch("/api/v3/unshare", {
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
+            body: JSON.stringify({ removeuseremail: remove.email, dev: this.props.devid, removeuseruuid: remove.uuid })
         }).then(response => response.json()).then(stats => {
             this.setState({ stats: stats })
             this.setState({ qresponse: { mail: "sent" } })
@@ -149,7 +149,7 @@ export class ShareList extends Component {
             temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email })
             for (var look in this.state.shared) {
                 for (var i in temp) {
-                    if (temp[i].uuid == this.state.shared[look]) {
+                    if (temp[i].email == this.state.shared[look].email || temp[i].uuid == this.state.shared[look].uuid || temp[i].uuid == this.state.shared[look]) {
                         temp[i].shared = "yes"
                     }
                 }
@@ -168,7 +168,7 @@ export class ShareList extends Component {
                             return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <i className={user.icon} style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /></div>
                         }
                         else {
-                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user)}>Revoke Sharing </div></div>
                         }
                     })
                 }
@@ -234,7 +234,8 @@ export class ShareList extends Component {
                     html: '<p>Hi <br></br>' + this.props.username + ' has shared (' + this.props.devid + ') Device with you </p>',
                     subject: 'SHARED DEVICE',
                     dev: this.props.devid,
-                    person: this.props.username
+                    person: this.props.username,
+                    uuid: this.state.EmailsharedDevice[dev].uuid
                 })
             }).then(response => response.json()).then(serverresponse => {
                 this.setState({ qresponse: serverresponse.result })
