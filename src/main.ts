@@ -409,24 +409,9 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
         // payload.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
         packets.push(payload)
       }
-      console.log(packets)
-
       res.json(packets);
     })
   }
-
-  // db.packets.find({ apikey: req.user.apikey }).sort({ _id: -1 }).limit(limit, (err: Error, rawpackets: any) => {
-  //   rawpackets = rawpackets.reverse();
-  //   var packets = []
-
-  //   for (var p in rawpackets) {
-  //     var payload = rawpackets[p].payload;
-  //     payload.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
-  //     packets.push(payload)
-  //   }
-  //   res.json(packets);
-  //   console.log(payload)
-  // })
 
   ////////////////////////////////////////
 
