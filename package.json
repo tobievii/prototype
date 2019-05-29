@@ -1,6 +1,6 @@
 {
   "name": "prototype",
-  "version": "5.0.40",
+  "version": "5.0.41",
   "description": "Typescrypt based IoT framework for general purpose remote monitoring/control.",
   "main": "src/main.js",
   "scripts": {
