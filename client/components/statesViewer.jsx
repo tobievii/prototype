@@ -73,7 +73,15 @@ export class DeviceList extends Component {
 
   render() {
     if (this.props.devices == undefined) {
-      return null
+      return (
+        <div className="row " style={{ opacity: 0.5 }}>
+          <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
+            <div className="commanderBgPanel" style={{ margin: 0 }}>
+              <center>Loading...</center>
+            </div>
+          </div>
+        </div>
+      )
     }
 
     if (this.props.devices.length == 0) {
@@ -118,7 +126,7 @@ export class StatesViewer extends Component {
     search: "",
     sort: "",
     devicesServer: [],
-    devicesView: [],
+    devicesView: undefined,
     checkboxstate: "Select All",
     boxtick: "far fa-check-square",
     publicButton: "",
