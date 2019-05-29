@@ -1,7 +1,6 @@
 import React, { Component, Suspense } from "react";
 const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
-
-import { tomorrowNightBright } from 'react-syntax-highlighter/styles/hljs';
+const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
 
 class ApiInfo extends Component {
   state = {
@@ -191,7 +190,6 @@ class ApiInfo extends Component {
 
           {/* 2) GET STATES */}
 
-
           <div className="col-md-6 commanderBgPanel" >
             <h4 className="spot" style={{ paddingTop: 10 }}>GET DATA</h4>
             <p>To get all the current device state data is simple. Just click on the url on the right.</p>
@@ -214,15 +212,7 @@ class ApiInfo extends Component {
             <h5>QUICK CURL SNIPPET:</h5>
             <p className="commanderBgPanel" id="postSample" >{curlStatesSample}</p>
           </div>
-
-
-
-
         </div>
-
-
-
-
 
         <div className="row" style={this.getMenuPageStyle(3)}>
           <div className="col-md-12 commanderBgPanel" >
