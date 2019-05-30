@@ -816,9 +816,7 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOn ?
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
-          <Suspense fallback={<div>Loading...</div>}>
-            <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
-          </Suspense>
+          <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
         </div>
         : null
       )
