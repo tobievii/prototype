@@ -1,78 +1,78 @@
 import React, { Component } from "react";
 import moment from 'moment'
-import socketio from "socket.io-client";
+
 export class DeviceHistory extends React.Component {
     state = {
-        logdata: [],
+        timeago: "",
+        millisago: 0,
+        logdata: []
     }
-    // socket = undefined;
 
-    // constructor(props) {
-    //     super(props)
-    //     this.socket = socketio({ transports: ['websocket', 'polling'] });
-    //     this.socket.on("connect", a => {
-    //         this.socket.emit("join", this.props.username)
-    //         fetch("/api/v3/packets", {
-    //             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-    //             body: JSON.stringify({ log: true })
-    //         }).then(response => response.json()).then(logdata => {
-    //             this.setState({ logdata })
-    //         }).catch(err => console.error(err.toString()));
-    //         this.socket.on("post", (logdata) => {
-    //             this.handleDevicePacket(logdata)
-    //         })
-    //     })
-    // }
+    intervalUpdator = undefined;
 
-    // handleDevicePacket = (packet) => {
-    //     var devices = _.clone(this.state.devicesServer)
-    //     var found = 0;
-    //     for (var dev in devices) {
-    //         if (devices[dev].devid == packet.id) {
-    //             found = 1;
-    //             devices[dev]["_last_seen"] = packet.timestamp;
-    //             devices[dev].payload = _.merge(devices[dev].payload, packet)
-    //         } else if (devices[dev].devid == packet.devid) {
-    //             if (packet.boundaryLayer != undefined) {
-    //                 found = 1;
-    //                 devices[dev]["_last_seen"] = packet._last_seen;
-    //                 devices[dev].payload.timestamp = packet._last_seen;
-    //                 devices[dev].boundaryLayer = packet.boundaryLayer;
-    //             } else {
-    //                 found = 1;
-    //                 devices[dev]["_last_seen"] = packet._last_seen;
-    //                 devices[dev].payload.timestamp = packet._last_seen;
-    //                 packet.selectedIcon = true;
-    //                 devices[dev] = _.merge(devices[dev].boundaryLayer, packet);
-    //             }
-    //         }
-    //     }
-
-    //     if (found == 0) {
-    //         // console.log("recieved data for device not on our list yet.")
-    //     } else {
-    //         // update
-    //         if (this.state.search.length > 0) {
-    //             this.setState({ devicesServer: devices })
-    //         } else {
-    //             this.setState({ devicesServer: devices })
-    //             this.setState({ devicesView: devices }, () => {
-    //             })
-    //             //this.sort();
-    //         }
-    //     }
-    // }
-
-
-    componentDidMount() {
-
+    componentWillMount() {
         fetch("/api/v3/packets", {
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({ log: true })
         }).then(response => response.json()).then(logdata => {
             this.setState({ logdata })
+            this.props.logdata(logdata)
         }).catch(err => console.error(err.toString()));
 
+        this.intervalUpdator = setInterval(() => {
+            this.updateTime();
+        }, 1000 / 10)
+    }
+
+    componentDidUpdate = () => {
+        if (this.props.logdatanew != undefined) {
+            if (this.props.logdatanew.length > this.state.logdata.length) {
+                this.setState({ logdata: this.props.logdatanew })
+            }
+        }
+    }
+
+    blendrgba(x, y, ratio) {
+        if (ratio <= 0) {
+            return "rgba(" + Math.round(x.r) + "," + Math.round(x.g) + "," + Math.round(x.b) + "," + x.a + ")"
+        } else if (ratio >= 1) {
+            return "rgba(" + Math.round(y.r) + "," + Math.round(y.g) + "," + Math.round(y.b) + "," + y.a + ")"
+        } else {
+            var blended = {
+                r: (x.r * (1 - ratio)) + (y.r * ratio),
+                g: (x.g * (1 - ratio)) + (y.g * ratio),
+                b: (x.b * (1 - ratio)) + (y.b * ratio),
+                a: (x.a * (1 - ratio)) + (y.a * ratio),
+            }
+            return "rgba(" + Math.round(blended.r) + "," + Math.round(blended.g) + "," + Math.round(blended.b) + "," + blended.a + ")"
+        }
+    }
+
+    calcStyle(logdata) {
+        var timefade = 3000;
+        var lastChange = new Date(logdata.timestamp);
+        var millisago = Date.now() - lastChange.getTime();
+        var ratio = (timefade - millisago) / timefade;
+        if (ratio < 0) { ratio = 0 }
+        if (ratio > 1) { ratio = 1 }
+        return {
+            marginBottom: 2, padding: "0px",
+            backgroundImage: "linear-gradient(to right, rgba(16, 26, 38, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
+            borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
+        }
+    }
+
+    updateTime = () => {
+        {
+            this.state.logdata.map((logdata, i) => {
+                if (logdata.timestamp) {
+                    var lastChange = new Date(logdata.timestamp);
+                    var millisago = Date.now() - lastChange.getTime();
+                    var timeago = moment(logdata.timestamp).fromNow()
+                    this.setState({ timeago, millisago })
+                }
+            })
+        }
     }
 
     render() {
@@ -87,12 +87,11 @@ export class DeviceHistory extends React.Component {
                     dash={this.props.dash}
                     style={{ height: "100%", overflowY: "scroll" }}
                 >
-                    {this.state.logdata.map(function (logdata, i) {
+                    {this.state.logdata.map((logdata, i) => {
                         var timeago = moment(logdata.timestamp).fromNow()
                         return ([
-
                             <div className="container-fluid" style={{ marginBottom: 2 }}>
-                                <div className="row statesViewerItemMap">
+                                <div className="row statesViewerItemMap" style={this.calcStyle(logdata)} >
                                     <div style={{ paddingLeft: "20px" }}>
                                         <h3 key={i}>{logdata.id}</h3>
                                         <div className="row dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right" }}>
