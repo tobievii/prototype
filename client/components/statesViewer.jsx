@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from "react";
+import React, { Component } from "react";
 import './react-confirm-alert/src/react-confirm-alert.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSort, faSortNumericDown, faSortAlphaDown, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
@@ -7,8 +7,8 @@ import * as p from "../prototype.ts"
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 
-const MapDevices = React.lazy(() => import('./dashboard/map'))
-const ChangePassword = React.lazy(() => import('../components/changePassword'))
+import MapDevices from './dashboard/map';
+import ChangePassword from '../components/changePassword'
 import { confirmAlert } from 'react-confirm-alert';
 
 library.add(faSort)
@@ -73,7 +73,15 @@ export class DeviceList extends Component {
 
   render() {
     if (this.props.devices == undefined) {
-      return null
+      return (
+        <div className="row " style={{ opacity: 0.5 }}>
+          <div className="col-12" style={{ padding: "0 5px 0 5px" }}>
+            <div className="commanderBgPanel" style={{ margin: 0 }}>
+              <center>Loading...</center>
+            </div>
+          </div>
+        </div>
+      )
     }
 
     if (this.props.devices.length == 0) {
@@ -118,7 +126,7 @@ export class StatesViewer extends Component {
     search: "",
     sort: "",
     devicesServer: [],
-    devicesView: [],
+    devicesView: undefined,
     checkboxstate: "Select All",
     boxtick: "far fa-check-square",
     publicButton: "",
@@ -783,9 +791,7 @@ export class StatesViewer extends Component {
     if (this.props.mainView == "devices") {
       return (
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
-          <Suspense fallback={<div>Loading...</div>}>
-            <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
-          </Suspense>
+          <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
         </div>
       )
     } else {
@@ -859,13 +865,11 @@ export class StatesViewer extends Component {
               </div>
             </div>
             {this.displayMap()}
-            <Suspense fallback={<div>Loading...</div>}>
-              <ChangePassword
-                account={this.props.account}
-                isOpen={this.state.isOpen}
-                closeModel={() => { this.setState({ isOpen: false }) }}
-              />
-            </Suspense>
+            <ChangePassword
+              account={this.props.account}
+              isOpen={this.state.isOpen}
+              closeModel={() => { this.setState({ isOpen: false }) }}
+            />
           </div>
         </div >
       )

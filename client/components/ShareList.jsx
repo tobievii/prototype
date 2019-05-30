@@ -1,7 +1,6 @@
 import { confirmAlert } from 'react-confirm-alert';
 import React, { Component } from "react";
 import Modal from 'react-modal';
-import { Stats } from "./stats.jsx"
 var loggedInUser = "";
 const customStyles = {
     content: {

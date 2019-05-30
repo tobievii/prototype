@@ -15,7 +15,7 @@ import * as _ from "lodash"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-const MapDevices = React.lazy(() => import('./map'))
+const MapDevices = React.lazy(() => import('./map'));
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
@@ -388,7 +388,8 @@ class Dashboard extends React.Component {
             devices={this.props.devices}
             widget={true}
             showBoundary={this.state.showB}
-            PopUpLink={false} />
+            PopUpLink={false}
+          />
         </Suspense>
       )
     }

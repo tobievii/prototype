@@ -1,7 +1,7 @@
 var net = require("net");
 import * as events from "events";
 import { clearInterval } from "timers";
-
+import { log } from "../../log"
 export var serversMem: any = {};
 
 export const name = "scheduler";
@@ -24,10 +24,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
   getAllSchedulersAndStart(db, eventHub);
 }
 
-
-
-
-var repeatEveryOptionsMS = {
+var repeatEveryOptionsMS: any = {
   "second": 1000,
   "minute": 1000 * 60,
   "hour": 1000 * 60 * 60,
@@ -37,92 +34,95 @@ var repeatEveryOptionsMS = {
   "year": 1000 * 60 * 60 * 24 * 365
 }
 
-
-
 var updateScheduler = (db: any, request: any, eventHub: any, cb: Function) => {
-  //console.log(request);
-  //console.log(request.props.data.i)
+  clearScheduler(request.props.data.i)
 
   if (request.state.enabled) {
-    console.log("enable")
-    clearTimeout(scheduledTasks[request.props.data.i])
-    clearInterval(scheduledTasks[request.props.data.i])
-    startJobs(request.props.state, { i: request.props.data.i, options: request.state }, eventHub);
-  } else {
-    console.log("disable")
-    clearTimeout(scheduledTasks[request.props.data.i])
-    clearInterval(scheduledTasks[request.props.data.i])
+    startJobs(db, request.props.state, { i: request.props.data.i, options: request.state }, eventHub, cb);
   }
 }
 
-
+var clearScheduler = (i: any) => {
+  clearTimeout(scheduledTasks[i])
+  clearInterval(scheduledTasks[i])
+}
 
 function getAllSchedulersAndStart(db: any, eventHub: any) {
   db["states"].find(
     { layout: { $elemMatch: { type: "scheduler", "options.enabled": true } } },
-    { devid: 1, apikey: 1, layout: { $elemMatch: { type: "scheduler", "options.enabled": true } } },
+    { devid: 1, apikey: 1, layout: 1 },
     (e: Error, devices: any) => {
       for (var device of devices) {
-        for (var scheduler of device.layout) {
-          startJobs(device, scheduler, eventHub);
+        for (var widget of device.layout) {
+          if (widget.type == "scheduler") {
+            startJobs(db, device, widget, eventHub, () => { });
+          }
         }
       }
     })
 }
 
-
-function startJobs(device: any, job: any, eventHub: any) {
-  //console.log(JSON.stringify(device, null, 2))
-
+function startJobs(db: any, device: any, job: any, eventHub: any, cb: Function) {
   var start = new Date(job.options.startTime).getTime();
   var now = new Date().getTime();
   var diff = (now - start);
   var intervalMS = parseInt(job.options.repeatAmount) * repeatEveryOptionsMS[job.options.repeatEvery];
-
-
   var count = diff / intervalMS;
   var next = Math.ceil(count);
-  //console.log(next)
-
   var nextMS = start + (next * intervalMS);
   var nextTime = new Date(nextMS);
-  //console.log(nextTime);
 
-  /////
   // calculate how many ms from now until nextTime
-
   var msUntilNextTrigger = nextTime.getTime() - new Date().getTime();
 
-
+  //error checks incase time error
   if (isNaN(msUntilNextTrigger)) {
-    console.log("SCHEDULER error msUntilNextTrigger is Nan")
     return;
   }
   if (isNaN(intervalMS)) {
-    console.log("SCHEDULER error intervalMS is Nan")
     return;
   }
-  startATask(msUntilNextTrigger, intervalMS, eventHub, device, job)
+  startATask(db, msUntilNextTrigger, intervalMS, eventHub, device, job, cb)
 }
 
 
-function startATask(nextMS: any, intervalMS: any, eventHub: any, device: any, job: any) {
+function startATask(db: any, nextMS: any, intervalMS: any, eventHub: any, device: any, job: any, cb: Function) {
 
   if (isNaN(nextMS)) { return; }
   if (isNaN(intervalMS)) { return; }
 
-  console.log("SCHEDULER - STARTING TASK")
-
   var taskToDo = () => {
-    console.log("SCHEDULED TASK RUN:" + device.devid + " " + job.options.command)
-    eventHub.emit("device",
-      {
-        apikey: device.apikey,
-        packet: {
-          id: device.devid,
-          data: JSON.parse(job.options.command),
-          meta: { method: "scheduler" }
+    // check if this widget still exists
+    db["states"].findOne(
+      { layout: { $elemMatch: { i: job.i, type: "scheduler", "options.enabled": true } } },
+      { devid: 1, apikey: 1, layout: 1 },
+      (err: Error, result: any) => {
+        /////
+        var found = 0;
+
+        if (result != null) {
+          for (var widget of result.layout) {
+            if (widget.i == job.i) {
+              found = 1;
+              eventHub.emit("device",
+                {
+                  apikey: device.apikey,
+                  packet: {
+                    id: device.devid,
+                    data: JSON.parse(widget.options.command),
+                    meta: { method: "scheduler" }
+                  }
+                }
+              )
+            }
+          }
         }
+
+        if (found == 0) {
+          // if scheduler should no longer run:
+          clearScheduler(job.i)
+        }
+        /////
       }
     )
   }
@@ -134,4 +134,5 @@ function startATask(nextMS: any, intervalMS: any, eventHub: any, device: any, jo
     }, intervalMS)
   }, nextMS)
 
+  cb(); //DONE
 }

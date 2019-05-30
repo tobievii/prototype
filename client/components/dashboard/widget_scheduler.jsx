@@ -33,7 +33,7 @@ export class WidgetScheduler extends React.Component {
 
 
   scheduler = () => {
-    // console.log("scheduler update")
+    console.log("scheduler update")
     fetch("/api/v3/scheduler/widget", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ props: this.props, state: this.state })
@@ -45,8 +45,11 @@ export class WidgetScheduler extends React.Component {
   setOptions = (options, cb) => {
     //this.setState(options);
 
+    console.log("options set");
+
     this.setState(_.merge(this.state, options), () => {
       this.updatedOptions();
+      this.scheduler(); // force scheduler update serverside
     })
 
     // update dash and server
@@ -70,18 +73,20 @@ export class WidgetScheduler extends React.Component {
     if (this.props.data.options) {
       this.setState(_.merge(this.state, this.props.data.options), () => {
         this.updatedOptions();
-        this.setOptions();
+        //this.setOptions();
       });
     } else {
       //defaults
+      console.log("NEW COMPONENT");
       var update = {
         startTime: new Date(),
         repeatAmount: 5,
         repeatEvery: "second",
         command: JSON.stringify({ "foo": true }),
       }
-      this.setState(update);
-      this.updateParent(update);
+      this.update(update);
+      //this.setState(update);
+      //this.updateParent(update);
     }
 
     setInterval(() => {

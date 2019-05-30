@@ -1,7 +1,7 @@
 import React, { PureComponent, Suspense } from "react";
 
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
+const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
+const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
 import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -19,14 +19,12 @@ library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
 
-
 import * as p from "../prototype.ts"
 
 import socketio from "socket.io-client";
-
-
 import { Editor } from "./editor.jsx"
 import { StatesViewer } from "./statesViewer.jsx";
+
 var loggedInUser = "";
 
 const customStyles = {
@@ -402,7 +400,7 @@ export class DeviceView extends PureComponent {
   dashboardColumn = () => {
     return (<div className={this.state.dashboard} >
       {this.editorBlock()}
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="spinner"></div>}>
         <Dashboard
           username={this.props.username}
           acc={this.props.acc}

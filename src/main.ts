@@ -171,12 +171,6 @@ app.get('/', (req: any, res: any) => {
 
 stats.init(app, db);
 
-app.get('/admin/accounts', (req, res) => {
-  fs.readFile('../public/admin_accounts.html', (err, data: any) => {
-    res.end(data.toString())
-  })
-})
-
 app.get("/recover/:recoverToken", (req, res) => {
   fs.readFile('../public/react.html', (err, data: any) => {
     res.end(data.toString())
