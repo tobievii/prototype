@@ -306,9 +306,9 @@ export class IotnxtQueue extends events.EventEmitter {
 
 
 
-    this.mqttRed.publish(topic.toUpperCase(), JSON.stringify(wrappedMessage), function (err: any) {
+    this.mqttRed.publish(topic.toUpperCase(), JSON.stringify(wrappedMessage), (err: any) => {
       if (err) {
-        console.log("ERROR:");
+        log("IOTNXT [" + this.GatewayId + "] ERROR");
         console.log(err);
       } else {
         cb(undefined, true); //SUCCESS
