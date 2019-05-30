@@ -164,7 +164,7 @@ export function init(app: any, db: any) {
             email: user.email,
             username: user.username,
             selected: "deselected",
-            uuid: user.uuid,
+            sharekey: user.publickey,
             shared: "no"
           });
         }

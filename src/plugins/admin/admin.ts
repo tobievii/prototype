@@ -248,7 +248,7 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
                 if (updated) res.json(updated);
               })
             })
-            db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: { email: req.body.email, uuid: req.body.uuid } } })
+            db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
             db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
               db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
             })

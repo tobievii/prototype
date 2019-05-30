@@ -99,6 +99,7 @@ utilsLib.checkFirstRun(db);
 
 utilsLib.createUsernamesForOldAccounts(db);
 utilsLib.createDeviceKeysForOldAccounts(db);
+utilsLib.createPublicKeysforOldAccounts(db);
 
 //handle accounts/cookies.
 app.use(accounts.midware(db));
@@ -644,7 +645,7 @@ async function findstate(req: any, res: any) {
 
 app.post('/api/v3/publicStates', (req: any, res: any) => {
   if (req.user.level == 0) {
-    db.states.find({ public: true }, (err: Error, result: any) => {
+    db.states.find({ public: true }, { "meta.user": 0, "meta.uuid": 0 }, (err: Error, result: any) => {
       res.json(result);
     })
   }
@@ -691,13 +692,10 @@ app.post('/api/v3/shared', (req: any, res: any) => {
 app.post('/api/v3/unshare', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
   db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-    db.users.update({ email: req.body.removeuseremail }, { "$pull": { shared: { keys: { key: result.key } } } })
+    db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
   })
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { email: req.body.removeuseremail, uuid: req.body.removeuseruuid } } }, (err: Error, states: any) => {
-    db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: req.body.removeuseruuid } }, (err: Error, states: any) => {
-      res.json(states)
-    })
+  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
     res.json(states)
   })
   //unshare device
@@ -716,7 +714,7 @@ async function findstates(req: any, res: any) {
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
         await db.users.findOne({ username: req.body.username }, { apikey: 1, _id: 0 }, (err: Error, sharedwith: any) => {
-          db.states.find({ $or: [{ apikey: sharedwith.apikey, 'access': req.user.uuid }, { apikey: sharedwith.apikey, 'public': true }, { apikey: sharedwith.apikey, 'access.uuid': req.user.uuid }, { apikey: sharedwith.apikey, 'access.email': req.user.email }] }, (err: Error, known: any) => {
+          db.states.find({ $or: [{ apikey: sharedwith.apikey, 'access': req.user.publickey }, { apikey: sharedwith.apikey, 'public': true }] }, (err: Error, known: any) => {
             if (known == null || known.length == 0 || !known || known == undefined || known == "") {
               res.json([])
               return;
@@ -752,7 +750,7 @@ async function findstates(req: any, res: any) {
           db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
             if (e) { res.json({ error: "db error" }) }
             if (user) {
-              db.states.find({ $or: [{ apikey: user.apikey, 'access': req.user.uuid }, { apikey: user.apikey, 'public': true }, { apikey: user.apikey, 'access.uuid': req.user.uuid }, { apikey: user.apikey, 'access.email': req.user.email }] }, (er: Error, states: any[]) => {
+              db.states.find({ $or: [{ apikey: user.apikey, 'access': req.user.publickey }, { apikey: user.apikey, 'public': true }] }, (er: Error, states: any[]) => {
                 var cleanStates: any = []
                 for (var a in states) {
                   var cleanState = _.clone(states[a])
