@@ -1,6 +1,6 @@
 /*
-  This example shows how to get serialport data into prototype cloud.
-
+  This example shows how to get serialport data into node
+  
   npm install serialport
 */
 
@@ -26,7 +26,8 @@ port.on("data", (chunk) => {
   // check if buffer has new line/carraige return
   var newlineIndex = serialBuffer.toString().indexOf("\r\n")
   if (newlineIndex != -1) {
-    console.log(serialBuffer);
-    serialBuffer = serialBuffer.slice(newlineIndex);
+    var cleanString = serialBuffer.slice(1, newlineIndex);
+    console.log(cleanString);
+    serialBuffer = serialBuffer.slice(newlineIndex + 1);
   }
 })
