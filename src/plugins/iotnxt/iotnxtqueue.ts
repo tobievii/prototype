@@ -121,9 +121,22 @@ export class IotnxtQueue extends events.EventEmitter {
     var replyKey = "MessageAuthNotify.".toUpperCase() + getGUID().toUpperCase();
     var mqttGreen = mqtt.connect(mqttcfg.protocol + this.hostaddress + mqttcfg.port, greenOptions);
 
-    mqttGreen.on('error', (err: any) => { cb(err, undefined); })
-    mqttGreen.on("offline", function (err: any) { cb(err, undefined); })
-    mqttGreen.on("close", function (err: any) { cb(err, undefined); })
+    mqttGreen.on('error', (err: any) => {
+      log("IOTNXT [" + this.GatewayId + "] GREEN ERROR");
+      log(err);
+      mqttGreen.end();
+      cb(err, undefined);
+    })
+    mqttGreen.on("offline", (err: any) => {
+      log("IOTNXT [" + this.GatewayId + "] GREEN OFFLINE");
+      mqttGreen.end();
+      cb(err, undefined);
+    })
+    mqttGreen.on("close", (err: any) => {
+      log("IOTNXT [" + this.GatewayId + "] GREEN CLOSE");
+      mqttGreen.end();
+      cb(err, undefined);
+    })
 
     mqttGreen.on('connect', () => {
 
@@ -188,6 +201,7 @@ export class IotnxtQueue extends events.EventEmitter {
           //console.log(secret);
           this.secret = secret;
           cb(undefined, secret);
+          mqttGreen.end();
         } else {
           log("IOTNXT FAILED TO CONNECT [" + this.GatewayId + "] ErrorMsg:" + secret.ErrorMsg)
           if (secret.ErrorMsg) {
@@ -195,6 +209,7 @@ export class IotnxtQueue extends events.EventEmitter {
           } else {
             cb("invalid server response", undefined);
           }
+          mqttGreen.end();
 
         }
 
@@ -214,7 +229,8 @@ export class IotnxtQueue extends events.EventEmitter {
       username: this.secret.vHost + ":" + this.GatewayId,
       password: this.secret.Password,
       //rejectUnauthorized: false,
-      //keepalive: 5
+      keepalive: 60,
+      reconnectPeriod: 9999
     }
 
     this.mqttRed = mqtt.connect(mqttcfg.protocol + this.secret.Hosts[0] + mqttcfg.port, redoptions);
@@ -224,9 +240,20 @@ export class IotnxtQueue extends events.EventEmitter {
       cb(undefined, true);
     });
 
-    this.mqttRed.on('reconnect', function () { console.log("Queue reconnected"); });
-    this.mqttRed.on('close', function () { console.log("Queue disconnected"); });
-    this.mqttRed.on('offline', function () { console.log("Queue has gone offline"); });
+    this.mqttRed.on('reconnect', () => {
+      log("IOTNXT [" + this.GatewayId + "] RED RECONNECT");
+      this.mqttRed.end();
+    });
+
+    this.mqttRed.on('close', () => {
+      log("IOTNXT [" + this.GatewayId + "] RED CLOSE");
+      this.mqttRed.end();
+    });
+
+    this.mqttRed.on('offline', () => {
+      log("IOTNXT [" + this.GatewayId + "] RED OFFLINE");
+      this.mqttRed.end();
+    });
 
     this.mqttRed.on('error', function (error: any) {
       console.log("error: " + error);
