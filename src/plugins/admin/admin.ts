@@ -235,32 +235,22 @@ export function init(app: any, db: any, eventHub: events.EventEmitter) {
           if (info) {
 
             res.json({ err: {}, result: { mail: "sent" } })
-            db.users.findOne({ email: req.body.email }, { _id: 1 }, (err: Error, result: any) => {
-              db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
-                var t = result.notifications;
-                if (result.notifications) {
-                  t.push(shareDeviceNotification)
-                } else {
-                  t = [shareDeviceNotification]
-                }
-                db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-                  console.log(updated)
-                  io.to(req.body.email).emit("info", info)
-                  if (err) res.json(err);
-                  if (updated) res.json(updated);
-                })
-              })
-
-
-              db.users.findOne({ email: req.body.email }, { uuid: 1, _id: 0 }, (err: Error, visitor: any) => {
-
-                db.states.update({ devid: req.body.dev, apikey: req.user.apikey }, { $push: { access: visitor.uuid } })
-              })
-
-              db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
-                db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+            db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
+              var t = result.notifications;
+              if (result.notifications) {
+                t.push(shareDeviceNotification)
+              } else {
+                t = [shareDeviceNotification]
               }
-              )
+              db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
+                io.to(req.body.email).emit("info", info)
+                if (err) res.json(err);
+                if (updated) res.json(updated);
+              })
+            })
+            db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+            db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+              db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
             })
           }
         })

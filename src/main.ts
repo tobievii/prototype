@@ -99,6 +99,7 @@ utilsLib.checkFirstRun(db);
 
 utilsLib.createUsernamesForOldAccounts(db);
 utilsLib.createDeviceKeysForOldAccounts(db);
+utilsLib.createPublicKeysforOldAccounts(db);
 
 //handle accounts/cookies.
 app.use(accounts.midware(db));
@@ -562,7 +563,7 @@ app.post("/api/v3/view", (req: any, res: any, next: any) => {
     //
   } else {
     if (req.body.id) {
-      db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+      db.states.findOne({ $and: [{ apikey: req.user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
 
         if (state == null) { res.json({ "error": "id not found" }); return; }
 
@@ -597,7 +598,7 @@ async function findstate(req: any, res: any) {
         await db.states.findOne({ devid: req.body.id }, (err: Error, give: any) => {
           db.users.findOne({ $and: [{ username: req.user.username }, { 'shared.keys.key': give.key }] }, (err: Error, found: any) => {
             if (give.public == false || give.public == null || give.public == undefined || !give.public || give.public == "") {
-              if (found == null) {
+              if (found == null || found.length == 0 || !found || found == undefined || found == "") {
                 res.json({ error: "must be level 100" }); return;
               }
             }
@@ -626,7 +627,7 @@ async function findstate(req: any, res: any) {
     if (!req.user) { res.json({ error: "user not authenticated" }); return; }
 
     if (req.body.id) {
-      db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (err: Error, state: any) => {
+      db.states.findOne({ $and: [{ apikey: req.user.apikey, devid: req.body.id }] }, (err: Error, state: any) => {
 
         res.json(state);
       })
@@ -638,7 +639,7 @@ async function findstate(req: any, res: any) {
 
 app.post('/api/v3/publicStates', (req: any, res: any) => {
   if (req.user.level == 0) {
-    db.states.find({ public: true }, (err: Error, result: any) => {
+    db.states.find({ public: true }, { "meta.user": 0, "meta.uuid": 0 }, (err: Error, result: any) => {
       res.json(result);
     })
   }
@@ -671,7 +672,7 @@ app.get('/api/v3/states', (req: any, res: any) => {
 //Share Device
 app.post('/api/v3/shared', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
-  db.states.findOne({ apikey: req.user.apikey, devid: req.body.dev }, { access: 1, _id: 0 }, (err: Error, states: any) => {
+  db.states.findOne({ $and: [{ apikey: req.user.apikey, devid: req.body.dev }] }, { access: 1, _id: 0 }, (err: Error, states: any) => {
     if (states.access) {
       res.json(states)
     } else {
@@ -685,42 +686,38 @@ app.post('/api/v3/shared', (req: any, res: any) => {
 app.post('/api/v3/unshare', (req: any, res: any) => {
   if (!req.user) { res.json({ error: "user not authenticated" }); return; }
   db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-    db.users.update({ uuid: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
+    db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
   })
-  //remove device from user
 
-
-  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { $pull: { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
+  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
     res.json(states)
   })
+  //unshare device
 })
 //unshare device
-
-//preview devices
-app.post('/api/v3/preview/publicdevices', (req: any, res: any) => {
-  db.states.find({}, { devid: 1 }, (err: Error, states: any) => {
-    res.json(states)
-  })
-})
-//preview devices
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any, packet: any) => {
   changePassword(req, res)
+  findstates(req, res)
 
+})
+async function findstates(req: any, res: any) {
   if (req.body) {
     // find state by username
     if (req.body.username != req.user.username) {
       if (req.user.level < 100) {
-        db.users.findOne({ username: req.body.username }, { apikey: 1, _id: 0 }, (err: Error, sharedwith: any) => {
-          db.states.find({ $and: [{ apikey: sharedwith.apikey }, { 'access': req.user.uuid }] }, (err: Error, known: any) => {
-            if (known == null || known.length == 0) {
+        await db.users.findOne({ username: req.body.username }, { apikey: 1, _id: 0 }, (err: Error, sharedwith: any) => {
+          db.states.find({ $or: [{ apikey: sharedwith.apikey, 'access': req.user.publickey }, { apikey: sharedwith.apikey, 'public': true }] }, (err: Error, known: any) => {
+            if (known == null || known.length == 0 || !known || known == undefined || known == "") {
               res.json([])
               return;
             }
+            else {
+              res.json(known)
+            }
           })
         })
-
       }
       else if (req.user.level) {
         db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
@@ -747,7 +744,7 @@ app.post("/api/v3/states", (req: any, res: any, packet: any) => {
           db.users.findOne({ username: req.body.username }, (e: Error, user: any) => {
             if (e) { res.json({ error: "db error" }) }
             if (user) {
-              db.states.find({ $or: [{ $and: [{ apikey: user.apikey }, { 'access': req.user.uuid }] }, { public: true }] }, (er: Error, states: any[]) => {
+              db.states.find({ $or: [{ apikey: user.apikey, 'access': req.user.publickey }, { apikey: user.apikey, 'public': true }] }, (er: Error, states: any[]) => {
                 var cleanStates: any = []
                 for (var a in states) {
                   var cleanState = _.clone(states[a])
@@ -791,7 +788,7 @@ app.post("/api/v3/states", (req: any, res: any, packet: any) => {
       }
     }
   }
-})
+}
 
 app.get("/api/v3/states/full", (req: any, res: any) => {
   db.states.find({ apikey: req.user.apikey }, (err: Error, states: any[]) => {

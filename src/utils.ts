@@ -312,3 +312,11 @@ export function createDeviceKeysForOldAccounts(db: any) {
         }
     })
 }
+export function createPublicKeysforOldAccounts(db: any) {
+    db.users.find({ "level": { $gte: 1 }, "publickey": { "$exists": false } }).limit(10000, (err: Error, users: any) => {
+        for (var user of users) {
+            user["publickey"] = generate(32).toLowerCase()
+            db.users.update({ "_id": user["_id"] }, user)
+        }
+    })
+}
