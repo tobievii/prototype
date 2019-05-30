@@ -22,6 +22,7 @@ import { WidgetBlank } from "./widget_blank.jsx"
 import { WidgetMesh } from "./widget_mesh.jsx"
 import { WidgetForm } from "./widget_form.jsx"
 import { WidgetScheduler } from "./widget_scheduler.jsx"
+import { WidgetChart } from "./widget_chart.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -317,6 +318,14 @@ class Dashboard extends React.Component {
 
     if (data.type == "ChartLine") {
       return (<ChartLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+    }
+
+    if (data.type == "chart") {
+      var value;
+      return (<WidgetChart
         dash={dash}
         data={data}
         state={this.props.state} datapath={data.datapath.split("root.")[1]} />)

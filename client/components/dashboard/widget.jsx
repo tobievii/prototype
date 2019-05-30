@@ -73,6 +73,7 @@ export class Widget extends React.Component {
                 <option>form</option>
                 <option>scheduler</option>
                 <option>widgetButton</option>
+                <option>chart</option>
               </select></div>
           </div>
           <div className="col-6">

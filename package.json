@@ -7,8 +7,8 @@
     "start": "node ./build/main.js",
     "test": "mocha --exit ./build/tests/tests.js",
     "tests": "node ./build/tests.js",
-    "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
-    "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
+    "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/stresstest.ts --outDir ./build",
+    "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/stresstest.ts --outDir ./build",
     "build-clean": "rmdir build /s /q && tsc",
     "debug": "cd build && nodemon --inspect main.js"
   },
