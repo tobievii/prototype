@@ -99,7 +99,8 @@ export class mqttConnection extends EventEmitter {
                     accounts.checkApiKey(apikey, (err: Error, result: any) => {
 
                         if (err) {
-                            log("MQTT invalid username/pass")
+                            log("MQTT invalid apikey")
+                            log("MQTT " + socket.remoteAddress + " tried using: [" + connect.password + "]")
                             socket.destroy();
                             return;
                         }
@@ -110,6 +111,7 @@ export class mqttConnection extends EventEmitter {
                     })
                 } else {
                     log("MQTT invalid username/pass")
+                    log("MQTT " + socket.remoteAddress + " tried using: [" + connect.password + "]")
                     socket.destroy();
                 }
 
