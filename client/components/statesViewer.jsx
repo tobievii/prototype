@@ -157,6 +157,27 @@ export class StatesViewer extends Component {
             for (var s in states) {
               states[s].selected = false
             }
+            var packet1 = {
+              id: info.newdevice.id,
+              data: info.newdevice.payload.data,
+              timestamp: info.newdevice.payload.timestamp
+            }
+
+
+            if (this.state.logData != undefined) {
+              if (this.state.logData[0].timestamp <= packet1.timestamp) {
+                var newd = _.clone(this.state.logData)
+                var n = [];
+                n.push(packet1);
+                for (var count in newd) {
+                  n.push(newd[count]);
+                }
+                this.setState({ logdataNew: n })
+                this.setState({ logData: n })
+              }
+            }
+
+
             // if (this.props.account.level >= 100) {
             //   fetch("/api/v3/states/usernameToDevice", {
             //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
@@ -193,6 +214,18 @@ export class StatesViewer extends Component {
 
       this.socket.on("post", (packet) => {
         this.handleDevicePacket(packet)
+        if (this.state.logData != undefined) {
+          if (this.state.logData[0].timestamp <= packet.timestamp) {
+            var newd = _.clone(this.state.logData)
+            var n = [];
+            n.push(packet);
+            for (var count in newd) {
+              n.push(newd[count]);
+            }
+            this.setState({ logdataNew: n })
+            this.setState({ logData: n })
+          }
+        }
       })
 
 
@@ -766,12 +799,16 @@ export class StatesViewer extends Component {
     }
   }
 
+  setlogData = (data) => {
+    this.setState({ logData: data })
+  }
+
   displayLog = () => {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOn ?
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
           <Suspense fallback={<div>Loading...</div>}>
-            <DeviceHistory public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
+            <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
           </Suspense>
         </div>
         : null
