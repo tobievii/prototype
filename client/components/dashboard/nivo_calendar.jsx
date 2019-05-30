@@ -11,8 +11,6 @@ export class Calendar extends React.Component {
 
   componentDidMount = () => {
     if (this.props.state) {
-      console.log("calendar:")
-      console.log(this.props.state)
       this.fetchData();
     }
   }
