@@ -89,12 +89,27 @@ export class StatesViewerMenu extends Component {
             if (this.props.visiting == false) {
                 if (this.props.selectCount > 0) {
                     return (
-                        <span className="protoButton protoButtonClickable" style={{ fontWeight: "normal", padding: "1px 5px", background: "rgba(255,0,0, 0.6)", float: "left", margin: "5px 15px 0px" }} title={this.props.selectCount + " selected."}
+                        <span className="protoButton protoButtonClickable" style={
+                            {
+                                padding: "1px 5px",
+                                background: "rgba(255,0,0,0.6)",
+                                float: "left",
+                                margin: "5px 7px 0px"
+                            }} title={this.props.selectCount + " selected."}
                             onClick={() => this.clickDeleteConfirmation()}> <i className="fas fa-trash-alt" /> REMOVE</span>
                     )
                 } else {
                     return (
-                        <span className="" style={{ float: "left", margin: "5px 15px 0px", opacity: 0.3, cursor: "not-allowed", display: this.state.menu }} title="Select some devices first..."> <i className="fas fa-trash-alt" /> REMOVE</span>
+                        <span className="protoButton protoButtonClickable" style={
+                            {
+                                padding: "1px 5px",
+                                float: "left",
+                                margin: "5px 7px 0px",
+                                opacity: 0.3,
+                                cursor: "not-allowed",
+                                display: this.state.menu
+                            }
+                        } title="Select some devices first..."> <i className="fas fa-trash-alt" /> REMOVE</span>
                     )
                 }
             }
