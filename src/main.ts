@@ -967,7 +967,6 @@ function changePassword(req: any, res: any) {
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
-  checkExisting(req, res, db);
 
   if (req.body === undefined) { return; }
 
@@ -998,6 +997,7 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
+    checkExisting(req, res, db);
 
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {

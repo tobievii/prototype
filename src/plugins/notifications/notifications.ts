@@ -211,6 +211,10 @@ export function deviceSeen(db: any, user: any) {
 
 export function checkExisting(req: any, res: any, db: any) {
 
+  if (!req) { return; }
+  if (!req.user) { return; }
+  if (!req.user.apikey) { return; }
+
   db.users.findOne({ apikey: req.user.apikey }, (err: Error, state: any, info: any) => {
 
     function findNotified(array: any) {
