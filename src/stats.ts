@@ -105,8 +105,7 @@ export function init(app: any, db: any) {
         {
           $match: {
             _created_on: { $gt: new Date("2019-01-01T00:00:00.000Z") },
-            apikey: req.user.apikey,
-            devid: req.body.deviceid
+            key: req.body.key
           }
         },
         {

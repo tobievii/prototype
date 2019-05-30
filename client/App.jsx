@@ -1,4 +1,5 @@
-import React, { Component, lazy, Suspense } from "react";
+
+import React, { Component, Suspense } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -12,16 +13,15 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-// import { ApiInfo } from "./components/apiInfo.jsx";
-const ApiInfo = lazy(() => import('./components/apiInfo'))
-const SettingsView = lazy(() => import('./components/settingsView'))
-const AddDevice = lazy(() => import('./components/addDevice'))
+const ApiInfo = React.lazy(() => import('./components/apiInfo'))
+const SettingsView = React.lazy(() => import('./components/settingsView'))
+import AddDevice from './components/addDevice'
 
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 
-import Stats from "./components/stats.jsx"
+const Stats = React.lazy(() => import("./components/stats"));
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
@@ -205,11 +205,11 @@ class App extends Component {
                 return (
                     <div>
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
-                        <Suspense fallback={<div>Loading...</div>}>
+                        <Suspense fallback={<div className="spinner"></div>}>
                             <ApiInfo apikey={this.state.account.apikey} />
+                            <Stats />
+                            <Footer loggedIn={true} />
                         </Suspense>
-                        <Stats />
-                        <Footer loggedIn={true} />
                     </div>
                 )
             } else {
@@ -227,7 +227,7 @@ class App extends Component {
     }
 
     deviceView = ({ match }) => {
-        if (this.state.account) {
+        if (this.state.account && this.state.public != undefined) {
             if (this.state.account.username == match.params.username) {
                 visitingG = false;
             } else {
@@ -235,24 +235,21 @@ class App extends Component {
             }
             return (
                 <div>
-
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <DeviceView
-                            openModal={this.openModal}
-                            mainView={this.state.devicesView}
-                            changeMainView={this.changeView}
-                            devid={match.params.devid}
-                            username={match.params.username}
-                            visituser={this.state.visituser}
-                            acc={test.acc}
-                            deviceCall={test.dc}
-                            devices={test.ds}
-                            sendProps={this.setProps}
-                            account={this.state.account}
-                            public={this.state.public}
-                            visiting={visitingG}
-                        />
-                    </Suspense>
+                    <DeviceView
+                        openModal={this.openModal}
+                        mainView={this.state.devicesView}
+                        changeMainView={this.changeView}
+                        devid={match.params.devid}
+                        username={match.params.username}
+                        visituser={this.state.visituser}
+                        acc={test.acc}
+                        deviceCall={test.dc}
+                        devices={test.ds}
+                        sendProps={this.setProps}
+                        account={this.state.account}
+                        public={this.state.public}
+                        visiting={visitingG}
+                    />
                 </div>
             )
         } else {
@@ -266,14 +263,16 @@ class App extends Component {
 
     userView = ({ match }) => {
         visitingG = true;
-        return (
-            <div>
-                <UserPage visitu={this.passUserInfo} username={match.params.username} />
-                <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
-                <Footer />
-            </div>
+        if (this.state.account) {
+            return (
+                <div>
+                    <UserPage visitu={this.passUserInfo} username={match.params.username} />
+                    <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
+                    <Footer />
+                </div>
 
-        )
+            )
+        } else return <div className="spinner"></div>
     }
 
     recoverPassword = ({ match }) => {
@@ -296,7 +295,7 @@ class App extends Component {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<div className="spinner"></div>}>
                         <SettingsView />
                     </Suspense>
                 )
@@ -338,9 +337,7 @@ class App extends Component {
     addDevice = () => {
         if (this.state.account) {
             return (
-                <Suspense fallback={<div>Loading...</div>}>
-                    <AddDevice register={() => { this.setState({ registrationPanel: true }) }} login={() => { this.setState({ loginPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
-                </Suspense>
+                <AddDevice register={() => { this.setState({ registrationPanel: true }) }} login={() => { this.setState({ loginPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
             )
         } else {
             return null

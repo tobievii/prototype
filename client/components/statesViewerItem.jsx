@@ -140,7 +140,6 @@ export class StatesViewerItem extends Component {
       return "rgba(" + Math.round(blended.r) + "," + Math.round(blended.g) + "," + Math.round(blended.b) + "," + blended.a + ")"
     }
 
-    //return "rgba(255,255,255,1)"
   }
 
   calcStyle = () => {
@@ -150,24 +149,13 @@ export class StatesViewerItem extends Component {
     var millisago = Date.now() - lastChange.getTime();
     var ratio = (timefade - millisago) / timefade;
 
-    //var ratio = (timefade-this.state.millisago)/timefade;
     if (ratio < 0) { ratio = 0 }
     if (ratio > 1) { ratio = 1 }
 
-    if (this.props.device.selected) {
-      return {
-        marginBottom: 2, padding: "0px",
-        backgroundImage: "linear-gradient(to right, rgb(94, 37, 45), " + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
-        borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio),
-        borderLeft: "2px solid rgb(255, 57, 67)"
-      }
-    } else {
-      return {
-        marginBottom: 2, padding: "0px",
-        backgroundImage: "linear-gradient(to right, rgba(16, 26, 38, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
-        // background: "#101A24",
-        borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
-      }
+    return {
+      marginBottom: 2, padding: "0px",
+      backgroundImage: "linear-gradient(to right, rgba(16, 26, 38, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
+      borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
     }
   }
 
@@ -311,13 +299,13 @@ export class StatesViewerItem extends Component {
 
           return (
             <div className="col" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgba(125, 255, 175, 1)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
             </div>
           )
         } else {
           return (
-            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-              <i className="statesViewerCheckBoxes fas fa-check" style={{ fontSize: 14 }}></i>
+            <div className="col" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer", opacity: 0.2 }} onClick={this.selectBoxClickHandler("select")} >
+              <i className="statesViewerCheckBoxes fas fa-square" style={{ fontSize: 14 }}></i>
             </div>
           )
         }

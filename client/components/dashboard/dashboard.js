@@ -15,7 +15,7 @@ import * as _ from "lodash"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-const MapDevices = React.lazy(() => import('./map'))
+const MapDevices = React.lazy(() => import('./map'));
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
@@ -215,13 +215,19 @@ class Dashboard extends React.Component {
     }
   }
 
-  updateServer() {
+  updateServer(cb) {
     if (this.props.state != undefined && this.props.state.key != undefined) {
       fetch("/api/v3/dashboard", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-      }).then(response => response.json()).then(result => { })
-        .catch(err => console.error(err.toString()));
+      }).then(response => response.json()).then(result => {
+        console.log(result);
+        if (cb) { cb(undefined, result); }
+
+      }).catch(err => {
+        console.error(err.toString())
+        if (cb) { cb(err, undefined); }
+      });
     }
   }
 
@@ -267,15 +273,11 @@ class Dashboard extends React.Component {
     }
   }
 
-  setOptions = (data) => {
-    return (options) => {
-      // console.log("WIDGET OPTION CHANGE:")
-      // console.log({ data, options })
-
-      // find and update
+  setOptions = (widget) => {
+    return (options, cb) => {
       var layout = _.clone(this.state.layout);
       for (var w in layout) {
-        if (layout[w].i == data.i) {
+        if (layout[w].i == widget.i) {
           if (layout[w].options) {
             layout[w].options = _.merge(layout[w].options, options);
           } else {
@@ -284,8 +286,9 @@ class Dashboard extends React.Component {
         }
       }
 
-      //update server db
-      this.setState({ layout }, () => { this.updateServer(); })
+      this.setState({ layout }, () => {
+        this.updateServer(cb);
+      })
     }
   }
 
@@ -385,7 +388,8 @@ class Dashboard extends React.Component {
             devices={this.props.devices}
             widget={true}
             showBoundary={this.state.showB}
-            PopUpLink={false} />
+            PopUpLink={false}
+          />
         </Suspense>
       )
     }

@@ -1,0 +1,10 @@
+.git/
+*.md
+*.sh
+.gitignore
+.vscode/
+.github/
+examples/
+.dockerignore
+# To keep Dockerfile changes from breaking caches
+Dockerfile
