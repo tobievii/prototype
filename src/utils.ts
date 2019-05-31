@@ -271,6 +271,7 @@ export function createDBIndexes(db: any) {
     db.packets.createIndex({ "_created_on": 1 })
     db.packets.createIndex({ apikey: 1 })
     db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
+    db.packets.createIndex({ key: 1 }, { background: 1 })
 
     db.users.createIndex({ uuid: 1 })
     db.users.createIndex({ apikey: 1 })
