@@ -10,6 +10,7 @@ import { StatesViewerItem } from "./statesViewerItem.jsx"
 import MapDevices from './dashboard/map';
 import ChangePassword from '../components/changePassword'
 import { confirmAlert } from 'react-confirm-alert';
+import { DeviceHistory } from "./dashboard/device_history.jsx"
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -19,32 +20,6 @@ library.add(faSortAmountDown);
 import socketio from "socket.io-client";
 
 export class DeviceList extends Component {
-
-  componentDidMount() {
-    // if (this.props.public == true) {
-    //   setTimeout(() => {
-    //     return (
-    //       toast(
-    //         <div>
-    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we've added a dummy device for you to get you started
-    //       </div>
-    //       )
-    //     )
-    //   }, 3000)
-    // }
-
-    // if (this.props.devices.length == 0) {
-    //   setTimeout(() => {
-    //     return (
-    //       toast(
-    //         <div>
-    //           Hey there prototyper😎, we've noticed that you don't have any devices yet. Don't worry though, we'll add a dummy device shortly for you to get you started
-    //       </div>
-    //       )
-    //     )
-    //   }, 2000)
-    // }
-  }
 
   state = {
     activePage: 1,
@@ -150,7 +125,9 @@ export class StatesViewer extends Component {
       public: "asc"
     },
     isOpen: false,
-    tempdev: []
+    tempdev: [],
+    toggleOn: false,
+    toggleOff: true
   };
 
   socket = undefined;
@@ -188,6 +165,27 @@ export class StatesViewer extends Component {
             for (var s in states) {
               states[s].selected = false
             }
+            var packet1 = {
+              id: info.newdevice.id,
+              data: info.newdevice.payload.data,
+              timestamp: info.newdevice.payload.timestamp
+            }
+
+
+            if (this.state.logData != undefined) {
+              if (this.state.logData[0].timestamp <= packet1.timestamp) {
+                var newd = _.clone(this.state.logData)
+                var n = [];
+                n.push(packet1);
+                for (var count in newd) {
+                  n.push(newd[count]);
+                }
+                this.setState({ logdataNew: n })
+                this.setState({ logData: n })
+              }
+            }
+
+
             // if (this.props.account.level >= 100) {
             //   fetch("/api/v3/states/usernameToDevice", {
             //     method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" }
@@ -224,6 +222,18 @@ export class StatesViewer extends Component {
 
       this.socket.on("post", (packet) => {
         this.handleDevicePacket(packet)
+        if (this.state.logData != undefined) {
+          if (this.state.logData[0].timestamp <= packet.timestamp) {
+            var newd = _.clone(this.state.logData)
+            var n = [];
+            n.push(packet);
+            for (var count in newd) {
+              n.push(newd[count]);
+            }
+            this.setState({ logdataNew: n })
+            this.setState({ logData: n })
+          }
+        }
       })
 
 
@@ -789,15 +799,47 @@ export class StatesViewer extends Component {
 
   displayMap = () => {
     if (this.props.mainView == "devices") {
-      return (
+      return (this.state.toggleOff ?
         <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
           <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
         </div>
+        : null
       )
-    } else {
-      return null
     }
   }
+
+  setlogData = (data) => {
+    this.setState({ logData: data })
+  }
+
+  displayLog = () => {
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOn ?
+        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
+          <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
+        </div>
+        : null
+      )
+    }
+  }
+
+  handleInputFocus = () => {
+    this.setState({ toggleOn: !this.state.toggleOn });
+    this.setState({ toggleOff: !this.state.toggleOff });
+  };
+
+  buttonOne = () => {
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOn ? <button onClick={() => { this.handleInputFocus(); }} title="Show map" className="fas fa-toggle-on" /> : null)
+    } else return null
+  }
+
+  buttonTwo = () => {
+    if (this.props.mainView == "devices") {
+      return (this.state.toggleOff ? <button onClick={() => { this.handleInputFocus(); }} title="Show device logs" className="fas fa-toggle-off" /> : null)
+    } else return null
+  }
+
 
   deviceButtons = () => {
     return (
@@ -807,6 +849,8 @@ export class StatesViewer extends Component {
             <i className="fas fa-plus"></i>  ADD DEVICE
           </span>
           <div className="col" align="center" style={{ background: "#131e27", paddingTop: "3px", paddingLeft: "0px" }} >DEVICE LIST</div>
+          {this.buttonOne()}
+          {this.buttonTwo()}
         </div>
       </div>
     )
@@ -864,6 +908,7 @@ export class StatesViewer extends Component {
                 }
               </div>
             </div>
+            {this.displayLog()}
             {this.displayMap()}
             <ChangePassword
               account={this.props.account}

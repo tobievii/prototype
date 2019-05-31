@@ -185,7 +185,6 @@ export class Widget extends React.Component {
         <div className="widgetContents" height="100%" width="100%" style={{ height: "100%", width: "100%" }}>
           {this.props.children}
         </div>
-
         <div style={{ clear: "both" }}></div>
       </div >
     )
