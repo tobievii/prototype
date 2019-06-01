@@ -53,13 +53,13 @@ export class Recovery extends Component {
 
     return (
 
-      <div className="bgpanel" ><center><h4>Reset Password</h4>
-        <div className="col-5" style={{ textAlign: "right", paddingTop: 10, paddingRight: 140 }} >Enter new password: <input type="password" placeholder="new password" name="password" onChange={this.passwordInput("password")} value={this.state.password} style={{ width: "60%", marginBottom: 5 }} spellCheck="false" autoFocus /><br></br>
+      <div className="bgpanel" style={{ height: window.innerHeight - 55, marginTop: 35 }} ><center><h4 style={{ marginTop: 280 }}>Reset Password</h4>
+        <div className="col-5" style={{ textAlign: "right", paddingTop: 10, paddingRight: 220, marginTop: 25 }} >Enter new password: <input type="password" placeholder="new password" name="password" onChange={this.passwordInput("password")} value={this.state.password} style={{ width: "60%", marginBottom: 5 }} spellCheck="false" autoFocus /><br></br>
           Confirm password: <input type="password" placeholder="confirm password" name="confirm" style={{ width: "60%", marginBottom: 5 }} onChange={this.confirmInput("confirm")} spellCheck="false" />  </div>
         <div className="col-5">
           <span className="serverError" style={{ fontSize: "11px" }} >{this.state.message}</span>
           <center>
-            <button className="btn-spot" style={{ float: "center", display: this.state.changebutton }} onClick={this.checkpassword} >RESET PASSWORD</button></center>
+            <button className="btn-spot" style={{ float: "center", display: this.state.changebutton, marginTop: 20 }} onClick={this.checkpassword} >RESET PASSWORD</button></center>
         </div>
       </center>
       </div>
