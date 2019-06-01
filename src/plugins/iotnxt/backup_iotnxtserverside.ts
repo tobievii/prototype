@@ -500,6 +500,7 @@ function iotnxtUpdateDevice(db: any, packet: any, cb: any) {
 
           //console.log(deviceTrees)
 
+
           var diff = difference(deviceTree, deviceTrees[gatewayIdent])
           if (_.isEmpty(diff)) {
             //console.log("no need to register new endpoints");

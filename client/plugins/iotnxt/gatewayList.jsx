@@ -1,23 +1,12 @@
 import React, { Component } from "react";
+import * as utils from "../../utils.react"
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faServer,
-  faUser,
-  faTrashAlt,
-  faCheckCircle,
-  faTimesCircle
-} from "@fortawesome/free-solid-svg-icons";
-
-library.add(faServer);
-library.add(faUser);
-library.add(faTrashAlt);
-library.add(faCheckCircle);
-library.add(faTimesCircle);
+import moment from 'moment'
 
 
-import { gridstyle, cellstyle, gridHeadingStyle, blockstyle } from "../../styles.jsx"
+
+
+import { cellstyle, gridHeadingStyle, blockstyle } from "../../styles.jsx"
 
 export class GatewayList extends React.Component {
   state = {};
@@ -150,7 +139,11 @@ export class GatewayList extends React.Component {
   }
 
 
+
   render() {
+
+    const gridstyle = { borderBottom: "1px solid rgba(255,255,255,0.1)", paddingTop: 4, paddingBottom: 4 }
+
     if (this.props.gateways) {
       if (this.props.gateways.length > 0) {
 
@@ -159,9 +152,13 @@ export class GatewayList extends React.Component {
         return (
           <div style={blockstyle}>
             <div className="row" style={gridHeadingStyle}>
+
               <div className="col-4" style={{ paddingLeft: 34 }}>GatewayId</div>
-              <div className="col-1" style={{ textAlign: "center" }}>ENV</div>
-              <div className="col-6" />
+              <div className="col-1" style={{ textAlign: "right" }}>ENV</div>
+              <div className="col-2" style={{ textAlign: "left" }}>CONNECTED</div>
+              <div className="col-2" style={{ textAlign: "left" }}>CLUSTER</div>
+
+
             </div>
 
             {this.props.gateways.map(gateway => {
@@ -176,34 +173,61 @@ export class GatewayList extends React.Component {
                 }
               }
 
+
+
               return (
                 <div key={gateway.GatewayId} className="row" style={gridstyle}>
-                  <div className="col-4" style={{ padding: 10 }}>
+                  <div className="col-4" >
 
                     <div
-                      title={
-                        gateway.connected
-                          ? "Connected"
-                          : gateway.error
+                      title={utils.valueToggle(gateway.connected,
+                        [{ value: true, result: "connected" },
+                        { value: false, result: "not connected" },
+                        { value: "error", result: gateway.error },
+                        { value: "connecting", result: "connecting..." }])
                       }
                       style={{
                         float: "left",
                         paddingRight: 10,
                         paddingTop: 1,
-                        opacity: 0.9,
+                        opacity: 1,
                         cursor: gateway.default ? "" : "pointer",
-                        color: gateway.connected ? "rgb(0, 222, 125)" : "rgb(255, 57, 67)"
+                        //color: gateway.connected ? "rgb(0, 222, 125)" : "rgb(255, 57, 67)"
+                        color: utils.valueToggle(gateway.connected,
+                          [{ value: true, result: "rgb(0, 222, 125)" },
+                          { value: false, result: "#f4d701" },
+                          { value: "error", result: "#ff284a" },
+                          { value: "connecting", result: "rgb(255, 255, 255)" }])
                       }}
                     >
-                      <FontAwesomeIcon icon={gateway.connected ? "check-circle" : "times-circle"} />
+                      {utils.valueToggle(gateway.connected, [
+                        { value: true, result: <i className="fas fa-check-circle"></i> },
+                        { value: false, result: <i className="fas fa-times-circle"></i> },
+                        { value: "connecting", result: <i className="fas fa-circle-notch fa-spin"></i> },
+                        { value: "error", result: <i className="fas fa-exclamation-circle"></i> },
+                        { value: undefined, result: <i className="fas fa-question-circle"></i> }])}
+
                     </div>
 
                     {gateway.GatewayId}
                   </div>
-                  <div className="col-1" style={{ padding: 10, textAlign: "center" }} >
+
+                  {/* ENV */}
+                  <div className="col-1" style={{ textAlign: "right" }} >
                     {gateway.HostAddress.split(".")[1].toUpperCase()}
                   </div>
-                  <div className="col-6" style={cellstyle} >
+
+                  {/* CONNECTED */}
+                  <div className="col-2" style={{ textAlign: "left" }} >
+                    <span title={gateway["_connected_last"]}>{moment(gateway["_connected_last"]).fromNow()}</span>
+                  </div>
+
+                  {/* CLUSTER */}
+                  <div className="col-2" style={{ textAlign: "left" }} >
+                    {gateway.instance_id}
+                  </div>
+
+                  {/* <div className="col-6" style={cellstyle} >
                     <div
                       onClick={this.setgatewayserverdefault(gateway)}
                       title={
@@ -238,13 +262,14 @@ export class GatewayList extends React.Component {
                       }}
                     >
                       <FontAwesomeIcon icon="user" />
-                    </div>
+                    </div> 
+                  </div>*/}
 
 
 
 
 
-                  </div>
+
 
                   <div className="col-1" style={{ padding: 10, textAlign: "right" }} >
                     {this.renderDelete(gateway)}

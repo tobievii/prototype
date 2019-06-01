@@ -25,11 +25,28 @@ export class SettingsPanel extends React.Component {
 
   componentDidMount() {
     this.loadServerGateways();
-    socket.on("plugin", (data) => {
-      //console.log(data);
-      this.loadServerGateways();
+    socket.on("plugin_iotnxt", (event) => {
+
+      /* something happened with a gateway */
+      if (event.type == "gatewayUpdate") {
+        var gateways = _.clone(this.state.gateways)
+        for (var gateway of gateways) {
+          if (gateway.unique == event.gateway.unique) {
+            gateway = _.merge(gateway, event.gateway)
+            //gateway.connected = event.gateway.connected;
+            //if (event.gateway.error) { }
+            console.log("updated gateway state")
+          }
+        }
+        this.setState({ gateways });
+      }
+
+
+      //this.loadServerGateways();
     })
   }
+
+
 
   update = () => { this.loadServerGateways(); }
 

@@ -1,6 +1,8 @@
 import React, { Component, Suspense } from "react";
-const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
-const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
+// const SyntaxHighlighter = import('react-syntax-highlighter');
+// const tomorrowNightBright = import("react-syntax-highlighter/styles/hljs");
+
+import { CodeBlock } from "./codeBlock.jsx"
 
 class ApiInfo extends Component {
   state = {
@@ -96,7 +98,16 @@ class ApiInfo extends Component {
 
 
 
-    var codeStringRealtimeSocketIo = 'var socket = require("socket.io-client")("' + apiCall.path + '");\n\nsocket.on("connect", function(data) {\n\tconsole.log("connected.");\n\tsocket.emit("join", "' + this.props.apikey + '"); // your api key\n\n\tsocket.on("post", data => {\n\t\tconsole.log(data);\n\t});\n});';
+    var codeStringRealtimeSocketIo = `var socket = require("socket.io-client")("` + apiCall.path + `", { transports: ['websocket'] });
+socket.on("connect", function (data) {
+  console.log("connected.");
+  socket.emit("join", "` + this.props.apikey + `"); // your api key
+  socket.on("post", data => {
+    console.log(data);
+  });
+});
+`;
+
     var codeStringRealtimeSocketIoResult = '{ id: \'yourDevice001\',\n  data:\n    { temperature: 24.54,\n      doorOpen: false,\n      gps: { lat: 25.123, lon: 28.125 } },\n  timestamp: \'2018-08-27T08:42:30.512Z\' }';
     var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "' + this.props.apikey + '|yourDevice001"); // your api key | device id';
 
@@ -172,9 +183,10 @@ class ApiInfo extends Component {
 
               <div className="col-md-12">
                 <h6>BODY ( Content-Type: "application/json" )</h6>
-                <Suspense fallback={<div className="spinner"></div>}>
+                <CodeBlock />
+                {/* <Suspense fallback={<div className="spinner"></div>}>
                   <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
-                </Suspense>
+                </Suspense> */}
               </div>
               <div className="col-md-12">
                 <button onClick={this.sendHttpRestTest}>TEST</button>
@@ -216,49 +228,45 @@ class ApiInfo extends Component {
 
         <div className="row" style={this.getMenuPageStyle(3)}>
           <div className="col-md-12 commanderBgPanel" >
-            <h4 className="spot">SOCKET.IO</h4>
+            <h4 className="spot" style={{ paddingTop: 30 }}>SOCKET.IO</h4>
             <p>This page uses socket.io for real-time connectivity in the browser. This can also be used from the command line.</p>
 
             <p>Node.js</p>
 
             <p>Download <a href="https://nodejs.org/en/">Node.js</a> and duplicate the code below in a <b>test.js</b> file. This code will connect to your account and stream data to your terminal. We use this method to keep a connection open to the server and will be ready to receive data when needed. This example will stream data from all your devices if configured correctly.</p>
 
-            <Suspense fallback={<div className="spinner"></div>}>
+            {/* <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIo}</SyntaxHighlighter>
-            </Suspense>
+            </Suspense> */}
 
-            <p>On line 5 you can alternatively connect to a specific device by using the | (pipe) character in between your api key and the device id:</p>
-            <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter startingLineNumber={5} language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIoSingleDevice}</SyntaxHighlighter>
-            </Suspense>
+            <CodeBlock language='javascript' value={`var socket = require("socket.io-client")("` + apiCall.path + `", { transports: ['websocket'] });
+socket.on("connect", function (data) {
+  console.log("connected.");
+  socket.emit("join", "` + this.props.apikey + `"); // your api key
 
-            {/* <pre className="commanderBgPanel" >{ 'var socket = require("socket.io-client")("https://prototype.iotnxt.io");\n\nsocket.on("connect", function(data) {\n\tconsole.log("connected.");\n\tsocket.emit("join", "'+this.props.apikey+'"); // your api key\n\n\tsocket.on("post", data => {\n\t\tconsole.log(data);\n\t});\n});' }</pre> */}
+  // or subscribe to a specific device: 
+  // socket.emit("join", "` + this.props.apikey + `|yourdevice001");
+
+  // Receive data:
+  socket.on("post", data => {
+    console.log(data);
+  });
+});
+
+// Send some data:
+setInterval( ()=>{
+  socket.emit("post", {id: "yourDevice001", data: { temperature: 25.0 } } )
+},1000)
+
+`} />
 
             <p>Install the socket.io-client dependency from the same folder.</p>
 
-            <pre className="commanderBgPanel" >$ npm install socket.io-client</pre>
-
-            <p>Run it from the command line.</p>
-
-            <pre className="commanderBgPanel" >$ node test.js<br />
-              connected.
-            </pre>
-
-            <p>You can now test it by sending some data from a device. Your data should appear in your terminal.</p>
-
-            <p className="commanderBgPanel" id="postSample" >{curlPostSample}</p>
-
-            <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{codeStringRealtimeSocketIoResult}</SyntaxHighlighter>
-            </Suspense>
-
-            <h4>SENDING DATA</h4>
-
-            <p>Once socket.io is connected and you've "joined" using your API key, you can now start sending data. The format of the packet is identical to the HTTP REST post method.</p>
-
-            <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{'socket.emit("post", {id: "yourDevice001", data: { temperature: 25.0 } } )'}</SyntaxHighlighter>
-            </Suspense>
+            <CodeBlock language="js" value={`// install the socket.io-client dependeny
+$ npm install socket.io-client
+// run your code
+$ node test.js
+connected.`} />
 
           </div>
         </div>
@@ -269,11 +277,11 @@ class ApiInfo extends Component {
             <h4 className="spot">MQTT</h4>
             <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
 
-            <Suspense fallback={<div className="spinner"></div>}>
+            {/* <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
                 {"var mqtt = require('mqtt');\nvar config = { apikey: \"" + this.props.apikey + "\" };\nvar client  = mqtt.connect('mqtt://" + window.location.hostname + "', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
               </SyntaxHighlighter>
-            </Suspense>
+            </Suspense> */}
 
           </div>
         </div>
@@ -283,7 +291,7 @@ class ApiInfo extends Component {
             <h4 className="spot">Python</h4>
             <p>This code is for python users </p>
 
-            <Suspense fallback={<div className="spinner"></div>}>
+            {/* <Suspense fallback={<div className="spinner"></div>}>
               <SyntaxHighlighter language="python" style={tomorrowNightBright}>
                 {'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'}
               </SyntaxHighlighter>
@@ -291,7 +299,7 @@ class ApiInfo extends Component {
               <SyntaxHighlighter language="python" style={tomorrowNightBright}>
                 {'import json\nimport urllib.request\n\t"data" = {\n\t\t"id": "python3device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib.request.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib.request.urlopen(req, json.dumps(data).encode("utf8"))'}
               </SyntaxHighlighter>
-            </Suspense>
+            </Suspense> */}
           </div>
         </div>
       </div >

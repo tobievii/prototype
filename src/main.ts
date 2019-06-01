@@ -1,5 +1,9 @@
-import { log } from "./utils"
+import { log } from "./log"
 log("MAIN \tStart ===============================")
+
+// console.log("PM2 instance id:" + process.env.pm_id)
+// console.log(process.env.NODE_APP_INSTANCE)
+
 require('source-map-support').install();
 var nodemailer = require("nodemailer")
 var _ = require('lodash');
@@ -48,7 +52,7 @@ const { VM } = require('vm2');
 var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 var eventHub = new events.EventEmitter();
-import { plugins } from "./plugins/config"
+
 import * as stats from "./stats"
 import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
@@ -70,13 +74,35 @@ app.use('/u/:username/view', express.static('../client/dist'))
 
 //####################################################################
 // PLUGINS
+import { pluginsInitialize } from "./plugins/config"
+
+var plugins: any = [];
 
 eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 
 eventHub.on("plugin", (data: any) => {
-  io.sockets.emit('plugin', data);
+  // log("EVENTHUB", data)
+
+  /*
+    In plugins please use this.eventHub.emit("plugin", {plugin: "pluginname", event: {your data in here} });
+
+    In client side code please use:
+
+    socket.on("plugin_pluginname", (event) => {
+      console.log(event);
+    })
+
+  */
+
+  if (data.plugin && data.event) {
+    io.sockets.emit("plugin_" + data.plugin, data.event)
+  } else {
+    log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
+    io.sockets.emit('plugin', data);
+  }
+
 })
 
 eventHub.on("notification", (notification: any, device: any) => {
@@ -107,13 +133,17 @@ app.use(accounts.midware(db));
 
 
 db.on('connect', function () {
+  log("PLUGINS", "Initialize on db connect")
 
-  for (var p in plugins) {
-    if (plugins[p].init) {
-      log("PLUGIN\tinit [" + plugins[p].name + "]")
-      plugins[p].init(app, db, eventHub);
-    }
-  }
+  plugins = pluginsInitialize(config, app, db, eventHub);
+
+  // for (var p in pluginClasses) {
+  //   plugins.push(new pluginClasses[p](app, db, eventHub))
+  //   // if (plugins[p].init) {
+  //   //   log("PLUGIN\tinit [" + plugins[p].name + "]")
+  //   //   plugins[p].init(app, db, eventHub);
+  //   // }
+  // }
 
 })
 
@@ -1024,7 +1054,17 @@ function handleState(req: any, res: any, next: any) {
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, Result: any) => {
+
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, deviceState: any) => {
+
+          if (deviceState) {
+            for (var p in plugins) {
+              if (plugins[p].handlePacket) {
+                plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
+              }
+            }
+          }
+
           if (info.newdevice) {
 
             var newDeviceNotification = {
@@ -1035,7 +1075,7 @@ function handleState(req: any, res: any, next: any) {
               seen: false
             }
 
-            createNotification(db, newDeviceNotification, req.user, Result);
+            createNotification(db, newDeviceNotification, req.user, deviceState);
             io.to(req.user.username).emit("info", info);
           }
 
@@ -1049,10 +1089,10 @@ function handleState(req: any, res: any, next: any) {
             seen: false
           }
 
-          if (Result.boundaryLayer != undefined) {
-            if (Result.boundaryLayer.inbound == false) {
+          if (deviceState.boundaryLayer != undefined) {
+            if (deviceState.boundaryLayer.inbound == false) {
               AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req.user, Result);
+              createNotification(db, AlarmNotification, req.user, deviceState);
             }
           }
 
@@ -1062,23 +1102,16 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
 
-        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id },
-          (findErr: Error, findResult: any) => {
-            if (findResult.notification24 == true) {
-              db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-                //console.log(result)
-                //console.log(err)
-              })
-            }
-          })
-
-
-
-        for (var p in plugins) {
-          if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => { });
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
+          if (findResult.notification24 == true) {
+            db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+              //console.log(result)
+              //console.log(err)
+            })
           }
-        }
+        })
+
+
 
         res.json({ result: "success" });
 
@@ -1118,7 +1151,7 @@ function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any
 
         for (var p in plugins) {
           if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
+            plugins[p].handlePacket(info.deviceStateDBpreupdate, packet, (err: Error, packet: any) => {
 
             });
           }
@@ -1308,13 +1341,15 @@ app.post("/api/v3/state/query", (req: any, res: any) => {
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
 
-        for (var p in plugins) {
-          if (plugins[p].handlePacket) {
-            plugins[p].handlePacket(db, packet, (err: Error, packet: any) => {
+        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (e: Error, state: any) => {
+          for (var p in plugins) {
+            if (plugins[p].handlePacket) {
+              plugins[p].handlePacket(state, packet, (err: Error, packet: any) => {
 
-            });
+              });
+            }
           }
-        }
+        })
 
         res.json(packet);
 
@@ -1430,15 +1465,13 @@ if (config.ssl) {
 
 /* ############################################################################## */
 
-var io = require('socket.io')(server, {
-  transports: ['websocket', 'polling']
-});
+var io = require('socket.io')(server);
 
-const bindListeners = (io: any) => {
+function bindListeners(ioIn) {
   io.on('connection', function (socket: any) {
-    setTimeout(function () {
-      socket.emit("connect", { hello: "world" })
-    }, 5000)
+    // setTimeout(function () {
+    //   socket.emit("connect", { hello: "world" })
+    // }, 5000)
 
 
     socket.on('join', function (path: string) {
@@ -1468,13 +1501,18 @@ const bindListeners = (io: any) => {
   });
 }
 
+
+
 if (config.redis) {
   log("REDIS ENABLED")
   const redis = require('socket.io-redis')
   io.adapter(redis(config.redis))
+  bindListeners(io)
+} else {
+  bindListeners(io)
 }
 
-bindListeners(io)
+
 
 /* ############################################################################## */
 
@@ -1495,7 +1533,14 @@ if (config.ssl) {
   /////
 } else {
   trex.log("HTTP\tServer port: " + config.httpPort)
-  server.listen(config.httpPort);
+  server.listen(config.httpPort).on("error", (err: Error) => {
+    console.error("HTTP Caught error")
+    console.error(err);
+    console.log("You must have another process running that is using this port. EXITING")
+    process.exit();
+  })
+
+
 }
 
 server.on('error', (e: any) => {

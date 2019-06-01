@@ -30,9 +30,9 @@ export function getGUID() {
 
 /* ------------------------------------------------------------------------- */
 
-export function log(data:any) {
-    var now = new Date();    
-    var logItem = {now:now, data:data } //, stack: new Error().stack }
+export function log(data: any) {
+    var now = new Date();
+    var logItem = { now: now, data: data } //, stack: new Error().stack }
     //console.log(now.toISOString());
     //console.log(a);
     //console.log(logItem);
@@ -44,15 +44,30 @@ export function log(data:any) {
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
-export function difference(object:any, base:any) {
+export function difference(object: any, base: any) {
 
-	function changes(object:any, base:any) {
-		return _.transform(object, function(result:any, value:any, key:any) {
-			if (!_.isEqual(value, base[key])) {
-				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
-			}
-		});
+    function changes(object: any, base: any) {
+        return _.transform(object, function (result: any, value: any, key: any) {
+            if (!_.isEqual(value, base[key])) {
+                result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+            }
+        });
     }
-    
-	return changes(object, base);
+
+    return changes(object, base);
+}
+
+
+/*
+usage:
+valueToggle("A", [{value:"A", result:"Its an A"},
+                  {value:"B", result:"Its an B"},
+                  {value:"C", result:"Its an C"}]);
+*/
+export function valueToggle(valuein, options) {
+    for (var option of options) {
+        if (valuein == option.value) {
+            return option.result
+        }
+    }
 }

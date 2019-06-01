@@ -2,7 +2,7 @@ import * as events from 'events';
 import * as mqtt from 'mqtt';
 import * as crypto from 'crypto';
 
-var file = "/src/plugins/iotnxxt/iotnxtqueue.ts"
+var file = "/src/plugins/iotnxt/iotnxtqueue.ts"
 import { log } from "../../utils"
 
 var mqttcfg = {
@@ -70,8 +70,7 @@ export class IotnxtQueue extends events.EventEmitter {
       this.AES = AES;
       this.connectGreenQ((err: Error, secret: any) => {
         if (err) {
-          //this.emit('error', err);
-          log(err);
+          this.emit('error', err);
         }
         if (secret) {
           this.connectRedQ((err: Error, result: any) => {
@@ -122,18 +121,18 @@ export class IotnxtQueue extends events.EventEmitter {
     var mqttGreen = mqtt.connect(mqttcfg.protocol + this.hostaddress + mqttcfg.port, greenOptions);
 
     mqttGreen.on('error', (err: any) => {
-      log("IOTNXT [" + this.GatewayId + "] GREEN ERROR");
-      log(err);
+      //log("IOTNXT [" + this.GatewayId + "] GREEN ERROR");
+      //log(err);
       mqttGreen.end();
       cb(err, undefined);
     })
     mqttGreen.on("offline", (err: any) => {
-      log("IOTNXT [" + this.GatewayId + "] GREEN OFFLINE");
+      //log("IOTNXT [" + this.GatewayId + "] GREEN OFFLINE");
       mqttGreen.end();
       cb(err, undefined);
     })
     mqttGreen.on("close", (err: any) => {
-      log("IOTNXT [" + this.GatewayId + "] GREEN CLOSE");
+      //log("IOTNXT [" + this.GatewayId + "] GREEN CLOSE");
       mqttGreen.end();
       cb(err, undefined);
     })
@@ -203,7 +202,7 @@ export class IotnxtQueue extends events.EventEmitter {
           cb(undefined, secret);
           mqttGreen.end();
         } else {
-          log("IOTNXT FAILED TO CONNECT [" + this.GatewayId + "] ErrorMsg:" + secret.ErrorMsg)
+          log("IOTNXT FAILED TO CONNECT [" + this.GatewayId + "] ErrorMsg: " + secret.ErrorMsg)
           if (secret.ErrorMsg) {
             cb(secret.ErrorMsg.split('\n')[0], undefined);
           } else {
@@ -229,8 +228,8 @@ export class IotnxtQueue extends events.EventEmitter {
       username: this.secret.vHost + ":" + this.GatewayId,
       password: this.secret.Password,
       //rejectUnauthorized: false,
-      keepalive: 60,
-      reconnectPeriod: 9999
+      //keepalive: 60,
+      //reconnectPeriod: 9999
     }
 
     this.mqttRed = mqtt.connect(mqttcfg.protocol + this.secret.Hosts[0] + mqttcfg.port, redoptions);

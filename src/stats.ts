@@ -94,7 +94,6 @@ export async function accountStats(user: any, cb: Function) {
 ///////////////////////////////// SYSTEM WIDE
 
 export function init(app: any, db: any) {
-  log("STATS INIT");
   dbStats = db;
   //const person =this.props.username;
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

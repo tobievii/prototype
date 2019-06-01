@@ -767,7 +767,7 @@ export class StatesViewer extends Component {
     }
 
     return (
-      <div style={{ overflowY: "auto", height: window.innerHeight - size + "px" }}>
+      <div style={{ overflowY: "auto", height: (window.innerHeight * 0.9) - size + "px" }}>
         <div style={{ overflowY: "auto", padding: "2px 0px" }} >
           <DeviceList alarmStates={this.updateAlarmStates} mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
         </div>
@@ -800,7 +800,7 @@ export class StatesViewer extends Component {
   displayMap = () => {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOff ?
-        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
+        <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
           <MapDevices public={this.props.public} widget={false} showBoundary={this.state.showB} username={this.props.username} acc={this.props.account} deviceCall={this.state.devicePressed} devices={this.state.devicesServer} PopUpLink={true} visiting={this.props.visiting} />
         </div>
         : null
@@ -815,7 +815,7 @@ export class StatesViewer extends Component {
   displayLog = () => {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOn ?
-        <div className="mapContainer" style={{ height: window.innerHeight - 98 + "px" }}>
+        <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
           <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
         </div>
         : null

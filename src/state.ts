@@ -115,9 +115,13 @@ export function postState(
       //     console.log(err)
       //   })
       // }
-      var packetToUpsert: any = {};
 
+      var deviceStateDBpreupdate = _.clone(findResult);
+
+      var packetToUpsert: any = {};
       var info: any = {}
+      info.deviceStateDBpreupdate = deviceStateDBpreupdate
+
       if (findResult) {
         delete findResult["_id"];
 
