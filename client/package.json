@@ -1,6 +1,6 @@
 {
   "name": "prototype-ui",
-  "version": "5.0.41",
+  "version": "5.0.42",
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
