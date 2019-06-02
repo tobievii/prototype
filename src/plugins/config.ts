@@ -10,6 +10,7 @@ import { PluginTeltonika } from "./teltonika/plugin_teltonika"
 import { PluginMQTT } from "./mqttserver/mqttPlugin"
 import { pluginHF2111A } from "./HF2111A/plugin_HF2111A"
 import { PluginEFENTO } from "./efento/plugin_efento"
+import { PluginScheduler } from "./scheduler/scheduler"
 
 export function pluginsInitialize(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
   var plugins: any = [];
@@ -27,6 +28,7 @@ export function pluginsInitialize(config: any, app: express.Express, db: any, ev
   plugins.push(new PluginTeltonika(config, app, db, eventHub));
   plugins.push(new pluginHF2111A(config, app, db, eventHub));
   plugins.push(new PluginEFENTO(config, app, db, eventHub));
+  plugins.push(new PluginScheduler(config, app, db, eventHub));
 
   return plugins;
 }

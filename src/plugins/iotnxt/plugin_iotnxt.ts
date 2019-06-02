@@ -14,15 +14,19 @@ var RedisEvent = require('redis-event');
 
 export class PluginIotnxt extends Plugin {
   name = "iotnxt";
-  queue: Queue.Queue | undefined;
   db: any;
-  ev: any;
-  gateways: Gateway[] = [];
+  eventHub: events.EventEmitter;
+
   isCluster: boolean = false;
+  queue: Queue.Queue | undefined;
+  ev: any;
+
+  gateways: Gateway[] = [];
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
+    this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
 

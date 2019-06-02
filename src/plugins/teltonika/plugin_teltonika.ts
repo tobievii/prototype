@@ -7,7 +7,7 @@ import express = require('express');
 
 export class PluginTeltonika extends Plugin {
   db: any;
-  eventHub: any;
+  eventHub: events.EventEmitter;
   name = "teltonika";
   collection = "plugins_teltonika";
 
@@ -64,7 +64,7 @@ export class PluginTeltonika extends Plugin {
   }
 
   handlePacket(packet: any) {
-    log("PLUGIN", this.name, "HANDLE PACKET TODO");
+    // log("PLUGIN", this.name, "HANDLE PACKET TODO");
     // check if this device is a teltonika device
     // send data to device if its connected to this node
   }

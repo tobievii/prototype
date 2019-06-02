@@ -1129,10 +1129,13 @@ function handleState(req: any, res: any, next: any) {
 */
 
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
+  log("main.ts", "handleDeviceUpdate", "start")
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
+      if (err) { console.error(err) }
+      //log("main.ts", "handleDeviceUpdate", user)
       state.postState(db, user, newpacket, packetIn.meta, (packet: any, info: any) => {
         if (options) {
           if (options.socketio == true) {
@@ -1466,7 +1469,7 @@ if (config.ssl) {
 
 var io = require('socket.io')(server);
 
-function bindListeners(ioIn) {
+function bindListeners(ioIn: any) {
   io.on('connection', function (socket: any) {
     // setTimeout(function () {
     //   socket.emit("connect", { hello: "world" })

@@ -14,11 +14,12 @@ export class pluginHF2111A extends Plugin {
   db: any;
   name = "hf2111a";
   port = 12900;
-  eventHub: any;
+  eventHub: events.EventEmitter;;
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
+    this.eventHub = eventHub;
     log("PLUGIN", this.name, "LOADED");
   }
 

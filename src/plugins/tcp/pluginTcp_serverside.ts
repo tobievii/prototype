@@ -6,7 +6,7 @@ import express = require('express');
 
 export class PluginTCP extends Plugin {
   db: any;
-  eventHub: any;
+  eventHub: events.EventEmitter;
   serversMem: any[] = [];
   name = "tcp";
 
@@ -117,8 +117,6 @@ export class PluginTCP extends Plugin {
   }
 
   connectport(portOptions: any, eventHub: any, cb: any) {
-    console.log("TCP Server " + portOptions.portNum + " \t| loading...");
-
     var server = net.createServer((client: any) => {
       server.getConnections((err: Error, count: number) => {
         console.log("There are %d connections now. ", count);
@@ -163,7 +161,7 @@ export class PluginTCP extends Plugin {
     });
 
     server.listen(portOptions.portNum, () => {
-      console.log("TCP Server " + portOptions.portNum + " \t| ready.");
+      log("PLUGIN", this.name, "LISTENING ON PORT " + portOptions.portNum);
       cb(undefined, portOptions);
     });
 

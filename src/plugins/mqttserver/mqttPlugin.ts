@@ -13,7 +13,7 @@ export class PluginMQTT extends Plugin {
     serversMem: any[] = [];
     db: any;
     app: any;
-    eventHub: any;
+    eventHub: events.EventEmitter;
     name = "MQTT";
 
     mqttConnections: any = [];
@@ -40,7 +40,7 @@ export class PluginMQTT extends Plugin {
             })
 
             client.on("publish", (publish) => {
-                //log("mqtt incoming publish"); 
+                log("PLUGIN", this.name, "PUBLISH Received");
                 var requestClean: any = {}
 
                 try {
