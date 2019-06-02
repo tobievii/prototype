@@ -4,6 +4,7 @@ import express = require('express');
 import { PluginAdmin } from "./admin/admin"
 import { PluginAccount } from "./account/account"
 import { PluginIotnxt } from "./iotnxt/plugin_iotnxt"
+import { PluginHTTP } from "./http/pluginHTTP_serverside"
 
 export function pluginsInitialize(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
   var plugins: any = [];
@@ -15,6 +16,7 @@ export function pluginsInitialize(config: any, app: express.Express, db: any, ev
   plugins.push(new PluginAdmin(config, app, db, eventHub));
   plugins.push(new PluginAccount(config, app, db, eventHub));
   plugins.push(new PluginIotnxt(config, app, db, eventHub));
+  plugins.push(new PluginHTTP(config, app, db, eventHub));
 
   return plugins;
 }
@@ -28,7 +30,7 @@ import * as efento from "./efento/plugin_efento"
 import * as tcpPlugin from "./tcp/pluginTcp_serverside"
 import * as discord from "./discord/discord"
 import * as mqttPlugin from "./mqttserver/mqttPlugin"
-import * as httpPlugin from "./http/pluginHTTP_serverside"
+
 import * as notifications from "./notifications/notifications"
 import * as teltonika from "./teltonika/plugin_teltonika"
 
