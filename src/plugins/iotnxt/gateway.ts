@@ -181,7 +181,7 @@ export class Gateway extends EventEmitter {
         this.connect(this.deviceTree, () => {
           log("IOTNXT [" + this.gateway.GatewayId + "] PUBLISHSTATE RECONNECTED");
           //once reconnected try again... recursive.
-          //this.updateDevicePublish(packet);
+          this.updateDevicePublish(packet);
           // todo: buffer packets while reconnected?.. needs special testing here.
         })
       }

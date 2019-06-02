@@ -2,15 +2,17 @@ import { Plugin } from "../plugin"
 import * as events from "events";
 import express = require('express');
 import * as _ from "lodash";
-export var name = "account";
-
+import { log } from "../../log"
 
 export class PluginAccount extends Plugin {
     db: any;
+    name = "account";
 
     constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
         super(app, db, eventHub);
         this.db = db;
+
+        log("PLUGIN", this.name, "LOADED");
 
         app.post("/api/v3/account/checkupdateusername", (req: any, res: any) => {
             this.checkupdateusername(req.body.username, (result: any) => {

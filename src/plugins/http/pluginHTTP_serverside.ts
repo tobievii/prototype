@@ -2,22 +2,24 @@ var net = require("net");
 import * as events from "events";
 import { generate, generateDifficult } from "../../utils";
 
-export const name = "HTTP"
-
 import { Plugin } from "../plugin"
 import express = require('express');
+import { log } from "../../log"
 
 export class PluginHTTP extends Plugin {
   serversMem: any[] = [];
   db: any;
   app: any;
   eventHub: any;
+  name = "HTTP";
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
     this.app = app;
     this.eventHub = eventHub;
+
+    log("PLUGIN", this.name, "LOADED");
 
     app.get("/api/v3/http/routes", (req: any, res: any) => {
       this.getroutes(req.user, (err: Error, routes: any) => {

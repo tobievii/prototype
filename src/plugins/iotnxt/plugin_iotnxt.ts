@@ -22,8 +22,9 @@ export class PluginIotnxt extends Plugin {
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
-
     this.db = db;
+
+    log("PLUGIN", this.name, "LOADED");
 
     // if redis is on and this is running inside PM2
     if (config.redis && process.env.pm_id) {
@@ -58,7 +59,6 @@ export class PluginIotnxt extends Plugin {
 
     } else {
       // single instance
-      console.log("RUNNING IN SINGLE INSTANCE MODE")
       setTimeout(() => {
         this.singleInstanceStart();
       }, 1500)
@@ -95,8 +95,6 @@ export class PluginIotnxt extends Plugin {
       })
     });
 
-    log("PLUGIN", this.name, "INITIALIZED");
-    //this.name = "Cluster";
   }
 
   handlePacket(deviceState: any, packet: any, cb: Function) {

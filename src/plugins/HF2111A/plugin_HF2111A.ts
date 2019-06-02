@@ -8,15 +8,18 @@ import { readFile } from "fs";
 import { DeviceHF2111A } from "./device_HF2111A"
 
 import { test } from "./test"
+import { log } from "../../log"
 
-class PluginHF2111a extends Plugin {
+export class pluginHF2111A extends Plugin {
+  db: any;
   name = "hf2111a";
   port = 12900;
-  eventHub: events.EventEmitter;
+  eventHub: any;
 
-  constructor() {
-    super();
-    this.log("TEST ADSF")
+  constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
+    super(app, db, eventHub);
+    this.db = db;
+    log("PLUGIN", this.name, "LOADED");
   }
 
   public init(app: express.Express, db: any, eventHub: events.EventEmitter) {
@@ -70,7 +73,6 @@ class PluginHF2111a extends Plugin {
   }
 }
 
-export default new PluginHF2111a();
 
 // export const name = "hf2111a";
 // const port = 12900;

@@ -1,10 +1,6 @@
 var net = require("net");
 import * as events from "events";
-
-
-
-export const name = "tcp";
-
+import { log } from "../../log"
 import { Plugin } from "../plugin"
 import express = require('express');
 
@@ -12,11 +8,14 @@ export class PluginTCP extends Plugin {
   db: any;
   eventHub: any;
   serversMem: any[] = [];
+  name = "tcp";
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
     this.eventHub = eventHub;
+
+    log("PLUGIN", this.name, "LOADED");
 
     app.get("/api/v3/tcp/ports", (req: any, res: any) => {
       db.plugins_tcp.find({}, (err: Error, ports: any) => {
