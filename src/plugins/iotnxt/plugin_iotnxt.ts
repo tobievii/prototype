@@ -43,27 +43,8 @@ export class PluginIotnxt extends Plugin {
 
       this.ev.on('ready', () => {
         console.log("REDIS EVENTS READY")
-
-        // this.ev.on('iotnxtevents:greenqueue.prod.iotnxt.io|ROUAN_TEST_DEV_002', (data: any) => {
-        //   console.log("REDIS EVENTS RECIEVED:")
-        //   console.log(data);
-        //   console.log("RECIEVED AT:" + new Date().toISOString())
-        // });
-
-        // if (process.env.pm_id == "0") {
-        //   setTimeout(() => {
-        //     this.ev.pub('iotnxtevents:greenqueue.prod.iotnxt.io|ROUAN_TEST_DEV_002', {
-        //       launchedAt: new Date()
-        //     });
-        //   }, 2000)
-        // }
-
-
-
-        // ev.on('updates:shutdown', function (data) {
-        //   ev.quit();
-        // });
       });
+
       // is this the main node?
       if (process.env.pm_id == "0") {
 
@@ -138,7 +119,7 @@ export class PluginIotnxt extends Plugin {
       for (var gateway of this.gateways) {
         if ((gateway.GatewayId == deviceState.plugins_iotnxt_gateway.GatewayId) &&
           (gateway.HostAddress == deviceState.plugins_iotnxt_gateway.HostAddress)) {
-          console.log("SUCCESS WE ARE CONNECTED TO THIS GATEWAY ALREADY")
+          //console.log("SUCCESS WE ARE CONNECTED TO THIS GATEWAY ALREADY")
           dispatchToCluster = false;
           gateway.handlePacket(deviceState, packet);
         }
@@ -265,9 +246,9 @@ export class PluginIotnxt extends Plugin {
       // if we're part of a cluster subscribe to cluster events for this gateway
       if (this.isCluster) {
         this.ev.on('iotnxtevents:' + gateway.HostAddress + '|' + gateway.GatewayId, (data: any) => {
-          console.log("IOTNXT CLUSTER RECIEVED GATEWAY PACKET")
-          console.log(data);
-          console.log("RECIEVED AT:" + new Date().toISOString())
+          // console.log("IOTNXT CLUSTER RECIEVED GATEWAY PACKET")
+          // console.log(data);
+          // console.log("RECIEVED AT:" + new Date().toISOString())
           this.handlePacket(data.deviceState, data.packet, () => { })
         });
       }

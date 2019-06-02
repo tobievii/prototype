@@ -395,7 +395,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
             result.push(clean)
           }
           res.json(result);
-          console.log(result)
         })
       }
     })
