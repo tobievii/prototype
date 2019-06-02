@@ -1,9 +1,11 @@
 export var plugins = []
 
-plugins.push(require("./iotnxt/pluginIotnxt.jsx")) // new cluster version
+plugins.push(require("./account/pluginAccount.jsx"))
+plugins.push(require("./iotnxt/pluginIotnxt.jsx"))
+
 
 // todo: convert to cluster compatible plugins:
-// plugins.push(require("./account/pluginAccount.jsx"))
+
 // plugins.push(require("./admin/admin_main.jsx"))
 // plugins.push(require("./discord/discord.jsx"))
 // plugins.push(require("./http/pluginHTTP.jsx"))

@@ -1,11 +1,28 @@
 import * as events from "events"
 import express = require('express');
 
+import { PluginAccount } from "./account/account"
+import { PluginIotnxt } from "./iotnxt/plugin_iotnxt"
+
+export function pluginsInitialize(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
+  var plugins: any = [];
+
+  // if (config.redis) {
+  //   plugins.push(new PluginCluster(config, app, db, eventHub));
+  // }
+
+  plugins.push(new PluginAccount(config, app, db, eventHub));
+  plugins.push(new PluginIotnxt(config, app, db, eventHub));
+
+  return plugins;
+}
+
+//// OLD BELOW
+
 import * as account from "./account/account"
 import * as admin from "./admin/admin"
 // import * as serialports from "./serialports/serialports"
 import * as efento from "./efento/plugin_efento"
-
 import * as tcpPlugin from "./tcp/pluginTcp_serverside"
 import * as discord from "./discord/discord"
 import * as mqttPlugin from "./mqttserver/mqttPlugin"
@@ -34,28 +51,4 @@ import * as teltonika from "./teltonika/plugin_teltonika"
 
 
 //import { PluginCluster } from "./cluster/plugin_cluster"
-import { PluginIotnxt } from "./iotnxt/plugin_iotnxt"
-// export function getPluginClasses(config: any) {
-//   console.log("CONFIG:")
-//   console.log(config);
 
-//   var pluginClasses: any = []
-
-//   if (config.redis) {
-//     pluginClasses.push(PluginCluster);
-//   }
-
-//   return pluginClasses;
-// }
-
-export function pluginsInitialize(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
-  var plugins: any = [];
-
-  // if (config.redis) {
-  //   plugins.push(new PluginCluster(config, app, db, eventHub));
-  // }
-
-  plugins.push(new PluginIotnxt(config, app, db, eventHub));
-
-  return plugins;
-}
