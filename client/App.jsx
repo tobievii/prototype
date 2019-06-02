@@ -67,7 +67,9 @@ class App extends Component {
         p.getStates((states) => { this.setState({ states }) })
 
         this.serviceworkerfunction();
+
     }
+
 
     componentWillMount = () => {
         p.getAccount(account => {
@@ -125,7 +127,8 @@ class App extends Component {
                 applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
             });
 
-            await fetch("/subscribe", {
+            console.log(subscription)
+            await fetch("/api/v3/iotnxt/subscribe", {
                 method: "POST",
                 body: JSON.stringify(subscription),
                 headers: {
