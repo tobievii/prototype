@@ -1,6 +1,7 @@
 import * as events from "events"
 import express = require('express');
 
+import { PluginAdmin } from "./admin/admin"
 import { PluginAccount } from "./account/account"
 import { PluginIotnxt } from "./iotnxt/plugin_iotnxt"
 
@@ -11,6 +12,7 @@ export function pluginsInitialize(config: any, app: express.Express, db: any, ev
   //   plugins.push(new PluginCluster(config, app, db, eventHub));
   // }
 
+  plugins.push(new PluginAdmin(config, app, db, eventHub));
   plugins.push(new PluginAccount(config, app, db, eventHub));
   plugins.push(new PluginIotnxt(config, app, db, eventHub));
 
