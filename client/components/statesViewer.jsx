@@ -124,6 +124,15 @@ export class StatesViewer extends Component {
       shared: "asc",
       public: "asc"
     },
+    sortvaluestest: [
+      "timedesc",
+      "namedesc",
+      "selected",
+      "alarm",
+      "warning",
+      "shared",
+      "public"
+    ],
     isOpen: false,
     tempdev: [],
     toggleOn: false,
@@ -212,7 +221,7 @@ export class StatesViewer extends Component {
                 this.socket.emit("join", this.state.devicesServer[device].key);
               }
               this.setState({ devicesView: states }, () => {
-                this.sort();
+                this.sort(this.state.sort);
               })
             })
             //}
@@ -271,7 +280,7 @@ export class StatesViewer extends Component {
             }
             this.setState({ devicesView: states }, () => {
               if (functionCall == "initial load") {
-                this.sort();
+                this.sort(this.state.sort);
               }
             })
           })
@@ -298,7 +307,7 @@ export class StatesViewer extends Component {
 
             this.setState({ devicesView: serverresponse }, () => {
               if (functionCall == "initial load") {
-                this.sort();
+                this.sort(this.state.sort);
               }
             })
           })
@@ -317,7 +326,7 @@ export class StatesViewer extends Component {
           }
           this.setState({ devicesView: states }, () => {
             if (functionCall == "initial load") {
-              this.sort();
+              this.sort(this.state.sort);
             }
           })
         })
@@ -423,9 +432,9 @@ export class StatesViewer extends Component {
         this.setState({ devicesServer: devices })
       } else {
         this.setState({ devicesServer: devices })
-        this.setState({ devicesView: devices }, () => {
-        })
-        //this.sort();
+        // this.setState({ devicesView: devices }, () => {
+        // })
+        this.sort(this.state.sort, "devicePost");
       }
     }
   }
@@ -465,18 +474,35 @@ export class StatesViewer extends Component {
     })
   }
 
-  sort = (sorttype) => {
+  sort = (sorttype, call) => {
+    console.log(this.state.sortvalues)
     var sv = _.clone(this.state.sortvalues)
     var alarmDevices = [];
-    var value;
-    if (sorttype != undefined) {
-      value = sorttype;
-      this.setState({ sort: value })
-    } else {
-      value = this.state.sort;
-    }
+    var value = sorttype;
 
     var newDeviceList = _.clone(this.state.devicesView)
+
+    if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      })
+
+      if (call != "devicePost") {
+        sv.namedesc = "des"
+      }
+    } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
+      newDeviceList.sort((a, b) => {
+        if (a.devid >= b.devid) {
+          return 1
+        } else { return -1 }
+      }).reverse();
+
+      if (call != "devicePost") {
+        sv.namedesc = "asc"
+      }
+    }
 
     if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
       newDeviceList.sort((a, b) => {
@@ -487,8 +513,9 @@ export class StatesViewer extends Component {
         }
       }).reverse();
 
-      sv.timedesc = "des"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.timedesc = "des"
+      }
     } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
       newDeviceList.sort((a, b) => {
         if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
@@ -498,28 +525,9 @@ export class StatesViewer extends Component {
         }
       }).reverse();
 
-      sv.timedesc = "asc"
-      this.setState({ sortvalues: sv })
-    }
-
-    if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      })
-
-      sv.namedesc = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.namedesc = "asc"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.timedesc = "asc"
+      }
     }
 
     if (value == "selected" && this.state.sortvalues.selected == "asc") {
@@ -529,8 +537,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.selected = "des"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.selected = "des"
+      }
     } else if (value == "selected" && this.state.sortvalues.selected == "des") {
       newDeviceList.sort((a, b) => {
         if (a.selected == false && b.selected == true) {
@@ -538,8 +547,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.selected = "asc"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.selected = "asc"
+      }
     }
 
     if (value == "alarm") {
@@ -558,8 +568,10 @@ export class StatesViewer extends Component {
           } else { return -1 }
         }).reverse();
 
-        sv.alarm = "des"
-        this.setState({ sortvalues: sv })
+        if (call != "devicePost") {
+          sv.alarm = "des"
+        }
+
       } else if (this.state.sortvalues.alarm == "des") {
         newDeviceList.sort((a, b) => {
           if (a.alarm == undefined && b.alarm == true) {
@@ -567,8 +579,10 @@ export class StatesViewer extends Component {
           } else { return -1 }
         }).reverse();
 
-        sv.alarm = "asc"
-        this.setState({ sortvalues: sv })
+        if (call != "devicePost") {
+          sv.alarm = "asc"
+        }
+
       }
     }
 
@@ -579,8 +593,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.warning = "des"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.warning = "des"
+      }
     } else if (value == "warning" && this.state.sortvalues.warning == "des") {
       newDeviceList.sort((a, b) => {
         if (a.notification24 == undefined && b.notification24 == true) {
@@ -588,8 +603,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.warning = "asc"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.warning = "asc"
+      }
     }
 
     if (value == "shared" && this.state.sortvalues.shared == "asc") {
@@ -599,8 +615,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.shared = "des"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.shared = "des"
+      }
     } else if (value == "shared" && this.state.sortvalues.shared == "des") {
       newDeviceList.sort((a, b) => {
         if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
@@ -608,10 +625,10 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.shared = "asc"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.shared = "asc"
+      }
     }
-
 
     if (value == "public" && this.state.sortvalues.public == "asc") {
       newDeviceList.sort((a, b) => {
@@ -620,8 +637,9 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.public = "des"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.public = "des"
+      }
     } else if (value == "public" && this.state.sortvalues.public == "des") {
       newDeviceList.sort((a, b) => {
         if (b.public == true && a.public == undefined) {
@@ -629,12 +647,14 @@ export class StatesViewer extends Component {
         } else { return -1 }
       }).reverse();
 
-      sv.public = "asc"
-      this.setState({ sortvalues: sv })
+      if (call != "devicePost") {
+        sv.public = "asc"
+      }
     }
-
+    console.log(sv)
+    this.setState({ sort: sorttype })
+    this.setState({ sortvalues: sv })
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
-    this.setState({ sort: value });
   }
 
   selectCountUpdate = () => {
