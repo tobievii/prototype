@@ -54,7 +54,7 @@ var db = mongojs(config.mongoConnection, config.mongoCollections);
 var eventHub = new events.EventEmitter();
 
 import * as stats from "./stats"
-import { createNotification, checkExisting } from "./plugins/notifications/notifications";
+//import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
 app.use(cookieParser());
@@ -122,7 +122,6 @@ app.use(safeParser);
 //FIRST RUN
 // OLD: accounts.defaultAdminAccount(db);
 utilsLib.checkFirstRun(db);
-
 utilsLib.createUsernamesForOldAccounts(db);
 utilsLib.createDeviceKeysForOldAccounts(db);
 utilsLib.createPublicKeysforOldAccounts(db);
@@ -252,31 +251,20 @@ app.get("/u/:username", (req, res) => {
   })
 })
 
-const webpush = require("web-push");
 
-const publicVapidKey =
-  "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
-const privateVapidKey = "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90";
+// app.post("/subscribe", (req: any, res: any) => {
+//   const subscription = req.body;
+//   res.status(201).json({});
 
-webpush.setVapidDetails(
-  "mailto:prototype@iotnxt.com",
-  publicVapidKey,
-  privateVapidKey
-);
+//   const payload = JSON.stringify({ title: "Push Test" });
 
-app.post("/subscribe", (req: any, res: any) => {
-  const subscription = req.body;
-  res.status(201).json({});
-
-  const payload = JSON.stringify({ title: "Push Test" });
-
-  webpush
-    .sendNotification(subscription, payload)
-    .then((response: any) => {
-      // io.to(req.user.apikey).emit('pushNotification', { title: "Push Test" })
-    })
-    .catch((err: any) => console.error(err));
-});
+//   webpush
+//     .sendNotification(subscription, payload)
+//     .then((response: any) => {
+//       // io.to(req.user.apikey).emit('pushNotification', { title: "Push Test" })
+//     })
+//     .catch((err: any) => console.error(err));
+// });
 
 app.get("/u/:username/view/:devid", (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
@@ -395,7 +383,6 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
             result.push(clean)
           }
           res.json(result);
-          console.log(result)
         })
       }
     })
@@ -1049,13 +1036,15 @@ function handleState(req: any, res: any, next: any) {
       method: req.method
     }
 
-    checkExisting(req, res, db);
+    //checkExisting(req, res, db);
 
 
     processPacketWorkflow(db, req.user.apikey, req.body.id, req.body, plugins, (err: Error, newpacket: any) => {
       state.postState(db, req.user, newpacket, meta, (packet: any, info: any) => {
-
         db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (Err: Error, deviceState: any) => {
+
+          // inject into deviceState.
+          deviceState.newdevice = info.newdevice;
 
           if (deviceState) {
             for (var p in plugins) {
@@ -1065,36 +1054,36 @@ function handleState(req: any, res: any, next: any) {
             }
           }
 
-          if (info.newdevice) {
+          // if (info.newdevice) {
 
-            var newDeviceNotification = {
-              type: "NEW DEVICE ADDED",
-              device: req.body.id,
-              created: packet._created_on,
-              notified: true,
-              seen: false
-            }
+          //   var newDeviceNotification = {
+          //     type: "NEW DEVICE ADDED",
+          //     device: req.body.id,
+          //     created: packet._created_on,
+          //     notified: true,
+          //     seen: false
+          //   }
 
-            createNotification(db, newDeviceNotification, req.user, deviceState);
-            io.to(req.user.username).emit("info", info);
-          }
+          //   //createNotification(db, newDeviceNotification, req.user, deviceState);
+          //   io.to(req.user.username).emit("info", info);
+          // }
 
-          var message = "";
-          var AlarmNotification = {
-            type: "ALARM",
-            device: req.body.id,
-            created: Date.now(),
-            message: message,
-            notified: true,
-            seen: false
-          }
+          // var message = "";
+          // var AlarmNotification = {
+          //   type: "ALARM",
+          //   device: req.body.id,
+          //   created: Date.now(),
+          //   message: message,
+          //   notified: true,
+          //   seen: false
+          // }
 
-          if (deviceState.boundaryLayer != undefined) {
-            if (deviceState.boundaryLayer.inbound == false) {
-              AlarmNotification.message = "has gone out of its boundary";
-              createNotification(db, AlarmNotification, req.user, deviceState);
-            }
-          }
+          // if (deviceState.boundaryLayer != undefined) {
+          //   if (deviceState.boundaryLayer.inbound == false) {
+          //     AlarmNotification.message = "has gone out of its boundary";
+          //     //createNotification(db, AlarmNotification, req.user, deviceState);
+          //   }
+          // }
 
         })
 
@@ -1102,14 +1091,14 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
 
-        db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
-          if (findResult.notification24 == true) {
-            db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-              //console.log(result)
-              //console.log(err)
-            })
-          }
-        })
+        // db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
+        //   if (findResult.notification24 == true) {
+        //     db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+        //       //console.log(result)
+        //       //console.log(err)
+        //     })
+        //   }
+        // })
 
 
 
@@ -1130,10 +1119,13 @@ function handleState(req: any, res: any, next: any) {
 */
 
 function handleDeviceUpdate(apikey: string, packetIn: any, options: any, cb: any) {
+  log("main.ts", "handleDeviceUpdate", "start")
   state.getUserByApikey(db, apikey, (err: any, user: any) => {
     if (err) { log(err); cb(err, undefined); return; }
 
     processPacketWorkflow(db, apikey, packetIn.id, packetIn, plugins, (err: Error, newpacket: any) => {
+      if (err) { console.error(err) }
+      //log("main.ts", "handleDeviceUpdate", user)
       state.postState(db, user, newpacket, packetIn.meta, (packet: any, info: any) => {
         if (options) {
           if (options.socketio == true) {
@@ -1467,7 +1459,7 @@ if (config.ssl) {
 
 var io = require('socket.io')(server);
 
-function bindListeners(ioIn) {
+function bindListeners(ioIn: any) {
   io.on('connection', function (socket: any) {
     // setTimeout(function () {
     //   socket.emit("connect", { hello: "world" })

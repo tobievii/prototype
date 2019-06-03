@@ -1,4 +1,4 @@
-import { log, generate } from "../../utils"
+import { generate } from "../../utils"
 
 var nodemailer = require("nodemailer")
 var randomString = require('random-string');
@@ -9,19 +9,24 @@ var server;
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
-export var name = "admin";
+
 var scrypt = require("scrypt");
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('prototype');
 
 import { Plugin } from "../plugin"
 import express = require('express');
+import { log } from "../../log"
 
 export class PluginAdmin extends Plugin {
   db: any;
+  name = "admin";
+
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
+
+    log("PLUGIN", this.name, "LOADED");
 
     app.get("/verify/:id", (req: any, res: any) => {
       db.users.findOne({ "_id": ObjectId(req.params.id) }, (err: Error, user: any) => {

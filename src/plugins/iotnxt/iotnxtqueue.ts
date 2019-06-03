@@ -342,6 +342,10 @@ export class IotnxtQueue extends events.EventEmitter {
 
   public publishState(packetIn: any, cb: any) {
 
+    if (!this.mqttRed.publish) {
+      console.log("NOT YET CONNECTED")
+      return;
+    }
 
     var packet = JSON.parse(JSON.stringify(this.state));
     ///////

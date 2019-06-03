@@ -122,16 +122,16 @@ export class Gateway extends EventEmitter {
 
   handlePacket(deviceState: any, packet: any) {
     //calculate new device tree;
-    console.log("calculate new device tree")
+    //console.log("calculate new device tree")
     this.calculateGatewayTree((e: Error, deviceTree: object) => {
       if (deviceTree) {
         // any new endpoints?
         var diff = difference(deviceTree, this.deviceTree)
         if (_.isEmpty(diff)) {
-          console.log("no need to register new endpoints");
+          //console.log("no need to register new endpoints");
           this.updateDevicePublish(packet);
         } else {
-          console.log("need to register new endpoints");
+          //console.log("need to register new endpoints");
           // register endpoints
           this.iotnxtqueue.registerEndpoints(deviceTree, (e: Error, result: any) => {
             if (result) {
@@ -174,7 +174,18 @@ export class Gateway extends EventEmitter {
     }
 
     this.iotnxtqueue.publishState(packet, (err: Error, result: any) => {
-      console.log([err, result]);
+      if (err) {
+        //todo: cleanup error code and retry
+        log("IOTNXT [" + this.gateway.GatewayId + "] PUBLISHSTATE ERROR: " + err);
+        delete this.iotnxtqueue;
+        this.connect(this.deviceTree, () => {
+          log("IOTNXT [" + this.gateway.GatewayId + "] PUBLISHSTATE RECONNECTED");
+          //once reconnected try again... recursive.
+          this.updateDevicePublish(packet);
+          // todo: buffer packets while reconnected?.. needs special testing here.
+        })
+      }
+      if (result) log("IOTNXT [" + this.gateway.GatewayId + "] PUBLISHSTATE SUCCESS");
     })
   }
 }

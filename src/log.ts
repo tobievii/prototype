@@ -8,11 +8,9 @@ export function log(a: any, b?: any, c?: any) {
 
 
 
-  // if (typeof a == "object") {
-  //   console.log(now.toISOString() + "\t" + JSON.stringify(a))
-  // } else {
-
-  // }
+  if (typeof a == "object") {
+    console.log(now.toISOString() + "\t" + JSON.stringify(a))
+  }
 
   clean += now.toISOString() + "\t" + a
 

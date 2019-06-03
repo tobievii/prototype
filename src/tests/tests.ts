@@ -484,7 +484,7 @@ describe("API", function () {
 
       var randomnumber = Math.round(Math.random() * 10000)
 
-      var socket = require("socket.io-client")(testAccount.server + ":" + testAccount.port)
+      var socket = require("socket.io-client")(testAccount.server + ":" + testAccount.port, { transports: ['websocket'] })
 
       var counter = 0;
 
@@ -574,7 +574,7 @@ describe("API", function () {
       var mqtt = require('mqtt');
 
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
-      var socket = require("socket.io-client")(testAccount.server + ":" + testAccount.port)
+      var socket = require("socket.io-client")(testAccount.server + ":" + testAccount.port, { transports: ['websocket'] })
 
       var randomnumber = Math.round(Math.random() * 10000)
       var dataVar = { random: randomnumber, asdf: "123" };
@@ -663,7 +663,7 @@ describe("API", function () {
       var mqtt = require('mqtt');
       var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + testAccount.apikey });
 
-      var socket = require("socket.io-client")("http://localhost:8080")
+      var socket = require("socket.io-client")("http://localhost:8080", { transports: ['websocket'] })
 
       var randomnumber = Math.round(Math.random() * 10000)
       var dataVar = {

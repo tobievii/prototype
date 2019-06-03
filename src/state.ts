@@ -3,6 +3,8 @@ import * as geoip from "geoip-lite";
 
 var _ = require("lodash");
 
+import { log } from "./log"
+
 export function postState(
   db: any,
   user: any,
@@ -12,11 +14,8 @@ export function postState(
 ) {
 
   if (!user) {
-
-    //console.log(meta)
-    //console.log(request)
-    //console.log("user undefined")
-    //cb("user undefined", undefined)
+    log("state.ts", "postState", "user not defined!")
+    console.log(user);
     return;
   }
 
@@ -348,6 +347,7 @@ export function validApiKey(db: any, testkey: string, cb: any) {
 
 
 export function getUserByApikey(db: any, apikey: string, cb: any) {
+  log("state.ts", "getUserByApikey", "start")
   db.users.findOne({ apikey: apikey }, (err: Error, user: any) => {
     if (user) {
       cb(undefined, user)
