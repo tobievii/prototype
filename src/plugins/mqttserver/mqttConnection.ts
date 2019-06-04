@@ -104,7 +104,7 @@ export class mqttConnection extends EventEmitter {
                             socket.destroy();
                             return;
                         }
-
+                        connect.apikey = apikey;
                         this.apikey = apikey;
                         this.emit("connect", connect)
                         socket.write(" \u0002\u0000\u0000");
