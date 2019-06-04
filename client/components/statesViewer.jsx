@@ -124,15 +124,6 @@ export class StatesViewer extends Component {
       shared: "asc",
       public: "asc"
     },
-    sortvaluestest: [
-      "timedesc",
-      "namedesc",
-      "selected",
-      "alarm",
-      "warning",
-      "shared",
-      "public"
-    ],
     isOpen: false,
     tempdev: [],
     toggleOn: false,
@@ -432,8 +423,8 @@ export class StatesViewer extends Component {
         this.setState({ devicesServer: devices })
       } else {
         this.setState({ devicesServer: devices })
-        // this.setState({ devicesView: devices }, () => {
-        // })
+        this.setState({ devicesView: devices }, () => {
+        })
         this.sort(this.state.sort, "devicePost");
       }
     }
@@ -475,7 +466,6 @@ export class StatesViewer extends Component {
   }
 
   sort = (sorttype, call) => {
-    console.log(this.state.sortvalues)
     var sv = _.clone(this.state.sortvalues)
     var alarmDevices = [];
     var value = sorttype;
@@ -512,7 +502,7 @@ export class StatesViewer extends Component {
           return -1
         }
       }).reverse();
-
+      sv.timedesc = "asc"
       if (call != "devicePost") {
         sv.timedesc = "des"
       }
@@ -524,7 +514,7 @@ export class StatesViewer extends Component {
           return -1
         }
       }).reverse();
-
+      sv.timedesc = "des"
       if (call != "devicePost") {
         sv.timedesc = "asc"
       }
@@ -651,9 +641,8 @@ export class StatesViewer extends Component {
         sv.public = "asc"
       }
     }
-    console.log(sv)
-    this.setState({ sort: sorttype })
-    this.setState({ sortvalues: sv })
+    this.setState({ sort: sorttype },
+      this.setState({ sortvalues: sv }))
     this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
