@@ -127,7 +127,6 @@ class App extends Component {
                 applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
             });
 
-            console.log(subscription)
             await fetch("/api/v3/iotnxt/subscribe", {
                 method: "POST",
                 body: JSON.stringify(subscription),

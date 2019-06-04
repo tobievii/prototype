@@ -32,11 +32,11 @@ export class CodeBlock extends React.PureComponent {
 
   render() {
     return (
-      <pre>
-        <code ref={this.setRef} className={`language-${this.props.language}`}>
-          {this.props.value}
-        </code>
+
+      <pre ref={this.setRef} className={`language-${this.props.language}`}>
+        {this.props.value}
       </pre>
+
     )
   }
 }

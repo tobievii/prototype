@@ -71,45 +71,9 @@ class ApiInfo extends Component {
     var apiCall = { path: window.location.origin }
 
     var samplePacket = { "id": "yourDevice001", "data": { "temperature": 24.54, "doorOpen": false, "gps": { "lat": 25.123, "lon": 28.125 } } }
-    var samplePacket2 = { "id": "yourDevice001" }
 
     var authheader = 'Basic ' + Buffer.from("api:key-" + this.props.apikey).toString('base64')
 
-    var curlPostSample =
-      "curl --user 'api:key-" +
-      this.props.apikey +
-      '\' -X POST -H "Content-Type: application/json" -d \'' + JSON.stringify(samplePacket) + '\' ' +
-      window.location.origin +
-      "/api/v3/data/post";
-
-    var curlStatesSample =
-      "curl --user 'api:key-" +
-      this.props.apikey +
-      '\' -X GET -H "Content-Type: application/json" ' +
-      window.location.origin +
-      "/api/v3/states";
-
-    var curlViewSample =
-      "curl --user 'api:key-" +
-      this.props.apikey +
-      '\' -X POST -H "Content-Type: application/json" -d \'' + JSON.stringify({ "id": "yourDevice001" }) + '\' ' +
-      window.location.origin +
-      "/api/v3/view";
-
-
-
-    var codeStringRealtimeSocketIo = `var socket = require("socket.io-client")("` + apiCall.path + `", { transports: ['websocket'] });
-socket.on("connect", function (data) {
-  console.log("connected.");
-  socket.emit("join", "` + this.props.apikey + `"); // your api key
-  socket.on("post", data => {
-    console.log(data);
-  });
-});
-`;
-
-    var codeStringRealtimeSocketIoResult = '{ id: \'yourDevice001\',\n  data:\n    { temperature: 24.54,\n      doorOpen: false,\n      gps: { lat: 25.123, lon: 28.125 } },\n  timestamp: \'2018-08-27T08:42:30.512Z\' }';
-    var codeStringRealtimeSocketIoSingleDevice = 'socket.emit("join", "' + this.props.apikey + '|yourDevice001"); // your api key | device id';
 
     return (
       <div className="apiInfo" style={{ paddingTop: 0, margin: "0 25px", marginTop: "60px" }} >
@@ -119,7 +83,6 @@ socket.on("connect", function (data) {
           <div className={this.getMenuClasses(2)} onClick={this.onClickMenuTab(2)}>HTTP REST</div>
           <div className={this.getMenuClasses(3)} onClick={this.onClickMenuTab(3)}>SOCKET.IO</div>
           <div className={this.getMenuClasses(4)} onClick={this.onClickMenuTab(4)} >MQTT</div>
-          <div className={this.getMenuClasses(5)} onClick={this.onClickMenuTab(5)} >PYTHON</div>
         </div>
 
         <div className="row" style={this.getMenuPageStyle(1)}>
@@ -147,7 +110,7 @@ socket.on("connect", function (data) {
           <div className="col-md-12 commanderBgPanel" >
             <h4>HEADERS</h4>
 
-            <p>Only two headers are required. The tool/software used will usually handle the Authorization header construction based on the username/password.<br /> </p>
+            <p>Only two headers are required. The tool/software used will usually handle the Authorization header construction based on the username/password.</p>
 
             <pre className="commanderBgPanel" style={{ fontSize: 12 }}>
               "Authorization":"{authheader}"<br />
@@ -160,13 +123,21 @@ socket.on("connect", function (data) {
 
         <div className="row" style={this.getMenuPageStyle(2)}>
 
+          <div className="col-12 commanderBgPanel" style={{ marginBottom: 20 }}>
+            <h4 className="spot" style={{ padding: "30px 0 0 0" }}>HTTP</h4>
+
+            <p>Documentation for HTTP(S) REST API:</p>
+
+            <p>Sending and recieving data using HTTP(S) is the simplest. If you need to
+            have a device connect and wait for commands from the cloud the best would
+              be to use MQTT or SOCKET.IO instead.</p>
+
+            <p>Example code for python, C# and node/js is available here: <a href="https://github.com/IoT-nxt/prototype/tree/dev/examples">https://github.com/IoT-nxt/prototype/tree/dev/examples</a></p>
+          </div>
+
           <div className="col-xl-6 commanderBgPanel" >
-            <h4 className="spot" style={{ padding: "30px 0 0 0" }}>ADD AND UPDATE DATA</h4>
-
-            <p>The API call to add a device and update a device is identical. The data will be merged in the current state. Changes will be stored as packets and these packets will represents the history of a device.</p>
-
+            <p style={{ paddingTop: 10 }}>The API call to add a device and update a device is identical. The data will be merged in the current state. Changes will be stored as packets and these packets will represents the history of a device.</p>
             <p>You can make the "id" anything you want as long as it is unique to your account. </p>
-
             <p>The "data" section of the packet can contain anything you'd like as long as it is valid JSON.</p>
           </div>
 
@@ -183,32 +154,48 @@ socket.on("connect", function (data) {
 
               <div className="col-md-12">
                 <h6>BODY ( Content-Type: "application/json" )</h6>
-                <CodeBlock />
-                {/* <Suspense fallback={<div className="spinner"></div>}>
-                  <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>{JSON.stringify(samplePacket, null, 2)}</SyntaxHighlighter>
-                </Suspense> */}
+                <CodeBlock language='javascript' value={`{ 
+  "id": "yourDevice001", 
+  "data": { 
+    "temperature": 24.54, 
+    "doorOpen": false, 
+    "gps": { 
+      "lat": 25.123, 
+      "lon": 28.125 
+    } 
+  } 
+}`} />
+
               </div>
               <div className="col-md-12">
                 <button onClick={this.sendHttpRestTest}>TEST</button>
               </div>
+
+              <div className="col-md-12">
+                <h5 style={{ paddingTop: 20 }}>QUICK CURL SNIPPET:</h5>
+
+                <CodeBlock language='bash' value={"curl --user 'api:key-" +
+                  this.props.apikey +
+                  '\' -X POST -H "Content-Type: application/json" -d \'' + JSON.stringify(samplePacket) + '\' ' +
+                  window.location.origin +
+                  "/api/v3/data/post"} />
+              </div>
+
             </div>
           </div>
 
 
-          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10 }} >
-            <h5>QUICK CURL SNIPPET:</h5>
-            <p className="commanderBgPanel" id="postSample" >{curlPostSample}</p>
-          </div>
 
-          {/* 2) GET STATES */}
+
 
           <div className="col-md-6 commanderBgPanel" >
-            <h4 className="spot" style={{ paddingTop: 10 }}>GET DATA</h4>
+            <h4 className="spot" style={{ paddingTop: 50 }}></h4>
             <p>To get all the current device state data is simple. Just click on the url on the right.</p>
           </div>
 
           <div className="col-md-6 commanderBgPanel" >
-            <div className="row" style={{ paddingTop: 30 }}>
+
+            <div className="row" style={{ paddingTop: 60 }}>
               <div className="col-md-3">
                 <h6>METHOD:</h6>
                 <pre className="commanderBgPanel">GET</pre>
@@ -217,14 +204,23 @@ socket.on("connect", function (data) {
                 <h6>URL</h6>
                 <div className="commanderBgPanel"><a className="apidocsLinkUrl" href={apiCall.path + "/api/v3/states"}>{apiCall.path + "/api/v3/states"}</a></div>
               </div>
+
+              <div className="col-12">
+                <h5 style={{ paddingTop: 20 }}>QUICK CURL SNIPPET:</h5>
+
+                <CodeBlock language='bash' value={"curl --user 'api:key-" +
+                  this.props.apikey +
+                  '\' -X GET -H "Content-Type: application/json" ' +
+                  window.location.origin +
+                  "/api/v3/states"} />
+              </div>
+
             </div>
+
           </div>
 
-          <div className="col-md-12 commanderBgPanel" style={{ marginBottom: 10, overflow: "auto" }} >
-            <h5>QUICK CURL SNIPPET:</h5>
-            <p className="commanderBgPanel" id="postSample" >{curlStatesSample}</p>
-          </div>
-        </div>
+
+        </div >
 
         <div className="row" style={this.getMenuPageStyle(3)}>
           <div className="col-md-12 commanderBgPanel" >
@@ -235,9 +231,6 @@ socket.on("connect", function (data) {
 
             <p>Download <a href="https://nodejs.org/en/">Node.js</a> and duplicate the code below in a <b>test.js</b> file. This code will connect to your account and stream data to your terminal. We use this method to keep a connection open to the server and will be ready to receive data when needed. This example will stream data from all your devices if configured correctly.</p>
 
-            {/* <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter language='javascript' showLineNumbers={true} style={tomorrowNightBright}>{codeStringRealtimeSocketIo}</SyntaxHighlighter>
-            </Suspense> */}
 
             <CodeBlock language='javascript' value={`var socket = require("socket.io-client")("` + apiCall.path + `", { transports: ['websocket'] });
 socket.on("connect", function (data) {
@@ -274,34 +267,32 @@ connected.`} />
 
         <div className="row" style={this.getMenuPageStyle(4)}>
           <div className="col-md-12 commanderBgPanel" >
-            <h4 className="spot">MQTT</h4>
+            <h4 className="spot" style={{ paddingTop: 30 }}>MQTT</h4>
             <p>This code example is for nodejs users, but should be similar for other mqtt clients</p>
 
-            {/* <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter language="javascript" style={tomorrowNightBright}>
-                {"var mqtt = require('mqtt');\nvar config = { apikey: \"" + this.props.apikey + "\" };\nvar client  = mqtt.connect('mqtt://" + window.location.hostname + "', {username:\"api\", password:\"key-\"+config.apikey});\n\nclient.on('connect', function () {\n\tconsole.log(\"connected.\");\n\n\tclient.subscribe(config.apikey, function (err) {\n\t\tif (err) { console.log(err) }\n\t\tconsole.log(\"subscribed.\")\n\t})\n\n\tsetInterval(()=>{\n\t\tclient.publish(config.apikey, JSON.stringify({id:\"mqttDevice01\", data: { a: Math.random() }}) );\n\t},1000)\n})\n\nclient.on('message', function (topic, message) {\n\tconsole.log(message.toString())\n})"}
-              </SyntaxHighlighter>
-            </Suspense> */}
+            <CodeBlock language="javascript" value={`
+var mqtt = require('mqtt');
+var config = { apikey: "` + this.props.apikey + `" };
+var client  = mqtt.connect("mqtt://` + window.location.hostname + `", {username:"api", password:"key-" + config.apikey });
+
+client.on('connect', function () {
+  console.log("connected.");
+  client.subscribe(config.apikey, function (err) {
+    if (err) { console.log(err) }
+    console.log("subscribed.")
+  })
+  
+  setInterval(()=>{
+    client.publish(config.apikey, JSON.stringify({id:"mqttDevice01", data: { a: Math.random() }}) );
+  },1000)
+})
+
+client.on('message', (topic, message) => { console.log(message.toString()); })`} />
 
           </div>
         </div>
 
-        <div className="row" style={this.getMenuPageStyle(5)}>
-          <div className="col-md-12 commanderBgPanel" >
-            <h4 className="spot">Python</h4>
-            <p>This code is for python users </p>
 
-            {/* <Suspense fallback={<div className="spinner"></div>}>
-              <SyntaxHighlighter language="python" style={tomorrowNightBright}>
-                {'import json\nimport urllib2\n\t"data" = {\n\t\t"id": "python2device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib2.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib2.urlopen(req, json.dumps(data))'}
-              </SyntaxHighlighter>
-
-              <SyntaxHighlighter language="python" style={tomorrowNightBright}>
-                {'import json\nimport urllib.request\n\t"data" = {\n\t\t"id": "python3device",\n\t\t"data": {\n\t\t\t"temperature": 25.12,\n\t\t\t"doorClosed" : True,\n\t\t\t"movementDetected" : False\n\t\t}\n}\n\nreq = urllib.request.Request(http://localhost:8080/api/v3/data/post)\nreq.add_header("Content-Type", "application/json")\nreq.add_header("Authorization", "Basic YXBpOmtleS1tZnJhZGg2ZHJpdmJ5a3o3czRwM3ZseWVsamI4NjY2dg==")\n\nresponse = urllib.request.urlopen(req, json.dumps(data).encode("utf8"))'}
-              </SyntaxHighlighter>
-            </Suspense> */}
-          </div>
-        </div>
       </div >
     );
   }
