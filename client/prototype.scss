@@ -1546,15 +1546,6 @@ $particle-size: 5px;
 $time: 14s; 
 $base-hue: 0; // change for diff colors
 
-html, body {
-  height: 100%;
-}
-
-body {
-  background: black;
-  overflow: hidden; 
-}
-
 .wrap {
   position: relative;
   top: 50%;
