@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import { Line } from 'react-chartjs-2';
 import { Widget } from "./widget.jsx"
+import { months } from "moment";
+
+var dateFormat = require('dateformat');
+var now = new Date();
+//var day = ["Monday", "Tuesday", "Wednesday", "Thurday", "Friday", "Saturday", "Sunday"]
 
 export class ChartLine extends React.Component {
   state = {}
@@ -18,7 +23,7 @@ export class ChartLine extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ key, datapath })
     }).then(response => response.json()).then(result => {
-      //console.log(result);
+      console.log(result);
 
       var linedata = [{
         id: datapath,
@@ -37,8 +42,19 @@ export class ChartLine extends React.Component {
     var data = [];
 
     for (var d of this.state.linedata[0].data) {
-      labels.push(d.x)
+
+      //dateFormat(d.x, "dddd, mmmm dS, yyyy, h:MM:ss TT")
+      //console.log(d.x)
+      //console.log(dateFormat(d.x, "dddd, mmmm dS, yyyy, h:MM:ss TT"))
+      var day = ["Monday", "Tuesday", "Wednesday", "Thurday", "Friday", "Saturday", "Sunday"]
+      var month = ["January", "", "", "", "", "", "", "", "", "", "", ""]
+      if (day) {
+        labels.push(dateFormat(d.x, "dddd"))
+        data.push(d.y)
+      } else if (month)
+        labels.push(dateFormat(d.x, "mmmm"))
       data.push(d.y)
+
     }
 
     var graph = {
