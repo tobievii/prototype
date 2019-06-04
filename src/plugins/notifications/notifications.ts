@@ -5,7 +5,6 @@ import { Plugin } from "../plugin"
 import express = require('express');
 import { checkExisting } from "./backup_notifications";
 
-
 const webpush = require("web-push");
 
 export class PluginNotifications extends Plugin {
@@ -43,23 +42,50 @@ export class PluginNotifications extends Plugin {
     })
   }
 
-  handlePacket(deviceState: any, packet: any, cb: Function) {
+  handlePacket(deviceState: any, packet: any, user: any, cb: Function) {
     log("PLUGIN", this.name, "HANDLE PACKET");
     //this.checkExisting(deviceState.apikey);
 
-
     if (deviceState.newdevice) {
       this.db["plugins_" + this.name].find({ apikey: deviceState.apikey }, (e: Error, dbSubscriptions: any) => {
-        console.log(dbSubscriptions.length)
+
         for (var sub of dbSubscriptions) {
           // IF NEW DEVICE:
-          webpush.sendNotification(sub.subscriptionData, JSON.stringify({ title: "titletest", message: "messagetest" })).then((response: any) => {
-            console.log(response);
-            // io.to(req.user.apikey).emit('pushNotification', { title: "Push Test" })
-          }).catch((err: any) => console.error(err));
+          var message = "Device Added";
+          var newDeviceNotification = {
+            type: "NEW DEVICE ADDED",
+            device: deviceState.devid,
+            created: packet._created_on,
+            notified: true,
+            seen: false
+          }
+
+          if (user.notifications) {
+            user.notifications.push(newDeviceNotification)
+          } else {
+            user.notifications = [newDeviceNotification]
+          }
+
+          this.db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+            if (err) console.log(err);
+            if (updated) {
+              this.eventHub.emit("plugin", {
+                plugin: this.name,
+                event: {
+                  newdevice: true,
+                  device: deviceState
+                }
+              })
+              webpush.sendNotification(sub.subscriptionData, message).then((response: any) => {
+                console.log(response);
+              }).catch((err: any) => console.error(err));
+            };
+          })
         }
       });
     }
+
+
   };
 
   checkExisting(apikey: string) {
@@ -104,5 +130,4 @@ export class PluginNotifications extends Plugin {
       t.push(array[i]);
     }
   }
-
 }

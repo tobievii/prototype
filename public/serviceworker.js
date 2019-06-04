@@ -28,6 +28,7 @@ self.addEventListener('activate', function (e) {
 
 
 self.addEventListener('push', function (e) {
+    console.log(e.data)
     var options = {
         body: 'This notification was generated from a push!',
         icon: '/favicon.png',

@@ -98,6 +98,9 @@ eventHub.on("plugin", (data: any) => {
 
   if (data.plugin && data.event) {
     io.sockets.emit("plugin_" + data.plugin, data.event)
+    if (data.event.newdevice) {
+      io.sockets.emit("plugin_info", data.event.device)
+    }
   } else {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
     io.sockets.emit('plugin', data);
@@ -1049,7 +1052,11 @@ function handleState(req: any, res: any, next: any) {
           if (deviceState) {
             for (var p in plugins) {
               if (plugins[p].handlePacket) {
-                plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
+                if (plugins[p].name == "notifications") {
+                  plugins[p].handlePacket(deviceState, packet, req.user, (err: Error, packet: any) => { });
+                } else {
+                  plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
+                }
               }
             }
           }
