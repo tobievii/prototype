@@ -423,8 +423,8 @@ export class StatesViewer extends Component {
         this.setState({ devicesServer: devices })
       } else {
         this.setState({ devicesServer: devices })
-        this.setState({ devicesView: devices }, () => {
-        })
+        // this.setState({ devicesView: devices }, () => {
+        // })
         this.sort(this.state.sort, "devicePost");
       }
     }
@@ -467,183 +467,183 @@ export class StatesViewer extends Component {
 
   sort = (sorttype, call) => {
     var sv = _.clone(this.state.sortvalues)
-    var alarmDevices = [];
     var value = sorttype;
 
     var newDeviceList = _.clone(this.state.devicesView)
 
-    if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      })
+    if (call == "post" && call != undefined) {
+      if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.devid >= b.devid) {
+            return 1
+          } else { return -1 }
+        }).reverse();
 
-      if (call != "devicePost") {
-        sv.namedesc = "des"
-      }
-    } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.namedesc = "asc"
-      }
-    }
-
-    if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
-          return 1
-        } else {
-          return -1
+        if (call != "devicePost" && call != undefined) {
+          sv.namedesc = "des"
         }
-      }).reverse();
-      sv.timedesc = "asc"
-      if (call != "devicePost") {
-        sv.timedesc = "des"
-      }
-    } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
-          return 1
-        } else {
-          return -1
+      } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
+        newDeviceList.sort((a, b) => {
+          if (a.devid >= b.devid) {
+            return 1
+          } else { return -1 }
+        })
+
+        if (call != "devicePost" && call != undefined) {
+          sv.namedesc = "asc"
         }
-      }).reverse();
-      sv.timedesc = "des"
-      if (call != "devicePost") {
+      }
+
+      if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
+            return 1
+          } else {
+            return -1
+          }
+        }).reverse();
         sv.timedesc = "asc"
+        if (call != "devicePost" && call != undefined) {
+          sv.timedesc = "des"
+        }
+      } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
+        newDeviceList.sort((a, b) => {
+          if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
+            return 1
+          } else {
+            return -1
+          }
+        }).reverse();
+        sv.timedesc = "des"
+        if (call != "devicePost" && call != undefined) {
+          sv.timedesc = "asc"
+        }
       }
-    }
 
-    if (value == "selected" && this.state.sortvalues.selected == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.selected == true && b.selected == false) {
-          return 1
-        } else { return -1 }
-      }).reverse();
+      if (value == "selected" && this.state.sortvalues.selected == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.selected == true && b.selected == false) {
+            return 1
+          } else { return -1 }
+        }).reverse();
 
-      if (call != "devicePost") {
-        sv.selected = "des"
+        if (call != "devicePost" && call != undefined) {
+          sv.selected = "des"
+        }
+      } else if (value == "selected" && this.state.sortvalues.selected == "des") {
+        newDeviceList.sort((a, b) => {
+          if (a.selected == false && b.selected == true) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.selected = "asc"
+        }
       }
-    } else if (value == "selected" && this.state.sortvalues.selected == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.selected == false && b.selected == true) {
-          return 1
-        } else { return -1 }
-      }).reverse();
 
-      if (call != "devicePost") {
-        sv.selected = "asc"
-      }
-    }
+      if (value == "alarm") {
+        var alarmstates = _.clone(this.state.alarmStates);
+        for (var device in newDeviceList) {
+          for (var c in alarmstates) {
+            if (alarmstates[c].key == newDeviceList[device].key) {
+              newDeviceList[device]["alarm"] = true;
+            }
+          }
+        }
+        if (this.state.sortvalues.alarm == "asc") {
+          newDeviceList.sort((a, b) => {
+            if (a.alarm == true && b.alarm == undefined) {
+              return 1
+            } else { return -1 }
+          }).reverse();
 
-    if (value == "alarm") {
-      var alarmstates = _.clone(this.state.alarmStates);
-      for (var device in newDeviceList) {
-        for (var c in alarmstates) {
-          if (alarmstates[c].key == newDeviceList[device].key) {
-            newDeviceList[device]["alarm"] = true;
+          if (call == "post" && call != undefined) {
+            sv.alarm = "des"
+          }
+
+        } else if (this.state.sortvalues.alarm == "des") {
+          newDeviceList.sort((a, b) => {
+            if (a.alarm == undefined && b.alarm == true) {
+              return 1
+            } else { return -1 }
+          }).reverse();
+
+          if (call == "post" && call != undefined) {
+            sv.alarm = "asc"
           }
         }
       }
-      if (this.state.sortvalues.alarm == "asc") {
+
+      if (value == "warning" && this.state.sortvalues.warning == "asc") {
         newDeviceList.sort((a, b) => {
-          if (a.alarm == true && b.alarm == undefined) {
+          if (a.notification24 == true && b.notification24 == undefined) {
             return 1
           } else { return -1 }
         }).reverse();
 
-        if (call != "devicePost") {
-          sv.alarm = "des"
+        if (call != "devicePost" && call != undefined) {
+          sv.warning = "des"
         }
-
-      } else if (this.state.sortvalues.alarm == "des") {
+      } else if (value == "warning" && this.state.sortvalues.warning == "des") {
         newDeviceList.sort((a, b) => {
-          if (a.alarm == undefined && b.alarm == true) {
+          if (a.notification24 == undefined && b.notification24 == true) {
             return 1
           } else { return -1 }
         }).reverse();
 
-        if (call != "devicePost") {
-          sv.alarm = "asc"
+        if (call != "devicePost" && call != undefined) {
+          sv.warning = "asc"
         }
-
       }
+
+      if (value == "shared" && this.state.sortvalues.shared == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.shared = "des"
+        }
+      } else if (value == "shared" && this.state.sortvalues.shared == "des") {
+        newDeviceList.sort((a, b) => {
+          if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.shared = "asc"
+        }
+      }
+
+      if (value == "public" && this.state.sortvalues.public == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.public == true && b.public == undefined) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.public = "des"
+        }
+      } else if (value == "public" && this.state.sortvalues.public == "des") {
+        newDeviceList.sort((a, b) => {
+          if (b.public == true && a.public == undefined) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.public = "asc"
+        }
+      }
+      this.setState({ sort: sorttype },
+        this.setState({ sortvalues: sv }))
+      this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     }
-
-    if (value == "warning" && this.state.sortvalues.warning == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.notification24 == true && b.notification24 == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.warning = "des"
-      }
-    } else if (value == "warning" && this.state.sortvalues.warning == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.notification24 == undefined && b.notification24 == true) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.warning = "asc"
-      }
-    }
-
-    if (value == "shared" && this.state.sortvalues.shared == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.shared = "des"
-      }
-    } else if (value == "shared" && this.state.sortvalues.shared == "des") {
-      newDeviceList.sort((a, b) => {
-        if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.shared = "asc"
-      }
-    }
-
-    if (value == "public" && this.state.sortvalues.public == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.public == true && b.public == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.public = "des"
-      }
-    } else if (value == "public" && this.state.sortvalues.public == "des") {
-      newDeviceList.sort((a, b) => {
-        if (b.public == true && a.public == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      if (call != "devicePost") {
-        sv.public = "asc"
-      }
-    }
-    this.setState({ sort: sorttype },
-      this.setState({ sortvalues: sv }))
-    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
   }
 
   selectCountUpdate = () => {
