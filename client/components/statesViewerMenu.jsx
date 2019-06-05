@@ -96,7 +96,7 @@ export class StatesViewerMenu extends Component {
             // }).catch(err => console.error(err.toString()));
 
             this.setState({ sort: action })
-            tthis.props.sort(action, "post");
+            this.props.sort(action, "post");
         }
     }
 
