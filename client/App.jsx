@@ -26,6 +26,7 @@ import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
 import socketio from "socket.io-client";
+import { DeviceHistory } from "./components/device_history.jsx";
 var socket = socketio({ transports: ['websocket', 'polling'] });
 const publicVapidKey =
     "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
@@ -323,6 +324,13 @@ class App extends Component {
         )
     }
 
+    logs = ({ match }) => {
+        return (
+            <DeviceHistory devices={this.state} sendProps={this.setProps} username={match.params.username} account={this.state.account} />
+        )
+    }
+
+
     changeView = (view) => {
         this.setState({ devicesView: view });
     }
@@ -360,6 +368,7 @@ class App extends Component {
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />
+                        <Route path="/logs" component={this.logs} />
                     </div>
                 </Router>
             </div>
