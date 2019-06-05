@@ -6,7 +6,8 @@ import * as events from "events"
 import { log } from "../../log"
 import { Plugin } from "../plugin"
 import express = require('express');
-
+import MeasurementManager from "./MeasurementManager";
+var Measurements, proto = require('../../../nbiot_pb.js');
 export class PluginEFENTO extends Plugin {
     serversMem: any[] = [];
     db: any;
@@ -28,11 +29,23 @@ export class PluginEFENTO extends Plugin {
             let requestUrl = req.url.split('/')[1];
             if (requestUrl === 'm') {
                 let payload = req.payload;
-                //let message = proto.Measurements.deserializeBinary(payload);
-                //MeasurementManager.logToConsoleDataOfSensor(message);
+                var message = proto.Measurements.deserializeBinary(payload);
+                var devicepacket = MeasurementManager.logToConsoleDataOfSensor(message);
+
+                if (devicepacket.Owner && devicepacket.Owner.length == 32) {
+                    eventHub.emit("device",
+                        {
+                            apikey: devicepacket.Owner,
+                            packet: {
+                                id: devicepacket.SerialNumber,
+                                data: devicepacket.packet,
+                                meta: { method: "efento" }
+                            }
+                        }
+                    )
+                }
                 res.statusCode = '2.01';
                 res.end(''); // put here optional payload
-                //console.log(res.payload)
             }
         });
 

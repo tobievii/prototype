@@ -26,6 +26,7 @@ import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
 import socketio from "socket.io-client";
+import { DeviceHistory } from "./components/device_history.jsx";
 var socket = socketio({ transports: ['websocket', 'polling'] });
 
 const test = {
@@ -215,7 +216,12 @@ class App extends Component {
                     <div>
                         <Account loginPanel={this.state.loginPanel} registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
+                        {/* 
+                        // Jan 5 2019
+                        // ROUAN: Disabled for now until we have more devices shared publicly, or built a proper way to explore devices for non-logged in users.
+
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} /> 
+                        */}
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -319,6 +325,13 @@ class App extends Component {
         )
     }
 
+    logs = ({ match }) => {
+        return (
+            <DeviceHistory devices={this.state} sendProps={this.setProps} username={match.params.username} account={this.state.account} />
+        )
+    }
+
+
     changeView = (view) => {
         this.setState({ devicesView: view });
     }
@@ -356,6 +369,7 @@ class App extends Component {
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />
+                        <Route path="/logs" component={this.logs} />
                     </div>
                 </Router>
             </div>
