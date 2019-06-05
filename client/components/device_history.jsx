@@ -7,44 +7,44 @@ export class DeviceHistory extends React.Component {
     state = {
         timeago: "",
         millisago: 0,
-        logdata: []
+        logdata: [],
+        socketConnected: false
     }
+
+    socket;
 
     constructor(props) {
         super(props)
-        this.socket = socketio({ transports: ['websocket', 'polling'] });
 
-        this.socket.on("connect", a => {
-            this.socket.emit("join", this.props.username)
-            this.socket.on("log", (info) => {
-                console.log(info)
 
-                p.statesByUsername(this.props.username, (states) => {
-                    for (var s in states) {
-                        states[s].selected = false
-                    }
-                    var packet1 = {
-                        id: info.newdevice.id,
-                        data: info.newdevice.payload.data,
-                        timestamp: info.newdevice.payload.timestamp
-                    }
 
-                    if (this.state.logData != undefined) {
-                        if (this.state.logData[0].timestamp <= packet1.timestamp) {
-                            var newd = _.clone(this.state.logData)
-                            var n = [];
-                            n.push(packet1);
-                            for (var count in newd) {
-                                n.push(newd[count]);
-                            }
-                            this.setState({ logdataNew: n })
-                            this.setState({ logData: n })
-                        }
-                    }
-                })
-            }
-            )
-        })
+
+
+        //         // p.statesByUsername(this.props.username, (states) => {
+        //         //     for (var s in states) {
+        //         //         states[s].selected = false
+        //         //     }
+        //         //     var packet1 = {
+        //         //         id: info.newdevice.id,
+        //         //         data: info.newdevice.payload.data,
+        //         //         timestamp: info.newdevice.payload.timestamp
+        //         //     }
+
+        //         //     if (this.state.logData != undefined) {
+        //         //         if (this.state.logData[0].timestamp <= packet1.timestamp) {
+        //         //             var newd = _.clone(this.state.logData)
+        //         //             var n = [];
+        //         //             n.push(packet1);
+        //         //             for (var count in newd) {
+        //         //                 n.push(newd[count]);
+        //         //             }
+        //         //             this.setState({ logdataNew: n })
+        //         //             this.setState({ logData: n })
+        //         //         }
+        //         //     }
+        //         // })
+        //     )
+        // })
     }
 
 
@@ -56,7 +56,8 @@ export class DeviceHistory extends React.Component {
             body: JSON.stringify({ log: true })
         }).then(response => response.json()).then(logdata => {
             this.setState({ logdata })
-            this.props.devices.states(logdata)
+            console.log(logdata);
+            //this.props.devices.states(logdata)
         }).catch(err => console.error(err.toString()));
 
         this.intervalUpdator = setInterval(() => {
@@ -65,6 +66,31 @@ export class DeviceHistory extends React.Component {
     }
 
     componentDidUpdate = () => {
+
+        if (this.props.account) {
+            // we recieved account info from parent
+            if (this.state.socketConnected == false) {
+                // now we connect.
+                this.state.socketConnected = true;
+                this.socket = socketio({ transports: ['websocket'] });
+
+                /// ----
+                this.socket.on("connect", a => {
+                    this.socket.emit("join", this.props.account.apikey)
+
+                    this.socket.on("post", (newDeviceData) => {
+                        // so we recieve some data:
+                        console.log(newDeviceData);
+
+                        var newlogdata = _.clone(this.state.logdata);
+                        newlogdata.unshift(newDeviceData);
+                        this.setState({ logdata: newlogdata })
+                    })
+                })
+                /// ----
+            } // end if socketConnected
+        }
+        /// end if account
 
         // console.log(this.props.devices.states)
         if (this.props.devices.states != undefined) {
@@ -132,7 +158,7 @@ export class DeviceHistory extends React.Component {
                     {this.state.logdata.map((logdata, i) => {
                         var timeago = moment(logdata.timestamp).fromNow()
                         return ([
-                            <div className="container-fluid" style={{ marginBottom: 2 }}>
+                            <div key={i} className="container-fluid" style={{ marginBottom: 2 }}>
                                 <div className="row statesViewerItemMap" style={this.calcStyle(logdata)} >
                                     <div style={{ paddingLeft: "20px" }}>
                                         <h3 key={i}>{logdata.id}</h3>
