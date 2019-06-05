@@ -11,6 +11,7 @@ import MapDevices from './dashboard/map';
 import ChangePassword from '../components/changePassword'
 import { confirmAlert } from 'react-confirm-alert';
 import { DeviceHistory } from "./dashboard/device_history.jsx"
+import Fullscreen from "react-full-screen";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -127,7 +128,9 @@ export class StatesViewer extends Component {
     isOpen: false,
     tempdev: [],
     toggleOn: false,
-    toggleOff: true
+    toggleOff: true,
+    isFull: false,
+    screensize: "fas fa-expand"
   };
 
   socket = undefined;
@@ -812,12 +815,44 @@ export class StatesViewer extends Component {
     this.setState({ logData: data })
   }
 
+  screen = () => {
+    if (this.state.isFull == false) {
+      this.setState({ screensize: "fas fa-compress" })
+      this.setState({ isFull: !this.state.isFull });
+    } else {
+      this.setState({ screensize: "fas fa-expand" })
+      this.setState({ isFull: !this.state.isFull });
+    }
+  }
+
+  showFullScreenButton = () => {
+    const style = {
+      margin: 0,
+      top: 'auto',
+      right: 15,
+      bottom: 80,
+      left: 'auto',
+      position: 'absolute',
+      zindex: 1000
+    };
+    return (
+      <button style={style} class={this.state.screensize} onClick={this.screen} />
+    )
+  }
+
   displayLog = () => {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOn ?
-        <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
-          <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
-        </div>
+        <Fullscreen
+          enabled={this.state.isFull}
+          onChange={isFull => this.setState({ isFull })}
+        >
+          <div style={{ marginRight: "5%" }}>{this.showFullScreenButton()}</div>
+          <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
+            <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
+          </div>
+        </Fullscreen>
+
         : null
       )
     }
