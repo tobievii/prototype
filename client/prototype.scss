@@ -1540,18 +1540,26 @@ button:active {
   transition: background 0.0s;
 }
 
+.my-component {
+  background: #fff;
+}
+
+.fullscreen-enabled .my-component {
+  background: #000;
+}
+
 $total: 300; // total particles
 $orb-size: 300px;
 $particle-size: 5px;
-$time: 14s; 
+$time: 14s;
 $base-hue: 0; // change for diff colors
 
 .wrap {
   position: relative;
   top: 50%;
   left: 50%;
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   transform-style: preserve-3d;
   perspective: 1000px;
   animation: rotate $time infinite linear;
@@ -1568,33 +1576,36 @@ $base-hue: 0; // change for diff colors
   width: $particle-size;
   height: $particle-size;
   border-radius: 50%;
-  opacity: 0; 
+  opacity: 0;
 }
 
 @for $i from 1 through $total {
-  $z: (random(360) * 1deg); 
-  $y: (random(360) * 1deg); 
+  $z: (random(360) * 1deg);
+  $y: (random(360) * 1deg);
   $hue: ((40/$total * $i) + $base-hue);
-  
-  .c:nth-child(#{$i}){ 
+
+  .c:nth-child(#{$i}) {
     animation: orbit#{$i} $time infinite;
-    animation-delay: ($i * .01s); 
+    animation-delay: ($i * .01s);
     background-color: hsla($hue, 100%, 50%, 1);
   }
 
-  @keyframes orbit#{$i}{ 
+  @keyframes orbit#{$i} {
     20% {
       opacity: 1;
     }
+
     30% {
       transform: rotateZ(-$z) rotateY($y) translateX($orb-size) rotateZ($z);
     }
+
     80% {
       transform: rotateZ(-$z) rotateY($y) translateX($orb-size) rotateZ($z);
       opacity: 1;
     }
+
     100% {
-       transform: rotateZ(-$z) rotateY($y) translateX( ($orb-size * 3) ) rotateZ($z);
+      transform: rotateZ(-$z) rotateY($y) translateX(($orb-size * 3)) rotateZ($z);
     }
   }
 }
