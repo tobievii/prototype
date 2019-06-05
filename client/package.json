@@ -38,6 +38,7 @@
     "countdown": "^2.6.0",
     "cryptr": "^4.0.2",
     "css-loader": "^1.0.0",
+    "dateformat": "^3.0.3",
     "highlight.js": "^9.15.6",
     "i": "^0.3.6",
     "install": "^0.12.2",

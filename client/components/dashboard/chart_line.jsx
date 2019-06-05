@@ -4,8 +4,10 @@ import { Widget } from "./widget.jsx"
 import { months } from "moment";
 
 var dateFormat = require('dateformat');
-var now = new Date();
-//var day = ["Monday", "Tuesday", "Wednesday", "Thurday", "Friday", "Saturday", "Sunday"]
+var day = []
+var time = []
+var month = []
+var year = []
 
 export class ChartLine extends React.Component {
   state = {}
@@ -46,15 +48,24 @@ export class ChartLine extends React.Component {
       //dateFormat(d.x, "dddd, mmmm dS, yyyy, h:MM:ss TT")
       //console.log(d.x)
       //console.log(dateFormat(d.x, "dddd, mmmm dS, yyyy, h:MM:ss TT"))
-      var day = ["Monday", "Tuesday", "Wednesday", "Thurday", "Friday", "Saturday", "Sunday"]
-      var month = ["January", "", "", "", "", "", "", "", "", "", "", ""]
+
+      //Want to compare, but will need to check some other way
+      //var day = ["Monday", "Tuesday", "Wednesday", "Thurday", "Friday", "Saturday", "Sunday"]
+      //var month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
       if (day) {
         labels.push(dateFormat(d.x, "dddd"))
         data.push(d.y)
-      } else if (month)
-        labels.push(dateFormat(d.x, "mmmm"))
-      data.push(d.y)
-
+      } else if (time) {
+        labels.push(dateFormat(d.x, "h:MM:ss TT"))
+        data.push(d.y)
+      } else if (month) {
+        labels.push(dateFormat(d.x, "mmmm dS"))
+        data.push(d.y)
+      }
+      else if (year) {
+        labels.push(dateFormat(d.x, "yyyy"))
+        data.push(d.y)
+      }
     }
 
     var graph = {
