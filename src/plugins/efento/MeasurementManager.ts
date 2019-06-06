@@ -1,6 +1,6 @@
 import StringUtils from './StringUtils';
 import DateUtils from './DateUtils';
-var Measurements, proto = require('../../../nbiot_pb.js');
+var Measurements, proto = require('../../../src/plugins/efento/nbiot_pb.js');
 var Sample_offsets: any[] = [];
 
 export default class MeasurementManager {

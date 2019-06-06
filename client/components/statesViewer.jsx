@@ -845,7 +845,7 @@ export class StatesViewer extends Component {
       zindex: 1000
     };
     return (
-      <button style={style} class={this.state.screensize} onClick={this.screen} />
+      <button style={style} className={this.state.screensize} onClick={this.screen} />
     )
   }
 
