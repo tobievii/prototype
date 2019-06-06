@@ -98,16 +98,10 @@ eventHub.on("plugin", (data: any) => {
 
   if (data.plugin && data.event) {
     io.sockets.emit("plugin_" + data.plugin, data.event)
-    if (data.event.notification) {
-      if (data.event.notification.type == "NEW DEVICE ADDED") {
-        io.sockets.emit("plugin_info", data.event.device)
-      }
-    }
   } else {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
     io.sockets.emit('plugin', data);
   }
-
 })
 
 // eventHub.on("notification", (notification: any, device: any) => {

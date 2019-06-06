@@ -162,8 +162,8 @@ export class StatesViewer extends Component {
 
     this.socket.on("connect", a => {
       this.socket.emit("join", this.props.username)
-      this.socket.on("plugin_info", (info) => {
-        if (info) {
+      this.socket.on("info", (info) => {
+        if (info.newdevice) {
           p.statesByUsername(this.props.username, (states) => {
             for (var s in states) {
               states[s].selected = false
