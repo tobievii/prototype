@@ -220,7 +220,12 @@ class App extends Component {
                     <div>
                         <Account loginPanel={this.state.loginPanel} registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
+                        {/* 
+                        // Jan 5 2019
+                        // ROUAN: Disabled for now until we have more devices shared publicly, or built a proper way to explore devices for non-logged in users.
+
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} /> 
+                        */}
                         <Footer loggedIn={false} />
                     </div>)
             }
