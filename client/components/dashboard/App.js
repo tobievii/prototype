@@ -1,6 +1,6 @@
 import React from 'react';
 
-import LineChart from './chart_line';
+import ChartLine from './chart_line';
 
 const createData = () => {
     const data = [];
@@ -22,7 +22,7 @@ const createData = () => {
 const App = (props) => {
     return (
         <div style={{ width: '80%', margin: '0 auto' }}>
-            <LineChart data={createData()} />
+            <ChartLine data={createData()} />
         </div>
     )
 }

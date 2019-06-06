@@ -1599,4 +1599,10 @@ $base-hue: 0; // change for diff colors
   }
 }
 
+#chartLine {
+	width	: 100%;
+  height	: 500px;
+  background-color: lightgrey;
+}	
+
 @import 'mobile.scss'
