@@ -102,18 +102,19 @@ eventHub.on("plugin", (data: any) => {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
     io.sockets.emit('plugin', data);
   }
+
 })
 
-// eventHub.on("notification", (notification: any, device: any) => {
-//   if (notification != undefined || notification != null) {
-//     io.to(device.apikey).emit('pushNotification', notification)
-//     io.to(device.apikey).emit("notification");
-//     io.to(device.key).emit('notificationState');
-//   } else {
-//     io.to(device).emit("notification");
-//     io.to(device).emit('notificationState');
-//   }
-// });
+eventHub.on("notification", (notification: any, device: any) => {
+  if (notification != undefined || notification != null) {
+    io.to(device.apikey).emit('pushNotification', notification)
+    io.to(device.apikey).emit("notification");
+    io.to(device.key).emit('notificationState');
+  } else {
+    io.to(device).emit("notification");
+    io.to(device).emit('notificationState');
+  }
+});
 
 //app.use(express.json())
 app.use(safeParser);
@@ -1055,11 +1056,7 @@ function handleState(req: any, res: any, next: any) {
           if (deviceState) {
             for (var p in plugins) {
               if (plugins[p].handlePacket) {
-                if (plugins[p].name == "notifications") {
-                  plugins[p].handlePacket(deviceState, packet, req.user, (err: Error, packet: any) => { });
-                } else {
-                  plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
-                }
+                plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
               }
             }
           }
@@ -1378,6 +1375,7 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 })
 
 export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
+
   db.states.find({ apikey: apikey }, (err: Error, states: any) => {
     if (err) { log("WORKFLOW ERROR"); }
 
@@ -1414,10 +1412,7 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
         var options = {
           apikey: state.apikey,
-          devid: state.devid,
-          app: undefined,
-          db: db,
-          eventHub: eventHub
+          devid: state.devid
         }
 
         for (var plugin of plugins) {
