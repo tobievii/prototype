@@ -27,15 +27,7 @@ export class StatesViewerMenu extends Component {
         super(props);
         this.state = {
             selectAll: false,
-            sort: [
-                "timedesc",
-                "namedesc",
-                "selected",
-                "alarm",
-                "warning",
-                "shared",
-                "public"
-            ],
+            sort: "",
             menu: "",
             view: "map",
             addIcon: "fas fa-plus-circle",
@@ -54,15 +46,7 @@ export class StatesViewerMenu extends Component {
             method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(serverresponse => {
             if (serverresponse.sort == null || serverresponse.sort == undefined) {
-                serverresponse.sort = [
-                    "timedesc",
-                    "namedesc",
-                    "selected",
-                    "alarm",
-                    "warning",
-                    "shared",
-                    "public"
-                ];
+                serverresponse.sort = "";
             }
             this.setState({ sort: serverresponse.sort })
         }).catch(err => console.error(err.toString()));
@@ -96,7 +80,7 @@ export class StatesViewerMenu extends Component {
             // }).catch(err => console.error(err.toString()));
 
             this.setState({ sort: action })
-            this.props.sort(action, "post");
+            this.props.sort(action);
         }
     }
 
