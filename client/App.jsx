@@ -38,7 +38,9 @@ const test = {
 
 var visitingG = undefined;
 
+
 class App extends Component {
+
     state = {
         devicesView: "dashboardDevices",
         isOpen: false,
@@ -48,7 +50,7 @@ class App extends Component {
         public: undefined,
         visituser: undefined
     };
-
+        
     constructor(props) {
         super(props);
 
@@ -63,9 +65,8 @@ class App extends Component {
         });
 
         p.getStates((states) => { this.setState({ states }) })
-
+        this.serviceworkerfunction();
     }
-
 
     componentWillMount = () => {
         p.getAccount(account => {
@@ -80,74 +81,75 @@ class App extends Component {
         })
     }
 
-    // serviceworkerfunction = () => {
-    //     if ('serviceWorker' in navigator) {
-    //         if (supportsServiceWorkers(location, navigator)) {
-    //             workerInit().catch(err => console.error(err));
-    //         }
-    //     }
+    serviceworkerfunction = () => {
+        if ('serviceWorker' in navigator) {
+            if (supportsServiceWorkers(location, navigator)) {
+                workerInit().catch(err => console.error(err));
+            }
+        }
 
-    //     function supportsServiceWorkers(location, navigator) {
-    //         if (location.hostname === `localhost` || location.protocol === `https:`) {
-    //             return `serviceWorker` in navigator
-    //         }
-    //         return false
-    //     }
+        function supportsServiceWorkers(location, navigator) {
+            if (location.hostname === `localhost` || location.protocol === `https:`) {
+                return `serviceWorker` in navigator
+            }
+            return false
+        }
 
-    //     async function workerInit() {
-    //         const register = await navigator.serviceWorker.register('/serviceworker.js', {
-    //             scope: "/"
-    //         });
+        async function workerInit() {
+            var publicVapidKey = "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
+            const register = await navigator.serviceWorker.register('/serviceworker.js', {
+                scope: "/"
+            });
 
-    //         socket.on("pushNotification", a => {
-    //             var message = " ";
+            socket.on("pushNotification", a => {
+                var message = " ";
 
-    //             if (a.message == undefined || a.message == null) {
-    //                 if (a.type == "NEW DEVICE ADDED" || a.type == "New dewvice added") {
-    //                     message = "has been successfuly added to PROTOTYP3.";
-    //                 } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
-    //                     message = "hasn't sent data in the last 24hours";
-    //                 }
-    //             } else {
-    //                 message = a.message;
-    //             }
+                if (a.message == undefined || a.message == null) {
+                    if (a.type == "NEW DEVICE ADDED" || a.type == "New dewvice added") {
+                        message = "has been successfuly added to PROTOTYP3.";
+                    } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
+                        message = "hasn't sent data in the last 24hours";
+                    }
+                } else {
+                    message = a.message;
+                }
 
-    //             register.showNotification(a.type, {
-    //                 body: '"' + a.device + '" ' + message,
-    //                 icon: "./iotnxtLogo.png"
-    //             });
-    //         })
+                register.showNotification(a.type, {
+                    body: '"' + a.device + '" ' + message,
+                    icon: "./iotnxtLogo.png"
+                });
+            })
 
-    //         const subscription = await register.pushManager.subscribe({
-    //             userVisibleOnly: true,
-    //             applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-    //         });
+            const subscription = await register.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+            });
 
-    //         console.log(subscription)
-    //         await fetch("/api/v3/iotnxt/subscribe", {
-    //             method: "POST",
-    //             body: JSON.stringify(subscription),
-    //             headers: {
-    //                 "content-type": "application/json"
-    //             }
-    //         });
-    //     }
+            console.log(subscription)
+            await fetch("/api/v3/iotnxt/subscribe", {
+                method: "POST",
+                body: JSON.stringify(subscription),
+                headers: {
+                    "content-type": "application/json"
+                }
+            });
+        }
 
-    //     function urlBase64ToUint8Array(base64String) {
-    //         const padding = "=".repeat((4 - base64String.length % 4) % 4);
-    //         const base64 = (base64String + padding)
-    //             .replace(/\-/g, "+")
-    //             .replace(/_/g, "/");
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, "+")
+                .replace(/_/g, "/");
 
-    //         const rawData = window.atob(base64);
-    //         const outputArray = new Uint8Array(rawData.length);
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
 
-    //         for (let i = 0; i < rawData.length; ++i) {
-    //             outputArray[i] = rawData.charCodeAt(i);
-    //         }
-    //         return outputArray;
-    //     }
-    // }
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+    }
 
     // socketHandler = (socketDataIn) => {
     //     if (this.state.states) {
