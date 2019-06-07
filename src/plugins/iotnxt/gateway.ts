@@ -114,6 +114,31 @@ export class Gateway extends EventEmitter {
       log("IOTNXT [" + this.GatewayId + "] CONNECTED");
       cb(undefined, this.iotnxtqueue);
     });
+    
+    this.iotnxtqueue.on("request", (request: any) => {
+
+      for (var key in request.deviceGroups) {
+        if (request.deviceGroups.hasOwnProperty(key)) {
+          var apikey = key.split(":")[0].split("|")[0]
+          var requestClean: any = {}
+          requestClean.id = key.split(":")[1].split("|")[0]
+          requestClean.req = request.deviceGroups[key];
+
+          var meta = { ip: "", userAgent: "iotnxtQueue", method: "REQ" }
+
+          if (!requestClean.data) {
+            requestClean.data = {};
+          }
+
+          requestClean.meta = meta;
+
+          var deviceData = { apikey: apikey, packet: requestClean }
+          var emitsend = { apikey: apikey.toLowerCase(), packet: requestClean }
+          
+          this.emit("request", emitsend);
+        }
+      }
+    });
 
     this.iotnxtqueue.on("disconnect", () => { });
 
