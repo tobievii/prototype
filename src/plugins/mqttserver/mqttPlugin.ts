@@ -4,7 +4,6 @@ import * as net from "net";
 import { mqttConnection } from "./mqttConnection"
 import * as _ from "lodash"
 
-
 import { log } from "../../log"
 import { Plugin } from "../plugin"
 import express = require('express');
@@ -63,13 +62,16 @@ export class PluginMQTT extends Plugin {
             })
 
             client.on("publish", (publish) => {
-                log("PLUGIN", this.name, "PUBLISH Received");
                 var requestClean: any = {}
-
                 try {
                     requestClean = JSON.parse(publish.payload)
-                    requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
-                    this.eventHub.emit("device", { apikey: publish.topic, packet: requestClean })
+                    if (requestClean.data == undefined || requestClean.id == undefined) {
+                        log(new Error("MQTT data/id parameter missing"))
+                    } else {
+                        log("PLUGIN", this.name, "PUBLISH Received");
+                        requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
+                        this.eventHub.emit("device", { apikey: publish.topic, packet: requestClean })
+                    }
                 } catch (err) {
                     log(err);
                 }
