@@ -59,6 +59,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "nbiot_pb.js",
+    "src/plugins/efento/nbiot_pb.js",
   ]
 }
