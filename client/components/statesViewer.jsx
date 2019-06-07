@@ -169,9 +169,9 @@ export class StatesViewer extends Component {
               states[s].selected = false
             }
             var packet1 = {
-              id: info.newdevice.id,
-              data: info.newdevice.payload.data,
-              timestamp: info.newdevice.payload.timestamp
+              id: info.devid,
+              data: info.payload.data,
+              timestamp: info.payload.timestamp
             }
 
 
@@ -240,7 +240,7 @@ export class StatesViewer extends Component {
       })
 
 
-      this.socket.on("notificationState", a => {
+      this.socket.on("plugin_notifications", a => {
         this.getDevices("notification");
       })
 
