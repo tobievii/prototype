@@ -11,8 +11,21 @@ export var version = {
 
 log("VERSION\t" + version.version)
 
-export var configGen: any = () => {
+export var webpushkeys: any = () => {
+    var webpushkeys: any;
+    try {
+        webpushkeys = JSON.parse(fs.readFileSync("../../lconfig/webpushkeys.json").toString());
+    } catch (err) {
+        log("WEB PUSH KEYS File not found. See /src/config.ts for details.");
+        webpushkeys = {
+            publicVapidKey: "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA",
+            privateVapidKey: "IclWedYTzNBuMaDHjCjA1B5km-Y3NAxTGbxR7BqhU90"
+        }
+    }
+    return webpushkeys;
+}
 
+export var configGen: any = () => {
     try {
         var mainconfig = JSON.parse(fs.readFileSync('../../../iotconfig.json').toString());
         mainconfig.version = version
@@ -42,5 +55,4 @@ export var configGen: any = () => {
         }
         return defaultconfig
     }
-
 }

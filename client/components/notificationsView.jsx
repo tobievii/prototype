@@ -7,7 +7,7 @@ export class NotificationsView extends Component {
         this.state = { notifications: [] };
 
         fetch('/api/v3/notifications/seen', {
-            method: 'POST', headers: {
+            method: 'GET', headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
