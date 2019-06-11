@@ -20,6 +20,7 @@ body {
   background-repeat: no-repeat;
   background-attachment: absolute;
   color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 .centre {
@@ -1599,10 +1600,11 @@ $base-hue: 0; // change for diff colors
   }
 }
 
-#chartLine {
-	width	: 100%;
-  height	: 500px;
-  background-color: lightgrey;
-}	
+#chartLine
+{
+  width: 100%; 
+  height: 500px;
+  background-color: darkslategray;
+}
 
 @import 'mobile.scss'
