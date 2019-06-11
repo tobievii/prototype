@@ -36,6 +36,7 @@ export class PluginNotifications extends Plugin {
 
     log("PLUGIN", this.name, "LOADED");
 
+    // recieve device notification subscriptions
     app.post("/api/v3/iotnxt/subscribe", (req: any, res: any) => {
       this.subscribe(req.user.apikey, req.body);
       res.status(201).json({});
@@ -97,7 +98,7 @@ export class PluginNotifications extends Plugin {
   //   // }
 
   //   // this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-  //   //   this.createNotification(this.db, AlarmNotification, result, options);
+  //   //   this.createNotification(this.db, AlarmNotification, options);
   //   // })
   // }
 
@@ -107,14 +108,14 @@ export class PluginNotifications extends Plugin {
       var AlarmNotification = {
         type: "ALARM",
         device: options.devid,
-        created: Date.now(),
+        created: new Date(),
         message: message,
         notified: true,
         seen: false
       }
 
       options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-        // this.createNotification(this.db, AlarmNotification, result, options);
+        // this.createNotification(this.db, AlarmNotification, options);
         var opt = options;
         options.db["plugins_" + "notifications"].find({ apikey: options.apikey }, (e: Error, dbSubscriptions: any) => {
 
@@ -124,7 +125,7 @@ export class PluginNotifications extends Plugin {
               plugin: "notifications",
               event: {
                 notification: AlarmNotification,
-                device: options
+                device: { apikey: options.apikey, devid: options.devid }
               }
             })
 
@@ -151,18 +152,18 @@ export class PluginNotifications extends Plugin {
       var AlarmNotification = {
         type: "WARNING",
         device: options.devid,
-        created: Date.now(),
+        created: new Date(),
         message: message,
         notified: true,
         seen: false
       }
 
       // this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => { //if this format is used, VM doesn't understand/access whats contained in "this", tried binding it nothing.
-      //   this.createNotification(this.db, AlarmNotification, result, options);
+      //   this.createNotification(this.db, AlarmNotification, options);
       // })
 
       options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-        // this.createNotification(this.db, AlarmNotification, result, options);
+        // this.createNotification(this.db, AlarmNotification, options);
         options.db["plugins_" + "notifications"].find({ apikey: options.apikey }, (e: Error, dbSubscriptions: any) => {
 
           for (var sub of dbSubscriptions) {
@@ -170,7 +171,7 @@ export class PluginNotifications extends Plugin {
               plugin: "notifications",
               event: {
                 notification: AlarmNotification,
-                device: options
+                device: { apikey: options.apikey, devid: options.devid }
               }
             })
 
@@ -203,7 +204,7 @@ export class PluginNotifications extends Plugin {
     //   }
 
     //   this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => { if In use this format it doesn't understand whats contained in this, tried binding it nothing.
-    //     this.createNotification(this.db, AlarmNotification, result, options);
+    //     this.createNotification(this.db, AlarmNotification, options);
     //   })
     // }
 
@@ -211,13 +212,13 @@ export class PluginNotifications extends Plugin {
       var AlarmNotification = {
         type: "INFO",
         device: options.devid,
-        created: Date.now(),
+        created: new Date(),
         message: message,
         notified: true,
         seen: false
       }
       options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-        // this.createNotification(this.db, AlarmNotification, result, options);
+        // this.createNotification(this.db, AlarmNotification, options);
         var opt = options;
         options.db["plugins_" + "notifications"].find({ apikey: options.apikey }, (e: Error, dbSubscriptions: any) => {
 
@@ -227,7 +228,7 @@ export class PluginNotifications extends Plugin {
               plugin: "notifications",
               event: {
                 notification: AlarmNotification,
-                device: options
+                device: { apikey: options.apikey, devid: options.devid }
               }
             })
 
@@ -260,52 +261,54 @@ export class PluginNotifications extends Plugin {
     //   console.log(options)
     //   options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
     //     console.log(result)
-    //     this.createNotification(this.db, AlarmNotification, result, options);
+    //     this.createNotification(this.db, AlarmNotification, options);
     //   })
     // }
   }
 
-  createNotification(db: any, notification: any, user: any, device: any) {
-    this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
-      for (var sub of dbSubscriptions) {
-        var subscription = {
-          endpoint: sub.subscriptionData.endpoint,
-          keys: {
-            p256dh: sub.subscriptionData.keys.p256dh,
-            auth: sub.subscriptionData.keys.auth
+  createNotification(db: any, notification: any, device: any) {
+    db.users.findOne({ apikey: device.apikey }, (err: Error, user: any) => {
+      this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
+        for (var sub of dbSubscriptions) {
+          var subscription = {
+            endpoint: sub.subscriptionData.endpoint,
+            keys: {
+              p256dh: sub.subscriptionData.keys.p256dh,
+              auth: sub.subscriptionData.keys.auth
+            }
           }
-        }
 
-        var opt = {
-          vapidDetails: {
-            subject: "mailto:prototype@iotnxt.com",
-            publicKey: this.publicVapidKey,
-            privateKey: this.privateVapidKey
+          var opt = {
+            vapidDetails: {
+              subject: "mailto:prototype@iotnxt.com",
+              publicKey: this.publicVapidKey,
+              privateKey: this.privateVapidKey
+            }
           }
-        }
 
-        this.eventHub.emit("plugin", {
-          plugin: this.name,
-          event: {
-            notification: notification,
-            device: device
+          this.eventHub.emit("plugin", {
+            plugin: this.name,
+            event: {
+              notification: notification,
+              device: device
+            }
+          })
+
+          if (user.notifications) {
+            user.notifications.push(notification)
+          } else {
+            user.notifications = [notification]
           }
-        })
 
-        if (user.notifications) {
-          user.notifications.push(notification)
-        } else {
-          user.notifications = [notification]
+          db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+            if (err) console.log(err);
+            if (updated) console.log(updated);
+          })
+
+          webpush.sendNotification(subscription, JSON.stringify({ notification }), opt).then((response: any) => {
+          }).catch((err: any) => console.error(err));
         }
-
-        db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
-          if (err) console.log(err);
-          if (updated) console.log(updated);
-        })
-
-        webpush.sendNotification(subscription, JSON.stringify({ notification }), opt).then((response: any) => {
-        }).catch((err: any) => console.error(err));
-      }
+      });
     });
   }
 
@@ -318,9 +321,10 @@ export class PluginNotifications extends Plugin {
     })
   }
 
-  handlePacket(deviceState: any, packet: any, user: any, cb: Function) {
+  handlePacket(deviceState: any, packet: any, cb: Function) {
     log("PLUGIN", this.name, "HANDLE PACKET");
     //this.checkExisting(deviceState.apikey);
+
 
     if (deviceState.newdevice) {
       var message = "Device Added";
@@ -331,7 +335,7 @@ export class PluginNotifications extends Plugin {
         notified: true,
         seen: false
       }
-      this.createNotification(this.db, newDeviceNotification, user, deviceState);
+      this.createNotification(this.db, newDeviceNotification, deviceState);
     }
   };
 
@@ -377,36 +381,5 @@ export class PluginNotifications extends Plugin {
       t.push(array[i]);
     }
   }
+
 }
-
-// export class notificationsExtend extends PluginNotifications {
-//   options: any;
-//   db: any;
-//   eventHub: any;
-
-//   constructor(options: any) {
-//     super(config, app, db, eventHub);
-
-//     this.options = options;
-//     this.db = db;
-//     this.eventHub = eventHub;
-//   }
-
-//   alarm(message: string) {
-//     console.log(message + " is the alarm");
-//     // var AlarmNotification = {
-//     //   type: "ALARM",
-//     //   device: options.devid,
-//     //   created: Date.now(),
-//     //   message: message,
-//     //   notified: true,
-//     //   seen: false
-//     // }
-
-//     // this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-//     //   this.createNotification(this.db, AlarmNotification, result, options);
-//     // })
-//   }
-
-
-// }

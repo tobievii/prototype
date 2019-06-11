@@ -7,7 +7,7 @@ import { log } from "../../log"
 import { Plugin } from "../plugin"
 import express = require('express');
 import MeasurementManager from "./MeasurementManager";
-var Measurements, proto = require('../../../nbiot_pb.js');
+var Measurements, proto = require('../../../src/plugins/efento/nbiot_pb.js');
 export class PluginEFENTO extends Plugin {
     serversMem: any[] = [];
     db: any;

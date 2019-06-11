@@ -14,7 +14,7 @@ log("VERSION\t" + version.version)
 export var webpushkeys: any = () => {
     var webpushkeys: any;
     try {
-        webpushkeys = JSON.parse(fs.readFileSync("../../lconfig/webpushkeys.json").toString());
+        webpushkeys = JSON.parse(fs.readFileSync("../../config/webpushkeys.json").toString());
     } catch (err) {
         log("WEB PUSH KEYS File not found. See /src/config.ts for details.");
         webpushkeys = {

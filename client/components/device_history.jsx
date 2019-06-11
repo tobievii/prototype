@@ -157,6 +157,9 @@ export class DeviceHistory extends React.Component {
                 >
                     {this.state.logdata.map((logdata, i) => {
                         var timeago = moment(logdata.timestamp).fromNow()
+                        if (logdata.id.includes("Efento") == true) {
+                            delete logdata.data['TakenMeasurements']
+                        }
                         return ([
                             <div key={i} className="container-fluid" style={{ marginBottom: 2 }}>
                                 <div className="row statesViewerItemMap" style={this.calcStyle(logdata)} >

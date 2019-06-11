@@ -1055,11 +1055,7 @@ function handleState(req: any, res: any, next: any) {
           if (deviceState) {
             for (var p in plugins) {
               if (plugins[p].handlePacket) {
-                if (plugins[p].name == "notifications") {
-                  plugins[p].handlePacket(deviceState, packet, req.user, (err: Error, packet: any) => { });
-                } else {
-                  plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
-                }
+                plugins[p].handlePacket(deviceState, packet, (err: Error, packet: any) => { });
               }
             }
           }

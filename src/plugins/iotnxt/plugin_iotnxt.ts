@@ -257,6 +257,11 @@ export class PluginIotnxt extends Plugin {
 
     })
     //
+    
+    // handling incoming requests from commander/portal
+    gatewayConnection.on("request", (request:any)=>{
+      this.eventHub.emit("device", request);
+    })
 
     // error
     gatewayConnection.on("error", (error) => {
