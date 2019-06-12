@@ -28,7 +28,7 @@ export class ChartLine extends React.Component {
   createLine = (chart) => {
     const middleLine = chart.plotContainer.createChild(am4charts.AxisLine);
     middleLine.strokeOpacity = 1;
-    middleLine.stroke = am4core.color("#000000");
+    middleLine.stroke = am4core.color("white");
     middleLine.strokeDasharray = "";
     middleLine.zIndex = 1;
     return middleLine;
@@ -70,14 +70,6 @@ export class ChartLine extends React.Component {
   }
 
   createData = () => {
-    const data1 = [];
-    let price1 = 1000;
-    for (let i = 0; i < 10; i++) {
-      price1 += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 100);
-      data1.push({ date1: new Date(2015, 0, i), price1 });
-    }
-    console.log(data1)
-    var data = [];
     fetch("/api/v3/packets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify(
@@ -87,17 +79,19 @@ export class ChartLine extends React.Component {
         }
       )
     }).then(response => response.json()).then(result => {
-      var test = []
+      var data = []
+      console.log(result);
       for (var date in result) {
-        var f = {
-          date1: new Date(parseInt(result[date].x), 0, date),
-          price1: result[date].y
+        if (date == 0) {
+          console.log(parseInt(result[date].x.substr(0, 4)) + "-" + parseInt(result[date].x.substr(5, 3)) + "-" + parseInt(result[date].x.substr(8, 2)))
         }
-        test.push(f)
+        var f = {
+          x: new Date(parseInt(result[date].x.substr(0, 4)), parseInt(result[date].x.substr(5, 3)) - 1, parseInt(result[date].x.substr(8, 2))),
+          y: result[date].y
+        }
+        data.push(f)
       }
-      console.log(test)
-      data = result;
-      this.createChart(test)
+      this.createChart(data)
     }).catch(err => console.error(err.toString()));
   }
 
@@ -107,29 +101,29 @@ export class ChartLine extends React.Component {
 
     const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
-    dateAxis.renderer.labels.template.fill = am4core.color("#e59165");
+    dateAxis.renderer.labels.template.fill = am4core.color("white");
 
     this.setState(() => ({ dateAxis }))
 
-    const dateAxis2 = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis2.renderer.grid.template.location = 0;
-    dateAxis2.renderer.labels.template.fill = am4core.color("#dfcc64");
+    //const dateAxis2 = chart.xAxes.push(new am4charts.DateAxis());
+    //dateAxis2.renderer.grid.template.location = 0;
+    //dateAxis2.renderer.labels.template.fill = am4core.color("#dfcc64");
 
     const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
-    valueAxis.renderer.labels.template.fill = am4core.color("#e59165");
+    valueAxis.renderer.labels.template.fill = am4core.color("white");
     valueAxis.renderer.minWidth = 60;
 
-    const valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
-    valueAxis2.tooltip.disabled = true;
-    valueAxis2.renderer.grid.template.strokeDasharray = "2,3";
-    valueAxis2.renderer.labels.template.fill = am4core.color("#dfcc64");
-    valueAxis2.renderer.minWidth = 60;
+    //const valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
+    //valueAxis2.tooltip.disabled = true;
+    //valueAxis2.renderer.grid.template.strokeDasharray = "2,3";
+    //valueAxis2.renderer.labels.template.fill = am4core.color("#dfcc64");
+    //valueAxis2.renderer.minWidth = 60;
 
     const axisRange = dateAxis.axisRanges.create();
-    axisRange.date = new Date(2015, 0, 5);
+    //axisRange.date = new Date(2015, 0, 5);
     // axisRange.value = 1200;
-    axisRange.grid.stroke = am4core.color("#A96478");
+    axisRange.grid.stroke = am4core.color("white");
     axisRange.grid.strokeWidth = 2;
     axisRange.grid.strokeOpacity = 1;
     // axisRange.label.text = "middle";
@@ -137,14 +131,14 @@ export class ChartLine extends React.Component {
     axisRange.label.verticalCenter = "bottom";
 
     const series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.dateX = "date1";
-    series.dataFields.valueY = "price1";
-    series.tooltipText = "[bold]{valueY}[/]";
-    series.fill = am4core.color("#e59165");
-    series.stroke = am4core.color("#e59165");
+    series.dataFields.dateX = "x";
+    series.dataFields.valueY = "y";
+    series.tooltipText = "{valueY}";
+    series.fill = am4core.color("#14222c");
+    series.stroke = am4core.color("white");
 
-    let axisTooltip = dateAxis.tooltip;
-    axisTooltip.background.fill = am4core.color("#e59165");
+    let axisTooltip = dateAxis.tooltip; ``
+    axisTooltip.background.fill = am4core.color("#14222c");
     axisTooltip.background.strokeWidth = 0;
     axisTooltip.background.cornerRadius = 3;
     axisTooltip.background.pointerLength = 0;
@@ -154,27 +148,27 @@ export class ChartLine extends React.Component {
     //   console.log("clicked on ", ev.target);
     // }, this);
 
-    const series2 = chart.series.push(new am4charts.LineSeries());
-    series2.dataFields.dateX = "date2";
-    series2.dataFields.valueY = "price2";
-    series2.yAxis = valueAxis2;
-    series2.xAxis = dateAxis2;
-    series2.tooltipText = "[bold]{valueY}[/]";
-    series2.fill = am4core.color("#dfcc64");
-    series2.stroke = am4core.color("#dfcc64");
+    //const series2 = chart.series.push(new am4charts.LineSeries());
+    //series2.dataFields.dateX = "date2";
+    //series2.dataFields.valueY = "price2";
+    // series2.yAxis = valueAxis2;
+    // series2.xAxis = dateAxis2;
+    // series2.tooltipText = "[bold]{valueY}[/]";
+    // series2.fill = am4core.color("pink");
+    //series2.stroke = am4core.color("#0a0d13");
 
-    let axisTooltip2 = dateAxis2.tooltip;
-    axisTooltip2.background.fill = am4core.color("#dfcc64");
-    axisTooltip2.background.strokeWidth = 0;
-    axisTooltip2.background.cornerRadius = 3;
-    axisTooltip2.background.pointerLength = 0;
-    axisTooltip2.dy = 5;
+    // let axisTooltip2 = dateAxis2.tooltip;
+    // axisTooltip2.background.fill = am4core.color("#dfcc64");
+    // axisTooltip2.background.strokeWidth = 0;
+    // axisTooltip2.background.cornerRadius = 3;
+    // axisTooltip2.background.pointerLength = 0;
+    // axisTooltip2.dy = 5;
 
     // const line = this.createLine(chart);
     // console.log(line);
 
     chart.cursor = new am4charts.XYCursor();
-    chart.cursor.lineX.stroke = am4core.color("#000000");
+    chart.cursor.lineX.stroke = am4core.color("white");
     chart.cursor.lineX.strokeWidth = 2;
     chart.cursor.lineX.strokeDasharray = "";
     chart.cursor.lineY.strokeOpacity = 0;
@@ -183,19 +177,21 @@ export class ChartLine extends React.Component {
 
     const scrollbarX = new am4charts.XYChartScrollbar();
     scrollbarX.series.push(series);
-    scrollbarX.series.push(series2);
+    //scrollbarX.series.push(series2);
     chart.scrollbarX = scrollbarX;
 
-    chart.legend = new am4charts.Legend();
-    chart.legend.parent = chart.plotContainer;
-    chart.legend.zIndex = 100;
+    // chart.legend = new am4charts.Legend();
+    // //chart.legend.parent = chart.plotContainer;
+    // chart.legend.zIndex = 100;
 
     chart.exporting.menu = new am4core.ExportMenu();
 
-    valueAxis2.renderer.grid.template.strokeOpacity = 0.07;
-    dateAxis2.renderer.grid.template.strokeOpacity = 0.07;
-    dateAxis.renderer.grid.template.strokeOpacity = 0.07;
-    valueAxis.renderer.grid.template.strokeOpacity = 0.07;
+    // valueAxis2.renderer.grid.template.strokeOpacity = 0.9;
+    // dateAxis2.renderer.grid.template.strokeOpacity = 0.9;
+    dateAxis.renderer.grid.template.strokeOpacity = 0.2;
+    valueAxis.renderer.grid.template.strokeOpacity = 0.2;
+    valueAxis.renderer.grid.template.stroke = am4core.color("white");
+    dateAxis.renderer.grid.template.stroke = am4core.color("white");
     this.setState(() => ({ chart }))
 
   }
@@ -203,17 +199,16 @@ export class ChartLine extends React.Component {
   render() {
     return (
       <div>
+        <Widget label={this.props.data.dataname} dash={this.props.dash}></Widget>
         <div id="chartLine" />
         {this.state.chart ?
-          <Widget label={this.props.data.dataname} dash={this.props.dash}>
-            <AmchartsReact
-              chart={this.state.chart}
-              xAxis={this.state.dateAxis}
-              color={am4core.color("#838383")}
-            />
-          </Widget>
-          : <Widget label={this.props.data.dataname} dash={this.props.dash}></Widget>}
-      //: null}
+          <AmchartsReact
+            chart={this.state.chart}
+            xAxis={this.state.dateAxis}
+            color={am4core.color("#1b394d")}
+          />
+          // : <Widget label={this.props.data.dataname} dash={this.props.dash}></Widget>}
+          : null}
       </div>
     );
   }
