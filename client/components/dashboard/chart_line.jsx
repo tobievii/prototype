@@ -20,7 +20,7 @@ export class ChartLine extends React.Component {
   constructor(props) {
     super(props)
 
-    console.log(props)
+    //console.log(props)
   }
 
   componentDidMount() {
@@ -95,10 +95,10 @@ export class ChartLine extends React.Component {
       )
     }).then(response => response.json()).then(result => {
       var data = []
-      console.log(result);
+      //console.log(result);
       for (var date in result) {
         if (date == 0) {
-          console.log(parseInt(result[date].x.substr(0, 4)) + "-" + parseInt(result[date].x.substr(5, 3)) + "-" + parseInt(result[date].x.substr(8, 2)))
+          //console.log(parseInt(result[date].x.substr(0, 4)) + "-" + parseInt(result[date].x.substr(5, 3)) + "-" + parseInt(result[date].x.substr(8, 2)))
         }
         var f = {
           x: new Date(parseInt(result[date].x.substr(0, 4)), parseInt(result[date].x.substr(5, 3)) - 1, parseInt(result[date].x.substr(8, 2))),
@@ -108,7 +108,7 @@ export class ChartLine extends React.Component {
       }
       this.setState({ linedata: data })
       this.createChart(data)
-      console.log(this.state)
+      //console.log(this.state)
     }).catch(err => console.error(err.toString()));
   }
 
