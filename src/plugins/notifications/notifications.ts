@@ -2,10 +2,7 @@ import * as events from "events";
 import { log } from "../../log"
 import { Plugin } from "../plugin"
 import express = require('express');
-import { webpushkeys } from "../../config"
 const webpush = require("web-push");
-
-let keys: any = webpushkeys();
 
 export class PluginNotifications extends Plugin {
   db: any;
@@ -24,11 +21,13 @@ export class PluginNotifications extends Plugin {
   warning: any;
   workflowfunction: any;
 
-  publicVapidKey = keys.publicVapidKey;
-  privateVapidKey = keys.privateVapidKey;
+  publicVapidKey: any;
+  privateVapidKey: any;
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
+    this.publicVapidKey = config.webpushkeys.publicVapidKey
+    this.privateVapidKey = config.webpushkeys.privateVapidKey
     this.db = db;
     this.eventHub = eventHub;
 

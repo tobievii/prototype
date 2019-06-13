@@ -18,15 +18,11 @@ import * as scrypt from "scrypt"
 //var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
-import { configGen } from "./config"
 
 import * as trex from './utils'
 import * as state from "./state"
 //import * as discordBot from './discordBot'
 
-
-let config: any = configGen();
-var version = config.version; //
 //trex.log(config);
 
 var compression = require('compression')
@@ -45,15 +41,18 @@ import * as events from "events";
 
 import * as utilsLib from "./utils"
 
-var mongojs = require('mongojs')
+
 
 const { VM } = require('vm2');
 
-var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 var eventHub = new events.EventEmitter();
 
 import * as stats from "./stats"
+import { Config } from "./config"
+var config = new Config(app, eventHub);
+var db = config.db;
+var version = config.version;
 //import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
@@ -129,20 +128,26 @@ utilsLib.createPublicKeysforOldAccounts(db);
 app.use(accounts.midware(db));
 
 
+eventHub.on("config", (data: any) => {
+  config = data;
+  if (data.db) {
+    log("PLUGINS", "Initialize on db redis call")
+    plugins = pluginsInitialize(config, app, db, eventHub);
+  } else {
+    db.on('connect', function () {
+      log("PLUGINS", "Initialize on db connect")
+      plugins = pluginsInitialize(config, app, db, eventHub);
 
-db.on('connect', function () {
-  log("PLUGINS", "Initialize on db connect")
+      // for (var p in pluginClasses) {
+      //   plugins.push(new pluginClasses[p](app, db, eventHub))
+      //   // if (plugins[p].init) {
+      //   //   log("PLUGIN\tinit [" + plugins[p].name + "]")
+      //   //   plugins[p].init(app, db, eventHub);
+      //   // }
+      // }
 
-  plugins = pluginsInitialize(config, app, db, eventHub);
-
-  // for (var p in pluginClasses) {
-  //   plugins.push(new pluginClasses[p](app, db, eventHub))
-  //   // if (plugins[p].init) {
-  //   //   log("PLUGIN\tinit [" + plugins[p].name + "]")
-  //   //   plugins[p].init(app, db, eventHub);
-  //   // }
-  // }
-
+    })
+  }
 })
 
 //####################################################################
@@ -175,7 +180,7 @@ app.get('/', (req: any, res: any) => {
   //redirect main page people to https.
   if (req.protocol == "http") {
     trex.log("HTTP VISITOR")
-    if (config.ssl) {
+    if (config.configGen.ssl) {
       res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
       res.end();
     }
@@ -1452,8 +1457,8 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
 var server;
 
-if (config.ssl) {
-  server = https.createServer(config.sslOptions, app);
+if (config.configGen.ssl) {
+  server = https.createServer(config.configGen.sslOptions, app);
 } else {
   server = http.createServer(app);
 }
@@ -1511,7 +1516,7 @@ if (config.redis) {
 
 /* ############################################################################## */
 
-if (config.ssl) {
+if (config.configGen.ssl) {
   server.listen(443);
 
   // temporary open ports for shockwave pivot
@@ -1527,8 +1532,8 @@ if (config.ssl) {
 
   /////
 } else {
-  trex.log("HTTP\tServer port: " + config.httpPort)
-  server.listen(config.httpPort).on("error", (err: Error) => {
+  trex.log("HTTP\tServer port: " + config.configGen.httpPort)
+  server.listen(config.configGen.httpPort).on("error", (err: Error) => {
     console.error("HTTP Caught error")
     console.error(err);
     console.log("You must have another process running that is using this port. EXITING")

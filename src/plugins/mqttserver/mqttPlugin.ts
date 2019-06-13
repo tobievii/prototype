@@ -37,16 +37,6 @@ export class PluginMQTT extends Plugin {
             this.ev.on('ready', () => {
                 log(this.name, "CLUSTER", "READY")
             });
-        } else {
-            db.plugins_admin.findOne({ settings: "redis" }, (err: Error, result: any) => {
-                if (result.host && process.env.pm_id) {
-                    this.isCluster = true;
-                    this.ev = new RedisEvent(result.host, [this.name]);
-                    this.ev.on('ready', () => {
-                        log(this.name, "CLUSTER", "READY")
-                    });
-                }
-            })
         }
 
         var server = net.createServer((socket: any) => {

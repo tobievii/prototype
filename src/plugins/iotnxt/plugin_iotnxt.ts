@@ -61,40 +61,6 @@ export class PluginIotnxt extends Plugin {
         }, 2500)
       }
 
-    } else if (process.env.pm_id) {
-      db.plugins_admin.findOne({ settings: "redis" }, (err: Error, result: any) => {
-        if (result.host && result.port) {
-          this.isCluster = true;
-          // load balance
-          this.queue = new Queue(this.name, 'redis://' + result.host + ':' + result.port);
-          this.queue.process((job, done) => {
-            log("PLUGIN", this.name, "RECIEVED JOB");
-            this.processJob(job, () => {
-              done();
-            })
-          })
-
-          //listen to cluster events
-          log("PLUGIN", this.name, "STARTING REDIS EVENT");
-          this.ev = new RedisEvent(result.host, ['iotnxtevents']);
-
-          this.ev.on('ready', () => {
-            console.log("REDIS EVENTS READY")
-          });
-
-          // is this the main node?
-          if (process.env.pm_id == "0") {
-
-            //wait for some other nodes to spin up
-            setTimeout(() => {
-              log("PLUGIN", this.name, "MAIN NODE " + process.env.pm_id);
-              log("PLUGIN", this.name, "STARTING CLUSTER JOBS");
-              this.clusterStart();
-            }, 2500)
-          }
-        }
-      })
-
     } else {
       // single instance
       setTimeout(() => {
