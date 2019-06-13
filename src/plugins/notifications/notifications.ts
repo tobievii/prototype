@@ -47,6 +47,7 @@ export class PluginNotifications extends Plugin {
       res.json({ result: "done" })
     });
 
+    //Needs to be changed so that the notification is directly sent instead of being featched
     app.get("/api/v3/notifications/getNew", (req: any, res: any) => {
       db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
         res.json(result.notifications[result.notifications.length - 1]);
@@ -137,7 +138,6 @@ export class PluginNotifications extends Plugin {
 
             opt2.db.users.update({ apikey: result.apikey }, result, (err: Error, updated: any) => {
               if (err) console.log(err);
-              if (updated) console.log(updated);
             })
 
             webpush.sendNotification(sub.subscriptionData, JSON.stringify({ title: AlarmNotification })).then((response: any) => {
@@ -183,7 +183,6 @@ export class PluginNotifications extends Plugin {
 
             options.db.users.update({ apikey: result.apikey }, result, (err: Error, updated: any) => {
               if (err) console.log(err);
-              if (updated) console.log(updated);
             })
 
             webpush.sendNotification(sub.subscriptionData, JSON.stringify({ title: AlarmNotification })).then((response: any) => {
@@ -240,7 +239,6 @@ export class PluginNotifications extends Plugin {
 
             opt2.db.users.update({ apikey: result.apikey }, result, (err: Error, updated: any) => {
               if (err) console.log(err);
-              if (updated) console.log(updated);
             })
 
             webpush.sendNotification(sub.subscriptionData, JSON.stringify({ title: AlarmNotification })).then((response: any) => {
@@ -302,7 +300,6 @@ export class PluginNotifications extends Plugin {
 
           db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
             if (err) console.log(err);
-            if (updated) console.log(updated);
           })
 
           webpush.sendNotification(subscription, JSON.stringify({ notification }), opt).then((response: any) => {
