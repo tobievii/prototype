@@ -129,6 +129,7 @@ class Dashboard extends React.Component {
   }
 
 
+
   onDrop = (e, f) => {
     e.preventDefault();
     var typel = undefined;
@@ -318,9 +319,10 @@ class Dashboard extends React.Component {
 
     if (data.type == "ChartLine") {
       return (<ChartLine
-        dash={dash}
         data={data}
-        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+        dash={dash}
+        state={this.props.state}
+        datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "chart") {

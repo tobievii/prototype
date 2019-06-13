@@ -27,6 +27,7 @@
   "author": "Rouan van der Ende",
   "license": "ISC",
   "dependencies": {
+    "@amcharts/amcharts4": "^4.4.10",
     "@types/chai": "^4.1.7",
     "@types/crc": "^3.4.0",
     "@types/cryptr": "^4.0.0",
