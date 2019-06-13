@@ -11,6 +11,7 @@ import MapDevices from './dashboard/map';
 import ChangePassword from '../components/changePassword'
 import { confirmAlert } from 'react-confirm-alert';
 import { DeviceHistory } from "./dashboard/device_history.jsx"
+import Fullscreen from "react-full-screen";
 
 library.add(faSort)
 library.add(faSortNumericDown);
@@ -127,7 +128,9 @@ export class StatesViewer extends Component {
     isOpen: false,
     tempdev: [],
     toggleOn: false,
-    toggleOff: true
+    toggleOff: true,
+    isFull: false,
+    screensize: "fas fa-expand"
   };
 
   socket = undefined;
@@ -212,7 +215,7 @@ export class StatesViewer extends Component {
                 this.socket.emit("join", this.state.devicesServer[device].key);
               }
               this.setState({ devicesView: states }, () => {
-                this.sort();
+                this.sort(this.state.sort);
               })
             })
             //}
@@ -271,7 +274,7 @@ export class StatesViewer extends Component {
             }
             this.setState({ devicesView: states }, () => {
               if (functionCall == "initial load") {
-                this.sort();
+                this.sort(this.state.sort);
               }
             })
           })
@@ -298,7 +301,7 @@ export class StatesViewer extends Component {
 
             this.setState({ devicesView: serverresponse }, () => {
               if (functionCall == "initial load") {
-                this.sort();
+                this.sort(this.state.sort);
               }
             })
           })
@@ -317,7 +320,7 @@ export class StatesViewer extends Component {
           }
           this.setState({ devicesView: states }, () => {
             if (functionCall == "initial load") {
-              this.sort();
+              this.sort(this.state.sort);
             }
           })
         })
@@ -423,9 +426,9 @@ export class StatesViewer extends Component {
         this.setState({ devicesServer: devices })
       } else {
         this.setState({ devicesServer: devices })
-        this.setState({ devicesView: devices }, () => {
-        })
-        //this.sort();
+        // this.setState({ devicesView: devices }, () => {
+        // })
+        this.sort(this.state.sort, "devicePost");
       }
     }
   }
@@ -465,176 +468,185 @@ export class StatesViewer extends Component {
     })
   }
 
-  sort = (sorttype) => {
+  sort = (sorttype, call) => {
     var sv = _.clone(this.state.sortvalues)
-    var alarmDevices = [];
-    var value;
-    if (sorttype != undefined) {
-      value = sorttype;
-      this.setState({ sort: value })
-    } else {
-      value = this.state.sort;
-    }
+    var value = sorttype;
 
     var newDeviceList = _.clone(this.state.devicesView)
 
-    if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
-          return 1
-        } else {
-          return -1
+    if (call == "post" && call != undefined) {
+      if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.devid >= b.devid) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.namedesc = "des"
         }
-      }).reverse();
+      } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
+        newDeviceList.sort((a, b) => {
+          if (a.devid >= b.devid) {
+            return 1
+          } else { return -1 }
+        })
 
-      sv.timedesc = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
-      newDeviceList.sort((a, b) => {
-        if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
-          return 1
-        } else {
-          return -1
+        if (call != "devicePost" && call != undefined) {
+          sv.namedesc = "asc"
         }
-      }).reverse();
+      }
 
-      sv.timedesc = "asc"
-      this.setState({ sortvalues: sv })
-    }
+      if (value == "timedesc" && this.state.sortvalues.timedesc == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (new Date(a["_last_seen"]) < new Date(b["_last_seen"])) {
+            return 1
+          } else {
+            return -1
+          }
+        }).reverse();
+        sv.timedesc = "asc"
+        if (call != "devicePost" && call != undefined) {
+          sv.timedesc = "des"
+        }
+      } else if (value == "timedesc" && this.state.sortvalues.timedesc == "des") {
+        newDeviceList.sort((a, b) => {
+          if (new Date(a["_last_seen"]) > new Date(b["_last_seen"])) {
+            return 1
+          } else {
+            return -1
+          }
+        }).reverse();
+        sv.timedesc = "des"
+        if (call != "devicePost" && call != undefined) {
+          sv.timedesc = "asc"
+        }
+      }
 
-    if (value == "namedesc" && this.state.sortvalues.namedesc == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      })
+      if (value == "selected" && this.state.sortvalues.selected == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.selected == true && b.selected == false) {
+            return 1
+          } else { return -1 }
+        }).reverse();
 
-      sv.namedesc = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "namedesc" && this.state.sortvalues.namedesc == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.devid >= b.devid) {
-          return 1
-        } else { return -1 }
-      }).reverse();
+        if (call != "devicePost" && call != undefined) {
+          sv.selected = "des"
+        }
+      } else if (value == "selected" && this.state.sortvalues.selected == "des") {
+        newDeviceList.sort((a, b) => {
+          if (a.selected == false && b.selected == true) {
+            return 1
+          } else { return -1 }
+        }).reverse();
 
-      sv.namedesc = "asc"
-      this.setState({ sortvalues: sv })
-    }
+        if (call != "devicePost" && call != undefined) {
+          sv.selected = "asc"
+        }
+      }
 
-    if (value == "selected" && this.state.sortvalues.selected == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.selected == true && b.selected == false) {
-          return 1
-        } else { return -1 }
-      }).reverse();
+      if (value == "alarm") {
+        var alarmstates = _.clone(this.state.alarmStates);
+        for (var device in newDeviceList) {
+          for (var c in alarmstates) {
+            if (alarmstates[c].key == newDeviceList[device].key) {
+              newDeviceList[device]["alarm"] = true;
+            }
+          }
+        }
+        if (this.state.sortvalues.alarm == "asc") {
+          newDeviceList.sort((a, b) => {
+            if (a.alarm == true && b.alarm == undefined) {
+              return 1
+            } else { return -1 }
+          }).reverse();
 
-      sv.selected = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "selected" && this.state.sortvalues.selected == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.selected == false && b.selected == true) {
-          return 1
-        } else { return -1 }
-      }).reverse();
+          if (call == "post" && call != undefined) {
+            sv.alarm = "des"
+          }
 
-      sv.selected = "asc"
-      this.setState({ sortvalues: sv })
-    }
+        } else if (this.state.sortvalues.alarm == "des") {
+          newDeviceList.sort((a, b) => {
+            if (a.alarm == undefined && b.alarm == true) {
+              return 1
+            } else { return -1 }
+          }).reverse();
 
-    if (value == "alarm") {
-      var alarmstates = _.clone(this.state.alarmStates);
-      for (var device in newDeviceList) {
-        for (var c in alarmstates) {
-          if (alarmstates[c].key == newDeviceList[device].key) {
-            newDeviceList[device]["alarm"] = true;
+          if (call == "post" && call != undefined) {
+            sv.alarm = "asc"
           }
         }
       }
-      if (this.state.sortvalues.alarm == "asc") {
+
+      if (value == "warning" && this.state.sortvalues.warning == "asc") {
         newDeviceList.sort((a, b) => {
-          if (a.alarm == true && b.alarm == undefined) {
+          if (a.notification24 == true && b.notification24 == undefined) {
             return 1
           } else { return -1 }
         }).reverse();
 
-        sv.alarm = "des"
-        this.setState({ sortvalues: sv })
-      } else if (this.state.sortvalues.alarm == "des") {
+        if (call != "devicePost" && call != undefined) {
+          sv.warning = "des"
+        }
+      } else if (value == "warning" && this.state.sortvalues.warning == "des") {
         newDeviceList.sort((a, b) => {
-          if (a.alarm == undefined && b.alarm == true) {
+          if (a.notification24 == undefined && b.notification24 == true) {
             return 1
           } else { return -1 }
         }).reverse();
 
-        sv.alarm = "asc"
-        this.setState({ sortvalues: sv })
+        if (call != "devicePost" && call != undefined) {
+          sv.warning = "asc"
+        }
       }
+
+      if (value == "shared" && this.state.sortvalues.shared == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.shared = "des"
+        }
+      } else if (value == "shared" && this.state.sortvalues.shared == "des") {
+        newDeviceList.sort((a, b) => {
+          if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.shared = "asc"
+        }
+      }
+
+      if (value == "public" && this.state.sortvalues.public == "asc") {
+        newDeviceList.sort((a, b) => {
+          if (a.public == true && b.public == undefined) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.public = "des"
+        }
+      } else if (value == "public" && this.state.sortvalues.public == "des") {
+        newDeviceList.sort((a, b) => {
+          if (b.public == true && a.public == undefined) {
+            return 1
+          } else { return -1 }
+        }).reverse();
+
+        if (call != "devicePost" && call != undefined) {
+          sv.public = "asc"
+        }
+      }
+      this.setState({ sort: sorttype },
+        this.setState({ sortvalues: sv }))
+      this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
     }
-
-    if (value == "warning" && this.state.sortvalues.warning == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.notification24 == true && b.notification24 == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.warning = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "warning" && this.state.sortvalues.warning == "des") {
-      newDeviceList.sort((a, b) => {
-        if (a.notification24 == undefined && b.notification24 == true) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.warning = "asc"
-      this.setState({ sortvalues: sv })
-    }
-
-    if (value == "shared" && this.state.sortvalues.shared == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.access != undefined && a.access.length > 0 && (b.access == undefined || b.access.length == 0)) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.shared = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "shared" && this.state.sortvalues.shared == "des") {
-      newDeviceList.sort((a, b) => {
-        if (b.access != undefined && b.access.length > 0 && (a.access == undefined || a.access.length == 0)) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.shared = "asc"
-      this.setState({ sortvalues: sv })
-    }
-
-
-    if (value == "public" && this.state.sortvalues.public == "asc") {
-      newDeviceList.sort((a, b) => {
-        if (a.public == true && b.public == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.public = "des"
-      this.setState({ sortvalues: sv })
-    } else if (value == "public" && this.state.sortvalues.public == "des") {
-      newDeviceList.sort((a, b) => {
-        if (b.public == true && a.public == undefined) {
-          return 1
-        } else { return -1 }
-      }).reverse();
-
-      sv.public = "asc"
-      this.setState({ sortvalues: sv })
-    }
-
-    this.setState({ devicesView: newDeviceList }, this.selectCountUpdate);
-    this.setState({ sort: value });
   }
 
   selectCountUpdate = () => {
@@ -812,12 +824,44 @@ export class StatesViewer extends Component {
     this.setState({ logData: data })
   }
 
+  screen = () => {
+    if (this.state.isFull == false) {
+      this.setState({ screensize: "fas fa-compress" })
+      this.setState({ isFull: !this.state.isFull });
+    } else {
+      this.setState({ screensize: "fas fa-expand" })
+      this.setState({ isFull: !this.state.isFull });
+    }
+  }
+
+  showFullScreenButton = () => {
+    const style = {
+      margin: 0,
+      top: 'auto',
+      right: 15,
+      bottom: 80,
+      left: 'auto',
+      position: 'absolute',
+      zindex: 1000
+    };
+    return (
+      <button style={style} className={this.state.screensize} onClick={this.screen} />
+    )
+  }
+
   displayLog = () => {
     if (this.props.mainView == "devices") {
       return (this.state.toggleOn ?
-        <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
-          <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
-        </div>
+        <Fullscreen
+          enabled={this.state.isFull}
+          onChange={isFull => this.setState({ isFull })}
+        >
+          <div style={{ marginRight: "5%" }}>{this.showFullScreenButton()}</div>
+          <div className="mapContainer" style={{ height: (window.innerHeight * 0.9) - 98 + "px" }}>
+            <DeviceHistory public={this.props.public} username={this.props.username} devices={this.state.devicesServer} visiting={this.props.visiting} logdata={this.setlogData} logdatanew={this.state.logData} />
+          </div>
+        </Fullscreen>
+
         : null
       )
     }

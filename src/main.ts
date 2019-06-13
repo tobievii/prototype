@@ -183,15 +183,10 @@ app.get('/', (req: any, res: any) => {
   }
 
   if (req.user) {
-    if (req.user.level > 0) {
-      fs.readFile('../public/react.html', (err, data: any) => {
-        res.end(data.toString())
-      })
-    } else {
-      fs.readFile('../public/react.html', (err, data: any) => {
-        res.end(data.toString())
-      })
-    }
+    fs.readFile('../public/react.html', (err, data: any) => {
+      res.type(".html");
+      res.end(data.toString())
+    });
   } else {
     res.end("AN ERROR HAS OCCURED. ARE COOKIES ENABLED?")
   }
@@ -278,6 +273,11 @@ app.get("/notifications", (req: any, res: any) => {
   })
 })
 
+app.get("/logs", (req: any, res: any) => {
+  fs.readFile('../public/react.html', (err, data: any) => {
+    res.end(data.toString())
+  })
+})
 
 app.get('/settings', (req: any, res: any) => {
   fs.readFile('../public/react.html', (err, data: any) => {
@@ -421,6 +421,8 @@ app.post("/api/v3/packets", (req: any, res: any, next: any) => {
         // payload.meta = { userAgent: rawpackets[p].meta.userAgent, method: rawpackets[p].meta.method }
         packets.push(payload)
       }
+      io.emit("log", payload)
+
       res.json(packets);
     })
   }

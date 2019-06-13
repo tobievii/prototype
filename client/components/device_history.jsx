@@ -1,12 +1,52 @@
 import React, { Component } from "react";
 import moment from 'moment'
+import socketio from "socket.io-client";
 
 export class DeviceHistory extends React.Component {
+
     state = {
         timeago: "",
         millisago: 0,
-        logdata: []
+        logdata: [],
+        socketConnected: false
     }
+
+    socket;
+
+    constructor(props) {
+        super(props)
+
+
+
+
+
+        //         // p.statesByUsername(this.props.username, (states) => {
+        //         //     for (var s in states) {
+        //         //         states[s].selected = false
+        //         //     }
+        //         //     var packet1 = {
+        //         //         id: info.newdevice.id,
+        //         //         data: info.newdevice.payload.data,
+        //         //         timestamp: info.newdevice.payload.timestamp
+        //         //     }
+
+        //         //     if (this.state.logData != undefined) {
+        //         //         if (this.state.logData[0].timestamp <= packet1.timestamp) {
+        //         //             var newd = _.clone(this.state.logData)
+        //         //             var n = [];
+        //         //             n.push(packet1);
+        //         //             for (var count in newd) {
+        //         //                 n.push(newd[count]);
+        //         //             }
+        //         //             this.setState({ logdataNew: n })
+        //         //             this.setState({ logData: n })
+        //         //         }
+        //         //     }
+        //         // })
+        //     )
+        // })
+    }
+
 
     intervalUpdator = undefined;
 
@@ -16,7 +56,8 @@ export class DeviceHistory extends React.Component {
             body: JSON.stringify({ log: true })
         }).then(response => response.json()).then(logdata => {
             this.setState({ logdata })
-            this.props.logdata(logdata)
+            console.log(logdata);
+            //this.props.devices.states(logdata)
         }).catch(err => console.error(err.toString()));
 
         this.intervalUpdator = setInterval(() => {
@@ -25,9 +66,36 @@ export class DeviceHistory extends React.Component {
     }
 
     componentDidUpdate = () => {
-        if (this.props.logdatanew != undefined) {
-            if (this.props.logdatanew.length > this.state.logdata.length) {
-                this.setState({ logdata: this.props.logdatanew })
+
+        if (this.props.account) {
+            // we recieved account info from parent
+            if (this.state.socketConnected == false) {
+                // now we connect.
+                this.state.socketConnected = true;
+                this.socket = socketio({ transports: ['websocket'] });
+
+                /// ----
+                this.socket.on("connect", a => {
+                    this.socket.emit("join", this.props.account.apikey)
+
+                    this.socket.on("post", (newDeviceData) => {
+                        // so we recieve some data:
+                        console.log(newDeviceData);
+
+                        var newlogdata = _.clone(this.state.logdata);
+                        newlogdata.unshift(newDeviceData);
+                        this.setState({ logdata: newlogdata })
+                    })
+                })
+                /// ----
+            } // end if socketConnected
+        }
+        /// end if account
+
+        // console.log(this.props.devices.states)
+        if (this.props.devices.states != undefined) {
+            if (this.props.devices.states.length > this.state.logdata.length) {
+                this.setState({ logdata: this.props.devices.states })
             }
         }
     }
@@ -85,7 +153,7 @@ export class DeviceHistory extends React.Component {
                     label={"Logs"}
                     options={this.options}
                     dash={this.props.dash}
-                    style={{ height: "100%", overflowY: "scroll" }}
+                    style={{ height: "100%", overflowY: "scroll", marginTop: "50px" }}
                 >
                     {this.state.logdata.map((logdata, i) => {
                         var timeago = moment(logdata.timestamp).fromNow()
