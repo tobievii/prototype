@@ -15,6 +15,8 @@ export class ChartLine extends React.Component {
     dateAxis: null
   }
 
+  lasttimestamp = "";
+
   constructor(props) {
     super(props)
 
@@ -69,6 +71,19 @@ export class ChartLine extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    if (_.has(this, "props.state.payload." + this.props.datapath)) {
+      if (this.props.state.payload.timestamp != this.lasttimestamp) {
+        if (this.state.linedata) {
+          this.createData();
+        }
+        this.lasttimestamp = this.props.state.payload.timestamp;
+      }
+    }
+    //console.log(this.props.state);
+    //console.log(this.props.datapath)
+  }
+
   createData = () => {
     fetch("/api/v3/packets", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -91,7 +106,9 @@ export class ChartLine extends React.Component {
         }
         data.push(f)
       }
+      this.setState({ linedata: data })
       this.createChart(data)
+      console.log(this.state)
     }).catch(err => console.error(err.toString()));
   }
 
@@ -101,7 +118,7 @@ export class ChartLine extends React.Component {
 
     const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
-    dateAxis.renderer.labels.template.fill = am4core.color("white");
+    dateAxis.renderer.labels.template.fill = am4core.color("lightgrey");
 
     this.setState(() => ({ dateAxis }))
 
@@ -111,7 +128,7 @@ export class ChartLine extends React.Component {
 
     const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
     valueAxis.tooltip.disabled = true;
-    valueAxis.renderer.labels.template.fill = am4core.color("white");
+    valueAxis.renderer.labels.template.fill = am4core.color("lightgrey");
     valueAxis.renderer.minWidth = 60;
 
     //const valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
@@ -128,14 +145,14 @@ export class ChartLine extends React.Component {
     axisRange.grid.strokeOpacity = 1;
     // axisRange.label.text = "middle";
     axisRange.label.fill = axisRange.grid.stroke;
-    axisRange.label.verticalCenter = "bottom";
+    // axisRange.label.verticalCenter = "bottom";
 
     const series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.dateX = "x";
     series.dataFields.valueY = "y";
     series.tooltipText = "{valueY}";
     series.fill = am4core.color("#14222c");
-    series.stroke = am4core.color("white");
+    series.stroke = am4core.color("#0f854b");
 
     let axisTooltip = dateAxis.tooltip; ``
     axisTooltip.background.fill = am4core.color("#14222c");
@@ -143,7 +160,7 @@ export class ChartLine extends React.Component {
     axisTooltip.background.cornerRadius = 3;
     axisTooltip.background.pointerLength = 0;
     axisTooltip.dy = 5;
-    //series.strokeWidth = 3;
+    series.strokeWidth = 2;
     // series.columns.template.events.on("hit", function (ev) {
     //   console.log("clicked on ", ev.target);
     // }, this);
