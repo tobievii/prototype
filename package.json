@@ -10,6 +10,7 @@
     "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/stresstest.ts --outDir ./build",
     "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/stresstest.ts --outDir ./build",
     "build-clean": "rmdir build /s /q && tsc",
+    "testclient": "cypress open",
     "debug": "cd build && nodemon --inspect main.js"
   },
   "repository": {
@@ -89,6 +90,7 @@
   },
   "devDependencies": {
     "@types/bull": "^3.5.14",
+    "cypress": "^3.3.1",
     "pre-commit": "^1.2.2"
   }
 }

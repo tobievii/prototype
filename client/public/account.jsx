@@ -219,7 +219,7 @@ export class Account extends Component {
             {matches =>
               matches ? (
                 <div
-                  className={this.getMenuClasses(2)}
+                  className={"register " + this.getMenuClasses(2)}
                   onClick={this.onClickMenuTab(2)}
                   style={{
                     marginRight: "0",
@@ -232,7 +232,7 @@ export class Account extends Component {
                 </div>
               ) : (
                   <div
-                    className={this.getMenuClasses(2)}
+                    className={"register " + this.getMenuClasses(2)}
                     onClick={this.onClickMenuTab(2)}
                     style={{ width: "150", float: "right" }}
                   >
@@ -314,7 +314,7 @@ export class Account extends Component {
           <div className="col-md-12 ">
             {this.drawRegisterButton()}
             <div
-              className={this.getMenuClasses(1)}
+              className={"login " + this.getMenuClasses(1)}
               onClick={this.onClickMenuTab(1)}
               style={{ width: "150", float: "right" }}
             >
@@ -335,7 +335,7 @@ export class Account extends Component {
             <div className="col-9">
               {" "}
               <input
-                type="email"
+                id="emailInput"
                 placeholder="email"
                 style={{ width: "100%" }}
                 spellCheck="false"
@@ -380,6 +380,7 @@ export class Account extends Component {
             </div>
             <div className="col-9">
               <input
+                id="emailInput"
                 placeholder="email"
                 type="email"
                 style={{ width: "100%" }}
@@ -400,6 +401,7 @@ export class Account extends Component {
             </div>
             <div className="col-8">
               <input
+                className="password"
                 placeholder="password"
                 spellCheck="false"
                 style={{ width: "100%" }}
