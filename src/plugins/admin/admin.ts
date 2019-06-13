@@ -271,6 +271,7 @@ export class PluginAdmin extends Plugin {
     //Shared Device email
     //####################################################################
 
+
     app.get("/api/v3/admin/registration", (req: any, res: any) => {
       // public api to get information if server allows registration/requires email verification
       // if level > 100 then adds the server private email config.
@@ -325,10 +326,46 @@ export class PluginAdmin extends Plugin {
         res.json({ error, result, account: req.user })
       })
     })
+
+    app.get("/api/v3/admin/redis", (req: any, res: any) => {
+      if (req.user.level >= 100) {
+        this.getRedis((err: Error, result: any) => {
+          res.json({ err, result })
+        })
+      } else {
+        this.getRedis((err: Error, secret: any) => {
+          if (secret) {
+            var result = {
+              redisEnable: secret.redisEnable,
+            }
+            res.json({ err, result })
+          } else {
+            res.json({})
+          }
+        })
+      }
+    });
+
+    app.post("/api/v3/admin/redis", (req: any, res: any) => {
+      if (req.user.level >= 100) {
+        var userinput = req.body
+        userinput.settings = "redis"
+        this.updateRedis(userinput, (err: Error, result: any) => {
+          res.json({ err, result })
+        })
+      } else {
+        log("USER NOT AUTHORIZED!" + req.user.email)
+        res.json({ err: "not sufficient user level", result: null })
+      }
+    });
   }
 
   getRegistration(cb: any) {
     this.db.plugins_admin.findOne({ settings: "registration" }, cb);
+  }
+
+  getRedis(cb: any) {
+    this.db.plugins_admin.findOne({ settings: "redis" }, cb);
   }
 
   updateRegistration(userInput: any, cb: any) {
@@ -344,5 +381,17 @@ export class PluginAdmin extends Plugin {
     }
     this.db.plugins_admin.update({ settings: "registration" }, cleanInput, { upsert: true }, cb);
   }
+
+  updateRedis(userInput: any, cb: any) {
+    var cleanInput = {
+      settings: "redis",
+      redisEnable: userInput.redisEnable,
+      host: userInput.host,
+      port: userInput.port,
+      AuthPass: userInput.AuthPass,
+    }
+    this.db.plugins_admin.update({ settings: "redis" }, cleanInput, { upsert: true }, cb);
+  }
+
 
 }
