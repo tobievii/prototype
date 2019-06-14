@@ -34,19 +34,17 @@ module.exports = options => {
       },
       {
         test: /.js$/,
-        include: /node_modules/,
+        exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
           options: {
             cacheDirectory: true,
-            presets: ["@babel/preset-env"],
-            plugins: ["@babel/plugin-syntax-dynamic-import"]
           },
         },],
       },
       {
         test: /.jsx$/,
-        include: /node_modules/,
+        exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
           options: {
