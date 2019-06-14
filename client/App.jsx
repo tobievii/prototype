@@ -23,7 +23,9 @@ import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 
-const Stats = React.lazy(() => import("./components/stats"));
+//const Stats = React.lazy(() => import("./components/stats"));
+import { Stats } from "./components/stats";
+//./node_modules/babel-loader/lib/index.js
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
