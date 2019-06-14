@@ -13,8 +13,10 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-const ApiInfo = React.lazy(() => import('./components/apiInfo'))
-const SettingsView = React.lazy(() => import('./components/settingsView'))
+//const ApiInfo = React.lazy(() => import('./components/apiInfo'))
+import { ApiInfo } from "./components/apiInfo";
+//const SettingsView = React.lazy(() => import('./components/settingsView'))
+import { SettingsView } from "./components/settingsView";
 import AddDevice from './components/addDevice'
 
 import { DeviceView } from "./components/deviceView.jsx";

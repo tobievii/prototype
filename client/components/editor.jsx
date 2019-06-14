@@ -10,7 +10,8 @@ library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
 
-const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
+//const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
+import { MonacoEditor } from "react-monaco-editor";
 
 export class Editor extends Component {
 

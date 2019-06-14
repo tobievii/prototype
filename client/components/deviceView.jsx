@@ -1,7 +1,9 @@
 import React, { PureComponent, Suspense } from "react";
 
-const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
-const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
+//const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
+import { SyntaxHighlighter } from "react-syntax-highlighter";
+//const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
+import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
 import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -11,7 +13,8 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
+//const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
+import { Dashboard } from "./dashboard/dashboard";
 import moment from 'moment'
 
 library.add(faDigitalTachograph)
