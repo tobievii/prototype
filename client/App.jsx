@@ -13,15 +13,15 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-var ApiInfo = React.lazy(() => import('./components/apiInfo'))
-var SettingsView = React.lazy(() => import('./components/settingsView'))
+const ApiInfo = React.lazy(() => import('./components/apiInfo'))
+const SettingsView = React.lazy(() => import('./components/settingsView'))
 import AddDevice from './components/addDevice'
 
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 
-var Stats = React.lazy(() => import("./components/stats"));
+const Stats = React.lazy(() => import("./components/stats"));
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 

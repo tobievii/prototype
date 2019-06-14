@@ -39,6 +39,8 @@ module.exports = options => {
           loader: 'babel-loader',
           options: {
             cacheDirectory: true,
+            presets: ["@babel/preset-env"],
+            plugins: ["@babel/plugin-syntax-dynamic-import"]
           },
         },],
       },
@@ -49,6 +51,8 @@ module.exports = options => {
           loader: 'babel-loader',
           options: {
             cacheDirectory: true,
+            presets: ["@babel/preset-env"],
+            plugins: ["@babel/plugin-syntax-dynamic-import"]
           },
         },],
       },
