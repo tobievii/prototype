@@ -66,7 +66,6 @@ export class PluginIotnxt extends Plugin {
       setTimeout(() => {
         this.singleInstanceStart();
       }, 1500)
-
     }
 
     app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
@@ -257,9 +256,9 @@ export class PluginIotnxt extends Plugin {
 
     })
     //
-    
+
     // handling incoming requests from commander/portal
-    gatewayConnection.on("request", (request:any)=>{
+    gatewayConnection.on("request", (request: any) => {
       this.eventHub.emit("device", request);
     })
 

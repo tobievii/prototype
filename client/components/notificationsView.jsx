@@ -7,7 +7,7 @@ export class NotificationsView extends Component {
         this.state = { notifications: [] };
 
         fetch('/api/v3/notifications/seen', {
-            method: 'POST', headers: {
+            method: 'GET', headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
@@ -23,7 +23,7 @@ export class NotificationsView extends Component {
 
         fetch('/api/v3/u/notifications')
             .then(response => response.json())
-            .then(data => this.setState({ notifications: data }));
+            .then(data => this.setState({ notifications: data.reverse() }));
     }
 
     ClearNotificationsList = () => {
@@ -50,7 +50,7 @@ export class NotificationsView extends Component {
     render() {
         if (this.state.notifications !== undefined || this.state.notifications.length !== 0) {
 
-            var notify = this.state.notifications.reverse().map((notification, i) => {
+            var notify = this.state.notifications.map((notification, i) => {
                 if (notification.type == "CONNECTION DOWN 24HR WARNING" || notification.type == "WARNING") {
                     return (
                         <div className="warningNotificationItem" key={notification.device + i}>
