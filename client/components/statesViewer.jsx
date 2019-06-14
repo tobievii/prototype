@@ -7,7 +7,7 @@ import * as p from "../prototype.ts"
 import { StatesViewerMenu } from "./statesViewerMenu.jsx"
 import { StatesViewerItem } from "./statesViewerItem.jsx"
 
-import MapDevices from './dashboard/map';
+import { MapDevices } from './dashboard/map';
 import ChangePassword from '../components/changePassword'
 import { confirmAlert } from 'react-confirm-alert';
 import { DeviceHistory } from "./dashboard/device_history.jsx"

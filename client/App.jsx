@@ -44,7 +44,7 @@ const test = {
 
 var visitingG = undefined;
 
-class App extends Component {
+export default class App extends Component {
     state = {
         devicesView: "dashboardDevices",
         isOpen: false,
@@ -385,4 +385,4 @@ class App extends Component {
     }
 }
 
-export default App;
+//export default App;

@@ -4,7 +4,7 @@ import React, { Component, Suspense } from "react";
 
 import { CodeBlock } from "./codeBlock.jsx"
 
-class ApiInfo extends Component {
+export class ApiInfo extends Component {
   state = {
     apiMenu: 1,
     testPacket: {
@@ -298,4 +298,4 @@ client.on('message', (topic, message) => { console.log(message.toString()); })`}
   }
 }
 
-export default ApiInfo;
+//export default ApiInfo;

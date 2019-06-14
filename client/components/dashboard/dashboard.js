@@ -33,7 +33,7 @@ var mapDetails = {
   showB: false
 }
 
-class Dashboard extends React.Component {
+export class Dashboard extends React.Component {
 
   constructor(props) {
     super(props);
@@ -591,4 +591,4 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard;
+// export default Dashboard;

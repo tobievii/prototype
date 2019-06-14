@@ -7,7 +7,7 @@ library.add(faSave)
 import Media from "react-media";
 import { plugins } from "../plugins/config.ts"
 
-export default class SettingsView extends React.Component {
+export class SettingsView extends React.Component {
   state = { menuList: [] }
 
   componentDidMount = () => {
