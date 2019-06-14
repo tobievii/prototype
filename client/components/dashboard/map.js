@@ -38,7 +38,7 @@ var poly2tri = require('poly2tri');
 var b = undefined;
 var deviceSelected = undefined;
 
-export class MapDevices extends Component {
+class MapDevices extends Component {
   state = {
     devicePathHistory: undefined,
     boundaryVisible: false,
@@ -541,4 +541,4 @@ export class MapDevices extends Component {
   }
 }
 
-//export default MapDevices; 
+export default MapDevices; 

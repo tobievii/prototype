@@ -1,4 +1,3 @@
-// import React, { Component } from "react";
 import React, { Component } from 'react';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -9,7 +8,7 @@ import { AmchartsReact } from 'amchart4-react'
 
 am4core.useTheme(am4themes_animated);
 
-export class ChartLine extends React.Component {
+export class ChartLine extends Component {
   state = {
     chart: null,
     dateAxis: null

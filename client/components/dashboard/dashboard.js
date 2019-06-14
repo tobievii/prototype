@@ -15,8 +15,7 @@ import * as _ from "lodash"
 
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-//const MapDevices = React.lazy(() => import('./map'));
-import { MapDevices } from "./map";
+const MapDevices = React.lazy(() => import('./map'));
 import { ChartLine } from "./chart_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
@@ -33,7 +32,7 @@ var mapDetails = {
   showB: false
 }
 
-export class Dashboard extends React.Component {
+class Dashboard extends React.Component {
 
   constructor(props) {
     super(props);
@@ -390,19 +389,19 @@ export class Dashboard extends React.Component {
 
     if (data.type == "map") {
       return (
-        // <Suspense fallback={<div>Loading...</div>}>
-        <MapDevices
-          dash={dash}
-          data={data}
-          username={this.props.username}
-          acc={this.props.acc}
-          deviceCall={this.props.state}
-          devices={this.props.devices}
-          widget={true}
-          showBoundary={this.state.showB}
-          PopUpLink={false}
-        />
-        // </Suspense>
+        <Suspense fallback={<div>Loading...</div>}>
+          <MapDevices
+            dash={dash}
+            data={data}
+            username={this.props.username}
+            acc={this.props.acc}
+            deviceCall={this.props.state}
+            devices={this.props.devices}
+            widget={true}
+            showBoundary={this.state.showB}
+            PopUpLink={false}
+          />
+        </Suspense>
       )
     }
 
@@ -591,4 +590,4 @@ export class Dashboard extends React.Component {
   }
 }
 
-// export default Dashboard;
+export default Dashboard;

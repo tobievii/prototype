@@ -13,19 +13,15 @@ import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-//const ApiInfo = React.lazy(() => import('./components/apiInfo'))
-import { ApiInfo } from "./components/apiInfo";
-//const SettingsView = React.lazy(() => import('./components/settingsView'))
-import { SettingsView } from "./components/settingsView";
+const ApiInfo = React.lazy(() => import('./components/apiInfo'))
+const SettingsView = React.lazy(() => import('./components/settingsView'))
 import AddDevice from './components/addDevice'
 
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 
-//const Stats = React.lazy(() => import("./components/stats"));
-import { Stats } from "./components/stats";
-//./node_modules/babel-loader/lib/index.js
+const Stats = React.lazy(() => import("./components/stats"));
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
@@ -44,7 +40,7 @@ const test = {
 
 var visitingG = undefined;
 
-export default class App extends Component {
+class App extends Component {
     state = {
         devicesView: "dashboardDevices",
         isOpen: false,
@@ -212,11 +208,11 @@ export default class App extends Component {
                 return (
                     <div>
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
-                        {/* <Suspense fallback={<div className="spinner"></div>}> */}
-                        <ApiInfo apikey={this.state.account.apikey} />
-                        <Stats />
-                        <Footer loggedIn={true} />
-                        {/* </Suspense> */}
+                        <Suspense fallback={<div className="spinner"></div>}>
+                            <ApiInfo apikey={this.state.account.apikey} />
+                            <Stats />
+                            <Footer loggedIn={true} />
+                        </Suspense>
                     </div>
                 )
             } else {
@@ -307,9 +303,9 @@ export default class App extends Component {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
-                    // <Suspense fallback={<div className="spinner"></div>}>
-                    <SettingsView />
-                    // </Suspense>
+                    <Suspense fallback={<div className="spinner"></div>}>
+                        <SettingsView />
+                    </Suspense>
                 )
             } else {
                 return (
@@ -385,4 +381,4 @@ export default class App extends Component {
     }
 }
 
-//export default App;
+export default App;

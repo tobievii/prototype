@@ -1,9 +1,7 @@
 import React, { PureComponent, Suspense } from "react";
 
-//const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
-import { SyntaxHighlighter } from "react-syntax-highlighter";
-//const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
-import { tomorrowNightBright } from "react-syntax-highlighter/styles/hljs";
+const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
+const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
 import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -13,8 +11,7 @@ import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
 
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
-//const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
-import { Dashboard } from "./dashboard/dashboard";
+const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
 import moment from 'moment'
 
 library.add(faDigitalTachograph)
@@ -403,15 +400,15 @@ export class DeviceView extends PureComponent {
   dashboardColumn = () => {
     return (<div className={this.state.dashboard} >
       {this.editorBlock()}
-      {/* <Suspense fallback={<div className="spinner"></div>}> */}
-      <Dashboard
-        username={this.props.username}
-        acc={this.props.acc}
-        deviceCall={this.state.state}
-        devices={this.state.devicesServer}
-        state={this.state.state}
-      />
-      {/* </Suspense> */}
+      <Suspense fallback={<div className="spinner"></div>}>
+        <Dashboard
+          username={this.props.username}
+          acc={this.props.acc}
+          deviceCall={this.state.state}
+          devices={this.state.devicesServer}
+          state={this.state.state}
+        />
+      </Suspense>
     </div>)
   }
 

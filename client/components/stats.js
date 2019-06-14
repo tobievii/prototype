@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-export class Stats extends React.Component {
+export default class Stats extends React.Component {
   state = { stats: {} };
 
   userNameList = () => {
