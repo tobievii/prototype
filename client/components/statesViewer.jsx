@@ -579,8 +579,16 @@ export class StatesViewer extends Component {
       }
 
       if (value == "warning" && this.state.sortvalues.warning == "asc") {
+        var notifications = this.props.account.notifications;
+        for (var device in newDeviceList) {
+          for (var s in notifications) {
+            if ((notifications[s].type == "CONNECTION DOWN 24HR WARNING" || notifications[s].type == "WARNING") && newDeviceList[device].devid == notifications[s].device && notifications[s].seen == false) {
+              newDeviceList[device]['warning'] = true
+            }
+          }
+        }
         newDeviceList.sort((a, b) => {
-          if (a.notification24 == true && b.notification24 == undefined) {
+          if ((a.notification24 == true || a.warning == true) && (b.notification24 == undefined || b.warning == undefined)) {
             return 1
           } else { return -1 }
         }).reverse();
@@ -590,7 +598,7 @@ export class StatesViewer extends Component {
         }
       } else if (value == "warning" && this.state.sortvalues.warning == "des") {
         newDeviceList.sort((a, b) => {
-          if (a.notification24 == undefined && b.notification24 == true) {
+          if ((a.notification24 == undefined || a.warning == undefined) && (b.notification24 == true || b.warning == true)) {
             return 1
           } else { return -1 }
         }).reverse();
