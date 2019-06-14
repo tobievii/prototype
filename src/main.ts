@@ -82,7 +82,7 @@ eventHub.on("device", (data: any) => {
 })
 
 eventHub.on("plugin", (data: any) => {
-  // log("EVENTHUB", data)
+  //log("EVENTHUB", data)
 
   /*
     In plugins please use this.eventHub.emit("plugin", {plugin: "pluginname", event: {your data in here} });
@@ -96,6 +96,7 @@ eventHub.on("plugin", (data: any) => {
   */
 
   if (data.plugin && data.event) {
+    log("EVENTHUB", data.plugin, JSON.stringify(data.event));
     io.sockets.emit("plugin_" + data.plugin, data.event)
   } else {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
@@ -148,6 +149,8 @@ eventHub.on("config", (data: any) => {
 
     })
   }
+
+  initializeSocketio();
 })
 
 //####################################################################
@@ -1502,15 +1505,18 @@ function bindListeners(ioIn: any) {
 }
 
 
-
-if (config.redis) {
-  log("REDIS ENABLED")
-  const redis = require('socket.io-redis')
-  io.adapter(redis(config.redis))
-  bindListeners(io)
-} else {
-  bindListeners(io)
+function initializeSocketio() {
+  if (config.redis) {
+    log("socketio", "REDIS ENABLED")
+    const redis = require('socket.io-redis')
+    io.adapter(redis(config.redis))
+    bindListeners(io)
+  } else {
+    log("socketio", "REDIS NOT ENABLED")
+    bindListeners(io)
+  }
 }
+
 
 
 

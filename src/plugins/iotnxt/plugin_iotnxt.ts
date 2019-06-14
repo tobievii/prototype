@@ -29,9 +29,11 @@ export class PluginIotnxt extends Plugin {
     this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
-
+    console.log(config.redis);
+    console.log(process.env.pm_id);
     // if redis is on and this is running inside PM2
     if (config.redis && process.env.pm_id) {
+      log("CLUSTER MODE ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       this.isCluster = true;
       // load balance
       this.queue = new Queue(this.name, 'redis://' + config.redis.host + ':' + config.redis.port);
@@ -69,8 +71,9 @@ export class PluginIotnxt extends Plugin {
     }
 
     app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-      this.addgateway(req.body, req.user, (err: Error, result: any) => {
+      this.addgateway(req.body, req.user, (err: Error, result: any, gateway: any) => {
         if (err) res.json({ err: err.toString() });
+        this.handlenewgateway(gateway);
         //this.connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
         res.json(result);
       });
@@ -162,7 +165,17 @@ export class PluginIotnxt extends Plugin {
     gateway.type = "gateway"
     gateway["_created_on"] = new Date();
     gateway["_created_by"] = user["_id"];
-    this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result); });
+    this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
+  }
+
+  handlenewgateway(gateway: any) {
+    if (this.isCluster) {
+      // let cluster connect to it
+      if (this.queue) this.queue.add({ type: "connect", gateway });
+    } else {
+      // we connect to it.
+      this.connectGateway(gateway);
+    }
   }
 
   getgateways(cb: any) {
