@@ -281,19 +281,19 @@ export class Editor extends Component {
                         </div> */}
 
                         <div style={{ backgroundColor: "red", height: "100%" }}>
-                            <Suspense fallback={<div className="spinner"></div>}>
-                                <MonacoEditor
-                                    height="2000"
-                                    width="6000"
-                                    language="javascript"
-                                    theme="vs-dark"
-                                    value={this.state.code}
-                                    options={options}
-                                    onChange={this.onChange}
-                                    automaticLayout={true}
-                                    editorDidMount={this.editorDidMount}
-                                />
-                            </Suspense>
+                            {/* <Suspense fallback={<div className="spinner"></div>}> */}
+                            <MonacoEditor
+                                height="2000"
+                                width="6000"
+                                language="javascript"
+                                theme="vs-dark"
+                                value={this.state.code}
+                                options={options}
+                                onChange={this.onChange}
+                                automaticLayout={true}
+                                editorDidMount={this.editorDidMount}
+                            />
+                            {/* </Suspense> */}
                         </div>
                     </div>
                 );

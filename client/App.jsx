@@ -212,11 +212,11 @@ export default class App extends Component {
                 return (
                     <div>
                         <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
-                        <Suspense fallback={<div className="spinner"></div>}>
-                            <ApiInfo apikey={this.state.account.apikey} />
-                            <Stats />
-                            <Footer loggedIn={true} />
-                        </Suspense>
+                        {/* <Suspense fallback={<div className="spinner"></div>}> */}
+                        <ApiInfo apikey={this.state.account.apikey} />
+                        <Stats />
+                        <Footer loggedIn={true} />
+                        {/* </Suspense> */}
                     </div>
                 )
             } else {
@@ -307,9 +307,9 @@ export default class App extends Component {
         if (this.state.account) {
             if (this.state.account.level > 0) {
                 return (
-                    <Suspense fallback={<div className="spinner"></div>}>
-                        <SettingsView />
-                    </Suspense>
+                    // <Suspense fallback={<div className="spinner"></div>}>
+                    <SettingsView />
+                    // </Suspense>
                 )
             } else {
                 return (

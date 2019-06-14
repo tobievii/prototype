@@ -390,19 +390,19 @@ export class Dashboard extends React.Component {
 
     if (data.type == "map") {
       return (
-        <Suspense fallback={<div>Loading...</div>}>
-          <MapDevices
-            dash={dash}
-            data={data}
-            username={this.props.username}
-            acc={this.props.acc}
-            deviceCall={this.props.state}
-            devices={this.props.devices}
-            widget={true}
-            showBoundary={this.state.showB}
-            PopUpLink={false}
-          />
-        </Suspense>
+        // <Suspense fallback={<div>Loading...</div>}>
+        <MapDevices
+          dash={dash}
+          data={data}
+          username={this.props.username}
+          acc={this.props.acc}
+          deviceCall={this.props.state}
+          devices={this.props.devices}
+          widget={true}
+          showBoundary={this.state.showB}
+          PopUpLink={false}
+        />
+        // </Suspense>
       )
     }
 
