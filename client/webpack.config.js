@@ -34,7 +34,7 @@ module.exports = options => {
       },
       {
         test: /.js$/,
-        exclude: /node_modules/,
+        include: /node_modules/,
         use: [{
           loader: 'babel-loader',
           options: {
@@ -46,7 +46,7 @@ module.exports = options => {
       },
       {
         test: /.jsx$/,
-        exclude: /node_modules/,
+        include: /node_modules/,
         use: [{
           loader: 'babel-loader',
           options: {
