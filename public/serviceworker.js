@@ -1,4 +1,4 @@
-var cacheName = 'Prototype-3';
+var cacheName = 'Prototyp3';
 var filesToCache = [
     '/',
     '/index.js',
@@ -42,8 +42,12 @@ self.addEventListener('fetch', function (event) {
 });
 
 self.addEventListener('push', function (e) {
+    //console.log(e)
+
+    var message = " ";
+
     var options = {
-        body: 'This notification was generated from a push!',
+        body: '',
         icon: '/favicon.png',
         vibrate: [100, 50, 100],
         data: {
@@ -52,7 +56,7 @@ self.addEventListener('push', function (e) {
         },
         actions: [
             {
-                action: 'explore', title: 'Explore this new world',
+                action: 'explore', title: 'Open',
                 icon: '/favicon.png'
             },
             {
@@ -61,7 +65,45 @@ self.addEventListener('push', function (e) {
             },
         ]
     };
-    e.waitUntil(
-        self.registration.showNotification('Hello world!', options)
-    );
+
+    fetch('/api/v3/notifications/getNew', {
+        method: 'GET', headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+        .then(response => response.json())
+        .then((response) => {
+            if (response.message == undefined || response.message == null) {
+                if (response.type == "NEW DEVICE ADDED" || response.type == "New dewvice added") {
+                    message = "has been successfuly added to PROTOTYP3.";
+                } else if (response.type == "CONNECTION DOWN 24HR WARNING") {
+                    message = "hasn't sent data in the last 24hours";
+                }
+            } else {
+                message = response.message;
+            }
+
+            options.body = '"' + response.device + '" ' + message;
+
+            self.registration.showNotification(response.type, options)
+        })
+});
+
+self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+
+    event.waitUntil(clients.matchAll({
+        type: 'window'
+    }).then(function (clientList) {
+        for (var i = 0; i < clientList.length; i++) {
+            var client = clientList[i];
+            if (client.url === '/' && 'focus' in client) {
+                return client.focus();
+            }
+        }
+        if (clients.openWindow) {
+            return clients.openWindow('/');
+        }
+    }));
 });

@@ -5,8 +5,11 @@ COPY . /build
 
 RUN cd client && npm install && npm run build && cd /build && npm install && npm run build && npm install pm2 --global
 
-# Create directory for config with appropriate permissions (It should be mounted in as a volume - no write permissions from inside)
-RUN mkdir -m 0500 /etc/iotnxt /etc/certs && chown nobody:nogroup /etc/iotnxt /etc/certs
+# Prep for running: Create directory for config with appropriate permissions 
+# (It should be mounted in as a volume - no write permissions from inside)
+# Also give node the capabilities to listen on low ports as a non-root user
+RUN mkdir -m 0500 /etc/iotnxt /etc/certs && chown nobody:nogroup /etc/iotnxt /etc/certs \
+   && setcap cap_net_bind_service=+ep /usr/local/bin/node /usr/local/bin/pm2-runtime
 
 # Hack to get the config usable in a reasonable place
 RUN ln -sf /etc/iotnxt/prototype.json /iotconfig.json
@@ -23,7 +26,10 @@ USER nobody
 
 WORKDIR /build/build
 
-ENTRYPOINT ["/usr/local/bin/node","main.js"]
-# PM2 startup, is trying to write to home dir, which breaks
-#ENTRYPOINT ["/usr/local/bin/pm2","main.js"]
+######## Plain node.js startup
+#ENTRYPOINT ["/usr/local/bin/node","main.js"]
+######## PM2 startup
+# Set the HOME varaible to somewhere that PM2 can write
+ENV HOME=/tmp
+ENTRYPOINT ["/usr/local/bin/pm2-runtime","main.js"]
 #######################################################################
