@@ -27,6 +27,7 @@
   "author": "Rouan van der Ende",
   "license": "ISC",
   "dependencies": {
+    "@amcharts/amcharts4": "^4.5.2",
     "@types/chai": "^4.1.7",
     "@types/crc": "^3.4.0",
     "@types/cryptr": "^4.0.0",
@@ -40,6 +41,7 @@
     "@types/react-leaflet": "^1.1.6",
     "@types/scrypt": "^6.0.0",
     "@types/sinon": "^7.0.5",
+    "amchart4-react": "^1.0.4",
     "bull": "^3.9.1",
     "chai": "^4.2.0",
     "coap": "^0.23.1",
@@ -85,7 +87,7 @@
     "typescript": "^3.1.3",
     "vm2": "^3.6.3",
     "web-push": "^3.3.3",
-    "webpack-dev-server": "^3.4.1",
+    "webpack-dev-server": "^3.7.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
