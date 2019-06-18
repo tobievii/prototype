@@ -5,14 +5,18 @@ export class Redis extends React.Component {
         redisEnable: false,
         host: "host",
         port: "port",
-        AuthPass: ""
+        AuthPass: "",
+        redisContent: ""
     }
 
     componentWillMount = () => {
         fetch("/api/v3/admin/redis", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(data => {
-            if (data.err) { }
-            if (data.result) {
-                this.setState(data.result)
+            if (data) {
+                if (data.redis) {
+                    this.setState(data.redis)
+                } else if (data.redis == null) {
+                    this.setState({ redisContent: "No Redis configuration." })
+                }
             }
         }).catch(err => console.error(err.toString()));
     }
@@ -77,9 +81,10 @@ export class Redis extends React.Component {
             return (
                 <div className="adminBlocks" >
                     <div><h4>REDIS</h4></div>
-                    <div>{this.redisCheckBox()} Enable Redis</div>
+                    {/* <div>{this.redisCheckBox()} Enable Redis</div> */}
                     {this.setupRedis()}
-                    <button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={this.updateOptions} >APPLY</button>
+                    <div>{this.state.redisContent}</div>
+                    {/* <button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={this.updateOptions} >APPLY</button> */}
                     <div style={{ clear: "both" }} />
                 </div>
             )
