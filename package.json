@@ -4,7 +4,8 @@
   "description": "Typescrypt based IoT framework for general purpose remote monitoring/control.",
   "main": "src/main.js",
   "scripts": {
-    "start": "node ./build/main.js",
+    "start": "pm2 start ./build/main.js -i 0",
+    "startnode": "node ./build/main.js",
     "test": "mocha --exit ./build/tests/tests.js",
     "tests": "node ./build/tests.js",
     "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/stresstest.ts --outDir ./build",
@@ -63,6 +64,7 @@
     "mqtt": "^2.18.8",
     "nodemailer": "^4.7.0",
     "nodemon": "^1.18.10",
+    "pm2": "^3.5.1",
     "poly2tri": "^1.5.0",
     "public-ip": "^3.0.0",
     "random-string": "^0.2.0",
