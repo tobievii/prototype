@@ -12,10 +12,10 @@ RUN mkdir -m 0500 /etc/iotnxt /etc/certs
 RUN chown nobody:nogroup /etc/iotnxt /etc/certs
 
 # Update alpine packages
-RUN apk update && apk upgrade
+RUN apt-get update && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set capabilities to allow low port numbers to be used as non-root users
-RUN apk update && apk install libcap && setcap cap_net_bind_service=+ep /usr/local/bin/node /usr/local/bin/pm2-runtime
+RUN apt-get update && apt-get install -y libcap2-bin && apt-get clean && rm -rf /var/lib/apt/lists/* && setcap cap_net_bind_service=+ep /usr/local/bin/node
 
 # Hack to get the config usable in a reasonable place
 RUN ln -sf /etc/iotnxt/prototype.json /iotconfig.json
