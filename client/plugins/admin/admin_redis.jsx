@@ -102,7 +102,7 @@ export class FormInput extends React.Component {
             <div className="row" style={{ marginBottom: 3 }}>
                 <div className="col-3" style={{ textAlign: "right", paddingTop: 10 }}  >{this.props.label}:</div>
                 <div className="col-9">
-                    <input style={{ width: "100%" }} value={this.props.value} spellCheck="false" onChange={this.props.onChange} />
+                    <div className="commanderBgPanel" style={{ width: "100%", color: "rgba(255, 246, 235, 0.75)", opacity: "0.6" }} spellCheck="false" onChange={this.props.onChange}>{this.props.value}</div>
                 </div>
             </div>
         )
