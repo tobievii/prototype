@@ -15,6 +15,7 @@ Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://web
 - Fast mongodb for the data.
 - Extendable plugin architecture.
 - Edit code in the browser using the VSCode editor with intellisense autocompletion and deploy custom code instantly.
+- Multithreaded/Cluster support through redis.
 
 See a live realtime list of your devices, when they were last active and a summary of the raw data state.
 

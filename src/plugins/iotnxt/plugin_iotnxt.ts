@@ -10,6 +10,7 @@ var mongojs = require("mongojs")
 import * as utils from "../../utils"
 
 import { Gateway, GatewayType } from "./gateway"
+import { isNull } from "util";
 var RedisEvent = require('redis-event');
 
 export class PluginIotnxt extends Plugin {
@@ -113,6 +114,8 @@ export class PluginIotnxt extends Plugin {
     //   this.processJob(job, cb);
     // }
     //console.log(packet);
+
+    if (isNull(deviceState)) { return; } // has no state so we stop here.
 
     if (deviceState.plugins_iotnxt_gateway) {
       // "DEVICE HAS IOTNXT GATEWAY SET!"
