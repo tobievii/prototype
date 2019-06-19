@@ -1,4 +1,5 @@
 import { generate } from "../../utils"
+import * as fs from 'fs';
 
 var nodemailer = require("nodemailer")
 var randomString = require('random-string');
@@ -21,10 +22,12 @@ import { log } from "../../log"
 export class PluginAdmin extends Plugin {
   db: any;
   name = "admin";
+  eventHub: any;
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
+    this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
 
@@ -328,20 +331,15 @@ export class PluginAdmin extends Plugin {
     })
 
     app.get("/api/v3/admin/redis", (req: any, res: any) => {
+
+
       if (req.user.level >= 100) {
         this.getRedis((err: Error, result: any) => {
-          res.json({ err, result })
-        })
-      } else {
-        this.getRedis((err: Error, secret: any) => {
-          if (secret) {
-            var result = {
-              redisEnable: secret.redisEnable,
-            }
-            res.json({ err, result })
-          } else {
-            res.json({})
+          var redis = null;
+          if (result != undefined || result != null) {
+            redis = result.redis
           }
+          res.json({ err, redis })
         })
       }
     });
@@ -365,7 +363,12 @@ export class PluginAdmin extends Plugin {
   }
 
   getRedis(cb: any) {
-    this.db.plugins_admin.findOne({ settings: "redis" }, cb);
+    try {
+      var mainconfig = JSON.parse(fs.readFileSync('../../../iotconfig.json').toString())
+      cb(null, mainconfig);
+    } catch (err) {
+      cb(err, null);
+    }
   }
 
   updateRegistration(userInput: any, cb: any) {
@@ -384,14 +387,20 @@ export class PluginAdmin extends Plugin {
 
   updateRedis(userInput: any, cb: any) {
     var cleanInput = {
-      settings: "redis",
       redisEnable: userInput.redisEnable,
       host: userInput.host,
       port: userInput.port,
       AuthPass: userInput.AuthPass,
     }
-    this.db.plugins_admin.update({ settings: "redis" }, cleanInput, { upsert: true }, cb);
+    try {
+      var mainconfig = JSON.parse(fs.readFileSync('../../iotconfig.json').toString())
+      mainconfig = _.merge(mainconfig, { redis: cleanInput });
+      fs.writeFile("../../../iotconfig.json", JSON.stringify(mainconfig), (r: any) => {
+        cb(null, mainconfig);
+        this.eventHub.emit("configChange")
+      });
+    } catch (err) {
+      cb(err, null)
+    }
   }
-
-
 }
