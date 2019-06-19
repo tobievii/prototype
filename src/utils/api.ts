@@ -23,8 +23,8 @@ export class Prototype {
     /*
         registers a new account
     */
-    register(account:any, cb:Function) {
-        request.post(this.uri+"/api/v3/admin/register", { json: { email: account.email, pass: account.pass} }, (err,res,body)=>{
+    register(email:string, pass:string, cb:Function) {
+        request.post(this.uri+"/api/v3/admin/register", { json: { email, pass} }, (err,res,body)=>{
             if (err) cb(err);
             if (body) { 
                 if (body.error) {cb(new Error(body.error)); return; }

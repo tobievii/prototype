@@ -43,11 +43,7 @@ describe("PROTOTYPE", () => {
     it("register", (done) => {
         //this.timeout(5000);
 
-        prototype.register(
-            {
-                email:testAccount.email,
-                pass:testAccount.password
-            }, (err:Error, result:any)=>{
+        prototype.register(testAccount.email, testAccount.password, (err:Error, result:any)=>{
                 if (err) done(err);
                 if (result) { 
                     if (result.error) done(new Error(result.error))
