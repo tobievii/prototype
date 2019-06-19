@@ -48,8 +48,8 @@ export class PluginNotifications extends Plugin {
 
     //Needs to be changed so that the notification is directly sent instead of being featched
     app.get("/api/v3/notifications/getNew", (req: any, res: any) => {
-      db.users.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
-        res.json(result.notifications[result.notifications.length - 1]);
+      this.getNewNotification(this.db, req.user, (result: any) => {
+        res.json(result);
       })
     });
 
@@ -59,7 +59,19 @@ export class PluginNotifications extends Plugin {
   }
 
   getNewNotification(db: any, user: any, res: any) {
-
+    db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
+      var notifications = [];
+      if (err) res({ err: err });
+      if (result) {
+        for (var n in result.notifications) {
+          if (!result.notifications[n].notified) {
+            notifications.push(result.notifications[n])
+          }
+        }
+        res({ result: notifications })
+        this.deviceNotified(db, user);
+      };
+    })
   }
 
   deviceSeen(db: any, user: any) {
@@ -80,6 +92,23 @@ export class PluginNotifications extends Plugin {
           Seen: true
         }
       })
+
+      db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
+      })
+    });
+  }
+
+  deviceNotified(db: any, user: any) {
+    db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
+      var notifications = result.notifications;
+      var final = [];
+
+      for (var notification in notifications) {
+        if (notifications[notification].notified == false) {
+          notifications[notification].notified = true;
+        }
+        final.push(notifications[notification]);
+      }
 
       db.users.update({ apikey: user.apikey }, { $set: { notifications: final } }, (err: Error, updated: any) => {
       })
@@ -110,7 +139,7 @@ export class PluginNotifications extends Plugin {
         device: options.devid,
         created: new Date(),
         message: message,
-        notified: true,
+        notified: false,
         seen: false
       }
 
@@ -153,7 +182,7 @@ export class PluginNotifications extends Plugin {
         device: options.devid,
         created: new Date(),
         message: message,
-        notified: true,
+        notified: false,
         seen: false
       }
 
@@ -212,7 +241,7 @@ export class PluginNotifications extends Plugin {
         device: options.devid,
         created: new Date(),
         message: message,
-        notified: true,
+        notified: false,
         seen: false
       }
       options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
@@ -282,6 +311,7 @@ export class PluginNotifications extends Plugin {
               privateKey: this.privateVapidKey
             }
           }
+          notification.notified = false;
 
           this.eventHub.emit("plugin", {
             plugin: this.name,
