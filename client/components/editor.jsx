@@ -15,7 +15,7 @@ const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
 export class Editor extends Component {
 
     loadingState = 0;
-
+    count = false;
     state = {
         message: "",
         messageOpacity: 0,
@@ -54,7 +54,7 @@ export class Editor extends Component {
     };
 
     loadLastPacket = (devid, cb) => {
-        console.log("loadLastPacket")
+        // console.log("loadLastPacket")
         fetch("/api/v3/packets", {
             method: "POST",
             headers: {
@@ -253,6 +253,17 @@ export class Editor extends Component {
                 }
                 return (<div>loading....</div>)
             } else {
+
+                if (this.state.code != this.props.state.workflowCode) {
+                    if (this.props.state.workflowCode != null && this.props.state.workflowCode != undefined) {
+                        this.setState({ code: this.props.state.workflowCode })
+                        this.count = false;
+                    } else if (this.count == false) {
+                        this.count = true;
+                        this.setState({ code: `// uncomment below to test "workflow" processing \n// packet.data.test = "hello world"\ncallback(packet); ` })
+                    }
+                }
+
                 const options = {
                     selectOnLineNumbers: false,
                     minimap: { enabled: false }

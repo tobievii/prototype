@@ -28,10 +28,7 @@ self.addEventListener('activate', function (e) {
 
 
 self.addEventListener('push', function (e) {
-    //console.log(e)
-
     var message = " ";
-
     var options = {
         body: '',
         icon: '/favicon.png',
@@ -60,19 +57,24 @@ self.addEventListener('push', function (e) {
     })
         .then(response => response.json())
         .then((response) => {
-            if (response.message == undefined || response.message == null) {
-                if (response.type == "NEW DEVICE ADDED" || response.type == "New dewvice added") {
-                    message = "has been successfuly added to PROTOTYP3.";
-                } else if (response.type == "CONNECTION DOWN 24HR WARNING") {
-                    message = "hasn't sent data in the last 24hours";
+            if (response.result) {
+                for (var n in response.result) {
+                    if (response.result[n].message == undefined || response.result[n].message == null) {
+                        if (response.result[n].type == "NEW DEVICE ADDED" || response.result[n].type == "New dewvice added") {
+                            message = "has been successfuly added to PROTOTYP3.";
+                        } else if (response.result[n].type == "CONNECTION DOWN 24HR WARNING") {
+                            message = "hasn't sent data in the last 24hours";
+                        }
+                    } else {
+                        message = response.result[n].message;
+                    }
+
+                    options.data.dateOfArrival = response.result[n].created;
+                    options.body = '"' + response.result[n].device + '" ' + message;
+
+                    self.registration.showNotification(response.result[n].type, options)
                 }
-            } else {
-                message = response.message;
             }
-
-            options.body = '"' + response.device + '" ' + message;
-
-            self.registration.showNotification(response.type, options)
         })
 });
 

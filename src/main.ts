@@ -51,6 +51,7 @@ var eventHub = new events.EventEmitter();
 import * as stats from "./stats"
 import { Config } from "./config"
 var config = new Config(app, eventHub);
+//console.log(config)
 var db = config.db;
 var version = config.version;
 //import { createNotification, checkExisting } from "./plugins/notifications/notifications";
@@ -79,6 +80,17 @@ var plugins: any = [];
 
 eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
+})
+
+eventHub.on("configChange", () => {
+  //event to restart all servers on UI infor change
+  // config = new Config(app, eventHub);
+  // db = config.db;
+  // version = config.version;
+  // for(var prprocess.env){
+  process.exit();
+  // }
+  //initializeSocketio();
 })
 
 eventHub.on("plugin", (data: any) => {
@@ -129,29 +141,15 @@ utilsLib.createPublicKeysforOldAccounts(db);
 app.use(accounts.midware(db));
 
 
-eventHub.on("config", (data: any) => {
-  config = data;
-  if (data.db) {
-    log("PLUGINS", "Initialize on db redis call")
-    plugins = pluginsInitialize(config, app, db, eventHub);
-  } else {
-    db.on('connect', function () {
-      log("PLUGINS", "Initialize on db connect")
-      plugins = pluginsInitialize(config, app, db, eventHub);
 
-      // for (var p in pluginClasses) {
-      //   plugins.push(new pluginClasses[p](app, db, eventHub))
-      //   // if (plugins[p].init) {
-      //   //   log("PLUGIN\tinit [" + plugins[p].name + "]")
-      //   //   plugins[p].init(app, db, eventHub);
-      //   // }
-      // }
+db.on('connect', function () {
+  log("PLUGINS", "Initialize on db connect")
 
-    })
-  }
+  plugins = pluginsInitialize(config.configGen, app, db, eventHub);
 
   initializeSocketio();
 })
+
 
 //####################################################################
 // USERS LAST SEEN / ACTIVE
@@ -1506,10 +1504,10 @@ function bindListeners(ioIn: any) {
 
 
 function initializeSocketio() {
-  if (config.redis) {
+  if (config.configGen.redis && config.configGen.redis.redisEnable == true) {
     log("socketio", "REDIS ENABLED")
     const redis = require('socket.io-redis')
-    io.adapter(redis(config.redis))
+    io.adapter(redis({ host: config.configGen.redis.host, port: config.configGen.redis.port }))
     bindListeners(io)
   } else {
     log("socketio", "REDIS NOT ENABLED")
