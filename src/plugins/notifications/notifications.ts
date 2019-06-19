@@ -309,7 +309,7 @@ export class PluginNotifications extends Plugin {
   }
 
   subscribe(apikey: string, subscriptionData: any) {
-    this.db["plugins_" + this.name].find({ apikey, subscriptionData }, (e: Error, dbSubscriptions: any) => {
+    this.db["plugins_" + this.name].find({ apikey: apikey }, (e: Error, dbSubscriptions: any) => {
       if (dbSubscriptions.length == 0) {
         log("PLUGIN", this.name, "SUBSCRIPTION");
         this.db["plugins_" + this.name].save({ apikey, subscriptionData })
