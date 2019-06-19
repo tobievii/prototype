@@ -30,10 +30,10 @@ export class PluginIotnxt extends Plugin {
     this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
-    console.log(config.redis);
-    console.log(process.env.pm_id);
+    // console.log(config.redis);
+    // console.log(process.env.pm_id);
     // if redis is on and this is running inside PM2
-    if (config.redis && process.env.pm_id) {
+    if (config.redis && process.env.pm_id && config.redis.redisEnable == true) {
       log("CLUSTER MODE ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       this.isCluster = true;
       // load balance
