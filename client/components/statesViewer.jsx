@@ -777,6 +777,11 @@ export class StatesViewer extends Component {
 
   returnDeviceList = () => {
     var size = 242;
+    var n = 1;
+
+    if (this.props.mainView == "devices") {
+      n = 0.9
+    }
 
     if (this.props.visiting == true) {
       size = 220;
@@ -787,7 +792,7 @@ export class StatesViewer extends Component {
     }
 
     return (
-      <div style={{ overflowY: "auto", height: (window.innerHeight * 0.9) - size + "px" }}>
+      <div style={{ overflowY: "auto", height: (window.innerHeight * n) - size + "px" }}>
         <div style={{ overflowY: "auto", padding: "2px 0px" }} >
           <DeviceList alarmStates={this.updateAlarmStates} mainView={this.props.mainView} username={this.props.username} devices={this.state.devicesView} view={this.state.view} mapactionCall={this.deviceClicked} actionCall={this.handleActionCall} public={this.props.public} account={this.props.account} visiting={this.props.visiting} />
         </div>
