@@ -100,6 +100,13 @@ export class StatesViewerMenu extends Component {
         }
     }
 
+    search = evt => {
+        if (evt.target.value == "DASHBOARD PRESET" || evt.target.value == "SET IOTNXT GATEWAY" || evt.target.value == "SCRIPT PRESET") {
+            this.props.openModifyModal(evt.target.value.toString())
+            evt.target.value = ""
+        }
+    }
+
     menuDeleteButton = () => {
         if (this.props.public == false) {
             if (this.props.visiting == false) {
@@ -132,6 +139,30 @@ export class StatesViewerMenu extends Component {
         }
     }
 
+    menuModifyButton = () => {
+        if (this.props.public == false) {
+            if (this.props.visiting == false) {
+                if (this.props.selectCount > 0) {
+                    return (
+                        <div>
+                            <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "50%", color: "white" }} onChange={this.search} placeholder='MODIFY' />
+                            < datalist id="devices" >
+                                <option value="DASHBOARD PRESET" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="SCRIPT PRESET" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="SHARE" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                < option value="SET IOTNXT GATEWAY" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                            </datalist>
+                        </div>
+                    )
+                } else {
+                    return (
+                        <input list="devices" className="commanderBgPanel commanderBgPanelClickable" readOnly style={{ width: "50%", cursor: "not-allowed" }} placeholder='MODIFY' />
+                    )
+                }
+            }
+        }
+    }
+
     clickDeleteConfirmation = () => {
         confirmAlert({
             customUI: ({ onClose }) => {
@@ -143,7 +174,6 @@ export class StatesViewerMenu extends Component {
                             <button className="smallButton" style={{ margin: "5px", backgroundColor: "red", opacity: "0.7" }} onClick={onClose}>No, leave it!</button>
 
                             <button className="smallButton" style={{ margin: "5px", backgroundColor: "green", opacity: "0.6" }} onClick={() => {
-                                //this.handleClickDelete()
                                 this.props.deleteSelected()
                                 onClose()
                             }}>Yes, delete it!</button>
@@ -237,14 +267,17 @@ export class StatesViewerMenu extends Component {
                             {this.selectBox()}
                         </div>
                     </span>
-                    <span className={this.state.display}>
+                    <span className={this.state.display} >
                         <div className="col" style={{ flex: "0 0 35px" }}>
-                            {this.menuDeleteButton()}
+                            {this.menuModifyButton()}
                         </div>
+                    </span>
+                    <span >
+                        {this.menuDeleteButton()}
                     </span>
                 </div >
                 {this.filterSection()}
-            </div >
+            </div>
         )
     }
 }
