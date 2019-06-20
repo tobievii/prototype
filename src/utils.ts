@@ -277,6 +277,7 @@ export function createDBIndexes(db: any) {
     db.users.createIndex({ uuid: 1 })
     db.users.createIndex({ apikey: 1 })
     db.users.createIndex({ "_last_seen": 1 })
+    db.users.createIndex({ username: 1 }, { background: 1 })
 }
 
 export function checkFirstRun(db: any) {
