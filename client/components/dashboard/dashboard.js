@@ -16,7 +16,7 @@ import * as _ from "lodash"
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
 const MapDevices = React.lazy(() => import('./map'));
-import { ChartLine } from "./chart_line.jsx"
+import { LineChart } from "./chart.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
 import { WidgetMesh } from "./widget_mesh.jsx"
@@ -127,6 +127,7 @@ class Dashboard extends React.Component {
 
 
   }
+
 
 
   onDrop = (e, f) => {
@@ -317,10 +318,11 @@ class Dashboard extends React.Component {
     }
 
     if (data.type == "ChartLine") {
-      return (<ChartLine
-        dash={dash}
+      return (<LineChart
         data={data}
-        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+        dash={dash}
+        state={this.props.state}
+        datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "chart") {
