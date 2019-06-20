@@ -19,6 +19,7 @@ library.add(faSortAlphaDown);
 library.add(faSortAmountDown);
 
 import socketio from "socket.io-client";
+import ModifyDevices from "./modifyDevices";
 
 export class DeviceList extends Component {
 
@@ -116,6 +117,8 @@ export class StatesViewer extends Component {
     showB: false,
     buttonColour: " ",
     tempdev: [],
+    selectedModification: "",
+    modificationinfo: "",
     sortvalues: {
       timedesc: "asc",
       namedesc: "asc",
@@ -126,6 +129,8 @@ export class StatesViewer extends Component {
       public: "asc"
     },
     isOpen: false,
+    Modifychoice: "",
+    isOpenModify: false,
     tempdev: [],
     toggleOn: false,
     toggleOff: true,
@@ -907,6 +912,23 @@ export class StatesViewer extends Component {
       </div>
     )
   }
+  openModifyModal = (choice) => {
+    switch (choice) {
+      case "SET IOTNXT GATEWAY":
+        this.setState({ modificationinfo: "A easier way to assign a gateway to multipe devices" })
+        break;
+      case "SCRIPT PRESET":
+        this.setState({ modificationinfo: "You can now assign the same workflow code to multiple devices" })
+        break;
+      case "DASHBOARD PRESET":
+        this.setState({ modificationinfo: "You can now assign the same dashboard to multiple devices" })
+        break;
+      default:
+        this.setState({ modificationinfo: "" });
+    }
+    this.setState({ selectedModification: choice })
+    this.setState({ isOpenModify: true })
+  }
 
   render() {
     if (this.state.deleted == true) {
@@ -921,8 +943,8 @@ export class StatesViewer extends Component {
               <div>
                 {this.deviceButtons()}
                 < StatesViewerMenu
+                  openModifyModal={this.openModifyModal}
                   sortvalues={this.state.sortvalues}
-                  openModal={() => this.props.openModal()}
                   mainView={this.props.mainView}
                   deviceCall={this.state.devicePressed}
                   boundary={this.state.boundary}
@@ -962,6 +984,13 @@ export class StatesViewer extends Component {
             </div>
             {this.displayLog()}
             {this.displayMap()}
+            <ModifyDevices account={this.props.account}
+              isOpen={this.state.isOpenModify}
+              modification={this.state.selectedModification}
+              modificationinfo={this.state.modificationinfo}
+              closeModel={() => { this.setState({ isOpenModify: false }) }}
+              mainView={this.props.mainView}
+              devices={this.state.devicesServer} />
             <ChangePassword
               account={this.props.account}
               isOpen={this.state.isOpen}
