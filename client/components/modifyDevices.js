@@ -67,20 +67,20 @@ export default class ModifyDevices extends Component {
     options = () => {
         if (this.props.modification == "SET IOTNXT GATEWAY") {
             return (
-                <div style={{ overflowY: "auto", height: "1px" }}>{this.state.serverGateways.map(devices => <option value={devices.GatewayId + " | " + devices.HostAddress} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
+                <div style={{ overflowY: "auto", height: "1px" }}>{this.state.serverGateways.map(devices => <option key={devices.GatewayId} value={devices.GatewayId + "|" + devices.HostAddress} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
             )
         }
 
         else if (this.props.modification == "SCRIPT PRESET") {
             var temp = this.props.devices.filter((users) => { return users.workflowCode !== undefined })
             return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
+                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option key={devices.devid} value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
             )
         }
         else if (this.props.modification == "DASHBOARD PRESET") {
             var temp = this.props.devices.filter((users) => { return users.layout !== undefined })
             return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
+                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option key={devices.devid} value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
             )
         }
     }
@@ -93,6 +93,67 @@ export default class ModifyDevices extends Component {
                         <div ><CodeBlock type={"modify"} language='javascript' value={this.props.devices[i].workflowCode} /></div>)
                 }
             }
+        }
+    }
+
+    assignModify = () => {
+        var devices = this.props.devices.filter((device) => { return device.selected == true; })
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            var GatewayId = this.state.search.split("|")[0]
+            var HostAddress = this.state.search.split("|")[1]
+            for (var i in this.state.serverGateways) {
+                if (GatewayId == this.state.serverGateways[i].GatewayId && HostAddress == this.state.serverGateways[i].HostAddress) {
+                    var devices = this.props.devices.filter((device) => { return device.selected == true; })
+                    for (var i in devices) {
+                        fetch('/api/v3/iotnxt/setgatewaydevice', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                key: devices[i].key,
+                                id: devices[i].devid,
+                                GatewayId: GatewayId,
+                                HostAddress: HostAddress
+                            })
+                        }).then(response => response.json()).then((data) => {
+                            console.log(data)
+                        }).catch(err => console.error(this.props.url, err.toString()))
+                    }
+                }
+                else {
+                    null;
+                }
+            }
+        }
+
+        else if (this.props.modification == "SCRIPT PRESET") {
+            for (var dev in this.props.devices) {
+                if (this.state.search == this.props.devices[dev].devid) {
+                    for (var i in devices) {
+                        if (this.props.devices[dev].devid != devices[i].devid) {
+                            fetch("/api/v3/workflow", {
+                                method: "POST",
+                                headers: {
+                                    Accept: "application/json",
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ id: devices[i].devid, code: this.props.devices[dev].workflowCode })
+                            })
+                                .then(response => response.json()).then(serverresponse => {
+                                }).catch(err => console.error(err.toString()));
+                        }
+                        else {
+                            null
+                        }
+                    }
+                }
+                else {
+                    null;
+                }
+            }
+
         }
     }
 
@@ -116,13 +177,13 @@ export default class ModifyDevices extends Component {
                         </datalist>
                     </div>
 
-                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("select") }}>
+                    <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
+                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
                             ASSIGN <i className="fas fa-chevron-right"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
-            </div>
+            </div >
         )
     }
 
