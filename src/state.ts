@@ -150,6 +150,7 @@ export function postState(
         packetToUpsert["boundaryLayer"] = undefined;
         packetToUpsert["selectedIcon"] = false;
         info.newdevice = true
+        info.deviceStateDBpreupdate = packetToUpsert; //if its a new device we'll use this as the previous state.
       }
 
       packet["key"] = packetToUpsert.key

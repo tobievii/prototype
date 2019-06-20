@@ -1,4 +1,5 @@
 import { generate } from "../../utils"
+import * as fs from 'fs';
 
 var nodemailer = require("nodemailer")
 var randomString = require('random-string');
@@ -21,10 +22,12 @@ import { log } from "../../log"
 export class PluginAdmin extends Plugin {
   db: any;
   name = "admin";
+  eventHub: any;
 
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
     this.db = db;
+    this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
 
@@ -271,6 +274,7 @@ export class PluginAdmin extends Plugin {
     //Shared Device email
     //####################################################################
 
+
     app.get("/api/v3/admin/registration", (req: any, res: any) => {
       // public api to get information if server allows registration/requires email verification
       // if level > 100 then adds the server private email config.
@@ -325,10 +329,46 @@ export class PluginAdmin extends Plugin {
         res.json({ error, result, account: req.user })
       })
     })
+
+    app.get("/api/v3/admin/redis", (req: any, res: any) => {
+
+
+      if (req.user.level >= 100) {
+        this.getRedis((err: Error, result: any) => {
+          var redis = null;
+          if (result != undefined || result != null) {
+            redis = result.redis
+          }
+          res.json({ err, redis })
+        })
+      }
+    });
+
+    app.post("/api/v3/admin/redis", (req: any, res: any) => {
+      if (req.user.level >= 100) {
+        var userinput = req.body
+        userinput.settings = "redis"
+        this.updateRedis(userinput, (err: Error, result: any) => {
+          res.json({ err, result })
+        })
+      } else {
+        log("USER NOT AUTHORIZED!" + req.user.email)
+        res.json({ err: "not sufficient user level", result: null })
+      }
+    });
   }
 
   getRegistration(cb: any) {
     this.db.plugins_admin.findOne({ settings: "registration" }, cb);
+  }
+
+  getRedis(cb: any) {
+    try {
+      var mainconfig = JSON.parse(fs.readFileSync('../../../iotconfig.json').toString())
+      cb(null, mainconfig);
+    } catch (err) {
+      cb(err, null);
+    }
   }
 
   updateRegistration(userInput: any, cb: any) {
@@ -345,4 +385,22 @@ export class PluginAdmin extends Plugin {
     this.db.plugins_admin.update({ settings: "registration" }, cleanInput, { upsert: true }, cb);
   }
 
+  updateRedis(userInput: any, cb: any) {
+    var cleanInput = {
+      redisEnable: userInput.redisEnable,
+      host: userInput.host,
+      port: userInput.port,
+      AuthPass: userInput.AuthPass,
+    }
+    try {
+      var mainconfig = JSON.parse(fs.readFileSync('../../iotconfig.json').toString())
+      mainconfig = _.merge(mainconfig, { redis: cleanInput });
+      fs.writeFile("../../../iotconfig.json", JSON.stringify(mainconfig), (r: any) => {
+        cb(null, mainconfig);
+        this.eventHub.emit("configChange")
+      });
+    } catch (err) {
+      cb(err, null)
+    }
+  }
 }

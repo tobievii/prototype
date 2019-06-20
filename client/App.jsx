@@ -28,8 +28,6 @@ import * as p from "./prototype.ts"
 import socketio from "socket.io-client";
 import { DeviceHistory } from "./components/device_history.jsx";
 var socket = socketio({ transports: ['websocket', 'polling'] });
-const publicVapidKey =
-    "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
 
 const test = {
     un: undefined,
@@ -40,7 +38,9 @@ const test = {
 
 var visitingG = undefined;
 
+
 class App extends Component {
+
     state = {
         devicesView: "dashboardDevices",
         isOpen: false,
@@ -57,20 +57,16 @@ class App extends Component {
         p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
 
         socket.on("connect", a => {
-            socket.on("notification", a => {
+            socket.on("plugin_notifications", a => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })
             })
-
         });
 
         p.getStates((states) => { this.setState({ states }) })
-
         this.serviceworkerfunction();
-
     }
-
 
     componentWillMount = () => {
         p.getAccount(account => {
@@ -100,28 +96,21 @@ class App extends Component {
         }
 
         async function workerInit() {
+            var publicVapidKey = "";
+            await fetch('/api/v3/notifications/publicKey', {
+                method: 'GET', headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then((key) => {
+                    publicVapidKey = key;
+                })
+
             const register = await navigator.serviceWorker.register('/serviceworker.js', {
                 scope: "/"
             });
-
-            socket.on("pushNotification", a => {
-                var message = " ";
-
-                if (a.message == undefined || a.message == null) {
-                    if (a.type == "NEW DEVICE ADDED" || a.type == "New dewvice added") {
-                        message = "has been successfuly added to PROTOTYP3.";
-                    } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
-                        message = "hasn't sent data in the last 24hours";
-                    }
-                } else {
-                    message = a.message;
-                }
-
-                register.showNotification(a.type, {
-                    body: '"' + a.device + '" ' + message,
-                    icon: "./iotnxtLogo.png"
-                });
-            })
 
             const subscription = await register.pushManager.subscribe({
                 userVisibleOnly: true,

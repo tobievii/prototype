@@ -18,15 +18,11 @@ import * as scrypt from "scrypt"
 //var scrypt = require("scrypt");
 //var config = JSON.parse(fs.readFileSync('../config.json').toString());
 
-import { configGen } from "./config"
 
 import * as trex from './utils'
 import * as state from "./state"
 //import * as discordBot from './discordBot'
 
-
-let config: any = configGen();
-var version = config.version; //
 //trex.log(config);
 
 var compression = require('compression')
@@ -45,15 +41,19 @@ import * as events from "events";
 
 import * as utilsLib from "./utils"
 
-var mongojs = require('mongojs')
+
 
 const { VM } = require('vm2');
 
-var db = mongojs(config.mongoConnection, config.mongoCollections);
 
 var eventHub = new events.EventEmitter();
 
 import * as stats from "./stats"
+import { Config } from "./config"
+var config = new Config(app, eventHub);
+//console.log(config)
+var db = config.db;
+var version = config.version;
 //import { createNotification, checkExisting } from "./plugins/notifications/notifications";
 
 app.disable('x-powered-by');
@@ -82,8 +82,19 @@ eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 
+eventHub.on("configChange", () => {
+  //event to restart all servers on UI infor change
+  // config = new Config(app, eventHub);
+  // db = config.db;
+  // version = config.version;
+  // for(var prprocess.env){
+  process.exit();
+  // }
+  //initializeSocketio();
+})
+
 eventHub.on("plugin", (data: any) => {
-  // log("EVENTHUB", data)
+  //log("EVENTHUB", data)
 
   /*
     In plugins please use this.eventHub.emit("plugin", {plugin: "pluginname", event: {your data in here} });
@@ -97,24 +108,24 @@ eventHub.on("plugin", (data: any) => {
   */
 
   if (data.plugin && data.event) {
+    log("EVENTHUB", data.plugin, JSON.stringify(data.event));
     io.sockets.emit("plugin_" + data.plugin, data.event)
   } else {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
     io.sockets.emit('plugin', data);
   }
-
 })
 
-eventHub.on("notification", (notification: any, device: any) => {
-  if (notification != undefined || notification != null) {
-    io.to(device.apikey).emit('pushNotification', notification)
-    io.to(device.apikey).emit("notification");
-    io.to(device.key).emit('notificationState');
-  } else {
-    io.to(device).emit("notification");
-    io.to(device).emit('notificationState');
-  }
-});
+// eventHub.on("notification", (notification: any, device: any) => {
+//   if (notification != undefined || notification != null) {
+//     io.to(device.apikey).emit('pushNotification', notification)
+//     io.to(device.apikey).emit("notification");
+//     io.to(device.key).emit('notificationState');
+//   } else {
+//     io.to(device).emit("notification");
+//     io.to(device).emit('notificationState');
+//   }
+// });
 
 //app.use(express.json())
 app.use(safeParser);
@@ -134,17 +145,11 @@ app.use(accounts.midware(db));
 db.on('connect', function () {
   log("PLUGINS", "Initialize on db connect")
 
-  plugins = pluginsInitialize(config, app, db, eventHub);
+  plugins = pluginsInitialize(config.configGen, app, db, eventHub);
 
-  // for (var p in pluginClasses) {
-  //   plugins.push(new pluginClasses[p](app, db, eventHub))
-  //   // if (plugins[p].init) {
-  //   //   log("PLUGIN\tinit [" + plugins[p].name + "]")
-  //   //   plugins[p].init(app, db, eventHub);
-  //   // }
-  // }
-
+  initializeSocketio();
 })
+
 
 //####################################################################
 // USERS LAST SEEN / ACTIVE
@@ -176,7 +181,7 @@ app.get('/', (req: any, res: any) => {
   //redirect main page people to https.
   if (req.protocol == "http") {
     trex.log("HTTP VISITOR")
-    if (config.ssl) {
+    if (config.configGen.ssl) {
       res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
       res.end();
     }
@@ -1370,7 +1375,6 @@ app.get("/api/v3/plugins/definitions", (req: any, res: any) => {
 })
 
 export function processPacketWorkflow(db: any, apikey: string, deviceId: string, packet: any, plugins: any, cb: any) {
-
   db.states.find({ apikey: apikey }, (err: Error, states: any) => {
     if (err) { log("WORKFLOW ERROR"); }
 
@@ -1407,7 +1411,10 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
         var options = {
           apikey: state.apikey,
-          devid: state.devid
+          devid: state.devid,
+          app: undefined,
+          db: db,
+          eventHub: eventHub
         }
 
         for (var plugin of plugins) {
@@ -1451,8 +1458,8 @@ export function processPacketWorkflow(db: any, apikey: string, deviceId: string,
 
 var server;
 
-if (config.ssl) {
-  server = https.createServer(config.sslOptions, app);
+if (config.configGen.ssl) {
+  server = https.createServer(config.configGen.sslOptions, app);
 } else {
   server = http.createServer(app);
 }
@@ -1496,21 +1503,24 @@ function bindListeners(ioIn: any) {
 }
 
 
-
-if (config.redis) {
-  log("REDIS ENABLED")
-  const redis = require('socket.io-redis')
-  io.adapter(redis(config.redis))
-  bindListeners(io)
-} else {
-  bindListeners(io)
+function initializeSocketio() {
+  if (config.configGen.redis && config.configGen.redis.redisEnable == true) {
+    log("socketio", "REDIS ENABLED")
+    const redis = require('socket.io-redis')
+    io.adapter(redis({ host: config.configGen.redis.host, port: config.configGen.redis.port }))
+    bindListeners(io)
+  } else {
+    log("socketio", "REDIS NOT ENABLED")
+    bindListeners(io)
+  }
 }
+
 
 
 
 /* ############################################################################## */
 
-if (config.ssl) {
+if (config.configGen.ssl) {
   server.listen(443);
 
   // temporary open ports for shockwave pivot
@@ -1526,8 +1536,8 @@ if (config.ssl) {
 
   /////
 } else {
-  trex.log("HTTP\tServer port: " + config.httpPort)
-  server.listen(config.httpPort).on("error", (err: Error) => {
+  trex.log("HTTP\tServer port: " + config.configGen.httpPort)
+  server.listen(config.configGen.httpPort).on("error", (err: Error) => {
     console.error("HTTP Caught error")
     console.error(err);
     console.log("You must have another process running that is using this port. EXITING")

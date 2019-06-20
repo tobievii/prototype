@@ -10,6 +10,7 @@ var mongojs = require("mongojs")
 import * as utils from "../../utils"
 
 import { Gateway, GatewayType } from "./gateway"
+import { isNull } from "util";
 var RedisEvent = require('redis-event');
 
 export class PluginIotnxt extends Plugin {
@@ -29,9 +30,11 @@ export class PluginIotnxt extends Plugin {
     this.eventHub = eventHub;
 
     log("PLUGIN", this.name, "LOADED");
-
+    // console.log(config.redis);
+    // console.log(process.env.pm_id);
     // if redis is on and this is running inside PM2
-    if (config.redis && process.env.pm_id) {
+    if (config.redis && process.env.pm_id && config.redis.redisEnable == true) {
+      log("CLUSTER MODE ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
       this.isCluster = true;
       // load balance
       this.queue = new Queue(this.name, 'redis://' + config.redis.host + ':' + config.redis.port);
@@ -66,12 +69,12 @@ export class PluginIotnxt extends Plugin {
       setTimeout(() => {
         this.singleInstanceStart();
       }, 1500)
-
     }
 
     app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
-      this.addgateway(req.body, req.user, (err: Error, result: any) => {
+      this.addgateway(req.body, req.user, (err: Error, result: any, gateway: any) => {
         if (err) res.json({ err: err.toString() });
+        this.handlenewgateway(gateway);
         //this.connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
         res.json(result);
       });
@@ -111,6 +114,8 @@ export class PluginIotnxt extends Plugin {
     //   this.processJob(job, cb);
     // }
     //console.log(packet);
+
+    if (isNull(deviceState)) { return; } // has no state so we stop here.
 
     if (deviceState.plugins_iotnxt_gateway) {
       // "DEVICE HAS IOTNXT GATEWAY SET!"
@@ -163,7 +168,17 @@ export class PluginIotnxt extends Plugin {
     gateway.type = "gateway"
     gateway["_created_on"] = new Date();
     gateway["_created_by"] = user["_id"];
-    this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result); });
+    this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
+  }
+
+  handlenewgateway(gateway: any) {
+    if (this.isCluster) {
+      // let cluster connect to it
+      if (this.queue) this.queue.add({ type: "connect", gateway });
+    } else {
+      // we connect to it.
+      this.connectGateway(gateway);
+    }
   }
 
   getgateways(cb: any) {
@@ -257,9 +272,9 @@ export class PluginIotnxt extends Plugin {
 
     })
     //
-    
+
     // handling incoming requests from commander/portal
-    gatewayConnection.on("request", (request:any)=>{
+    gatewayConnection.on("request", (request: any) => {
       this.eventHub.emit("device", request);
     })
 

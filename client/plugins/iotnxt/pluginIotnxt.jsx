@@ -12,20 +12,22 @@ import { AddGatewayPanel } from "./addGateway.jsx"
 import { GatewayList } from "./gatewayList.jsx"
 
 import socketio from 'socket.io-client';
-const socket = socketio({ transports: ['websocket', 'polling'] });
 
 export class SettingsPanel extends React.Component {
   state = { gateways: [] }
+  socket;
 
-  loadServerGateways() {
-    fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((data) => {
-      if (data) { this.setState({ gateways: data }); }
-    }).catch(err => console.error(this.props.url, err.toString()))
-  }
+  constructor() {
+    super();
+    this.socket = socketio({ transports: ['websocket'] });
 
-  componentDidMount() {
-    this.loadServerGateways();
-    socket.on("plugin_iotnxt", (event) => {
+    this.socket.on("connect", () => {
+      console.log("iotnxt socket connected")
+    })
+
+    this.socket.on("plugin_iotnxt", (event) => {
+      console.log(event);
+
 
       /* something happened with a gateway */
       if (event.type == "gatewayUpdate") {
@@ -42,10 +44,17 @@ export class SettingsPanel extends React.Component {
       }
 
 
-      //this.loadServerGateways();
+      this.loadServerGateways();
     })
+
+    this.loadServerGateways();
   }
 
+  loadServerGateways() {
+    fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((data) => {
+      if (data) { this.setState({ gateways: data }); }
+    }).catch(err => console.error(this.props.url, err.toString()))
+  }
 
 
   update = () => { this.loadServerGateways(); }

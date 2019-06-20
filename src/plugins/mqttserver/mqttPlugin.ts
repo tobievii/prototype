@@ -19,6 +19,7 @@ export class PluginMQTT extends Plugin {
     mqttConnections: any = [];
     isCluster: boolean = false;
     ev: any;
+    clustersubs: string[] = [];
 
     constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
         super(app, db, eventHub);
@@ -26,10 +27,11 @@ export class PluginMQTT extends Plugin {
         this.app = app;
         this.eventHub = eventHub;
 
-        log("PLUGIN", this.name, "LOADED");
 
+        log("PLUGIN", this.name, "LOADED");
         // if redis is on and this is running inside PM2
-        if (config.redis && process.env.pm_id) {
+        if (config.redis && process.env.pm_id && config.redis.redisEnable == true) {
+
             this.isCluster = true;
             this.ev = new RedisEvent(config.redis.host, [this.name]);
 
@@ -45,11 +47,20 @@ export class PluginMQTT extends Plugin {
 
                 if (this.isCluster) {
                     // when a device connects we listen to events that should effect this device cluster wide.
-                    log(this.name, "CLUSTER", "SUBSCRIBE")
-                    this.ev.on(this.name + ":" + data.apikey, (data: any) => {
-                        log(this.name, "CLUSTER", "EVENT RECIEVED")
-                        this.handlePacket(data.deviceState, data.packet, () => { });
-                    });
+
+
+                    var sub = this.name + ":" + data.apikey
+                    if (this.clustersubs.indexOf(sub) == -1) {
+                        this.clustersubs.push(sub);
+                        log(this.name, "CLUSTER", "NEW SUB")
+                        this.ev.on(this.name + ":" + data.apikey, (data: any) => {
+                            if (data.packet.fromId != process.env.pm_id) {
+                                this.handlePacket(data.deviceState, data.packet, () => { });
+                            }
+                        });
+                    }
+
+
                 }
 
                 this.mqttConnections.push(client);
@@ -87,12 +98,15 @@ export class PluginMQTT extends Plugin {
 
     handlePacket(deviceState: any, packet: any, cb: any) {
 
+        if (!deviceState) { console.error("MQTT plugin handlePacket deviceState is not defined"); return; }
+
         // if this is not from the cluster (ie.. some other protocol on this server)
         // then if we are running as part of a cluster
         // we send it out and flag the packet as "fromCluster"
         if ((this.isCluster) && (packet.fromCluster != true)) {
             log(this.name, "CLUSTER", "EVENT PUBLISH")
             packet.fromCluster = true;
+            packet.fromId = process.env.pm_id
             this.ev.pub(this.name + ":" + deviceState.apikey, {
                 deviceState,
                 packet,
@@ -122,7 +136,12 @@ export class PluginMQTT extends Plugin {
                             }
                         }
 
-                        if (sendit) { mqttConnection.publish(packet.apikey, JSON.stringify(temp)) }
+                        if (sendit) {
+
+                            console.log("----- SENDING ----")
+                            console.log(mqttConnection.uuid)
+                            mqttConnection.publish(packet.apikey, JSON.stringify(temp))
+                        }
                     }
                 }
             }
