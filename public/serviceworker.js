@@ -39,7 +39,7 @@ self.addEventListener('push', function (e) {
         },
         actions: [
             {
-                action: 'explore', title: 'Open',
+                action: 'notificationclick', title: 'Open',
                 icon: '/favicon.png'
             },
             {
