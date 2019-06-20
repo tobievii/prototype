@@ -36,35 +36,6 @@ export class ChartLine extends React.Component {
     return middleLine;
   }
 
-  // componentDidMount() {
-  //   if (this.props.state) {
-  //     if (this.props.state.key) {
-  //       this.createData(this.props.state.key, this.props.datapath)
-  //       const chart = am4core.create("chartLine", am4charts.XYChart);
-  //       console.log(chart);
-  //       this.createChart(chart);
-
-  //       this.setState(() => ({ chart }))
-  //     }
-  //   }
-  // }
-  // createData(key, datapath) {
-  //   fetch("/api/v3/packets", {
-  //     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-  //     body: JSON.stringify({ key, datapath })
-  //   }).then(response => response.json()).then(result => {
-  //     //console.log(result);
-
-  //     var linedata = [{
-  //       id: datapath,
-  //       color: "rgb(0, 255, 255)",
-  //       data: result
-  //     }]
-
-  //     this.setState({ linedata })
-  //   }).catch(err => console.error(err.toString()));
-  // }
-
   componentWillUnmount() {
     if (this.state.chart) {
       this.state.chart.dispose();
