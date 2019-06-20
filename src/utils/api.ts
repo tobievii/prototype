@@ -96,7 +96,15 @@ export class Prototype {
     }
 
     //todo:
-    packets() {}
+    packets(id:string, cb:Function) {
+        request.post(this.uri+"/api/v3/packets", {headers:this.headers,json:{id}}, (err:Error, res:any, body:any)=>{
+            if (err) cb(err);
+            if (body) {
+                cb(null, body);
+            }
+        })
+    }
+
     state() {}
     states() {}
     delete() {}
