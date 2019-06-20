@@ -1,13 +1,7 @@
-
 const React = require('react')
 const PropTypes = require('prop-types')
 import hljs from 'highlight.js';
-//import 'highlight.js/styles/github.css';
 import 'highlight.js/styles/vs2015.css';
-
-// import hljs from 'highlight.js/lib/highlight';
-// import 'highlight.js/styles/github.css';
-
 export class CodeBlock extends React.PureComponent {
   constructor(props) {
     super(props)
@@ -30,13 +24,27 @@ export class CodeBlock extends React.PureComponent {
     hljs.highlightBlock(this.codeEl)
   }
 
+  view = () => {
+    if (this.props.type == undefined) {
+      return (
+        <pre ref={this.setRef} className={`language-${this.props.language}`}>
+          {this.props.value}
+        </pre>
+      )
+    }
+
+    else if (this.props.type == "modify") {
+      return (
+        <pre style={{ height: "100px" }} ref={this.setRef} className={`language-${this.props.language}`}>
+          {this.props.value}
+        </pre>
+      )
+    }
+  }
+
   render() {
-    return (
-
-      <pre ref={this.setRef} className={`language-${this.props.language}`}>
-        {this.props.value}
-      </pre>
-
+    return (<div>
+      {this.view()}</div>
     )
   }
 }
