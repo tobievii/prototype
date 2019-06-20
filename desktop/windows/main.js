@@ -22,7 +22,7 @@ function createWindow() {
     }
   })
   mainWindow.setMenuBarVisibility(false)
-  mainWindow.loadURL('https://prototype.iotnxt.io/')
+  mainWindow.loadURL('https://prototype.dev.iotnxt.io/')
   mainWindow.on('closed', function () {
     mainWindow = null
   })
