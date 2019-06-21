@@ -16,7 +16,8 @@ import * as _ from "lodash"
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
 const MapDevices = React.lazy(() => import('./map'));
-import { LineChart } from "./chart.jsx"
+import { ChartLine } from "./chart_line.jsx"
+import { LineChart } from "./zoomable_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
 import { WidgetMesh } from "./widget_mesh.jsx"
@@ -223,7 +224,7 @@ class Dashboard extends React.Component {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
       }).then(response => response.json()).then(result => {
-        console.log(result);
+        // console.log(result);
         if (cb) { cb(undefined, result); }
 
       }).catch(err => {
@@ -317,12 +318,19 @@ class Dashboard extends React.Component {
         state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
-    if (data.type == "ChartLine") {
+    if (data.type == "Zoomable") {
       return (<LineChart
         data={data}
         dash={dash}
         state={this.props.state}
         datapath={data.datapath.split("root.")[1]} />)
+    }
+
+    if (data.type == "ChartLine") {
+      return (<ChartLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
     if (data.type == "chart") {
