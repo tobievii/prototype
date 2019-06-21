@@ -151,11 +151,71 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    it("device HTTP STATE", (done)=>{
+        new Prototype({apikey: testAccount.apikey}).state(packet.id, (err:Error,response:any)=>{
+            if (err) done(err);
+            if (response) {  
+                if (!response.key) { done(new Error("key missing from state")); return;}
+                if (!response.apikey) { done(new Error("apikey missing")); return;}
+                if (!response.devid) { done(new Error("devid missing")); return;}
+                if (!response.payload) { done(new Error("payload missing")); return;}
+                if (packet.data.random != response.payload.data.random) { done(new Error("date mismatch")); return;}
+                done();          
+            }
+        })
+    })
+
+    it("device HTTP STATES", (done)=>{
+        new Prototype({apikey: testAccount.apikey}).states( (err:Error,response:any)=>{
+            if (err) done(err);
+            if (response) {  
+                if (response[0].id != packet.id) { done(new Error("id mismatch")); return;}
+                if (response[0].data.random != packet.data.random) { done(new Error("data mismatch")); return;}
+                done();          
+            }
+        })
+    })
+
+    it("device HTTP DELETE", (done)=>{
+        new Prototype({apikey: testAccount.apikey}).delete(packet.id, (err:Error,response:any)=>{
+            if (err) done(err);
+            if (response) {  
+                done();          
+            }
+        })
+    })
+
+    /*
+        Tests sending data over http post and recieving it on socket and mqtt
+    */
+
+    it("HTTP -> SOCKET", (done)=>{
+        var id = "protTestHttpSocket"
+        // SOCKET
+        var protSocket = new Prototype({apikey: testAccount.apikey, protocol: "socketio", id});
+        protSocket.on("connect", ()=>{
+            // HTTP POST
+            new Prototype({apikey: testAccount.apikey}).post({id, data:{a:"123"}}, (e:Error,r:any)=>{})
+        })
+        protSocket.on("data", (data:any)=>{
+            done();
+        })
+    })
+
+    it("HTTP -> MQTT", (done)=>{
+        var id = "protTestHttpMqtt"
+        // SOCKET
+        var protSocket = new Prototype({apikey: testAccount.apikey, protocol: "mqtt", id});
+        protSocket.on("connect", ()=>{
+            // HTTP POST
+            new Prototype({apikey: testAccount.apikey}).post({id, data:{a:"123"}}, (e:Error,r:any)=>{})
+        })
+        protSocket.on("data", (data:any)=>{
+            done();
+        })
+    })
+
 })
-
-
-
-
 
 
 
@@ -168,4 +228,8 @@ function generateDifficult(count: number) {
     }
     return str;
   }
+  
+
+
+
   
