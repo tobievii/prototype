@@ -30,7 +30,7 @@ export class PluginMQTT extends Plugin {
 
         log("PLUGIN", this.name, "LOADED");
         // if redis is on and this is running inside PM2
-        if (config.redis && (process.env.pm_id != undefined)) {
+        if (config.redis && process.env.pm_id && config.redis.redisEnable == true) {
 
             this.isCluster = true;
             this.ev = new RedisEvent(config.redis.host, [this.name]);

@@ -1286,8 +1286,16 @@ input[type="color"] {
 
 .protoButtonClickable:hover {
   color: #f3353a;
-  background: rgba(20, 19, 25, 0.9);
+  background: rgba(0, 0, 0, 0.9);
   border: 1px solid rgba(60, 19, 25, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.protoButtonClickableModify:hover {
+  color: #fff;
+  background: rgba(20, 19, 25, 0.9);
+  border: 1px solid white;
   box-sizing: border-box;
   cursor: pointer;
 }

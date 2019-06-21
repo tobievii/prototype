@@ -1,6 +1,7 @@
 .git/
 *.md
 *.sh
+!container_start.sh
 .gitignore
 .vscode/
 .github/
