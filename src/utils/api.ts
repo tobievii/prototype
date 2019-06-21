@@ -11,6 +11,9 @@ export class Prototype extends EventEmitter{
     apikey:string = "";
     headers:any = {};
     id = undefined;
+    socketclient:any = undefined;
+    mqttclient:any = undefined;
+    protocol = "http";
 
     constructor(options?:any) {
         super();
@@ -23,6 +26,7 @@ export class Prototype extends EventEmitter{
 
 
             if (options.protocol) {
+                this.protocol = options.protocol;
                 if (options.protocol == "socketio") {
                     //connect over socket.io
                     this.protocolSocketio();
@@ -93,14 +97,30 @@ export class Prototype extends EventEmitter{
         })
     }
 
-    post(packet:Packet, cb:Function) {
-        request.post(this.uri+"/api/v3/data/post", {headers:this.headers,json:packet}, (err:Error, res:any, body:any)=>{
-            if (err) cb(err);
-            if (body) { 
-                if (body.result == "success") { cb(null, body); return; } 
-                cb(body);
+    post(packet:Packet, cb?:Function) {
+
+        if (this.protocol == "http") {
+            request.post(this.uri+"/api/v3/data/post", {headers:this.headers,json:packet}, (err:Error, res:any, body:any)=>{
+                if (err) if(cb) cb(err);
+                if (body) { 
+                    if (body.result == "success") { 
+                        if (cb) cb(null, body); 
+                        return; } 
+                    if (cb) cb(body);
+                }
+            })
+        }
+
+        if (this.protocol == "mqtt") {
+            if (this.mqttclient) {
+                this.mqttclient.publish(this.apikey, JSON.stringify(packet), cb)
             }
-        })
+        }
+
+        if (this.protocol == "socketio") {
+            if (this.socketclient) this.socketclient.emit("post", packet)
+        }
+        
     }
 
     // view state of a device by id
@@ -178,18 +198,19 @@ export class Prototype extends EventEmitter{
     }
 
     protocolSocketio() {
-        var socket = require("socket.io-client")(this.uri, { transports: ['websocket'] })
-        socket.on("connect", ()=>{
+        var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
+        this.socketclient = socketclient;
+        socketclient.on("connect", ()=>{
             this.emit("connect");
             if (this.apikey == "") { console.error("apikey blank")}
             if (this.id) {
-                socket.emit("join", this.apikey+"|"+this.id);
+                socketclient.emit("join", this.apikey+"|"+this.id);
             } else {
-                socket.emit("join", this.apikey);
+                socketclient.emit("join", this.apikey);
             }
             
 
-            socket.on("post", (data:any) =>{
+            socketclient.on("post", (data:any) =>{
                 this.emit("data", data);
             })
         })
@@ -197,20 +218,35 @@ export class Prototype extends EventEmitter{
 
     protocolMqtt() {
         var mqtt = require('mqtt');
-        var client = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + this.apikey });
-        client.on("connect", ()=>{
+        var mqttclient = mqtt.connect('mqtt://localhost', { username: "api", password: "key-" + this.apikey });
+        this.mqttclient = mqttclient;
+        
+        mqttclient.on("connect", ()=>{
             this.emit("connect");
             if (this.id) {
-                client.subscribe(this.apikey+"|"+this.id);
+                mqttclient.subscribe(this.apikey+"|"+this.id);
             } else {
-                client.subscribe(this.apikey);
+                mqttclient.subscribe(this.apikey);
             }
             
-            client.on("message", (topic:string, message:any)=>{
+            mqttclient.on("message", (topic:string, message:any)=>{
                 this.emit("data", JSON.parse(message.toString()))
             })
         })
         
+    }
+
+    /*
+     Disconnects from server
+    */
+
+    disconnect() {
+        if (this.protocol == "mqtt") { 
+            if (this.mqttclient) this.mqttclient.end(); 
+        }
+        if (this.protocol == "socketio") { 
+            if (this.socketclient) this.socketclient.disconnect();            
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 import { describe, it } from "mocha";
 import { Prototype } from "../utils/api"
+import { promises } from "fs";
 
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('prototype');
@@ -40,9 +41,8 @@ describe("PROTOTYPE", () => {
     // instance for new user
     var prototype = new Prototype();
 
-    it("register", (done) => {
+    it("register", done => {
         //this.timeout(5000);
-
         prototype.register(testAccount.email, testAccount.password, (err:Error, result:any)=>{
                 if (err) done(err);
                 if (result) { 
@@ -54,7 +54,7 @@ describe("PROTOTYPE", () => {
         })
     })
     //////
-    it("account", (done)=>{
+    it("account", done => {
         prototype.account( (err:Error,account:any)=>{
             if (err) done(err);
             if (account) { 
@@ -67,7 +67,7 @@ describe("PROTOTYPE", () => {
     })
 
     // checks server version
-    it("version", (done)=>{
+    it("version", done => {
         prototype.version( (err:Error,version:any)=>{
             if (err) done(err);
             if (version) {
@@ -78,7 +78,7 @@ describe("PROTOTYPE", () => {
 
     
     // attempt signin using email/pass
-    it("signin", function(done) {
+    it("signin", done => {
         // fresh instance
         new Prototype().signin(testAccount.email,testAccount.password, (err:Error, result:any)=>{
             if (err) done(err);
@@ -89,7 +89,7 @@ describe("PROTOTYPE", () => {
     })    
 
     // attempt to get account info with only apikey
-    it("account", (done)=>{
+    it("account", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); } 
         // fresh instance
         new Prototype({apikey: testAccount.apikey}).account( (err:Error,account:any)=>{
@@ -110,7 +110,7 @@ describe("PROTOTYPE", () => {
         data: { random: generateDifficult(32) }
     }
 
-    it("device HTTP POST", (done) => {
+    it("device HTTP POST", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); } 
         
         new Prototype({apikey: testAccount.apikey}).post(packet, (err:Error,response:any)=>{
@@ -122,7 +122,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    it("device HTTP VIEW", (done) => {
+    it("device HTTP VIEW", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); } 
         
         new Prototype({apikey: testAccount.apikey}).view(packet.id, (err:Error,response:any)=>{
@@ -138,7 +138,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    it("device HTTP PACKETS", (done)=>{
+    it("device HTTP PACKETS", done  => {
         new Prototype({apikey: testAccount.apikey}).packets(packet.id, (err:Error,response:any)=>{
             if (err) done(err);
             if (response) {  
@@ -151,7 +151,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    it("device HTTP STATE", (done)=>{
+    it("device HTTP STATE", done => {
         new Prototype({apikey: testAccount.apikey}).state(packet.id, (err:Error,response:any)=>{
             if (err) done(err);
             if (response) {  
@@ -165,7 +165,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    it("device HTTP STATES", (done)=>{
+    it("device HTTP STATES", done => {
         new Prototype({apikey: testAccount.apikey}).states( (err:Error,response:any)=>{
             if (err) done(err);
             if (response) {  
@@ -176,7 +176,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    it("device HTTP DELETE", (done)=>{
+    it("device HTTP DELETE", done => {
         new Prototype({apikey: testAccount.apikey}).delete(packet.id, (err:Error,response:any)=>{
             if (err) done(err);
             if (response) {  
@@ -185,34 +185,93 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    /*
-        Tests sending data over http post and recieving it on socket and mqtt
-    */
-
-    it("HTTP -> SOCKET", (done)=>{
+    /* 
+        Tests sending data over http post and recieving it on socket         */
+    
+    it("HTTP -> SOCKET", done => {
         var id = "protTestHttpSocket"
+        var test = Math.random()
         // SOCKET
         var protSocket = new Prototype({apikey: testAccount.apikey, protocol: "socketio", id});
         protSocket.on("connect", ()=>{
             // HTTP POST
-            new Prototype({apikey: testAccount.apikey}).post({id, data:{a:"123"}}, (e:Error,r:any)=>{})
+            new Prototype({apikey: testAccount.apikey}).post({id, data:{test}}, (e:Error,r:any)=>{})
         })
         protSocket.on("data", (data:any)=>{
+            if (data.id != id) { done(new Error("id missing from socket packet")); return;}
+            if (!data.data) { done(new Error("data missing from socket packet"));return;}
+            if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
             done();
+            protSocket.disconnect();
         })
     })
 
-    it("HTTP -> MQTT", (done)=>{
+    /* 
+        Tests sending data over http post and recieving it on mqtt         */
+
+    it("HTTP -> MQTT", done => {
         var id = "protTestHttpMqtt"
-        // SOCKET
-        var protSocket = new Prototype({apikey: testAccount.apikey, protocol: "mqtt", id});
-        protSocket.on("connect", ()=>{
+        var test = Math.random()
+        // MQTT
+        var protMqtt = new Prototype({apikey: testAccount.apikey, protocol: "mqtt", id});
+        protMqtt.on("connect", ()=>{
             // HTTP POST
-            new Prototype({apikey: testAccount.apikey}).post({id, data:{a:"123"}}, (e:Error,r:any)=>{})
+            new Prototype({apikey: testAccount.apikey}).post({id, data:{test}}, (e:Error,r:any)=>{})
         })
-        protSocket.on("data", (data:any)=>{
+        protMqtt.on("data", (data:any)=>{
+            if (data.id != id) { done(new Error("id missing from socket packet")); return;}
+            if (!data.data) { done(new Error("data missing from socket packet"));return;}
+            if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
             done();
+            protMqtt.disconnect();
         })
+    })
+
+    /* MQTT to SOCKET */
+    it("MQTT -> SOCKET", done => {
+        var id = "protTestMqttSocket"
+        var test = Math.random()
+
+        // SOCKET LISTEN
+        var protSocket = new Prototype({
+            apikey: testAccount.apikey, 
+            protocol: "socketio", 
+            id}).on("data", data => {
+                if (data.id != id) { done(new Error("id missing from socket packet")); return;}
+                if (!data.data) { done(new Error("data missing from socket packet"));return;}
+                if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
+                done();
+                protSocket.disconnect();
+        });
+
+        // MQTT POST
+        var protMqtt = new Prototype({
+            apikey: testAccount.apikey, 
+            protocol: "mqtt", 
+            id}).post({id, data:{test}})
+    })
+
+    /* MQTT to HTTP */
+    it("MQTT -> HTTP", done => {
+        var id = "protTestMqtt"
+        var test = Math.random()
+
+        var protMqtt = new Prototype({
+            apikey: testAccount.apikey, 
+            protocol: "mqtt"})
+                    
+        protMqtt.post({id, data:{test}}, (e:Error, result:any)=>{
+
+            new Prototype({apikey:testAccount.apikey}).view(id, (e:Error, data:any)=>{
+                if (data.id != id) { done(new Error("id missing from packet")); return;}
+                if (!data.data) { done(new Error("data missing from packet"));return;}
+                if (data.data.test != test) { done(new Error("data mismatch from packet"));return;}
+                done();
+            })
+
+            protMqtt.disconnect();
+        })
+        
     })
 
 })
