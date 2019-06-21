@@ -30,6 +30,7 @@ export default class ModifyDevices extends Component {
         serverGateways: [],
         preview: "",
         search: "",
+        confirmation: ""
     }
 
     componentWillMount = () => {
@@ -66,22 +67,17 @@ export default class ModifyDevices extends Component {
 
     options = () => {
         if (this.props.modification == "SET IOTNXT GATEWAY") {
-            return (
-                <div style={{ overflowY: "auto", height: "1px" }}>{this.state.serverGateways.map(devices => <option key={devices.GatewayId} value={devices.GatewayId + "|" + devices.HostAddress} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (this.state.serverGateways.map(devices => <option key={devices.GatewayId} value={devices.GatewayId + "|" + devices.HostAddress} className="optiondropdown" style={{ width: "90%" }} >{devices.GatewayId + "|" + devices.HostAddress}</option>))
         }
 
         else if (this.props.modification == "SCRIPT PRESET") {
             var temp = this.props.devices.filter((users) => { return users.workflowCode !== undefined })
-            return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option key={devices.devid} value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (temp.map(devices => <option key={devices.devid} value={devices.devid} className="optiondropdown" style={{ width: "90%" }} >{devices.devid}</option>))
+
         }
         else if (this.props.modification == "DASHBOARD PRESET") {
             var temp = this.props.devices.filter((users) => { return users.layout !== undefined })
-            return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option key={devices.devid} value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (temp.map(devices => <option key={devices.devid} value={devices.devid} className="optiondropdown" style={{ width: "90%" }} >{devices.devid}</option>))
         }
     }
 
@@ -118,7 +114,13 @@ export default class ModifyDevices extends Component {
                                 HostAddress: HostAddress
                             })
                         }).then(response => response.json()).then((data) => {
-                            console.log(data)
+                            if (data.nModified == 1) {
+                                this.setState({ confirmation: "Gateway Successfuly Modified" })
+                                this.props.closeModel()
+                            }
+                            else {
+                                this.setState({ confirmation: "Could not modify Gateway" })
+                            }
                         }).catch(err => console.error(this.props.url, err.toString()))
                     }
                 }
@@ -142,6 +144,14 @@ export default class ModifyDevices extends Component {
                                 body: JSON.stringify({ id: devices[i].devid, code: this.props.devices[dev].workflowCode })
                             })
                                 .then(response => response.json()).then(serverresponse => {
+                                    //this.props.closeModel()
+                                    if (serverresponse.result == "success") {
+                                        this.setState({ confirmation: "Workflow script code Successfuly Modified" })
+                                        this.props.closeModel()
+                                    }
+                                    else {
+                                        this.setState({ confirmation: "Could not modify Workflow script code" })
+                                    }
                                 }).catch(err => console.error(err.toString()));
                         }
                         else {
@@ -171,10 +181,10 @@ export default class ModifyDevices extends Component {
                     </div>
 
                     <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <input list="deviceschoice" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} placeholder="Type to filter options" />
-                        <datalist id="deviceschoice" style={{ height: "2px" }} >
+                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} >
+                            <option value="" disabled selected hidden>SELECT OPTION...</option>
                             {this.options()}
-                        </datalist>
+                        </select>
                     </div>
 
                     <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
@@ -183,6 +193,7 @@ export default class ModifyDevices extends Component {
                         </a>
                     </div>
                 </div>
+                <div style={{ color: "red" }}>{this.state.confirmation}</div>
             </div >
         )
     }
