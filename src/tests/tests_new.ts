@@ -138,6 +138,18 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    it("device HTTP PACKETS", (done)=>{
+        new Prototype({apikey: testAccount.apikey}).packets(packet.id, (err:Error,response:any)=>{
+            if (err) done(err);
+            if (response) {  
+                if (response[response.length - 1].data.random == packet.data.random) {
+                    done();
+                  } else {
+                      done(new Error("data mismatch"))
+                  }          
+            }
+        })
+    })
 
 })
 
