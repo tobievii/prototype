@@ -7,10 +7,9 @@
     "start": "pm2 start ./build/main.js -i 0",
     "startnode": "node ./build/main.js",
     "test": "mocha --exit ./build/tests/tests.js",
-    "testnew": "mocha --exit ./build/tests/tests_new.js",
     "tests": "node ./build/tests.js",
-    "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/tests_new.ts --outDir ./build",
-    "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts ./src/tests/tests_new.ts --outDir ./build",
+    "build": "tsc --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
+    "buildwatch": "tsc --sourcemap --w --lib es2015 ./src/main.ts ./src/tests/tests.ts --outDir ./build",
     "build-clean": "rmdir build /s /q && tsc",
     "testclient": "cypress open",
     "debug": "cd build && nodemon --inspect main.js"

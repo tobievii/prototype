@@ -118,7 +118,15 @@ export class Prototype extends EventEmitter{
         }
 
         if (this.protocol == "socketio") {
-            if (this.socketclient) this.socketclient.emit("post", packet)
+            if (this.socketclient) {
+                this.socketclient.emit("post", packet)
+
+                //workaround as emit post callback does not fire
+                setTimeout( ()=>{
+                    if (cb) cb()
+                },50)
+                
+            } 
         }
         
     }
@@ -201,12 +209,14 @@ export class Prototype extends EventEmitter{
         var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
         this.socketclient = socketclient;
         socketclient.on("connect", ()=>{
-            this.emit("connect");
+            
             if (this.apikey == "") { console.error("apikey blank")}
             if (this.id) {
                 socketclient.emit("join", this.apikey+"|"+this.id);
+                this.emit("connect");
             } else {
                 socketclient.emit("join", this.apikey);
+                this.emit("connect");
             }
             
 
