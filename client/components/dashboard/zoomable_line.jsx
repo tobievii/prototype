@@ -125,18 +125,21 @@ export class LineChart extends React.Component {
             var verify = [];
 
             if (result.length == 0) {
+
                 this.dates.push([{ String: true }]);
             } else {
+
                 for (var date in result) {
+                    var f = {
+                        x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                        y: parseInt(result[date].y).toFixed(0)
+                    }
+
                     if (!Number.isNaN(parseInt(result[date].y))) {
                         // if (date == 0) {
                         //     console.log(result[date])
                         //     console.log("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2)))
                         // }
-                        var f = {
-                            x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
-                            y: parseInt(result[date].y).toFixed(0)
-                        }
 
                         if (typeof result[date].y == "string") {
                             if (typeof parseInt(result[date].y) == "number") {
@@ -153,6 +156,15 @@ export class LineChart extends React.Component {
                             var innerArr = [f.x, f.y];
                             this.dates.push(innerArr)
                         }
+                    } else {
+                        verify.push(true);
+                        if (result[date].y == true) {
+                            f.y = 1;
+                        } else if (result[date].y == false) {
+                            f.y = 0;
+                        }
+                        var innerArr = [f.x, f.y];
+                        this.dates.push(innerArr)
                     }
                 }
 
@@ -181,7 +193,7 @@ export class LineChart extends React.Component {
                     <div>
                         <Widget label={this.props.data.dataname} dash={this.props.dash}>
                             <div id="chartz">
-                                <ReactApexChart style={{ fill: "red" }} options={this.state.options} series={this.state.series} type="area" />
+                                <ReactApexChart options={this.state.options} series={this.state.series} type="area" />
                             </div>
                         </Widget>
                     </div>
