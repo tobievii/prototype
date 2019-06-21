@@ -1,4 +1,5 @@
 import { describe, it } from "mocha";
+import { generateDifficult } from "../utils"
 import { Prototype } from "../utils/api"
 
 const Cryptr = require('cryptr');
@@ -52,7 +53,9 @@ describe("PROTOTYPE", () => {
                 }
         })
     })
-    //////
+    
+    /* --------------------------------------------------------------------- */
+
     it("account", done => {
         prototype.account( (err:Error,account:any)=>{
             if (err) done(err);
@@ -65,7 +68,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    // checks server version
+    /* --------------------------------------------------------------------- */
+
     it("version", done => {
         prototype.version( (err:Error,version:any)=>{
             if (err) done(err);
@@ -76,7 +80,8 @@ describe("PROTOTYPE", () => {
     })
 
     
-    // attempt signin using email/pass
+    /* --------------------------------------------------------------------- */
+
     it("signin", done => {
         // fresh instance
         new Prototype().signin(testAccount.email,testAccount.password, (err:Error, result:any)=>{
@@ -87,7 +92,8 @@ describe("PROTOTYPE", () => {
         })
     })    
 
-    // attempt to get account info with only apikey
+    /* --------------------------------------------------------------------- */
+
     it("account", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); } 
         // fresh instance
@@ -102,7 +108,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    ////// DEVICE
+    /* --------------------------------------------------------------------- */
 
     var packet = {
         id : "test_httppost",
@@ -121,6 +127,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    /* --------------------------------------------------------------------- */
+
     it("device HTTP VIEW", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); } 
         
@@ -137,6 +145,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    /* --------------------------------------------------------------------- */
+
     it("device HTTP PACKETS", done  => {
         new Prototype({apikey: testAccount.apikey}).packets(packet.id, (err:Error,response:any)=>{
             if (err) done(err);
@@ -149,6 +159,8 @@ describe("PROTOTYPE", () => {
             }
         })
     })
+
+    /* --------------------------------------------------------------------- */
 
     it("device HTTP STATE", done => {
         new Prototype({apikey: testAccount.apikey}).state(packet.id, (err:Error,response:any)=>{
@@ -164,6 +176,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    /* --------------------------------------------------------------------- */
+
     it("device HTTP STATES", done => {
         new Prototype({apikey: testAccount.apikey}).states( (err:Error,response:any)=>{
             if (err) done(err);
@@ -175,6 +189,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
+    /* --------------------------------------------------------------------- */
+
     it("device HTTP DELETE", done => {
         new Prototype({apikey: testAccount.apikey}).delete(packet.id, (err:Error,response:any)=>{
             if (err) done(err);
@@ -184,8 +200,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    /* 
-        Tests sending data over http post and recieving it on socket         */
+    /* --------------------------------------------------------------------- */
+        
     
     it("HTTP -> SOCKET", done => {
         var id = "protTestHttpSocket"
@@ -205,8 +221,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    /* 
-        Tests sending data over http post and recieving it on mqtt         */
+    /* --------------------------------------------------------------------- */
 
     it("HTTP -> MQTT", done => {
         var id = "protTestHttpMqtt"
@@ -226,7 +241,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    /* MQTT to SOCKET */
+    /* --------------------------------------------------------------------- */
+
     it("MQTT -> SOCKET", done => {
         var id = "protTestMqttSocket"
         var test = Math.random()
@@ -250,7 +266,8 @@ describe("PROTOTYPE", () => {
             id}).post({id, data:{test}})
     })
 
-    /* MQTT to HTTP */
+    /* --------------------------------------------------------------------- */
+
     it("MQTT -> HTTP", done => {
         var id = "protTestMqtt"
         var test = Math.random()
@@ -273,7 +290,8 @@ describe("PROTOTYPE", () => {
         
     })
 
-    /* SOCKET to HTTP */
+    /* --------------------------------------------------------------------- */
+
     it("SOCKET -> HTTP", done => {
         var id = "protTestSocketHttp"
         var test = Math.random()
@@ -296,7 +314,8 @@ describe("PROTOTYPE", () => {
         
     })
 
-    /* SOCKET to HTTP */
+    /* --------------------------------------------------------------------- */
+
     it("SOCKET -> MQTT", done => {
         var id = "protTestSocketMqtt"
         var test = Math.random()
@@ -312,18 +331,8 @@ describe("PROTOTYPE", () => {
         })
         
     })
+    
+    /* --------------------------------------------------------------------- */
 
 })
 
-
-
-function generateDifficult(count: number) {
-    var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
-    var str = '';
-    for (var i = 0; i < count; i++) {
-      var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
-      str += "" + tmp;
-    }
-    return str;
-  }
-  
