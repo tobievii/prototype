@@ -65,6 +65,7 @@ export class Widget extends React.Component {
                 <option>Calendar</option>
                 <option>NivoLine</option>
                 <option>ChartLine</option>
+                <option>Zoomable</option>
                 <option>Blank</option>
                 <option>ThreeDWidget</option>
                 <option>Gauge</option>
