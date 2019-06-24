@@ -57,7 +57,7 @@ export class SettingsPanel extends React.Component {
       var gateways = [];
       for (var g in data) {
         if (data[g]._created_by) {
-          if (data[g]._created_by.publickey == this.state.user.publickey) {
+          if (data[g]._created_by.publickey == this.state.user.publickey || this.state.user.level > 99) {
             gateways.push(data[g])
           }
         } else if (this.state.user.level > 99) {

@@ -46,10 +46,10 @@ export class DevicePluginPanel extends React.PureComponent {
       if (gateways) {
         for (var g in gateways) {
           if (gateways[g]._created_by) {
-            if (gateways[g]._created_by.publickey == this.state.user.publickey) {
+            if (gateways[g]._created_by.publickey == this.state.user.publickey || gateways[g]._created_by == undefined || this.state.user.level >= 100) {
               finalGateways.push(gateways[g])
             }
-          } else if (this.state.user.level >= 100) {
+          } else if (this.state.user.level >= 100 || gateways[g]._created_by == undefined) {
             finalGateways.push(gateways[g])
           }
 
