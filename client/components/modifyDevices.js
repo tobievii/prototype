@@ -30,6 +30,7 @@ export default class ModifyDevices extends Component {
         serverGateways: [],
         preview: "",
         search: "",
+        confirmation: ""
     }
 
     componentWillMount = () => {
@@ -39,6 +40,17 @@ export default class ModifyDevices extends Component {
     search = evt => {
         this.setState({ search: evt.target.value.toString() })
     }
+
+    generateDifficult(count) {
+        var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+        var str = '';
+        for (var i = 0; i < count; i++) {
+            var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
+            str += "" + tmp;
+        }
+        return str;
+    }
+
     modification = () => {
         return (
             <div>  <div className="container-fluid" style={{ background: "#16202C" }}>
@@ -66,22 +78,17 @@ export default class ModifyDevices extends Component {
 
     options = () => {
         if (this.props.modification == "SET IOTNXT GATEWAY") {
-            return (
-                <div style={{ overflowY: "auto", height: "1px" }}>{this.state.serverGateways.map(devices => <option value={devices.GatewayId + " | " + devices.HostAddress} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (this.state.serverGateways.map(devices => <option key={devices.GatewayId} value={devices.GatewayId + "|" + devices.HostAddress} className="optiondropdown" style={{ width: "90%" }} >{devices.GatewayId + "|" + devices.HostAddress}</option>))
         }
 
         else if (this.props.modification == "SCRIPT PRESET") {
             var temp = this.props.devices.filter((users) => { return users.workflowCode !== undefined })
-            return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (temp.map(devices => <option key={devices.devid} value={devices.devid} className="optiondropdown" style={{ width: "90%" }} >{devices.devid}</option>))
+
         }
         else if (this.props.modification == "DASHBOARD PRESET") {
             var temp = this.props.devices.filter((users) => { return users.layout !== undefined })
-            return (
-                <div style={{ overflowY: "auto" }}>{temp.map(devices => <option value={devices.devid} className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />)}</div>
-            )
+            return (temp.map(devices => <option key={devices.devid} value={devices.devid} className="optiondropdown" style={{ width: "90%" }} >{devices.devid}</option>))
         }
     }
 
@@ -92,6 +99,118 @@ export default class ModifyDevices extends Component {
                     return (
                         <div ><CodeBlock type={"modify"} language='javascript' value={this.props.devices[i].workflowCode} /></div>)
                 }
+            }
+        }
+    }
+
+    assignModify = () => {
+        var devices = this.props.devices.filter((device) => { return device.selected == true; })
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            var GatewayId = this.state.search.split("|")[0]
+            var HostAddress = this.state.search.split("|")[1]
+            for (var i in this.state.serverGateways) {
+                if (GatewayId == this.state.serverGateways[i].GatewayId && HostAddress == this.state.serverGateways[i].HostAddress) {
+                    var devices = this.props.devices.filter((device) => { return device.selected == true; })
+                    for (var i in devices) {
+                        fetch('/api/v3/iotnxt/setgatewaydevice', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                key: devices[i].key,
+                                id: devices[i].devid,
+                                GatewayId: GatewayId,
+                                HostAddress: HostAddress
+                            })
+                        }).then(response => response.json()).then((data) => {
+                            if (data.nModified == 1) {
+                                this.setState({ confirmation: "Gateway Successfully Modified" })
+                                this.props.closeModel()
+                            }
+                            else {
+                                this.setState({ confirmation: "Could not modify Gateway" })
+                            }
+                        }).catch(err => console.error(this.props.url, err.toString()))
+                    }
+                }
+                else {
+                    null;
+                }
+            }
+        }
+
+        else if (this.props.modification == "SCRIPT PRESET") {
+            for (var dev in this.props.devices) {
+                if (this.state.search == this.props.devices[dev].devid) {
+                    for (var i in devices) {
+                        if (this.props.devices[dev].devid != devices[i].devid) {
+                            fetch("/api/v3/workflow", {
+                                method: "POST",
+                                headers: {
+                                    Accept: "application/json",
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ id: devices[i].devid, code: this.props.devices[dev].workflowCode })
+                            })
+                                .then(response => response.json()).then(serverresponse => {
+                                    if (serverresponse.result == "success") {
+                                        this.setState({ confirmation: "Workflow script code Successfully Modified" })
+                                        this.props.closeModel()
+                                    }
+                                    else {
+                                        this.setState({ confirmation: "Could not modify Workflow script code" })
+                                    }
+                                }).catch(err => console.error(err.toString()));
+                        }
+                        else { null }
+                    }
+                }
+                else { null; }
+            }
+        }
+
+        else if (this.props.modification == "DASHBOARD PRESET") {
+            for (var dev in this.props.devices) {
+                if (this.state.search == this.props.devices[dev].devid) {
+                    for (var r in devices) {
+                        if (this.props.devices[dev].devid != devices[r].devid) {
+                            var dashboard = _.clone(this.props.devices[dev].layout)
+                            for (var l in dashboard) {
+                                if (dashboard[l].i !== "0") {
+                                    dashboard[l].i = this.generateDifficult(32)
+                                }
+                                else { null }
+                            }
+                            for (var d in devices[r].layout) {
+                                if (devices[r].layout[d].i !== "0") {
+                                    dashboard.push(devices[r].layout[d])
+                                }
+                                else { null }
+                            }
+
+                            fetch("/api/v3/dashboard", {
+                                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                body: JSON.stringify({ key: devices[r].key, layout: dashboard })
+                            }).then(response => response.json()).then(result => {
+                                if (result.nModified == 1) {
+                                    this.setState({ confirmation: "Dashboard preset Successfully Modified" })
+                                    this.props.closeModel()
+                                }
+                                else {
+                                    this.setState({ confirmation: "Could not modify Dashboard preset" })
+                                }
+
+                            }).catch(err => {
+                                console.error(err.toString())
+                                if (cb) { cb(err, undefined); }
+                            });
+                        }
+                        else { null }
+                    }
+                }
+                else { null }
             }
         }
     }
@@ -110,19 +229,20 @@ export default class ModifyDevices extends Component {
                     </div>
 
                     <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <input list="deviceschoice" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} placeholder="Type to filter options" />
-                        <datalist id="deviceschoice" style={{ height: "2px" }} >
+                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} >
+                            <option value="" disabled selected hidden>SELECT OPTION...</option>
                             {this.options()}
-                        </datalist>
+                        </select>
                     </div>
 
-                    <div className="col" style={{ padding: 0, cursor: "pointer" }}>
-                        <button className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={() => { this.addDevice("select") }}>
+                    <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
+                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
                             ASSIGN <i className="fas fa-chevron-right"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
-            </div>
+                <div style={{ color: "red" }}>{this.state.confirmation}</div>
+            </div >
         )
     }
 
