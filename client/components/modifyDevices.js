@@ -40,6 +40,17 @@ export default class ModifyDevices extends Component {
     search = evt => {
         this.setState({ search: evt.target.value.toString() })
     }
+
+    generateDifficult(count) {
+        var _sym = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+        var str = '';
+        for (var i = 0; i < count; i++) {
+            var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
+            str += "" + tmp;
+        }
+        return str;
+    }
+
     modification = () => {
         return (
             <div>  <div className="container-fluid" style={{ background: "#16202C" }}>
@@ -115,7 +126,7 @@ export default class ModifyDevices extends Component {
                             })
                         }).then(response => response.json()).then((data) => {
                             if (data.nModified == 1) {
-                                this.setState({ confirmation: "Gateway Successfuly Modified" })
+                                this.setState({ confirmation: "Gateway Successfully Modified" })
                                 this.props.closeModel()
                             }
                             else {
@@ -144,9 +155,8 @@ export default class ModifyDevices extends Component {
                                 body: JSON.stringify({ id: devices[i].devid, code: this.props.devices[dev].workflowCode })
                             })
                                 .then(response => response.json()).then(serverresponse => {
-                                    //this.props.closeModel()
                                     if (serverresponse.result == "success") {
-                                        this.setState({ confirmation: "Workflow script code Successfuly Modified" })
+                                        this.setState({ confirmation: "Workflow script code Successfully Modified" })
                                         this.props.closeModel()
                                     }
                                     else {
@@ -154,16 +164,54 @@ export default class ModifyDevices extends Component {
                                     }
                                 }).catch(err => console.error(err.toString()));
                         }
-                        else {
-                            null
-                        }
+                        else { null }
                     }
                 }
-                else {
-                    null;
-                }
+                else { null; }
             }
+        }
 
+        else if (this.props.modification == "DASHBOARD PRESET") {
+            for (var dev in this.props.devices) {
+                if (this.state.search == this.props.devices[dev].devid) {
+                    for (var r in devices) {
+                        if (this.props.devices[dev].devid != devices[r].devid) {
+                            var dashboard = _.clone(this.props.devices[dev].layout)
+                            for (var l in dashboard) {
+                                if (dashboard[l].i !== "0") {
+                                    dashboard[l].i = this.generateDifficult(32)
+                                }
+                                else { null }
+                            }
+                            for (var d in devices[r].layout) {
+                                if (devices[r].layout[d].i !== "0") {
+                                    dashboard.push(devices[r].layout[d])
+                                }
+                                else { null }
+                            }
+
+                            fetch("/api/v3/dashboard", {
+                                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                body: JSON.stringify({ key: devices[r].key, layout: dashboard })
+                            }).then(response => response.json()).then(result => {
+                                if (result.nModified == 1) {
+                                    this.setState({ confirmation: "Dashboard preset Successfully Modified" })
+                                    this.props.closeModel()
+                                }
+                                else {
+                                    this.setState({ confirmation: "Could not modify Dashboard preset" })
+                                }
+
+                            }).catch(err => {
+                                console.error(err.toString())
+                                if (cb) { cb(err, undefined); }
+                            });
+                        }
+                        else { null }
+                    }
+                }
+                else { null }
+            }
         }
     }
 
