@@ -13,18 +13,20 @@ export class GatewayList extends React.Component {
 
   getaccount = () => {
     fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
+
       if (user.plugins_iotnxt_gatewaydefault) {
         this.setState({
-          accountgatewaydefault: user.plugins_iotnxt_gatewaydefault,
-          user: user
+          accountgatewaydefault: user.plugins_iotnxt_gatewaydefault
         })
       } else {
         this.setState({ accountgatewaydefault: undefined });
       }
+
+      this.setState({ user: user })
     }).catch(err => console.error(err.toString()))
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     this.getaccount()
   }
 
@@ -45,6 +47,7 @@ export class GatewayList extends React.Component {
       })
         .then(response => response.json())
         .then(data => {
+          // console.log(data)
           if (this.props.update) {
             this.props.update();
           }
@@ -125,7 +128,7 @@ export class GatewayList extends React.Component {
               cursor: "pointer"
             }}
           >
-            <FontAwesomeIcon icon="trash-alt" />
+            <i className="fas fa-trash-alt"></i>
           </div>
         )
       } else {
@@ -265,18 +268,9 @@ export class GatewayList extends React.Component {
                     </div> 
                   </div>*/}
 
-
-
-
-
-
-
                   <div className="col-1" style={{ padding: 10, textAlign: "right" }} >
                     {this.renderDelete(gateway)}
                   </div>
-
-
-
                 </div>
               );
             }, this)}

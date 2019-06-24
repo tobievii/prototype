@@ -42,14 +42,22 @@ export class DevicePluginPanel extends React.PureComponent {
   getServerGateways() {
     //SERVER GATEWAYS
     fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((gateways) => {
+      var finalGateways = [];
       if (gateways) {
         for (var g in gateways) {
+          if (gateways[g]._created_by) {
+            if (gateways[g]._created_by.publickey == this.state.user.publickey) {
+              finalGateways.push(gateways[g])
+            }
+          } else if (this.state.user.level >= 100) {
+            finalGateways.push(gateways[g])
+          }
+
           if (gateways[g].default) {
             this.setState({ serverGatewayDefault: gateways[g] });
           }
         }
-
-        this.setState({ serverGateways: gateways });
+        this.setState({ serverGateways: finalGateways });
       }
     }).catch(err => console.error(this.props.url, err.toString()))
   }
