@@ -27,10 +27,9 @@ export class PluginMQTT extends Plugin {
         this.app = app;
         this.eventHub = eventHub;
 
-
         log("PLUGIN", this.name, "LOADED");
         // if redis is on and this is running inside PM2
-        if (config.redis && process.env.pm_id && config.redis.redisEnable == true) {
+        if (config.redis && process.env.pm_id) {
 
             this.isCluster = true;
             this.ev = new RedisEvent(config.redis.host, [this.name]);
@@ -97,6 +96,7 @@ export class PluginMQTT extends Plugin {
     }
 
     handlePacket(deviceState: any, packet: any, cb: any) {
+        log(this.name, "HANDLE PACKET");
 
         if (!deviceState) { console.error("MQTT plugin handlePacket deviceState is not defined"); return; }
 

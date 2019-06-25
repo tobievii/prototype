@@ -1505,7 +1505,7 @@ function bindListeners(ioIn: any) {
 
 
 function initializeSocketio() {
-  if (config.configGen.redis && config.configGen.redis.redisEnable == true) {
+  if (config.configGen.redis) {
     log("socketio", "REDIS ENABLED")
     const redis = require('socket.io-redis')
     io.adapter(redis({ host: config.configGen.redis.host, port: config.configGen.redis.port }))
