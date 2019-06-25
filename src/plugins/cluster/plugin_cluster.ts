@@ -13,7 +13,7 @@ export class PluginCluster extends Plugin {
   constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
     super(app, db, eventHub);
 
-    if (config.redis && config.redis.redisEnable == true) {
+    if (config.redis) {
       // load balance
       this.queue = new Queue(this.name, 'redis://127.0.0.1:6379');
       this.queue.process((job, done) => {
