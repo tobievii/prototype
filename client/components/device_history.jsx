@@ -56,7 +56,7 @@ export class DeviceHistory extends React.Component {
             body: JSON.stringify({ log: true })
         }).then(response => response.json()).then(logdata => {
             this.setState({ logdata })
-            console.log(logdata);
+            // console.log(logdata);
             //this.props.devices.states(logdata)
         }).catch(err => console.error(err.toString()));
 
@@ -80,7 +80,7 @@ export class DeviceHistory extends React.Component {
 
                     this.socket.on("post", (newDeviceData) => {
                         // so we recieve some data:
-                        console.log(newDeviceData);
+                        // console.log(newDeviceData);
 
                         var newlogdata = _.clone(this.state.logdata);
                         newlogdata.unshift(newDeviceData);

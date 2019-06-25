@@ -33,7 +33,7 @@ export class WidgetScheduler extends React.Component {
 
 
   scheduler = () => {
-    console.log("scheduler update")
+    // console.log("scheduler update")
     fetch("/api/v3/scheduler/widget", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ props: this.props, state: this.state })
@@ -45,7 +45,7 @@ export class WidgetScheduler extends React.Component {
   setOptions = (options, cb) => {
     //this.setState(options);
 
-    console.log("options set");
+    // console.log("options set");
 
     this.setState(_.merge(this.state, options), () => {
       this.updatedOptions();
@@ -77,7 +77,7 @@ export class WidgetScheduler extends React.Component {
       });
     } else {
       //defaults
-      console.log("NEW COMPONENT");
+      // console.log("NEW COMPONENT");
       var update = {
         startTime: new Date(),
         repeatAmount: 5,
@@ -123,7 +123,7 @@ export class WidgetScheduler extends React.Component {
 
   update = (update) => {
 
-    console.log("update run")
+    // console.log("update run")
     this.setState(update, () => {
       this.updatedOptions();
       this.updateParent(update);

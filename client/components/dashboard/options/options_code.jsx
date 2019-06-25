@@ -17,8 +17,8 @@ export class OptionsCode extends React.Component {
   }
 
   apply() {
-    console.log("code apply this.state.value")
-    console.log(this.state.value);
+    // console.log("code apply this.state.value")
+    // console.log(this.state.value);
     var option = {}
     option[this.props.option.name] = this.state.value;
 
@@ -26,7 +26,7 @@ export class OptionsCode extends React.Component {
 
       if (err) { console.log(err); }
       if (result) {
-        console.log(result);
+        // console.log(result);
         this.setState({ unsavedChanges: false })
       }
 

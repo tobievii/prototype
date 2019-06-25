@@ -24,11 +24,11 @@ export class SettingsPanel extends React.Component {
       this.setState({ user: user })
     })
     this.socket.on("connect", () => {
-      console.log("iotnxt socket connected")
+      // console.log("iotnxt socket connected")
     })
 
     this.socket.on("plugin_iotnxt", (event) => {
-      console.log(event);
+      // console.log(event);
 
 
       /* something happened with a gateway */
@@ -39,7 +39,7 @@ export class SettingsPanel extends React.Component {
             gateway = _.merge(gateway, event.gateway)
             //gateway.connected = event.gateway.connected;
             //if (event.gateway.error) { }
-            console.log("updated gateway state")
+            // console.log("updated gateway state")
           }
         }
         this.setState({ gateways });
