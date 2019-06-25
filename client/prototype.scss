@@ -6,6 +6,19 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+#chartz {
+  color: #000;
+}
+#chartz, .chart-box {
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+  background: rgba(10, 13, 19, 0.5);
+  box-shadow: 0 22px 35px -16px rgba(0,0,0, 0.1);
+}
+
+
 $panelBg: rgba(3, 4, 5, 0.5);
 $spot: #f3353a;
 $borders: rgb(34, 39, 44);
@@ -21,6 +34,14 @@ body {
   background-attachment: absolute;
   color: #fff;
 }
+
+text{
+  fill: grey;
+}
+
+// Use this format should you need to style a text field, otherwise try styling it inline.
+// text.classname{
+// }
 
 .centre {
   margin: 0 auto;
@@ -1241,8 +1262,16 @@ input[type="color"] {
 
 .protoButtonClickable:hover {
   color: #f3353a;
-  background: rgba(20, 19, 25, 0.9);
+  background: rgba(0, 0, 0, 0.9);
   border: 1px solid rgba(60, 19, 25, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.protoButtonClickableModify:hover {
+  color: #fff;
+  background: rgba(20, 19, 25, 0.9);
+  border: 1px solid white;
   box-sizing: border-box;
   cursor: pointer;
 }
