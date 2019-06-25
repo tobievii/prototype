@@ -63,7 +63,11 @@ export class AddGatewayPanel extends React.Component {
                 return response.json()
             }
         }).then((data) => {
-            // console.log(data);
+            console.log(data);
+            if (data.err) {
+                this.setState({ message: "ERROR:" + data.err })
+                return;
+            }
             if (this.props.update) { this.props.update(); }
         }).catch(
             (err) => {
