@@ -368,20 +368,21 @@ describe("PROTOTYPE", () => {
         mqttaccount.protocol = "mqtt";
         mqttaccount.id = id;
 
-        var protMqtt = new Prototype(mqttaccount).on("data", (data) => {
+        var protMqtt = new Prototype(mqttaccount)
+
+        protMqtt.on("connect", () => {
+            var socketaccount = _.clone(testAccount);
+            socketaccount.protocol = "socketio"
+            new Prototype(socketaccount).post({ id, data: { test } })
+        })
+
+        protMqtt.on("data", (data) => {
             if (data.id != id) { done(new Error("id missing from packet")); return; }
             if (!data.data) { done(new Error("data missing from packet")); return; }
             if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
             done();
             protMqtt.disconnect();
         })
-
-        setTimeout(() => {
-            var socketaccount = _.clone(testAccount);
-            socketaccount.protocol = "socketio"
-            new Prototype(socketaccount).post({ id, data: { test } })
-        }, 100)
-
     })
 
     /* --------------------------------------------------------------------- */
