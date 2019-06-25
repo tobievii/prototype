@@ -20,13 +20,15 @@ export class SettingsPanel extends React.Component {
   constructor() {
     super();
     this.socket = socketio({ transports: ['websocket'] });
-
+    fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
+      this.setState({ user: user })
+    })
     this.socket.on("connect", () => {
-      console.log("iotnxt socket connected")
+      // console.log("iotnxt socket connected")
     })
 
     this.socket.on("plugin_iotnxt", (event) => {
-      console.log(event);
+      // console.log(event);
 
 
       /* something happened with a gateway */
@@ -37,7 +39,7 @@ export class SettingsPanel extends React.Component {
             gateway = _.merge(gateway, event.gateway)
             //gateway.connected = event.gateway.connected;
             //if (event.gateway.error) { }
-            console.log("updated gateway state")
+            // console.log("updated gateway state")
           }
         }
         this.setState({ gateways });
@@ -52,10 +54,20 @@ export class SettingsPanel extends React.Component {
 
   loadServerGateways() {
     fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((data) => {
-      if (data) { this.setState({ gateways: data }); }
+      var gateways = [];
+      for (var g in data) {
+        if (data[g]._created_by) {
+          if (data[g]._created_by.publickey == this.state.user.publickey || this.state.user.level > 99) {
+            gateways.push(data[g])
+          }
+        } else if (this.state.user.level > 99) {
+          gateways.push(data[g]);
+        }
+      }
+
+      this.setState({ gateways: gateways });
     }).catch(err => console.error(this.props.url, err.toString()))
   }
-
 
   update = () => { this.loadServerGateways(); }
 

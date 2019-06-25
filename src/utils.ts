@@ -323,3 +323,21 @@ export function createPublicKeysforOldAccounts(db: any) {
         }
     })
 }
+
+export async function createIotnxtPublicKeysforOldAccounts(db: any) {
+    await db.plugins_iotnxt.find({}).limit(10000, (err: Error, gateways: any) => {
+        for (var g in gateways) {
+            if (gateways[g]._created_by) {
+                if (!gateways[g]._created_by.publickey) {
+                    db.users.findOne({ _id: gateways[g]._created_by }, (err: Error, user: any) => {
+                        gateways[g]._created_by = {
+                            _id: gateways[g]._created_by,
+                            publickey: user.publickey
+                        }
+                        db.plugins_iotnxt.update({ "_id": gateways[g]["_id"] }, gateways[g])
+                    })
+                }
+            }
+        }
+    })
+}

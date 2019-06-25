@@ -67,7 +67,7 @@ export class AddGatewayPanel extends React.Component {
             if (this.props.update) { this.props.update(); }
         }).catch(
             (err) => {
-                console.log("------")
+                // console.log("------")
                 // console.error(err.toString());
                 // this.setState({ message: err.toString() })
             }
