@@ -260,10 +260,20 @@ export class PluginAdmin extends Plugin {
                   if (updated) res.json(updated);
                 })
               })
-              db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
-              db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
-                db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
-              })
+              if (req.body.chosen) {
+                for (var i in req.body.chosen) {
+                  db.states.update({ $and: [{ devid: req.body.chosen[i].devid, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+                  db.states.findOne({ devid: req.body.chosen[i].devid }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                    db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+                  })
+                }
+              }
+              else if (!req.body.chosen) {
+                db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+                db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                  db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+                })
+              }
             }
           })
         })
