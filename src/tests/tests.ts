@@ -5,6 +5,7 @@ import { Prototype } from "../utils/api"
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('prototype');
 
+import * as _ from "lodash"
 
 /*
 
@@ -17,14 +18,21 @@ const cryptr = new Cryptr('prototype');
 // https://mochajs.org/#getting-started
 
 
-//var prototype = new Prototype({ uri: "https://prototype.dev.iotnxt.io" });
-//var prototype = new Prototype({ uri: "https://prototype.iotnxt.io" });
-
-var testAccount = {
+var testAccount: any = {
     email: "test" + generateDifficult(32) + "@iotlocalhost.com",
     password: cryptr.encrypt("newUser"),
-    apikey: ""
+
+    /* dev server:                          */
+    // host: "prototype.dev.iotnxt.io",
+    // https : true
+
+    /* localhost:                           */
+    host: "localhost",
+    https: false,
+    port: 8080
 }
+
+
 
 /*
 
@@ -39,30 +47,31 @@ if (process.env) {
 
 describe("PROTOTYPE", () => {
     // instance for new user
-    var prototype = new Prototype();
+    var prototype = new Prototype(testAccount);
 
-    it("register", done => {
-        //this.timeout(5000);
-        prototype.register(testAccount.email, testAccount.password, (err:Error, result:any)=>{
-                if (err) done(err);
-                if (result) { 
-                    if (result.error) done(new Error(result.error))
-                    if (result.account.apikey) { 
-                        testAccount.apikey = result.account.apikey;
-                        done(); }
+    it("register", function (done) {
+        this.timeout(5000);
+        prototype.register(testAccount.email, testAccount.password, (err: Error, result: any) => {
+            if (err) done(err);
+            if (result) {
+                if (result.error) done(new Error(result.error))
+                if (result.account.apikey) {
+                    testAccount.apikey = result.account.apikey;
+                    done();
                 }
+            }
         })
     })
-    
+
     /* --------------------------------------------------------------------- */
 
     it("account", done => {
-        prototype.account( (err:Error,account:any)=>{
+        prototype.account((err: Error, account: any) => {
             if (err) done(err);
-            if (account) { 
-                if (!account.uuid) { done(new Error("uuid missing")); return;}
-                if (!account.apikey) { done(new Error("apikey missing")); return;}
-                if (testAccount.apikey != account.apikey) { done(new Error("apikey mismatch")); return;}
+            if (account) {
+                if (!account.uuid) { done(new Error("uuid missing")); return; }
+                if (!account.apikey) { done(new Error("apikey missing")); return; }
+                if (testAccount.apikey != account.apikey) { done(new Error("apikey mismatch")); return; }
                 done();
             }
         })
@@ -71,7 +80,7 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     it("version", done => {
-        prototype.version( (err:Error,version:any)=>{
+        prototype.version((err: Error, version: any) => {
             if (err) done(err);
             if (version) {
                 done();
@@ -79,30 +88,30 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
     /* --------------------------------------------------------------------- */
 
     it("signin", done => {
         // fresh instance
-        new Prototype().signin(testAccount.email,testAccount.password, (err:Error, result:any)=>{
+        new Prototype(testAccount).signin(testAccount.email, testAccount.password, (err: Error, result: any) => {
             if (err) done(err);
-            if (result) { 
-                if(result.signedin == true) done();
+            if (result) {
+                if (result.signedin == true) done();
             }
         })
-    })    
+    })
 
     /* --------------------------------------------------------------------- */
 
     it("account", done => {
-        if (testAccount.apikey == "") { done("no apikey yet!"); } 
+        if (testAccount.apikey == "") { done("no apikey yet!"); }
         // fresh instance
-        new Prototype({apikey: testAccount.apikey}).account( (err:Error,account:any)=>{
+        new Prototype(testAccount).account((err: Error, account: any) => {
             if (err) done(err);
-            if (account) { 
-                if (!account.uuid) { done(new Error("uuid missing")); return;}
-                if (!account.apikey) { done(new Error("apikey missing")); return;}
-                if (testAccount.apikey != account.apikey) { done(new Error("apikey mismatch")); return;}
+            if (account) {
+                if (!account.uuid) { done(new Error("uuid missing")); return; }
+                if (!account.apikey) { done(new Error("apikey missing")); return; }
+                if (testAccount.apikey != account.apikey) { done(new Error("apikey mismatch")); return; }
                 done();
             }
         })
@@ -111,17 +120,17 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     var packet = {
-        id : "test_httppost",
+        id: "test_httppost",
         data: { random: generateDifficult(32) }
     }
 
     it("device HTTP POST", done => {
-        if (testAccount.apikey == "") { done("no apikey yet!"); } 
-        
-        new Prototype({apikey: testAccount.apikey}).post(packet, (err:Error,response:any)=>{
+        if (testAccount.apikey == "") { done("no apikey yet!"); }
+
+        new Prototype(testAccount).post(packet, (err: Error, response: any) => {
             if (err) done(err);
-            if (response) { 
-                if (response.result != "success") { done(new Error(response)); return;}
+            if (response) {
+                if (response.result != "success") { done(new Error(response)); return; }
                 done();
             }
         })
@@ -130,32 +139,32 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     it("device HTTP VIEW", done => {
-        if (testAccount.apikey == "") { done("no apikey yet!"); } 
-        
-        new Prototype({apikey: testAccount.apikey}).view(packet.id, (err:Error,response:any)=>{
+        if (testAccount.apikey == "") { done("no apikey yet!"); }
+
+        new Prototype(testAccount).view(packet.id, (err: Error, response: any) => {
             if (err) done(err);
-            if (response) { 
+            if (response) {
                 if (response.data.random == packet.data.random) {
                     done();
                 } else {
                     done(new Error("data mismatch"))
                 }
-                
+
             }
         })
     })
 
     /* --------------------------------------------------------------------- */
 
-    it("device HTTP PACKETS", done  => {
-        new Prototype({apikey: testAccount.apikey}).packets(packet.id, (err:Error,response:any)=>{
+    it("device HTTP PACKETS", done => {
+        new Prototype(testAccount).packets(packet.id, (err: Error, response: any) => {
             if (err) done(err);
-            if (response) {  
+            if (response) {
                 if (response[response.length - 1].data.random == packet.data.random) {
                     done();
-                  } else {
-                      done(new Error("data mismatch"))
-                  }          
+                } else {
+                    done(new Error("data mismatch"))
+                }
             }
         })
     })
@@ -163,15 +172,15 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     it("device HTTP STATE", done => {
-        new Prototype({apikey: testAccount.apikey}).state(packet.id, (err:Error,response:any)=>{
+        new Prototype(testAccount).state(packet.id, (err: Error, response: any) => {
             if (err) done(err);
-            if (response) {  
-                if (!response.key) { done(new Error("key missing from state")); return;}
-                if (!response.apikey) { done(new Error("apikey missing")); return;}
-                if (!response.devid) { done(new Error("devid missing")); return;}
-                if (!response.payload) { done(new Error("payload missing")); return;}
-                if (packet.data.random != response.payload.data.random) { done(new Error("date mismatch")); return;}
-                done();          
+            if (response) {
+                if (!response.key) { done(new Error("key missing from state")); return; }
+                if (!response.apikey) { done(new Error("apikey missing")); return; }
+                if (!response.devid) { done(new Error("devid missing")); return; }
+                if (!response.payload) { done(new Error("payload missing")); return; }
+                if (packet.data.random != response.payload.data.random) { done(new Error("date mismatch")); return; }
+                done();
             }
         })
     })
@@ -179,12 +188,12 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     it("device HTTP STATES", done => {
-        new Prototype({apikey: testAccount.apikey}).states( (err:Error,response:any)=>{
+        new Prototype(testAccount).states((err: Error, response: any) => {
             if (err) done(err);
-            if (response) {  
-                if (response[0].id != packet.id) { done(new Error("id mismatch")); return;}
-                if (response[0].data.random != packet.data.random) { done(new Error("data mismatch")); return;}
-                done();          
+            if (response) {
+                if (response[0].id != packet.id) { done(new Error("id mismatch")); return; }
+                if (response[0].data.random != packet.data.random) { done(new Error("data mismatch")); return; }
+                done();
             }
         })
     })
@@ -192,30 +201,40 @@ describe("PROTOTYPE", () => {
     /* --------------------------------------------------------------------- */
 
     it("device HTTP DELETE", done => {
-        new Prototype({apikey: testAccount.apikey}).delete(packet.id, (err:Error,response:any)=>{
+        new Prototype(testAccount).delete(packet.id, (err: Error, response: any) => {
             if (err) done(err);
-            if (response) {  
-                done();          
+            if (response) {
+                done();
             }
         })
     })
 
     /* --------------------------------------------------------------------- */
-        
-    
+
+
     it("HTTP -> SOCKET", done => {
         var id = "protTestHttpSocket"
         var test = Math.random()
+
         // SOCKET
-        var protSocket = new Prototype({apikey: testAccount.apikey, protocol: "socketio", id});
-        protSocket.on("connect", ()=>{
+        var account = _.clone(testAccount);
+        account.protocol = "socketio";
+        account.id = id;
+        var protSocket = new Prototype(account);
+
+        protSocket.on("connect", () => {
             // HTTP POST
-            new Prototype({apikey: testAccount.apikey}).post({id, data:{test}}, (e:Error,r:any)=>{})
+            setTimeout(() => {
+                new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => {
+                    if (e) done(e);
+                })
+            }, 100)
+
         })
-        protSocket.on("data", (data:any)=>{
-            if (data.id != id) { done(new Error("id missing from socket packet")); return;}
-            if (!data.data) { done(new Error("data missing from socket packet"));return;}
-            if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
+        protSocket.on("data", (data: any) => {
+            if (data.id != id) { done(new Error("id missing from socket packet")); return; }
+            if (!data.data) { done(new Error("data missing from socket packet")); return; }
+            if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
             done();
             protSocket.disconnect();
         })
@@ -226,16 +245,20 @@ describe("PROTOTYPE", () => {
     it("HTTP -> MQTT", done => {
         var id = "protTestHttpMqtt"
         var test = Math.random()
+
         // MQTT
-        var protMqtt = new Prototype({apikey: testAccount.apikey, protocol: "mqtt", id});
-        protMqtt.on("connect", ()=>{
+        var mqttaccount = _.clone(testAccount);
+        mqttaccount.protocol = "mqtt";
+
+        var protMqtt = new Prototype(mqttaccount);
+        protMqtt.on("connect", () => {
             // HTTP POST
-            new Prototype({apikey: testAccount.apikey}).post({id, data:{test}}, (e:Error,r:any)=>{})
+            new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => { })
         })
-        protMqtt.on("data", (data:any)=>{
-            if (data.id != id) { done(new Error("id missing from socket packet")); return;}
-            if (!data.data) { done(new Error("data missing from socket packet"));return;}
-            if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
+        protMqtt.on("data", (data: any) => {
+            if (data.id != id) { done(new Error("id missing from socket packet")); return; }
+            if (!data.data) { done(new Error("data missing from socket packet")); return; }
+            if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
             done();
             protMqtt.disconnect();
         })
@@ -248,22 +271,27 @@ describe("PROTOTYPE", () => {
         var test = Math.random()
 
         // SOCKET LISTEN
-        var protSocket = new Prototype({
-            apikey: testAccount.apikey, 
-            protocol: "socketio", 
-            id}).on("data", data => {
-                if (data.id != id) { done(new Error("id missing from socket packet")); return;}
-                if (!data.data) { done(new Error("data missing from socket packet"));return;}
-                if (data.data.test != test) { done(new Error("data mismatch from socket packet"));return;}
-                done();
-                protSocket.disconnect();
+        var socketaccount = _.clone(testAccount);
+        socketaccount.protocol = "socketio";
+        socketaccount.id = id;
+        var protSocket = new Prototype(socketaccount).on("data", data => {
+            if (data.id != id) { done(new Error("id missing from socket packet")); return; }
+            if (!data.data) { done(new Error("data missing from socket packet")); return; }
+            if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
+            done();
+            protSocket.disconnect();
         });
 
         // MQTT POST
-        var protMqtt = new Prototype({
-            apikey: testAccount.apikey, 
-            protocol: "mqtt", 
-            id}).post({id, data:{test}})
+        var mqttaccount = _.clone(testAccount);
+        mqttaccount.protocol = "mqtt";
+        mqttaccount.id = id;
+
+        setTimeout(() => {
+            var protMqtt = new Prototype(mqttaccount).post({ id, data: { test } })
+        }, 200);
+
+
     })
 
     /* --------------------------------------------------------------------- */
@@ -272,25 +300,26 @@ describe("PROTOTYPE", () => {
         var id = "protTestMqtt"
         var test = Math.random()
 
-        var protMqtt = new Prototype({
-            apikey: testAccount.apikey, 
-            protocol: "mqtt"})
-                    
-        protMqtt.post({id, data:{test}}, (e:Error, result:any)=>{
+        var mqttaccount = _.clone(testAccount);
+        mqttaccount.protocol = "mqtt";
+
+        var protMqtt = new Prototype(mqttaccount);
+
+        protMqtt.post({ id, data: { test } }, (e: Error, result: any) => {
 
             // Delay a bit
-            setTimeout( ()=>{
-                new Prototype({apikey:testAccount.apikey}).view(id, (e:Error, data:any)=>{
-                    if (data.id != id) { done(new Error("id missing from packet")); return;}
-                    if (!data.data) { done(new Error("data missing from packet"));return;}
-                    if (data.data.test != test) { done(new Error("data mismatch from packet"));return;}
+            setTimeout(() => {
+                new Prototype(testAccount).view(id, (e: Error, data: any) => {
+                    if (data.id != id) { done(new Error("id missing from packet")); return; }
+                    if (!data.data) { done(new Error("data missing from packet")); return; }
+                    if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
                     done();
                 })
-            },100)
+            }, 100)
 
             protMqtt.disconnect();
         })
-        
+
     })
 
     /* --------------------------------------------------------------------- */
@@ -299,22 +328,30 @@ describe("PROTOTYPE", () => {
         var id = "protTestSocketHttp"
         var test = Math.random()
 
-        var protSocket = new Prototype({apikey:testAccount.apikey, protocol: "socketio"})
 
-        protSocket.on("connect", ()=>{
-            protSocket.post({id, data:{test}}, (e:Error, result:any)=> {
-                //
-                new Prototype({apikey:testAccount.apikey}).view(id, (e:Error, data:any)=>{
-                    if (data.id != id) { done(new Error("id missing from packet")); return;}
-                    if (!data.data) { done(new Error("data missing from packet"));return;}
-                    if (data.data.test != test) { done(new Error("data mismatch from packet"));return;}
-                    done();
+        var socketAccount = _.clone(testAccount);
+        socketAccount.protocol = "socketio";
+
+        var protSocket = new Prototype(socketAccount)
+
+        protSocket.on("connect", () => {
+
+            setTimeout(() => {
+                protSocket.post({ id, data: { test } }, (e: Error, result: any) => {
+                    //
+                    new Prototype(testAccount).view(id, (e: Error, data: any) => {
+                        if (data.id != id) { done(new Error("id missing from packet")); return; }
+                        if (!data.data) { done(new Error("data missing from packet")); return; }
+                        if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
+                        done();
+                    })
+                    protSocket.disconnect();
+                    //
                 })
-                protSocket.disconnect();
-                //
-            })    
+            }, 100)
+
         })
-        
+
     })
 
     /* --------------------------------------------------------------------- */
@@ -322,21 +359,27 @@ describe("PROTOTYPE", () => {
     it("SOCKET -> MQTT", done => {
         var id = "protTestSocketMqtt"
         var test = Math.random()
-        
-        var protMqtt = new Prototype({apikey:testAccount.apikey, protocol:"mqtt", id}).on("data", (data)=>{
-            if (data.id != id) { done(new Error("id missing from packet")); return;}
-            if (!data.data) { done(new Error("data missing from packet"));return;}
-            if (data.data.test != test) { done(new Error("data mismatch from packet"));return;}
+
+        var mqttaccount = _.clone(testAccount);
+        mqttaccount.protocol = "mqtt";
+        mqttaccount.id = id;
+
+        var protMqtt = new Prototype(mqttaccount).on("data", (data) => {
+            if (data.id != id) { done(new Error("id missing from packet")); return; }
+            if (!data.data) { done(new Error("data missing from packet")); return; }
+            if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
             done();
             protMqtt.disconnect();
         })
 
-        setTimeout( ()=>{
-            new Prototype({apikey:testAccount.apikey, protocol: "socketio"}).post({id, data:{test}})  
-        },100)
-        
+        setTimeout(() => {
+            var socketaccount = _.clone(testAccount);
+            socketaccount.protocol = "socketio"
+            new Prototype(socketaccount).post({ id, data: { test } })
+        }, 100)
+
     })
-    
+
     /* --------------------------------------------------------------------- */
 
 })
