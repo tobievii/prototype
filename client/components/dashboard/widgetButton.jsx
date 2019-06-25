@@ -42,7 +42,7 @@ export class WidgetButton extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.state.devid, data: JSON.parse(this.state.command) })
     }).then(response => response.json()).then(resp => {
-      console.log(resp);
+      // console.log(resp);
     }).catch(err => console.error(err.toString()));
   }
 

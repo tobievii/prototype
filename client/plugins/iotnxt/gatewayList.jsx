@@ -13,18 +13,20 @@ export class GatewayList extends React.Component {
 
   getaccount = () => {
     fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
+
       if (user.plugins_iotnxt_gatewaydefault) {
         this.setState({
-          accountgatewaydefault: user.plugins_iotnxt_gatewaydefault,
-          user: user
+          accountgatewaydefault: user.plugins_iotnxt_gatewaydefault
         })
       } else {
         this.setState({ accountgatewaydefault: undefined });
       }
+
+      this.setState({ user: user })
     }).catch(err => console.error(err.toString()))
   }
 
-  componentDidMount = () => {
+  componentWillMount = () => {
     this.getaccount()
   }
 
@@ -45,6 +47,7 @@ export class GatewayList extends React.Component {
       })
         .then(response => response.json())
         .then(data => {
+          // console.log(data)
           if (this.props.update) {
             this.props.update();
           }
@@ -110,28 +113,22 @@ export class GatewayList extends React.Component {
 
   renderDelete = (gateway) => {
     if (this.state.user) {
-
-      if (this.state.user.level > 99) {
-
-        return (
-          <div
-            onClick={this.removeGateway(gateway)}
-            title={"Delete"}
-            style={{
-              float: "right",
-              paddingRight: 10,
-              paddingTop: 1,
-              opacity: 0.25,
-              cursor: "pointer"
-            }}
-          >
-            <FontAwesomeIcon icon="trash-alt" />
-          </div>
-        )
-      } else {
-        return (<div />)
-      }
-
+      return (
+        <div
+          className="deleteButton"
+          onClick={this.removeGateway(gateway)}
+          title={"Delete"}
+          style={{
+            float: "right",
+            paddingRight: 10,
+            paddingTop: 1,
+            opacity: 0.25,
+            cursor: "pointer"
+          }}
+        >
+          <i className="fas fa-trash-alt"></i>
+        </div>
+      )
     } else {
       return (<div />)
     }
@@ -177,7 +174,7 @@ export class GatewayList extends React.Component {
 
               return (
                 <div key={gateway.GatewayId} className="row" style={gridstyle}>
-                  <div className="col-4" >
+                  <div className="col-4" style={{ paddingTop: 10 }}>
 
                     <div
                       title={utils.valueToggle(gateway.connected,
@@ -213,17 +210,17 @@ export class GatewayList extends React.Component {
                   </div>
 
                   {/* ENV */}
-                  <div className="col-1" style={{ textAlign: "right" }} >
+                  <div className="col-1" style={{ textAlign: "right", paddingTop: 11, }} >
                     {gateway.HostAddress.split(".")[1].toUpperCase()}
                   </div>
 
                   {/* CONNECTED */}
-                  <div className="col-2" style={{ textAlign: "left" }} >
+                  <div className="col-2" style={{ textAlign: "left", paddingTop: 11, }} >
                     <span title={gateway["_connected_last"]}>{moment(gateway["_connected_last"]).fromNow()}</span>
                   </div>
 
                   {/* CLUSTER */}
-                  <div className="col-2" style={{ textAlign: "left" }} >
+                  <div className="col-2" style={{ textAlign: "left", paddingTop: 11, }} >
                     {gateway.instance_id}
                   </div>
 
@@ -265,18 +262,9 @@ export class GatewayList extends React.Component {
                     </div> 
                   </div>*/}
 
-
-
-
-
-
-
                   <div className="col-1" style={{ padding: 10, textAlign: "right" }} >
                     {this.renderDelete(gateway)}
                   </div>
-
-
-
                 </div>
               );
             }, this)}

@@ -11,6 +11,7 @@ import * as utils from "../../utils"
 
 import { Gateway, GatewayType } from "./gateway"
 import { isNull } from "util";
+
 var RedisEvent = require('redis-event');
 
 export class PluginIotnxt extends Plugin {
@@ -80,6 +81,24 @@ export class PluginIotnxt extends Plugin {
       });
     });
 
+    app.post("/api/v3/iotnxt/removegateway", (req: any, res: any) => {
+      if (req.body._created_by) {
+        if (req.body._created_by.publickey != req.user.publickey && req.user.level < 100) {
+          res.json({ err: "permission denied" }); return;
+        } else {
+          this.removegateway(db, req.body, (err: Error, result: any) => {
+            if (err) res.json({ err: err.toString() });
+            res.json(result);
+          });
+        }
+      } else if (req.user.level >= 100) {
+        this.removegateway(db, req.body, (err: Error, result: any) => {
+          if (err) res.json({ err: err.toString() });
+          res.json(result);
+        });
+      }
+    });
+
     app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
       this.getgateways((err: Error, gateways: any) => {
         if (err) res.json({ err: err.toString() });
@@ -102,6 +121,10 @@ export class PluginIotnxt extends Plugin {
       })
     });
 
+  }
+
+  removegateway(db: any, data: any, cb: any) {
+    db.plugins_iotnxt.remove({ type: "gateway", GatewayId: data.GatewayId, HostAddress: data.HostAddress }, cb);
   }
 
   handlePacket(deviceState: any, packet: any, cb: Function) {
@@ -162,12 +185,15 @@ export class PluginIotnxt extends Plugin {
 
   addgateway(gateway: any, user: any, cb: any) {
     //var gateway = gatewayRequest;
+    // if (!user.publickey) {
+    //   user["publickey"] = utils.generate(32).toLowerCase();
+    // }
     gateway.default = false; // defaults to not the default
     gateway.connected = false;
     gateway.unique = utils.generateDifficult(64);
     gateway.type = "gateway"
     gateway["_created_on"] = new Date();
-    gateway["_created_by"] = user["_id"];
+    gateway["_created_by"] = { _id: user["_id"], publickey: user["publickey"] };
     this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
   }
 

@@ -271,7 +271,8 @@ export function accountCreate(db: any, email: any, userAgent: any, ip: any, cb: 
     apikey: generate(32),
     password: generateDifficult(16),
     level: 0,
-    sort: ""
+    sort: "",
+    publickey: generate(32).toLowerCase()
   };
 
 
