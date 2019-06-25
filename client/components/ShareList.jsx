@@ -58,11 +58,6 @@ export class ShareList extends Component {
         showselected: "none"
     };
 
-
-    componentWillMount = () => {
-
-    }
-
     componentDidMount = () => {
         Modal.setAppElement('body');
     }
@@ -84,6 +79,7 @@ export class ShareList extends Component {
                 this.state.SelectedUsers = _.clone(temp)
             }
         }
+        this.setState({ userSearched: newEmailList })
     }
 
     unshare = (remove) => {
@@ -158,7 +154,6 @@ export class ShareList extends Component {
     }
 
     userNameList = () => {
-
         try {
             return (<div style={{ height: "20%" }}>
                 {
@@ -190,7 +185,6 @@ export class ShareList extends Component {
 
     sharedList = () => {
         fetch("/api/v3/shared", {
-
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({ dev: this.state.devid, })
         }).then(response => response.json()).then(states => {
@@ -203,46 +197,91 @@ export class ShareList extends Component {
     }
 
     ShareButton = () => {
-        if (this.state.SelectedUsers.length > 0) {
-            return (
-                <div className="protoButton"
-                    onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
-            )
-        } else {
-            return (
-                <div className="protoButton" style={{ opacity: 0.3, cursor: "not-allowed", float: "right" }} ><i className="fas fa-share-alt" />  SHARE DEVICE</div>
-            )
+        if (this.props.type) {
+            if (this.state.SelectedUsers.length > 0) {
+                return (
+                    <div className="protoButton"
+                        onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> SHARE DEVICE(s)</div>
+                )
+            } else {
+                return (
+                    <div className="protoButton" style={{ opacity: 0.3, cursor: "not-allowed", float: "right" }} ><i className="fas fa-share-alt" />  SHARE DEVICE(s)</div>
+                )
+            }
+        }
+        else if (!this.props.type) {
+            if (this.state.SelectedUsers.length > 0) {
+                return (
+                    <div className="protoButton"
+                        onClick={this.shareDevice} style={{ float: "right", cursor: "pointer" }}> <i className="fas fa-share-alt" /> SHARE DEVICE</div>
+                )
+            } else {
+                return (
+                    <div className="protoButton" style={{ opacity: 0.3, cursor: "not-allowed", float: "right" }} ><i className="fas fa-share-alt" />  SHARE DEVICE</div>
+                )
+            }
         }
     }
 
     shareDevice = () => {
-        this.setState({ show: "noDisplayShare" });
-
-        this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
-        for (let dev in this.state.EmailsharedDevice) {
-            for (let i in this.state.userSearched) {
-                if (this.state.EmailsharedDevice[dev].email == this.state.userSearched[i].email) {
-                    this.state.userSearched[i].shared = "yes";
+        if (this.props.type) {
+            {
+                this.setState({ show: "noDisplayShare" });
+                this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
+                this.props.chosen.map((user, i) => console.log(i + ":" + user.devid))
+                for (let dev in this.state.EmailsharedDevice) {
+                    fetch("/api/v3/admin/shareDevice", {
+                        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email: this.state.EmailsharedDevice[dev].email,
+                            text: 'Hi Device(s) have been shared with you ',
+                            html: '<p>Hi <br></br>' + this.props.account.username + ' has shared Device(s):<br></br> (' + this.props.chosen.map((user, i) => user.devid) + ')<br></br>  with you </p>',
+                            subject: 'SHARED DEVICE',
+                            dev: this.props.chosen.map((user, i) => user.devid + ''),
+                            type: "multi",
+                            chosen: this.props.chosen,
+                            person: this.props.account.username,
+                            publickey: this.state.EmailsharedDevice[dev].sharekey
+                        })
+                    }).then(response => response.json()).then(serverresponse => {
+                        this.setState({ qresponse: serverresponse.result })
+                        this.setState({ show: " " });
+                    }).catch(err => console.error(err.toString()));
                 }
+                this.setState({ SelectedUsers: [] })
+                this.setState({ isOpen: !this.state.isOpen })
             }
-            fetch("/api/v3/admin/shareDevice", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: this.state.EmailsharedDevice[dev].email,
-                    text: 'Hi a Device was shared with you called ' + this.props.devid,
-                    html: '<p>Hi <br></br>' + this.props.username + ' has shared (' + this.props.devid + ') Device with you </p>',
-                    subject: 'SHARED DEVICE',
-                    dev: this.props.devid,
-                    person: this.props.username,
-                    publickey:this.state.EmailsharedDevice[dev].sharekey
-                })
-            }).then(response => response.json()).then(serverresponse => {
-                this.setState({ qresponse: serverresponse.result })
-                this.setState({ show: " " });
-            }).catch(err => console.error(err.toString()));
         }
-        this.setState({ SelectedUsers: [] })
-        this.setState({ isOpen: !this.state.isOpen })
+        else if (!this.props.type) {
+            {
+                this.setState({ show: "noDisplayShare" });
+                this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
+                for (let dev in this.state.EmailsharedDevice) {
+                    for (let i in this.state.userSearched) {
+                        if (this.state.EmailsharedDevice[dev].email == this.state.userSearched[i].email) {
+                            this.state.userSearched[i].shared = "yes";
+                        }
+                    }
+                    fetch("/api/v3/admin/shareDevice", {
+                        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email: this.state.EmailsharedDevice[dev].email,
+                            text: 'Hi a Device was shared with you called ' + this.props.devid,
+                            html: '<p>Hi <br></br>' + this.props.username + ' has shared (' + this.props.devid + ') Device with you </p>',
+                            subject: 'SHARED DEVICE',
+                            dev: this.props.devid,
+                            person: this.props.username,
+                            publickey: this.state.EmailsharedDevice[dev].sharekey
+                        })
+                    }).then(response => response.json()).then(serverresponse => {
+                        this.setState({ qresponse: serverresponse.result })
+                        this.setState({ show: " " });
+                    }).catch(err => console.error(err.toString()));
+                }
+                this.setState({ SelectedUsers: [] })
+                this.setState({ isOpen: !this.state.isOpen })
+            }
+        }
     }
 
 
@@ -257,16 +296,32 @@ export class ShareList extends Component {
                             <button className="smallButton" style={{ margin: "5px" }} onClick={onClose}>No, Cancel it!</button>
                             <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
                                 {
-                                    fetch("/api/v3/makedevPublic", {
-                                        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                                        body: JSON.stringify({
-                                            devid: this.state.state.key
-                                        })
-                                    }).then(response => response.json()).then(serverresponse => {
-                                        { onClose() }
-                                        this.setState({ checkboxstate: "none" })
-                                        this.setState({ Devicestate: "UNSHARE PUBLICLY" })
-                                    }).catch(err => console.error(err.toString()));
+                                    if (this.props.type) {
+                                        fetch("/api/v3/makedevPublic", {
+                                            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                devid: this.props.chosen,
+                                                type: "multi"
+                                            })
+                                        }).then(response => response.json()).then(serverresponse => {
+                                            { onClose() }
+                                            this.setState({ checkboxstate: "none" })
+                                            this.setState({ Devicestate: "UNSHARE PUBLICLY" })
+                                        }).catch(err => console.error(err.toString()));
+
+                                    }
+                                    else if (!this.props.type) {
+                                        fetch("/api/v3/makedevPublic", {
+                                            method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                                            body: JSON.stringify({
+                                                devid: this.state.state.key
+                                            })
+                                        }).then(response => response.json()).then(serverresponse => {
+                                            { onClose() }
+                                            this.setState({ checkboxstate: "none" })
+                                            this.setState({ Devicestate: "UNSHARE PUBLICLY" })
+                                        }).catch(err => console.error(err.toString()));
+                                    }
                                 }
                             }}>Yes,Share Publicly!</button>
                         </div>
@@ -275,15 +330,29 @@ export class ShareList extends Component {
             })
         }
         else if (this.state.Devicestate == "UNSHARE PUBLICLY") {
-            fetch("/api/v3/makedevPrivate", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    devid: this.state.state.key
-                })
-            }).then(response => response.json()).then(serverresponse => {
-                this.setState({ checkboxstate: "" })
-                this.setState({ Devicestate: "SHARE PUBLICLY" })
-            }).catch(err => console.error(err.toString()));
+            if (this.props.type) {
+                fetch("/api/v3/makedevPrivate", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        devid: this.props.chosen,
+                        type: "multi"
+                    })
+                }).then(response => response.json()).then(serverresponse => {
+                    this.setState({ checkboxstate: "" })
+                    this.setState({ Devicestate: "SHARE PUBLICLY" })
+                }).catch(err => console.error(err.toString()));
+            }
+            else if (!this.props.type) {
+                fetch("/api/v3/makedevPrivate", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        devid: this.state.state.key
+                    })
+                }).then(response => response.json()).then(serverresponse => {
+                    this.setState({ checkboxstate: "" })
+                    this.setState({ Devicestate: "SHARE PUBLICLY" })
+                }).catch(err => console.error(err.toString()));
+            }
         }
     }
 
@@ -351,7 +420,6 @@ export class ShareList extends Component {
                     {this.userNameList()}
                 </div>
                 <center>
-                    {/* <button>Share Device</button> */}
                 </center>
             </Modal>
         </center>

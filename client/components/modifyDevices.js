@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Modal from 'react-modal';
 import { CodeBlock } from "./codeBlock.jsx"
+import { ShareList } from './ShareList.jsx'
 
 const customStyles = {
     content: {
@@ -253,6 +254,7 @@ export default class ModifyDevices extends Component {
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
                         {this.modification()}
                     </Modal>
+                    <ShareList account={this.props.account} isOpen={this.props.isOpenshare} username={this.props.username} closeModel={this.props.closeModel} type={"multi"} chosen={this.props.devices.filter((device) => { return device.selected == true })} />
                 </center>
             </div >
         )
