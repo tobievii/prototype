@@ -62,7 +62,7 @@ export class SettingsPanel extends React.Component {
   }
 
   onMouseOver = serialport => {
-    return event => {};
+    return event => { };
   };
 
   getSerialports = () => {
@@ -75,7 +75,7 @@ export class SettingsPanel extends React.Component {
 
   setserialportaccount = serialport => {
     return event => {
-      console.log(serialport);
+      // console.log(serialport);
 
       fetch("/api/v3/serialports/setserialportaccount", {
         method: "POST",

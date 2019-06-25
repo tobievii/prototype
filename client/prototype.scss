@@ -1585,6 +1585,11 @@ button:active {
   transition: background 0.0s;
 }
 
+.deleteButton:hover {
+  color: #f3353a;
+  opacity: 1 !important;
+}
+
 .my-component {
   background: #fff;
 }

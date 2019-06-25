@@ -108,7 +108,7 @@ eventHub.on("plugin", (data: any) => {
   */
 
   if (data.plugin && data.event) {
-    log("EVENTHUB", data.plugin, JSON.stringify(data.event));
+    log("EVENTHUB", data.plugin);
     io.sockets.emit("plugin_" + data.plugin, data.event)
   } else {
     log("EVENTHUB", "DEPRECIATED PLUGIN EVENT FORMAT.")
@@ -136,6 +136,7 @@ utilsLib.checkFirstRun(db);
 utilsLib.createUsernamesForOldAccounts(db);
 utilsLib.createDeviceKeysForOldAccounts(db);
 utilsLib.createPublicKeysforOldAccounts(db);
+utilsLib.createIotnxtPublicKeysforOldAccounts(db);
 
 //handle accounts/cookies.
 app.use(accounts.midware(db));
