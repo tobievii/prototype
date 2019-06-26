@@ -109,6 +109,5 @@ function Decoder(bytes, port) {
         "data": decoded
     };
 
-
     return Tracker;
 }
