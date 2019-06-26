@@ -74,7 +74,7 @@ export class PluginIotnxt extends Plugin {
 
     app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
       this.addgateway(req.body, req.user, (err: Error, result: any, gateway: any) => {
-        if (err) res.json({ err: err.toString() });
+        if (err) { res.json({ err: err.toString() }); return; }
         this.handlenewgateway(gateway);
         //this.connectgateway(db, req.body, eventHub, (errC: any, resultC: any) => { })
         res.json(result);
@@ -188,13 +188,24 @@ export class PluginIotnxt extends Plugin {
     // if (!user.publickey) {
     //   user["publickey"] = utils.generate(32).toLowerCase();
     // }
-    gateway.default = false; // defaults to not the default
-    gateway.connected = false;
-    gateway.unique = utils.generateDifficult(64);
-    gateway.type = "gateway"
-    gateway["_created_on"] = new Date();
-    gateway["_created_by"] = { _id: user["_id"], publickey: user["publickey"] };
-    this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
+    this.db.plugins_iotnxt.find({ GatewayId: gateway.GatewayId }, (err: Error, result: any) => {
+      if (err) { cb(err); console.log(err); return; }
+      if (result) {
+        if (result.length != 0) { cb(new Error("Gateway with this GatewayId already exists!")); return; }
+        //////////////
+        // ADD GATEWAY
+        gateway.default = false; // defaults to not the default
+        gateway.connected = false;
+        gateway.unique = utils.generateDifficult(64);
+        gateway.type = "gateway"
+        gateway["_created_on"] = new Date();
+        gateway["_created_by"] = { _id: user["_id"], publickey: user["publickey"] };
+        this.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
+        //////////////
+      }
+    })
+
+
   }
 
   handlenewgateway(gateway: any) {

@@ -266,7 +266,8 @@ describe("PROTOTYPE", () => {
 
     /* --------------------------------------------------------------------- */
 
-    it("MQTT -> SOCKET", done => {
+    it("MQTT -> SOCKET", function (done) {
+        this.timeout(5000);
         var id = "protTestMqttSocket"
         var test = Math.random()
 
@@ -274,7 +275,17 @@ describe("PROTOTYPE", () => {
         var socketaccount = _.clone(testAccount);
         socketaccount.protocol = "socketio";
         socketaccount.id = id;
-        var protSocket = new Prototype(socketaccount).on("data", data => {
+        var protSocket = new Prototype(socketaccount)
+
+        protSocket.on("connect", () => {
+            // MQTT POST
+            var mqttaccount = _.clone(testAccount);
+            mqttaccount.protocol = "mqtt";
+            mqttaccount.id = id;
+            var protMqtt = new Prototype(mqttaccount).post({ id, data: { test } })
+        })
+
+        protSocket.on("data", data => {
             if (data.id != id) { done(new Error("id missing from socket packet")); return; }
             if (!data.data) { done(new Error("data missing from socket packet")); return; }
             if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
@@ -282,14 +293,7 @@ describe("PROTOTYPE", () => {
             protSocket.disconnect();
         });
 
-        // MQTT POST
-        var mqttaccount = _.clone(testAccount);
-        mqttaccount.protocol = "mqtt";
-        mqttaccount.id = id;
 
-        setTimeout(() => {
-            var protMqtt = new Prototype(mqttaccount).post({ id, data: { test } })
-        }, 200);
 
 
     })
@@ -364,20 +368,21 @@ describe("PROTOTYPE", () => {
         mqttaccount.protocol = "mqtt";
         mqttaccount.id = id;
 
-        var protMqtt = new Prototype(mqttaccount).on("data", (data) => {
+        var protMqtt = new Prototype(mqttaccount)
+
+        protMqtt.on("connect", () => {
+            var socketaccount = _.clone(testAccount);
+            socketaccount.protocol = "socketio"
+            new Prototype(socketaccount).post({ id, data: { test } })
+        })
+
+        protMqtt.on("data", (data) => {
             if (data.id != id) { done(new Error("id missing from packet")); return; }
             if (!data.data) { done(new Error("data missing from packet")); return; }
             if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
             done();
             protMqtt.disconnect();
         })
-
-        setTimeout(() => {
-            var socketaccount = _.clone(testAccount);
-            socketaccount.protocol = "socketio"
-            new Prototype(socketaccount).post({ id, data: { test } })
-        }, 100)
-
     })
 
     /* --------------------------------------------------------------------- */
