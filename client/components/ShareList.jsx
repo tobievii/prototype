@@ -83,10 +83,7 @@ export class ShareList extends Component {
     }
 
     unshare = (remove) => {
-        if (this.props.type) {
-            null
-        }
-        else if (!this.props.type) {
+        if (!this.props.type) {
             this.setState({ show: "noDisplayShare" });
             for (let i in this.state.userSearched) {
                 if (remove == this.state.userSearched[i].sharekey) {
@@ -102,6 +99,7 @@ export class ShareList extends Component {
                 this.setState({ show: " " });
             }).catch(err => console.error(err.toString()));
         }
+        else return
     }
 
     setValues = (isOpen) => {
@@ -322,7 +320,7 @@ export class ShareList extends Component {
                                                 type: "multi"
                                             })
                                         }).then(response => response.json()).then(serverresponse => {
-                                            if (serverresponse.ok == 1) {
+                                            if (serverresponse.nModified == 1) {
                                                 for (var i in this.props.chosen) {
                                                     this.props.chosen[i].public = true
                                                 }
@@ -341,7 +339,7 @@ export class ShareList extends Component {
                                                 devid: this.state.state.key
                                             })
                                         }).then(response => response.json()).then(serverresponse => {
-                                            if (serverresponse.ok == 1) {
+                                            if (serverresponse.nModified == 1) {
                                                 for (var i in this.props.chosen) {
                                                     this.props.chosen[i].public = true
                                                 }
