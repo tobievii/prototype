@@ -1078,19 +1078,9 @@ function handleState(req: any, res: any, next: any) {
             }
           }
 
-          // if (info.newdevice) {
-
-          //   var newDeviceNotification = {
-          //     type: "NEW DEVICE ADDED",
-          //     device: req.body.id,
-          //     created: packet._created_on,
-          //     notified: true,
-          //     seen: false
-          //   }
-
-          //   //createNotification(db, newDeviceNotification, req.user, deviceState);
-          //   io.to(req.user.username).emit("info", info);
-          // }
+          if (info.newdevice) {
+            io.to(req.user.username).emit("info", info);
+          }
 
           // var message = "";
           // var AlarmNotification = {
