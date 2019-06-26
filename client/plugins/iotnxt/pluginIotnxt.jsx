@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHdd } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faHdd)
@@ -22,6 +21,7 @@ export class SettingsPanel extends React.Component {
     this.socket = socketio({ transports: ['websocket'] });
     fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
       this.setState({ user: user })
+      this.loadServerGateways();
     })
     this.socket.on("connect", () => {
       // console.log("iotnxt socket connected")
@@ -48,8 +48,6 @@ export class SettingsPanel extends React.Component {
 
       this.loadServerGateways();
     })
-
-    this.loadServerGateways();
   }
 
   loadServerGateways() {
