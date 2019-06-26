@@ -131,6 +131,7 @@ export class StatesViewer extends Component {
     isOpen: false,
     Modifychoice: "",
     isOpenModify: false,
+    isOpenshare: false,
     tempdev: [],
     toggleOn: false,
     toggleOff: true,
@@ -921,18 +922,27 @@ export class StatesViewer extends Component {
     switch (choice) {
       case "SET IOTNXT GATEWAY":
         this.setState({ modificationinfo: "A easier way to assign a gateway to multipe devices" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenModify: true })
         break;
       case "SCRIPT PRESET":
         this.setState({ modificationinfo: "You can now assign the same workflow code to multiple devices" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenModify: true })
         break;
       case "DASHBOARD PRESET":
         this.setState({ modificationinfo: "You can now assign the same dashboard to multiple devices" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenModify: true })
+        break;
+      case "SHARE":
+        this.setState({ modificationinfo: "You can now share multiple devices" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenshare: true })
         break;
       default:
         this.setState({ modificationinfo: "" });
     }
-    this.setState({ selectedModification: choice })
-    this.setState({ isOpenModify: true })
   }
 
   render() {
@@ -991,10 +1001,12 @@ export class StatesViewer extends Component {
             {this.displayMap()}
             <ModifyDevices account={this.props.account}
               isOpen={this.state.isOpenModify}
+              isOpenshare={this.state.isOpenshare}
               modification={this.state.selectedModification}
               modificationinfo={this.state.modificationinfo}
-              closeModel={() => { this.setState({ isOpenModify: false }) }}
+              closeModel={() => { this.setState({ isOpenModify: false }), this.setState({ isOpenshare: false }) }}
               mainView={this.props.mainView}
+              account={this.props.account}
               devices={this.state.devicesServer} />
             <ChangePassword
               account={this.props.account}
