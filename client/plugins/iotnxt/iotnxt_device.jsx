@@ -13,6 +13,7 @@ export class DevicePluginPanel extends React.PureComponent {
   getAccount = () => {
     fetch("/api/v3/account").then(res => res.json()).then(user => {
       this.setState({ user })
+      this.getServerGateways();
     })
   }
 
@@ -59,6 +60,7 @@ export class DevicePluginPanel extends React.PureComponent {
         }
         this.setState({ serverGateways: finalGateways });
       }
+      this.getDevice();
     }).catch(err => console.error(this.props.url, err.toString()))
   }
 
@@ -114,9 +116,7 @@ export class DevicePluginPanel extends React.PureComponent {
   }
 
   componentWillMount = () => {
-    this.getServerGateways();
     this.getAccount();
-    this.getDevice();
   }
 
   render() {

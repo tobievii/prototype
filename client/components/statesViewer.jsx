@@ -168,15 +168,16 @@ export class StatesViewer extends Component {
     this.socket.on("connect", a => {
       this.socket.emit("join", this.props.username)
       this.socket.on("info", (info) => {
+
         if (info.newdevice) {
           p.statesByUsername(this.props.username, (states) => {
             for (var s in states) {
               states[s].selected = false
             }
             var packet1 = {
-              id: info.newdevice.id,
-              data: info.newdevice.payload.data,
-              timestamp: info.newdevice.payload.timestamp
+              id: info.deviceStateDBpreupdate.devid,
+              data: info.deviceStateDBpreupdate.payload.data,
+              timestamp: info.deviceStateDBpreupdate.payload.timestamp
             }
 
 
