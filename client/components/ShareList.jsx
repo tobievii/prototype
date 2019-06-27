@@ -313,11 +313,12 @@ export class ShareList extends Component {
                             <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
                                 {
                                     if (this.props.type) {
-                                        fetch("/api/v3/makedevPublic", {
+                                        fetch("/api/v3/setprivateorpublic", {
                                             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                                             body: JSON.stringify({
                                                 devid: this.props.chosen,
-                                                type: "multi"
+                                                type: "multi",
+                                                public: true
                                             })
                                         }).then(response => response.json()).then(serverresponse => {
                                             if (serverresponse.nModified == 1) {
@@ -333,10 +334,11 @@ export class ShareList extends Component {
 
                                     }
                                     else if (!this.props.type) {
-                                        fetch("/api/v3/makedevPublic", {
+                                        fetch("/api/v3/setprivateorpublic", {
                                             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                                             body: JSON.stringify({
-                                                devid: this.state.state.key
+                                                devid: this.state.state.key,
+                                                public: true
                                             })
                                         }).then(response => response.json()).then(serverresponse => {
                                             if (serverresponse.nModified == 1) {
@@ -359,11 +361,12 @@ export class ShareList extends Component {
         }
         else if (this.state.Devicestate == "UNSHARE PUBLICLY") {
             if (this.props.type) {
-                fetch("/api/v3/makedevPrivate", {
+                fetch("/api/v3/setprivateorpublic", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({
                         devid: this.props.chosen,
-                        type: "multi"
+                        type: "multi",
+                        public: false
                     })
                 }).then(response => response.json()).then(serverresponse => {
                     this.setState({ checkboxstate: "" })
@@ -371,10 +374,11 @@ export class ShareList extends Component {
                 }).catch(err => console.error(err.toString()));
             }
             else if (!this.props.type) {
-                fetch("/api/v3/makedevPrivate", {
+                fetch("/api/v3/setprivateorpublic", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        devid: this.state.state.key
+                        devid: this.state.state.key,
+                        public: false
                     })
                 }).then(response => response.json()).then(serverresponse => {
                     this.setState({ checkboxstate: "" })

@@ -692,33 +692,36 @@ app.post('/api/v3/publicStates', (req: any, res: any) => {
   }
 })
 
-app.post('/api/v3/makedevPublic', (req: any, res: any) => {
-  if (req.body.type) {
-    for (var i in req.body.devid) {
-      db.states.update({ key: req.body.devid[i].key }, { $set: { public: true } }, (err: Error, result: any) => {
+app.post('/api/v3/setprivateorpublic', (req: any, res: any) => {
+  //to public
+  if (req.body.public == true) {
+    if (req.body.type) {
+      for (var i in req.body.devid) {
+        db.states.update({ key: req.body.devid[i].key }, { $set: { public: true } }, (err: Error, result: any) => {
+          res.json(result);
+        })
+      }
+    }
+    else if (!req.body.type) {
+      db.states.update({ key: req.body.devid }, { $set: { public: true } }, (err: Error, result: any) => {
         res.json(result);
       })
     }
   }
-  else if (!req.body.type) {
-    db.states.update({ key: req.body.devid }, { $set: { public: true } }, (err: Error, result: any) => {
-      res.json(result);
-    })
-  }
-})
-
-app.post('/api/v3/makedevPrivate', (req: any, res: any) => {
-  if (req.body.type) {
-    for (var i in req.body.devid) {
-      db.states.update({ key: req.body.devid[i].key }, { $set: { public: false } }, (err: Error, result: any) => {
+  //to private
+  if (req.body.public == false) {
+    if (req.body.type) {
+      for (var i in req.body.devid) {
+        db.states.update({ key: req.body.devid[i].key }, { $set: { public: false } }, (err: Error, result: any) => {
+          res.json(result);
+        })
+      }
+    }
+    else if (!req.body.type) {
+      db.states.update({ key: req.body.devid }, { $set: { public: false } }, (err: Error, result: any) => {
         res.json(result);
       })
     }
-  }
-  else if (!req.body.type) {
-    db.states.update({ key: req.body.devid }, { $set: { public: false } }, (err: Error, result: any) => {
-      res.json(result);
-    })
   }
 })
 
