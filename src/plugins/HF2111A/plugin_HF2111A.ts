@@ -21,11 +21,10 @@ export class pluginHF2111A extends Plugin {
     this.db = db;
     this.eventHub = eventHub;
     log("PLUGIN", this.name, "LOADED");
+    this.init(app, db, eventHub);
   }
 
   public init(app: express.Express, db: any, eventHub: events.EventEmitter) {
-    this.eventHub = eventHub;
-
     this.log("INIT HFHAKSFL")
 
     app.get("/api/v3/plugins/" + this.name + "/info", (req: Express.Request, res: express.Response) => {
