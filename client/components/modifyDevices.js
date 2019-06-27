@@ -73,7 +73,23 @@ export default class ModifyDevices extends Component {
     }
     getgateways = () => {
         fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((gateways) => {
-            this.setState({ serverGateways: gateways })
+            var finalGateways = [];
+            if (gateways) {
+                for (var g in gateways) {
+                    if (gateways[g]._created_by) {
+                        if (gateways[g]._created_by.publickey == this.props.account.publickey || gateways[g]._created_by == undefined || this.props.account.level >= 100) {
+                            finalGateways.push(gateways[g])
+                        }
+                    } else if (this.props.account.level >= 100 || gateways[g]._created_by == undefined) {
+                        finalGateways.push(gateways[g])
+                    }
+
+                    if (gateways[g].default) {
+                        this.setState({ serverGatewayDefault: gateways[g] });
+                    }
+                }
+                this.setState({ serverGateways: finalGateways });
+            }
         }).catch(err => console.error(this.props.url, err.toString()))
     }
 
