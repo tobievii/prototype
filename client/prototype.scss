@@ -1260,6 +1260,22 @@ input[type="color"] {
   font-size: 15px;
 }
 
+select {
+background : #1b394d;
+color: grey ;
+border:1px;
+border-color: grey
+}
+option{
+background : rgb(16, 23, 32);
+color:grey
+}
+
+option:hover{
+  background : rgb(16, 23, 32);
+  color:white
+}
+
 .protoButtonClickable:hover {
   color: #f3353a;
   background: rgba(0, 0, 0, 0.9);

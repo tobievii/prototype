@@ -73,7 +73,7 @@ export default class AddDevice extends Component {
         if (this.state.popupInfo == "default") {
             return (
                 <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                    <div style={{}}>
+                    <div>
                         Search for your device, service and/or protocol:
                 </div>
                     <div className="row addDevice">
@@ -82,14 +82,14 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                            <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} placeholder="Type to filter options" />
-                            <datalist id="devices">
-                                <option value="Arduino (Serialport)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="ESP32 (Wifi + MQTT)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            </datalist>
+                            <select id="devices" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search}>
+                                <option value="" disabled selected hidden>Select type of device..</option>
+                                <option value="Arduino (Serialport)" className="optiondropdown" style={{ width: "90%" }} >Arduino (Serialport)</option>
+                                <option value="ESP32 (Wifi + MQTT)" className="optiondropdown" style={{ width: "90%" }} >ESP32 (Wifi + MQTT)</option>
+                                <option value="IoT.nxt raptor" className="optiondropdown" style={{ width: "90%" }} >IoT.nxt raptor</option>
+                                <option value="Teltonika" className="optiondropdown" style={{ width: "90%" }} >Teltonika</option>
+                                <option value="Efento" className="optiondropdown" style={{ width: "90%" }} >Efento</option>
+                            </select>
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
