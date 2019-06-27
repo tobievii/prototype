@@ -207,10 +207,11 @@ export class StatesViewerItem extends Component {
 
               <button className="smallButton" style={{ margin: "5px" }} style={{ margin: "15px" }} onClick={() => {
                 {
-                  fetch("/api/v3/makedevPublic", {
+                  fetch("/api/v3/setprivateorpublic", {
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({
-                      devid: device.key
+                      devid: device.key,
+                      public: true
                     })
                   }).then(response => response.json()).then(serverresponse => {
                     device.public = true;
@@ -231,10 +232,11 @@ export class StatesViewerItem extends Component {
     if (this.props.account.email == this.props.device.meta.user.email) {
       if (device.public != undefined || device.public != null) {
         if (device.public == true) {
-          fetch("/api/v3/makedevPrivate", {
+          fetch("/api/v3/setprivateorpublic", {
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-              devid: device.key
+              devid: device.key,
+              public: false
             })
           }).then(response => response.json()).then(serverresponse => {
             if (serverresponse.nModified == 1) {
