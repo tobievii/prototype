@@ -34,10 +34,11 @@ export class PluginTeltonika extends Plugin {
     });
     app.get("/api/v3/teltonika/reqport", (req: any, res: any) => {
       // check if account has port assigned
-      this.db[this.collection].findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
+      // console.log(req.user)
+      this.db.plugins_teltonika.findOne({ apikey: req.user.apikey }, (err: Error, result: any) => {
         if (err) { res.json(err); }
 
-        if (result.length == 0) {
+        if (result == null) {
           // no ports yet
           // find open port
           this.findOpenPort((err: Error, openport: any) => {
