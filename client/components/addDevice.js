@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { plugins } from "../plugins/config.ts"
 import Modal from 'react-modal';
 
 const customStyles = {
@@ -58,8 +58,10 @@ export default class AddDevice extends Component {
     addDevice = (call) => {
         if (this.props.account.level < 1) {
             this.setState({ popupInfo: "public" })
-        } else if (this.state.search == "Efento" && call == "select") {
+        } else if ((this.state.search == "Efento" || this.state.search == "efento") && call == "select") {
             this.setState({ popupInfo: "Efento" })
+        } else if ((this.state.search == "Teltonika" || this.state.search == "teltonika") && call == "select") {
+            this.setState({ popupInfo: "Teltonika" })
         } else {
             return null;
         }
@@ -126,6 +128,14 @@ export default class AddDevice extends Component {
                     Your API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
                     <br /><br />
                     Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
+                </div>
+            )
+        } else if (this.state.popupInfo == "Teltonika") {
+
+            var SettingsPanel = plugins[5].SettingsPanel
+            return (
+                <div style={{ background: "#16202C", paddingBottom: 14 }}>
+                    <SettingsPanel {...this.props} />
                 </div>
             )
         }
