@@ -13,13 +13,28 @@ export class LineChart extends React.Component {
         this.state = {
             options: {
                 zoomable_line: {
-                    stacked: false,
+                    stacked: true,
                     zoom: {
                         type: 'x',
                         enabled: true
                     },
                     toolbar: {
                         autoSelected: 'zoom'
+                    }
+                },
+                chart: {
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                        animateGradually: {
+                            enabled: true,
+                            delay: 150
+                        },
+                        dynamicAnimation: {
+                            enabled: true,
+                            speed: 350
+                        }
                     }
                 },
                 stroke: {
@@ -62,10 +77,6 @@ export class LineChart extends React.Component {
                     style: 'full',
                 },
                 colors: ['#24e079'],
-                // title: {
-                //     text: 'Stock Price Movement',
-                //     align: 'left'
-                // },
                 fill: {
                     type: 'gradient',
                     gradient: {
@@ -77,15 +88,15 @@ export class LineChart extends React.Component {
                     },
                 },
                 yaxis: {
-                    // title: {
-                    //     text: 'Price'
-                    // },
+                    title: {
+                        text: this.props.datapath
+                    },
                 },
                 xaxis: {
                     type: 'datetime',
-                    // title: {
-                    //     text: 'HEllo'
-                    // }
+                    title: {
+                        text: 'date'
+                    },
                 },
 
                 tooltip: {
@@ -131,7 +142,9 @@ export class LineChart extends React.Component {
 
                 for (var date in result) {
                     var f = {
-                        x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                        //Limited way.
+                        //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                        x: new Date(result[date].x),
                         y: parseInt(result[date].y).toFixed(0)
                     }
 
@@ -199,7 +212,6 @@ export class LineChart extends React.Component {
                     </div>
                 )
             }
-
         } else {
             return null;
         }
