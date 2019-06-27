@@ -24,7 +24,7 @@ var testAccount: any = {
 
     /* dev server:                          */
     // host: "prototype.dev.iotnxt.io",
-    // https : true
+    // https: true
 
     /* localhost:                           */
     host: "localhost",
@@ -386,6 +386,48 @@ describe("PROTOTYPE", () => {
     })
 
     /* --------------------------------------------------------------------- */
+})
 
+describe("PLUGINS", () => {
+    describe("TELTONIKA", () => {
+        var portInfo: any;
+
+        it("Register Port", function (done) {
+            //this.timeout(5000);
+            new Prototype(testAccount).setTeltonikaPort((err: any, response: any) => {
+
+                if (err) { done(new Error(err)); return }
+                if (response) {
+                    portInfo = response;
+                    if (response.apikey == testAccount.apikey && response.port) {
+                        done(); return
+                    } else {
+                        done(new Error("The port was assigned to a different user.")); return
+                    }
+                }
+            })
+        })
+
+        it("Get Port", function (done) {
+            //this.timeout(5000);
+            new Prototype(testAccount).getTeltonikaPort((err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                if (response) {
+                    if (response.port == portInfo.port) {
+                        done(); return
+                    } else {
+                        done(new Error("The port returned it not the same as the port just created.")); return
+                    }
+                }
+            })
+        })
+
+        it("send data", function (done: any) {
+            new Prototype(testAccount).teltonikaTest(portInfo.port, testAccount.host, (e: Error, result: any) => {
+                if (e) { done(e); }
+                if (result) { done(); }
+            });
+        });
+    })
 })
 
