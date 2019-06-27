@@ -101,7 +101,7 @@ export class StatesViewerMenu extends Component {
     }
 
     search = evt => {
-        if (evt.target.value == "DASHBOARD PRESET" || evt.target.value == "SET IOTNXT GATEWAY" || evt.target.value == "SCRIPT PRESET") {
+        if (evt.target.value == "DASHBOARD PRESET" || evt.target.value == "SET IOTNXT GATEWAY" || evt.target.value == "SCRIPT PRESET" || evt.target.value == "SHARE") {
             this.props.openModifyModal(evt.target.value.toString())
             evt.target.value = ""
         }
@@ -145,18 +145,19 @@ export class StatesViewerMenu extends Component {
                 if (this.props.selectCount > 0) {
                     return (
                         <div>
-                            <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "50%", color: "white" }} onChange={this.search} placeholder='MODIFY' />
-                            < datalist id="devices" >
-                                <option value="DASHBOARD PRESET" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="SCRIPT PRESET" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="SHARE" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                < option value="SET IOTNXT GATEWAY" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            </datalist>
-                        </div>
+                            < select id="devices" style={{ width: "120px", marginTop: "7px" }} onChange={this.search}>
+                                <option value="" disabled selected hidden>MODIFY</option>
+                                <option className="optiondropdown" value="DASHBOARD PRESET" style={{ width: "90%" }}>DASHBOARD PRESET</option>
+                                <option className="optiondropdown" value="SCRIPT PRESET" style={{ width: "90%" }} >SCRIPT PRESET</option>
+                                <option className="optiondropdown" className="SHARE" value="SHARE" style={{ width: "90%" }} >SHARE</option>
+                                < option className="optiondropdown" value="SET IOTNXT GATEWAY" style={{ width: "90%" }} >SET IOTNXT GATEWAY</option>
+                            </select>
+                        </div >
                     )
                 } else {
                     return (
-                        <input list="devices" className="commanderBgPanel commanderBgPanelClickable" readOnly style={{ width: "50%", cursor: "not-allowed" }} placeholder='MODIFY' />
+                        < select id="devices" title="Select some devices first..." style={{ marginTop: "7px", width: "120px", cursor: "not-allowed", opacity: "0.3" }}>
+                            <option className="optiondropdown" style={{ width: "90%" }} value="" disabled selected hidden>MODIFY</option></ select>
                     )
                 }
             }
