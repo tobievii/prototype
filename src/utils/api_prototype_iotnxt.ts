@@ -11,9 +11,11 @@ interface Gateway {
 
 export class iotnxt {
     uri: string = "";
+    parent: any;
 
     constructor(options?: any) {
         if (options) {
+            this.parent = options;
             if (options.uri) this.uri = options.uri;
         }
     }
@@ -43,6 +45,23 @@ export class iotnxt {
                     if (body.error) { cb(new Error(body.error)); return; }
                     cb(null, body);
 
+                }
+            });
+    }
+
+    setgatewaydevice(key: string, id: string, GatewayId: string, HostAddress: string, cb: Function) {
+        var setgatewayPacket = { key, id, GatewayId, HostAddress }
+
+        request.post(this.uri + "/api/v3/iotnxt/setgatewaydevice", {
+            headers: this.parent.headers,
+            json:
+                setgatewayPacket
+        }
+            , (err, res, body) => {
+                if (err) { if (cb) cb(err); }
+                if (body) {
+                    if (body.err) { cb(new Error(body.err)); return; }
+                    if (body.n == 1) { cb(null, body); return; }
                 }
             });
     }

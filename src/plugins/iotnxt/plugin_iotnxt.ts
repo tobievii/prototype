@@ -188,6 +188,9 @@ export class PluginIotnxt extends Plugin {
     // if (!user.publickey) {
     //   user["publickey"] = utils.generate(32).toLowerCase();
     // }
+
+    if (user.level <= 0) { cb(new Error("level must be 1 or higher")); return; }
+
     this.db.plugins_iotnxt.find({ GatewayId: gateway.GatewayId }, (err: Error, result: any) => {
       if (err) { cb(err); console.log(err); return; }
       if (result) {
