@@ -40,16 +40,15 @@ export class StatesViewerItem extends Component {
     this.intervalUpdator = setInterval(() => {
       this.updateTime();
     }, 1000 / 10)
-    if (this.props.account.level < 100 && this.props.account.level > 0) {
+    if (this.props.account.level > 0) {
       this.setState({ User: this.props.username })
     }
-    else if (this.props.account.level >= 100 && this.props.visiting == false || this.props.account.level == 0) {
+    else if (this.props.account.level == 0) {
       this.setState({ User: this.props.device.fromUsers.username })
-
     }
-    else if (this.props.account.level >= 100 && this.props.visiting == true) {
-      this.setState({ User: this.props.username })
-    }
+    // else if (this.props.account.level >= 100 && this.props.visiting == true) {
+    //   this.setState({ User: this.props.username })
+    // }
 
     this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
   }
@@ -59,6 +58,7 @@ export class StatesViewerItem extends Component {
   }
 
   setDevice = (device) => {
+    var alarmStates = [];
     if (device.public != undefined) {
       if (device.public == true) {
         this.setState({ opacityp: "1" })
@@ -82,6 +82,7 @@ export class StatesViewerItem extends Component {
     if (device.boundaryLayer != undefined || device.boundaryLayer != null) {
       if (device.boundaryLayer.inbound != true) {
         this.setState({ opacitya: "1" })
+        this.props.alarmStates.push(device);
       } else {
         this.setState({ opacitya: "0.2" })
       }
@@ -98,12 +99,14 @@ export class StatesViewerItem extends Component {
 
     var notifications = this.props.account.notifications;
     for (var s in notifications) {
-      if (notifications[s].type == "CONNECTION DOWN 24HR WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
+      if ((notifications[s].type == "CONNECTION DOWN 24HR WARNING" || notifications[s].type == "WARNING") && device.devid == notifications[s].device && notifications[s].seen == false) {
+        this.setState({ opacityw: "1" });
         this.setState({ warningNotification: notifications[s] });
       }
 
       if (notifications[s].type == "ALARM" && device.devid == notifications[s].device && notifications[s].seen == false) {
         this.setState({ opacitya: "1" })
+        this.props.alarmStates.push(device);
         this.setState({ alarmNotification: notifications[s] });
       }
     }
@@ -138,7 +141,6 @@ export class StatesViewerItem extends Component {
       return "rgba(" + Math.round(blended.r) + "," + Math.round(blended.g) + "," + Math.round(blended.b) + "," + blended.a + ")"
     }
 
-    //return "rgba(255,255,255,1)"
   }
 
   calcStyle = () => {
@@ -148,23 +150,13 @@ export class StatesViewerItem extends Component {
     var millisago = Date.now() - lastChange.getTime();
     var ratio = (timefade - millisago) / timefade;
 
-    //var ratio = (timefade-this.state.millisago)/timefade;
     if (ratio < 0) { ratio = 0 }
     if (ratio > 1) { ratio = 1 }
 
-    if (this.props.device.selected) {
-      return {
-        marginBottom: 2, padding: "0px",
-        backgroundImage: "linear-gradient(to right, rgb(94, 37, 45), " + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
-        borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio),
-        borderLeft: "2px solid rgb(255, 57, 67)"
-      }
-    } else {
-      return {
-        marginBottom: 2, padding: "0px",
-        backgroundImage: "linear-gradient(to right, rgba(3, 4, 5, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
-        borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
-      }
+    return {
+      marginBottom: 2, padding: "0px",
+      backgroundImage: "linear-gradient(to right, rgba(16, 26, 38, 0.5)," + this.blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (ratio / 1.5) - 0.35) + ")",
+      borderRight: "2px solid " + this.blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, ratio)
     }
   }
 
@@ -181,7 +173,7 @@ export class StatesViewerItem extends Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: id })
     }).then(response => response.json()).then(serverresponse => {
-      console.log(serverresponse);
+      // console.log(serverresponse);
       this.setState({ deleted: true })
     }).catch(err => console.error(err.toString()));
   }
@@ -279,38 +271,26 @@ export class StatesViewerItem extends Component {
     }
   }
 
-  adjustMapView = (device) => {
+  adjustMapView = (device, call) => {
     var action;
     if (device.selectedIcon) {
       action = false;
     } else {
       action = true;
     }
-    return (e, n) => {
-      this.props.mapActionCall(device, action);
+    return (e) => {
+      this.props.mapActionCall({ device, action, call });
     }
   }
 
   displayDeviceInfo = () => {
-    if (this.props.account.level >= 100 && this.props.device.meta.user.email == this.props.account.email) {
-      return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> <span style={{ color: "red" }}>*</span>{this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
-    else {
-
-      return (
-        <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data">
-          <div style={{ overflow: "hidden", marginTop: "5px" }} onClick={this.adjustMapView(this.props.device)}>
-            <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
-          </div>
-        </Link>
-      )
-    }
+    return (
+      <Link className="col" style={{ padding: "0px 8px" }} to={"/u/" + this.state.User + "/view/" + this.props.device.devid} title="View Device Data" onClick={this.adjustMapView(this.props.device, "device")}>
+        <div style={{ overflow: "hidden", marginTop: "5px", marginLeft: "3px", cursor: "pointer" }} >
+          <span style={{ color: "#fff" }}> {this.props.device.devid} </span> {this.descIfExists()}<br />
+        </div>
+      </Link>
+    )
   }
 
   selectbox = () => {
@@ -319,14 +299,14 @@ export class StatesViewerItem extends Component {
         if (this.props.device.selected) {
 
           return (
-            <div className="col" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
-              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgb(250, 69, 72)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))" }}></i>
+            <div className="col" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("deselect")} >
+              <i className="statesViewerCheckBoxes fas fa-check" style={{ color: "rgba(125, 255, 175, 1)", filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
             </div>
           )
         } else {
           return (
-            <div className="col statesViewerCheckBoxDiv" style={{ flex: "0 0 25px", padding: 0, cursor: "pointer" }} onClick={this.selectBoxClickHandler("select")} >
-              <i className="statesViewerCheckBoxes fas fa-check" ></i>
+            <div className="col" style={{ flex: "0 0 20px", padding: 0, cursor: "pointer", opacity: 0.2 }} onClick={this.selectBoxClickHandler("select")} >
+              <i className="statesViewerCheckBoxes fas fa-square" style={{ fontSize: 14 }}></i>
             </div>
           )
         }
@@ -335,24 +315,22 @@ export class StatesViewerItem extends Component {
   }
 
   mapIcon = (viewUsed) => {
-    if (viewUsed == "map") {
+    if (this.props.mainView == "devices") {
       if (!this.props.device.selectedIcon) {
         return (
-          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
-            <i className="fas fa-map-marker-alt marker" title="Go To Device"></i>
+          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device, "map")}>
+            <i className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
       } else {
         return (
-          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device)}>
-            <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Go To Device"></i>
+          <span align="right" style={{ marginTop: "7px", fontSize: 14, paddingRight: "7px" }} onClick={this.adjustMapView(this.props.device, "map")}>
+            <i style={{ color: "red" }} className="fas fa-map-marker-alt marker" title="Show device on the map"></i>
           </span>
         )
       }
-    } else if (viewUsed == "list") {
-      return (
-        <span style={{ display: "none" }}></span>
-      )
+    } else {
+      return null;
     }
   }
 
@@ -402,14 +380,15 @@ export class StatesViewerItem extends Component {
       icon = "icon";
       columSize = "200px"
     }
+
     if (this.props.public == false) {
       if (this.props.visiting == true) {
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+            <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
             <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-            <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-            <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"share " + icon}><i title="Share device to users" className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+            <span className={"visibility " + icon}><i title="Share device public" className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
             {this.mapIcon(viewUsed)}
           </div>
         )
@@ -418,10 +397,10 @@ export class StatesViewerItem extends Component {
 
         return (
           <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-            <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
+            <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px" }}></i></span>
             {this.notifications(icon, device)}
-            <span className={"share " + icon}><i onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
-            <span className={"visibility " + icon}><i onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
+            <span className={"share " + icon}><i title="Share device to users" onClick={this.toggleModal} className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity }}></i></span>
+            <span className={"visibility " + icon}><i title="Share device public" onClick={() => this.publicShare(device)} className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp }}></i></span>
             {this.mapIcon(viewUsed)}
           </div>
         )
@@ -431,10 +410,10 @@ export class StatesViewerItem extends Component {
     else if (this.props.public == true) {
       return (
         <div className="col dataPreview" style={{ flex: "0 0 " + columSize, textAlign: "right", padding: "6px 3px 5px 0px" }}>
-          <span className={icon}><i className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
+          <span className={icon}><i title="Device alarm" className="fas fa-bullhorn" style={{ color: "red", opacity: this.state.opacitya, paddingRight: "7px", pointerEvents: "none" }}></i></span>
           <span className={icon}><i title={this.state.warningNotification.type} className="fas fa-exclamation-triangle" style={{ color: "yellow", opacity: this.state.opacityw, paddingRight: "7px", pointerEvents: "none" }}></i></span>
-          <span className={"share " + icon}><i className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
-          <span className={"visibility " + icon}><i className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+          <span className={"share " + icon}><i title="Share device to users" className="fas fa-share-alt" style={{ color: "green", paddingRight: "7px", opacity: this.state.opacity, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
+          <span className={"visibility " + icon}><i title="Share device public" className="fas fa-globe-africa" style={{ color: "#42adf4", paddingRight: "7px", opacity: this.state.opacityp, cursor: "not-allowed", pointerEvents: "none" }}></i></span>
           {this.mapIcon(viewUsed)}
         </div>
       )
@@ -454,55 +433,31 @@ export class StatesViewerItem extends Component {
       if (dataPreview.length > maxlength) { dataPreview = dataPreview.slice(0, maxlength) + "..." }
       var viewUsed = this.props.view
       var qr = { mail: "failedq" }
-      if (viewUsed == "list") {
+      var lastseen = 3;
 
-        return (
-          <div className="container-fluid" style={{ marginBottom: 2 }}>
-            <div className="row statesViewerItem" style={this.calcStyle()} >
-
-              {this.selectbox()}
-
-              <Link className="col" to={"/u/" + this.state.User + "/view/" + this.props.device.devid} style={{ overflow: "hidden" }}>
-                <div>
-                  <span style={{ color: "#fff" }}> {this.props.device.devid}</span> {this.adminDevices()}  {this.descIfExists()}<br />
-                  <span className="faded dataPreview" style={{ fontSize: 12, color: "rgba(225,255,225,0.5)" }} >{dataPreview}</span>
-                </div>
-              </Link>
-
-              <div className="col changeTimeagoWidth" style={{ flex: "0 0 230px", textAlign: "right" }}>
-                <span style={{ fontSize: 12 }}>{this.state.timeago}</span><br />
-                <span className="faded dataPreview" style={{ fontSize: 12 }}>{this.props.device["_last_seen"]}</span>
-              </div>
-              <div style={{ paddingTop: "7px" }}>
-                {this.stateListIcons(viewUsed, this.props.device)}
-              </div>
-
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
-
-            </div>
-          </div>
-        );
-      } else if (viewUsed == "map") {
-        return (
-          <div className="container-fluid" style={{ marginBottom: 2 }}>
-            <div className="row statesViewerItemMap" style={this.calcStyle()} >
-
-              {this.selectbox()}
-              {this.displayDeviceInfo()}
-
-              <div className="col" align="right" style={{ marginTop: "4px" }}>
-                <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
-              </div>
-
-              {/* <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}> */}
-              {this.stateListIcons(viewUsed, this.state.device)}
-              {/* {this.mapIcon()}
-              </div> */}
-              <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
-            </div>
-          </div>
-        )
+      if (this.props.mainView == "devices") {
+        lastseen = 10;
       }
+
+      return (
+        <div className="container-fluid" style={{ marginBottom: 2 }}>
+          <div className="row statesViewerItemMap" style={this.calcStyle()}>
+
+            {this.selectbox()}
+
+            {this.displayDeviceInfo()}
+
+            <div className="col" align="right" style={{ marginTop: "4px", paddingRight: lastseen }}>
+              <span style={{ fontSize: 12, color: "#fff" }}>{this.state.timeago}</span>
+            </div>
+
+            {/* <div className="col" style={{ flex: "0 0 40px", textAlign: "right" }}> */}
+            {this.stateListIcons(viewUsed, this.state.device)}
+
+            <ShareList devid={this.props.devID} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={this.clickShare} />
+          </div>
+        </div>
+      )
     }
   }
-}
+}   

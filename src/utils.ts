@@ -267,14 +267,17 @@ export function createDBIndexes(db: any) {
     db.states.createIndex({ apikey: 1 })
     db.states.createIndex({ apikey: 1, devid: 1 })
     db.states.createIndex({ "_last_seen": 1 })
+    db.states.createIndex({ key: 1 })
 
     db.packets.createIndex({ "_created_on": 1 })
     db.packets.createIndex({ apikey: 1 })
     db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
+    db.packets.createIndex({ key: 1 }, { background: 1 })
 
     db.users.createIndex({ uuid: 1 })
     db.users.createIndex({ apikey: 1 })
     db.users.createIndex({ "_last_seen": 1 })
+    db.users.createIndex({ username: 1 }, { background: 1 })
 }
 
 export function checkFirstRun(db: any) {
@@ -309,6 +312,32 @@ export function createDeviceKeysForOldAccounts(db: any) {
         for (var state of states) {
             state["key"] = generateDifficult(128)
             db.states.update({ "_id": state["_id"] }, state)
+        }
+    })
+}
+export function createPublicKeysforOldAccounts(db: any) {
+    db.users.find({ "level": { $gte: 1 }, "publickey": { "$exists": false } }).limit(10000, (err: Error, users: any) => {
+        for (var user of users) {
+            user["publickey"] = generate(32).toLowerCase()
+            db.users.update({ "_id": user["_id"] }, user)
+        }
+    })
+}
+
+export async function createIotnxtPublicKeysforOldAccounts(db: any) {
+    await db.plugins_iotnxt.find({}).limit(10000, (err: Error, gateways: any) => {
+        for (var g in gateways) {
+            if (gateways[g]._created_by) {
+                if (!gateways[g]._created_by.publickey) {
+                    db.users.findOne({ _id: gateways[g]._created_by }, (err: Error, user: any) => {
+                        gateways[g]._created_by = {
+                            _id: gateways[g]._created_by,
+                            publickey: user.publickey
+                        }
+                        db.plugins_iotnxt.update({ "_id": gateways[g]["_id"] }, gateways[g])
+                    })
+                }
+            }
         }
     })
 }

@@ -47,7 +47,7 @@ export class AddGatewayPanel extends React.Component {
     }
 
     addGateway = () => {
-        console.log(this.state)
+        // console.log(this.state)
 
         fetch('/api/v3/iotnxt/addgateway', {
             method: 'POST',
@@ -56,10 +56,26 @@ export class AddGatewayPanel extends React.Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(this.state.addGatewayForm)
-        }).then(response => response.json()).then((data) => {
+        }).then((response) => {
+            if (!response.ok) {
+                this.setState({ message: "ERROR:" + response.status + " " + response.statusText })
+            } else {
+                return response.json()
+            }
+        }).then((data) => {
             console.log(data);
+            if (data.err) {
+                this.setState({ message: "ERROR:" + data.err })
+                return;
+            }
             if (this.props.update) { this.props.update(); }
-        }).catch(err => console.error(err.toString()))
+        }).catch(
+            (err) => {
+                // console.log("------")
+                // console.error(err.toString());
+                // this.setState({ message: err.toString() })
+            }
+        )
 
     }
 
@@ -141,12 +157,10 @@ export class AddGatewayPanel extends React.Component {
                 <div className="row" style={formRowStyle} >
                     <div className="col-4" style={formLabelStyle} ></div>
                     <div className="col-8" style={formInputStyle}>
-
                         <div className="commanderBgPanel commanderBgPanelClickable"
-                            style={{ width: 160 }}
                             onClick={this.addGateway}>
-                            <FontAwesomeIcon icon="hdd" /> ADD GATEWAY</div>
-
+                            <i className="fas fa-plus"></i> ADD GATEWAY</div>
+                        <div style={{ padding: 7 }}>{this.state.message}</div>
                     </div>
                 </div>
 

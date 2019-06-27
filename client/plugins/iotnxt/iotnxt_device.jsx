@@ -1,16 +1,19 @@
 import React, { Component } from "react";
 
 
-export class DevicePluginPanel extends React.Component {
+export class DevicePluginPanel extends React.PureComponent {
   state = {
     deviceGateway: {},
     accountGateway: {},
     serverGateways: [],
   }
 
+  settingLayout = false;
+
   getAccount = () => {
     fetch("/api/v3/account").then(res => res.json()).then(user => {
       this.setState({ user })
+      this.getServerGateways();
     })
   }
 
@@ -26,35 +29,48 @@ export class DevicePluginPanel extends React.Component {
       }).then(response => response.json()).then((data) => {
         if (data.plugins_iotnxt_gateway) {
           this.setState({ deviceGateway: data.plugins_iotnxt_gateway })
+          this.setState({ deviceId: data.devid })
         } else {
-
           this.setState({ deviceGateway: {} })
+          this.setState({ deviceId: data.devid })
         }
       }).catch(err => console.error(this.props.url, err.toString()))
     } else {
-      console.log(this.props)
+      // console.log(this.props)
     }
-
   }
-
-
 
   getServerGateways() {
     //SERVER GATEWAYS
     fetch('/api/v3/iotnxt/gateways').then(response => response.json()).then((gateways) => {
+      var finalGateways = [];
       if (gateways) {
         for (var g in gateways) {
+          if (gateways[g]._created_by) {
+            if (gateways[g]._created_by.publickey == this.state.user.publickey || gateways[g]._created_by == undefined || this.state.user.level >= 100) {
+              finalGateways.push(gateways[g])
+            }
+          } else if (this.state.user.level >= 100 || gateways[g]._created_by == undefined) {
+            finalGateways.push(gateways[g])
+          }
+
           if (gateways[g].default) {
             this.setState({ serverGatewayDefault: gateways[g] });
           }
         }
-
-        this.setState({ serverGateways: gateways });
+        this.setState({ serverGateways: finalGateways });
       }
+      this.getDevice();
     }).catch(err => console.error(this.props.url, err.toString()))
   }
 
   renderDeviceGateway = () => {
+    if (this.settingLayout == false) {
+      this.getDevice();
+      this.settingLayout = true;
+    } else if (this.settingLayout == true && this.state.deviceId != this.props.stateId) {
+      this.settingLayout = false;
+    }
 
     if (this.state.deviceGateway) {
       if (this.state.deviceGateway.GatewayId) {
@@ -97,18 +113,11 @@ export class DevicePluginPanel extends React.Component {
     }).then(response => response.json()).then((data) => {
       this.getDevice();
     }).catch(err => console.error(this.props.url, err.toString()))
-
   }
-
-
 
   componentWillMount = () => {
-    this.getServerGateways();
     this.getAccount();
-    this.getDevice();
   }
-
-
 
   render() {
     return (
@@ -129,7 +138,6 @@ export class DevicePluginPanel extends React.Component {
             })
           }
         </select>
-
       </div>
     )
   }

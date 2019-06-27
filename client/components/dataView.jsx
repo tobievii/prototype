@@ -124,14 +124,9 @@ export class DataView extends React.Component {
                 <div style={{ clear: "both" }} />
               </div>)
           }
-
-
         })}
       </div>
     )
-
-
-
   }
 
   onDragStart = (e, name, i, data, level, path) => {
@@ -157,7 +152,6 @@ export class DataView extends React.Component {
   }
 
   render() {
-
     if (this.props.data) {
       if (this.props.data.payload) {
         return (

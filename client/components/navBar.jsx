@@ -2,29 +2,28 @@ import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faTimes, faBell, faUserEdit, faSignOutAlt, faEye, faPlus, faTasks } from '@fortawesome/free-solid-svg-icons'
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import moment from 'moment'
 
-
 library.add(faCog)
+library.add(faEye)
+library.add(faPlus)
 library.add(faTimes)
 library.add(faBell);
 library.add(faSignOutAlt)
 library.add(faUserEdit)
+library.add(faTasks)
+// library.add(faChartBar)
+// library.add(faDigitalTachograph)
 
 
 export class Notification extends Component {
   constructor(props) {
     super(props);
   }
-
-  // componentDidMount = () => {
-
-  //   this.setState({ device: this.props.device }, () => this.setDevice(this.props.device))
-  // }
 
   newDevice = () => {
 
@@ -47,16 +46,19 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
+
+    } else if (this.props.notification.type == "INFO") {
+      this.props.notification.type = "INFO"
     }
 
-    if (this.props.notification.type == "NEW DEVICE ADDED") {
+    if (this.props.notification.type == "NEW DEVICE ADDED" || this.props.notification.type == "INFO") {
       return (
 
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="newNotificationItem">
             <i className="fas fa-exclamation-circle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename" >{this.device()}</span><br />
+            <span className="devicename">{this.device()} message: {this.message()}</span><br />
             <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
@@ -70,7 +72,7 @@ export class Notification extends Component {
         <div className="newNotificationItem">
           <i className="fas fa-exclamation-circle"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename" >{this.device()}</span><br />
+          <span className="devicename">{this.device()} message: {this.message()}</span><br />
           <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
         </div>
       )
@@ -91,14 +93,14 @@ export class Notification extends Component {
       )
     }
 
-    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
+    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING" || this.props.notification.type == "WARNING") {
       return (
 
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="warningNotificationItem">
             <i className="fas fa-exclamation-triangle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()}</span><br />
+            <span className="devicename">{this.device()} message: {this.message()}</span><br />
             <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
@@ -122,12 +124,10 @@ export class Notification extends Component {
   }
 }
 
-
 export class NavBar extends Component {
 
-  constructor() {
-    super();
-
+  constructor(props) {
+    super(props);
     this.state = {
       showMenu: false,
       devid: undefined,
@@ -135,13 +135,16 @@ export class NavBar extends Component {
       isLoaded: false,
       notification: [{}],
       displayMenu: false,
+      displayViews: false,
       users: {},
       showNav: "",
       showSearch: "none",
       searchIcon: "none",
-      allUsers: []
+      allUsers: [],
+      popupHeading: "ADD DEVICE BY:",
+      popupInfo: "default",
+      devicesView: "devices"
     }
-
     this.showMenu = this.showMenu.bind(this);
     this.closeMenu = this.closeMenu.bind(this)
     this.showDropdownMenu = this.showDropdownMenu.bind(this);
@@ -168,23 +171,37 @@ export class NavBar extends Component {
     });
   }
 
-  showDropdownMenu(event) {
+  showDropdownMenu(options) {
     event.preventDefault();
-    this.setState({ displayMenu: true }, () => {
-      document.addEventListener('click', this.hideDropdownMenu);
-    });
+    if (options == "views") {
+      this.setState({ displayViews: true }, () => {
+        document.addEventListener('click', this.hideDropdownMenu);
+      });
+    } else if (options == "account") {
+      this.setState({ displayMenu: true }, () => {
+        document.addEventListener('click', this.hideDropdownMenu);
+      });
+    }
   }
 
   hideDropdownMenu() {
-    this.setState({ displayMenu: false }, () => {
-      document.removeEventListener('click', this.hideDropdownMenu);
-    });
+    if (this.state.displayViews == true) {
+      this.setState({ displayViews: false }, () => {
+        document.removeEventListener('click', this.hideDropdownMenu);
+      });
+    }
+
+    if (this.state.displayMenu == true) {
+      this.setState({ displayMenu: false }, () => {
+        document.removeEventListener('click', this.hideDropdownMenu);
+      });
+    }
   }
 
   showSettings = () => {
     if (this.props.account) {
       if (this.props.account.level > 0) {
-        return (<Link to="/settings" className="navLink" title="Settings"><FontAwesomeIcon icon="cog" /></Link>)
+        return (<Link to="/settings" className="navLink" title="Settings"><FontAwesomeIcon icon="cog" title="View settings" /></Link>)
       }
     }
   }
@@ -201,9 +218,10 @@ export class NavBar extends Component {
 
     return (
       <div className="dropdown">
-        <div className="fas fa-user" onClick={this.showDropdownMenu}></div>
+        <div className="fas fa-user" title="View account infromation" onClick={() => this.showDropdownMenu("account")}></div>
 
         {this.state.displayMenu ? (
+
           <div className="dropdown-content" style={{ width: "max-content" }}>
             <span style={{ fontSize: 13 }} title="email">EMAIL: {account.email}</span>
             <br></br>
@@ -225,6 +243,7 @@ export class NavBar extends Component {
               </a>
             </div>
           </div>
+
         ) :
           (
             null
@@ -255,7 +274,7 @@ export class NavBar extends Component {
         {
           this.state.showMenu
             ? (
-              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "25px", top: 25, zIndex: 1000 }}>
+              <div className="notificationPanel" style={{ padding: "50%", position: "absolute", color: "#ccc", background: "#101e29", width: 450, right: "1px", top: 25, zIndex: 1000 }}>
                 {account.notifications.slice(Math.max(account.notifications.length - 5, 1)).reverse().map((notification, i) => <Notification key={notification.device + i} notification={notification} account={account}></Notification>)}
                 <span>{this.showNotificationsView()}</span>
               </div>
@@ -317,6 +336,8 @@ export class NavBar extends Component {
         return (
           <div style={{ padding: "20px 20px 20px 20px 20px", float: "right", paddingRight: "20px", paddingTop: "18px" }}>
             <span className="navLink" style={{ float: "left", marginRight: "25px", display: this.state.searchIcon }}>{this.findPerson()}</span>
+            <span className="navLink" style={{ float: "left", marginRight: "28px", fontSize: "17px" }}>{this.addDeviceButton()}</span>
+            {/* <span className="navLink" style={{ float: "left", marginRight: "2px", fontSize: "18px" }}>{this.changeViews(account)}</span> */}
             <span className="navLink" style={{ float: "left" }}>{this.goSettings(account)}</span>
             <span style={{ marginRight: "5px" }}>{this.showSettings()}</span>
             <span style={{ height: 10, float: "right" }}>{this.showNotifications(account)}</span>
@@ -396,7 +417,7 @@ export class NavBar extends Component {
 
       if (this.props.account) {
         if (this.props.account.level > 0) {
-          return (<input type="search" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px" }} list="data" onChange={this.search} maxLength="32" />)
+          return (<input type="search" placeholder="username or email.." style={{ marginLeft: "20px", marginTop: "10px", width: "300px", border: "1px solid rgba(169, 169, 169, 0.2)" }} list="data" onChange={this.search} maxLength="32" />)
         }
         else if (this.props.account.level == 0) {
           return null
@@ -409,6 +430,52 @@ export class NavBar extends Component {
     this.setState({ showNav: "" })
     this.setState({ showSearch: "none" })
   }
+
+  // setView = (view) => {
+  //   this.setState({ devicesView: view });
+  //   this.props.mainView(view)
+  // }
+
+  // changeViews = (account) => {
+  //   return (
+  //     <div className="dropdown">
+  //       <FontAwesomeIcon icon="eye" title="Change main view" onClick={() => this.showDropdownMenu("views")} />
+  //       {this.state.displayViews ? (
+  //         <div className="arrow-up">
+  //           <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
+  //             <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
+  //               {/*Must move changeViews to dashboard 
+  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
+  //                 <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
+  //               </div> */}
+  //               {/* <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
+  //                 <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
+  //               </div> */}
+  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboardDevices")}>
+  //                 <FontAwesomeIcon icon="digital-tachograph" />  DASHBOARD WITH DEVICES
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+  //       ) :
+  //         (
+  //           null
+  //         )
+  //       }
+  //     </div>
+  //   );
+  // }
+
+  addDeviceButton = () => {
+    return (
+      <FontAwesomeIcon icon="plus" title="Add A Device" onClick={this.addButtonClicked} />
+    )
+  }
+
+  addButtonClicked = () => {
+    this.props.openModal("addDevice");
+  }
+
   render() {
     var username = ""
     if (this.props.account) {
@@ -419,7 +486,7 @@ export class NavBar extends Component {
     }
     return (
 
-      <div className="row " style={{ paddingBottom: 30 }}>
+      <div className="row " style={{ paddingBottom: 20 }}>
         <div className="col-md-12 navbar" style={{ position: "fixed", zIndex: 1000, width: "100%", right: 0 }} onClick={this.closeUserList}>
           <div className="navbarInsideWrap" >
             <Link to="/">
@@ -445,7 +512,7 @@ export class NavBar extends Component {
               {this.searchUser()}
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px" }} list="data" onChange={this.search} maxLength="32" />
+            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px", border: "1px solid rgba(169, 169, 169, 0.2)" }} list="data" onChange={this.search} maxLength="32" />
             {this.searchUser()}
           </div>
         </div>

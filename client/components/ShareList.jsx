@@ -1,7 +1,6 @@
 import { confirmAlert } from 'react-confirm-alert';
 import React, { Component } from "react";
 import Modal from 'react-modal';
-import { Stats } from "./stats.jsx"
 var loggedInUser = "";
 const customStyles = {
     content: {
@@ -14,7 +13,7 @@ const customStyles = {
         border: "none",
         background: "rgba(3, 4, 5,0.6)",
         maxHeight: 'calc(100vh - 210px)',
-        overflowY: 'auto',
+        overflow: 'auto'
     },
     //bacground of Pop up Modal on search
     overlay: {
@@ -55,7 +54,8 @@ export class ShareList extends Component {
         DevicestateIcon: "fas fa-globe-africa",
         checkboxstate: "",
         qresponse: { mail: "failed" },
-        show: " "
+        show: " ",
+        showselected: "none"
     };
 
 
@@ -74,9 +74,11 @@ export class ShareList extends Component {
             if (newEmailList[dev] == clickdata) {
                 if (clickdata.selected == "deselected") {
                     newEmailList[dev].selected = "selected";
+                    newEmailList[dev].icon = "fas fa-check-square";
                 }
                 else {
                     newEmailList[dev].selected = "deselected";
+                    newEmailList[dev].icon = "far fa-square";
                 }
                 temp = newEmailList.filter((users) => { return users.selected !== "deselected" })
                 this.state.SelectedUsers = _.clone(temp)
@@ -87,13 +89,13 @@ export class ShareList extends Component {
     unshare = (remove) => {
         this.setState({ show: "noDisplayShare" });
         for (let i in this.state.userSearched) {
-            if (remove == this.state.userSearched[i].uuid) {
+            if (remove == this.state.userSearched[i].sharekey) {
                 this.state.userSearched[i].shared = "no";
             }
         }
         fetch("/api/v3/unshare", {
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({ removeuser: remove, dev: this.props.devid, })
+            body: JSON.stringify({ removeuser: remove, dev: this.props.devid })
         }).then(response => response.json()).then(stats => {
             this.setState({ stats: stats })
             this.setState({ qresponse: { mail: "sent" } })
@@ -132,6 +134,9 @@ export class ShareList extends Component {
             var temp = [];
             var newDeviceList = [];
             var statsl = this.state.stats.userList;
+            for (var i in statsl) {
+                statsl[i].icon = "far fa-square"
+            }
             statsl.map((person, i) => {
                 temp = [...temp, person.email]
                 if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
@@ -143,7 +148,7 @@ export class ShareList extends Component {
             temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email })
             for (var look in this.state.shared) {
                 for (var i in temp) {
-                    if (temp[i].uuid == this.state.shared[look]) {
+                    if (temp[i].sharekey == this.state.shared[look]) {
                         temp[i].shared = "yes"
                     }
                 }
@@ -159,10 +164,10 @@ export class ShareList extends Component {
                 {
                     this.state.userSearched.map((user, i) => {
                         if (user.shared == "no") {
-                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <input type="checkbox" style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /> </div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <i className={user.icon} style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /></div>
                         }
                         else {
-                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.uuid)}>Revoke Sharing </div></div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.sharekey)}>Revoke Sharing </div></div>
                         }
                     })
                 }
@@ -228,7 +233,8 @@ export class ShareList extends Component {
                     html: '<p>Hi <br></br>' + this.props.username + ' has shared (' + this.props.devid + ') Device with you </p>',
                     subject: 'SHARED DEVICE',
                     dev: this.props.devid,
-                    person: this.props.username
+                    person: this.props.username,
+                    publickey:this.state.EmailsharedDevice[dev].sharekey
                 })
             }).then(response => response.json()).then(serverresponse => {
                 this.setState({ qresponse: serverresponse.result })
@@ -294,6 +300,14 @@ export class ShareList extends Component {
             )
         }
     }
+    selected = () => {
+        if (this.state.showselected == "none") {
+            this.setState({ showselected: "" })
+        }
+        else if (this.state.showselected == "") {
+            this.setState({ showselected: "none" })
+        }
+    }
 
     selectedUserCount = () => {
         if (this.state.SelectedUsers.length == 0) {
@@ -303,23 +317,37 @@ export class ShareList extends Component {
         }
         else {
             return (
-                <div>SELECTED USERS ({this.state.SelectedUsers.length})</div>
+                <div className="commanderBgPanel commanderBgPanelClickable"><h4 onClick={this.selected}>SELECTED USERS ({this.state.SelectedUsers.length})</h4>
+                    {this.selectedUsers()}
+                </div>
             )
         }
     }
 
+    selectedUsers = () => {
+        return (<div>
+            {
+                this.state.SelectedUsers.map((user, i) => {
+                    return <div id={user.email} key={i} style={{ display: this.state.showselected, color: "#f62636" }}>{user.email}</div>
+                })
+            }
+        </div >)
+    }
 
 
     render() {
         return (<div ><center>
             {this.setValues(this.props.isOpen)}
-            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}><i className={"fas fa-times " + this.state.show} onClick={() => { this.props.closeModel(this.state.qresponse); count = 0; }} style={{ color: "red" }}></i>
+            <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.toggle}>
+
+                <i className={"fas fa-times " + this.state.show} onClick={() => { this.props.closeModel(this.state.qresponse); count = 0; }} style={{ color: "red" }}></i>
+
                 <center style={{ color: "white", display: this.state.checkboxstate }}>
                     <br></br> Search For users to share  with<br></br>
                     <div style={{ color: "white" }}><i className="fas fa-search" style={{ color: "white" }}></i> <input type="text" name="search" placeholder=" By email" onChange={this.search} /></div></center><br></br>
                 <br></br>{this.DevicePublic()}<div>
                     {this.ShareButton()}</div><hr></hr>
-                <div >{this.selectedUserCount()}</div> <hr></hr><br></br>                <div >
+                <br></br>{this.selectedUserCount()}<div>
                     {this.userNameList()}
                 </div>
                 <center>

@@ -4,13 +4,15 @@ import { EventEmitter } from "events"
 export function log(a: any, b?: any, c?: any) {
 
   var clean = "";
-
   var now = new Date();
+
+
+
   if (typeof a == "object") {
     console.log(now.toISOString() + "\t" + JSON.stringify(a))
-  } else {
-    clean += now.toISOString() + "\t" + a
   }
+
+  clean += now.toISOString() + "\t" + a
 
   if (b) {
     clean += "\t" + b;
@@ -20,6 +22,7 @@ export function log(a: any, b?: any, c?: any) {
     clean += "\t" + c;
   }
 
+  //console.log([a, b, c])
   console.log(clean);
   // if (this.db) {
   //   var logentry: any = {}

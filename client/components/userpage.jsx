@@ -42,7 +42,7 @@ export class UserProfile extends Component {
         }
 
         return (
-            <div className="panel" style={{ marginTop: "70px", overflow: "auto" }}>
+            <div className="panel" style={{ marginTop: "60px", overflow: "auto", marginLeft: 10, marginRight: 10 }}>
                 <div className="avatarProfile" style={{ marginTop: "3px" }}> <img src={avatar} /></div>
                 <h3> {this.props.user.username} </h3>
                 {this.showInfor()}
@@ -75,6 +75,7 @@ export class UserPage extends Component {
             }
         }).then(response => response.json()).then((user) => {
             //console.log(user);
+            this.props.visitu(user)
             this.setState({ user })
         }).catch(err => console.error(err.toString()))
     }

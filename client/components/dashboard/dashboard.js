@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Suspense } from "react";
 
 import GridLayout from 'react-grid-layout';
 
@@ -13,17 +13,17 @@ import * as _ from "lodash"
 
 // https://github.com/STRML/react-grid-layout
 
-import { Widget } from "./widget.jsx"
-
 import { ThreeDWidget } from "./three.jsx"
 import { ProtoGauge } from "./gauge.jsx"
-import { MapDevices } from "./map.jsx"
-
+const MapDevices = React.lazy(() => import('./map'));
 import { ChartLine } from "./chart_line.jsx"
+import { LineChart } from "./zoomable_line.jsx"
 import { WidgetButton } from "./widgetButton.jsx"
 import { WidgetBlank } from "./widget_blank.jsx"
 import { WidgetMesh } from "./widget_mesh.jsx"
 import { WidgetForm } from "./widget_form.jsx"
+import { WidgetScheduler } from "./widget_scheduler.jsx"
+import { WidgetChart } from "./widget_chart.jsx"
 
 var mapDetails = {
   un: undefined,
@@ -33,7 +33,11 @@ var mapDetails = {
   showB: false
 }
 
-export class Dashboard extends React.Component {
+class Dashboard extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
 
   settingLayout = false;
 
@@ -126,6 +130,7 @@ export class Dashboard extends React.Component {
   }
 
 
+
   onDrop = (e, f) => {
     e.preventDefault();
     var typel = undefined;
@@ -213,12 +218,20 @@ export class Dashboard extends React.Component {
     }
   }
 
-  updateServer() {
-    fetch("/api/v3/dashboard", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
-    }).then(response => response.json()).then(result => { })
-      .catch(err => console.error(err.toString()));
+  updateServer(cb) {
+    if (this.props.state != undefined && this.props.state.key != undefined) {
+      fetch("/api/v3/dashboard", {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ key: this.props.state.key, layout: this.state.layout })
+      }).then(response => response.json()).then(result => {
+        // console.log(result);
+        if (cb) { cb(undefined, result); }
+
+      }).catch(err => {
+        console.error(err.toString())
+        if (cb) { cb(err, undefined); }
+      });
+    }
   }
 
   widgetRemove = (id) => {
@@ -263,15 +276,11 @@ export class Dashboard extends React.Component {
     }
   }
 
-  setOptions = (data) => {
-    return (options) => {
-      // console.log("WIDGET OPTION CHANGE:")
-      // console.log({ data, options })
-
-      // find and update
+  setOptions = (widget) => {
+    return (options, cb) => {
       var layout = _.clone(this.state.layout);
       for (var w in layout) {
-        if (layout[w].i == data.i) {
+        if (layout[w].i == widget.i) {
           if (layout[w].options) {
             layout[w].options = _.merge(layout[w].options, options);
           } else {
@@ -280,8 +289,9 @@ export class Dashboard extends React.Component {
         }
       }
 
-      //update server db
-      this.setState({ layout }, () => { this.updateServer(); })
+      this.setState({ layout }, () => {
+        this.updateServer(cb);
+      })
     }
   }
 
@@ -291,7 +301,8 @@ export class Dashboard extends React.Component {
     var dash = {
       change: this.widgetChange(data.i),
       remove: this.widgetRemove(data.i),
-      setOptions: this.setOptions(data)
+      setOptions: this.setOptions(data),
+      type: data.type
     }
 
 
@@ -307,8 +318,24 @@ export class Dashboard extends React.Component {
         state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
     }
 
+    if (data.type == "Zoomable") {
+      return (<LineChart
+        data={data}
+        dash={dash}
+        state={this.props.state}
+        datapath={data.datapath.split("root.")[1]} />)
+    }
+
     if (data.type == "ChartLine") {
       return (<ChartLine
+        dash={dash}
+        data={data}
+        state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
+    }
+
+    if (data.type == "chart") {
+      var value;
+      return (<WidgetChart
         dash={dash}
         data={data}
         state={this.props.state} datapath={data.datapath.split("root.")[1]} />)
@@ -369,16 +396,21 @@ export class Dashboard extends React.Component {
     }
 
     if (data.type == "map") {
-      return (<MapDevices
-        dash={dash}
-        data={data}
-        username={this.props.username}
-        acc={this.props.acc}
-        deviceCall={this.props.state}
-        devices={this.props.devices}
-        widget={true}
-        showBoundary={this.state.showB}
-        PopUpLink={false} />)
+      return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <MapDevices
+            dash={dash}
+            data={data}
+            username={this.props.username}
+            acc={this.props.acc}
+            deviceCall={this.props.state}
+            devices={this.props.devices}
+            widget={true}
+            showBoundary={this.state.showB}
+            PopUpLink={false}
+          />
+        </Suspense>
+      )
     }
 
     if (data.type == "widgetButton") {
@@ -392,6 +424,14 @@ export class Dashboard extends React.Component {
 
     if (data.type == "form") {
       return (<WidgetForm
+        state={this.props.state}
+        dash={dash}
+        data={data}
+      />)
+    }
+
+    if (data.type == "scheduler") {
+      return (<WidgetScheduler
         state={this.props.state}
         dash={dash}
         data={data}
@@ -434,9 +474,18 @@ export class Dashboard extends React.Component {
   }
 
   generateDashboard = () => {
+
+
     if (!this.props.state) {
       return (<div>loading..</div>)
     } else {
+
+      if (this.props.state.devid != this.state.device) {
+        this.settingLayout = false;
+        this.setState({ device: this.props.state.devid })
+        this.setState({ layout: this.props.state.layout })
+      }
+
       return (
         <div className="deviceViewBlock" style={{ marginBottom: 10 }}>
           <div>
@@ -485,6 +534,7 @@ export class Dashboard extends React.Component {
         if (this.settingLayout == false) {
           this.settingLayout = true;
           //console.log(this.props.state.layout)
+          this.setState({ device: this.props.state.devid })
           this.setState({ layout: this.props.state.layout })
         }
 
@@ -498,11 +548,7 @@ export class Dashboard extends React.Component {
 
         return (<div>loading</div>)
       }
-
-
-
     } else {
-      //console.log("no props yet")
       return (<div>no props</div>)
     }
 
@@ -551,3 +597,5 @@ export class Dashboard extends React.Component {
     return o;
   }
 }
+
+export default Dashboard;

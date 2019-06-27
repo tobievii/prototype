@@ -1,16 +1,13 @@
 import React, { Component } from "react";
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave } from '@fortawesome/free-solid-svg-icons'
 library.add(faSave)
 
 import Media from "react-media";
 import { plugins } from "../plugins/config.ts"
 
-
-
-export class SettingsView extends React.Component {
+export default class SettingsView extends React.Component {
   state = { menuList: [] }
 
   componentDidMount = () => {
@@ -32,7 +29,6 @@ export class SettingsView extends React.Component {
       var activeMenu = num;
       this.setState({ activeMenu })
 
-
       fetch("/api/v3/account/update", {
         method: "POST",
         headers: {
@@ -45,8 +41,6 @@ export class SettingsView extends React.Component {
       }).then(data => {
 
       }).catch(err => console.error(err.toString()));
-
-
     }
   }
 
@@ -60,19 +54,16 @@ export class SettingsView extends React.Component {
 
   genPage = () => {
     if (this.state.activeMenu !== undefined) {
-
       if (plugins[this.state.activeMenu]) {
         var SettingsPanel = plugins[this.state.activeMenu].SettingsPanel
-        return <SettingsPanel />
+        return <SettingsPanel {...this.props} />
       } else {
         //default to 0 
         this.setState({ activeMenu: 0 })
       }
-
     } else {
       return <div>none</div>
     }
-
   }
 
   genMenu = () => {

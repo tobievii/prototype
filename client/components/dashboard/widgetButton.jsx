@@ -23,7 +23,7 @@ export class WidgetButton extends React.Component {
     var options = [
       { name: "color", type: "color", value: this.state.color },
       { name: "background", type: "color", value: this.state.background },
-      { name: "command", type: "input", value: this.state.command },
+      { name: "command", type: "code", value: this.state.command },
       { name: "buttonText", type: "input", value: this.state.buttonText }
     ]
     this.options = options;
@@ -42,7 +42,7 @@ export class WidgetButton extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ id: this.props.state.devid, data: JSON.parse(this.state.command) })
     }).then(response => response.json()).then(resp => {
-      console.log(resp);
+      // console.log(resp);
     }).catch(err => console.error(err.toString()));
   }
 

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import { Registration } from "./registration.jsx"
+import { Redis } from "./admin_redis.jsx"
 
 export const name = "Admin"
 
@@ -31,7 +32,7 @@ export class SettingsPanel extends React.Component {
         </div>
 
         <Registration level={this.state.level} />
-        
+        <Redis level={this.state.level} />
       </div>
     )
   }

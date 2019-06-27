@@ -7,12 +7,10 @@ import { ResponsiveCalendar } from '@nivo/calendar'
 import { Widget } from "./widget.jsx"
 
 export class Calendar extends React.Component {
-  state = { activity: [], from: "2018-01-01", to: "2018-11-22" }
+  state = { activity: [], from: "2019-01-01", to: "2019-12-28" }
 
   componentDidMount = () => {
     if (this.props.state) {
-      //console.log("calendar:")
-      //console.log(this.props.state)
       this.fetchData();
     }
   }
@@ -20,7 +18,7 @@ export class Calendar extends React.Component {
   fetchData = () => {
     fetch("/api/v3/activity", {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ deviceid: this.props.state.devid })
+      body: JSON.stringify({ key: this.props.state.key })
     }).then(response => response.json()).then(activity => {
 
       if (activity.length > 2) {

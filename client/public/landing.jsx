@@ -4,15 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 export class Landing extends Component {
-  previewDevices = () => {
-    fetch("/api/v3/preview/publicdevices", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-    }).then(response => response.json()).then(serverresponse => {
-    }).catch(err => console.error(err.toString()));
-  }
-  componentDidMount = () => {
-    this.previewDevices();
-  }
   render() {
     return (
 

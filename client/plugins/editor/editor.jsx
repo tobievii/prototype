@@ -4,20 +4,20 @@ import MonacoEditor from 'react-monaco-editor';
 
 export class Editor extends React.Component {
 
-    state = { code:"asdf"}
+    state = { code: "asdf" }
 
     editorDidMount(editor, monaco) {
-        console.log('editorDidMount', editor);
+        // console.log('editorDidMount', editor);
         editor.focus();
     }
 
     onChange(newValue, e) {
-        console.log('onChange', newValue, e);
+        // console.log('onChange', newValue, e);
     }
     render() {
         const code = this.state.code;
         const options = {
-            selectOnLineNumbers: false 
+            selectOnLineNumbers: false
         };
         return (
             <MonacoEditor

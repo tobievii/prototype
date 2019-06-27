@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import ReactDOM from 'react-dom';
+
+import React, { Component, Suspense } from "react";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -9,28 +9,25 @@ import { NavBar } from "./components/navBar.jsx";
 import { Account } from "./public/account.jsx"
 // not logged in content:
 import { Landing } from "./public/landing.jsx"
-
-
 import { UserPage } from "./components/userpage.jsx"
 import { Recovery } from "./public/recovery.jsx";
 import { Encrypt } from "./public/encrypt.jsx";
 // logged in content:
-import { Verify } from "./components/verify.jsx";
-import { ApiInfo } from "./components/apiInfo.jsx";
+const ApiInfo = React.lazy(() => import('./components/apiInfo'))
+const SettingsView = React.lazy(() => import('./components/settingsView'))
+import AddDevice from './components/addDevice'
+
 import { DeviceView } from "./components/deviceView.jsx";
 import { StatesViewer } from "./components/statesViewer.jsx";
-import { SettingsView } from "./components/settingsView.jsx";
 import { NotificationsView } from "./components/notificationsView.jsx";
 
-
-import Stats from "./components/stats.jsx"
+const Stats = React.lazy(() => import("./components/stats"));
 import Footer from "./public/footer.jsx"
 import * as p from "./prototype.ts"
 
 import socketio from "socket.io-client";
-var socket = socketio();
-const publicVapidKey =
-    "BNOtJNzlbDVQ0UBe8jsD676zfnmUTFiBwC8vj5XblDSIBqnNrCdBmwv6T-EMzcdbe8Di56hbZ_1Z5s6uazRuAzA";
+import { DeviceHistory } from "./components/device_history.jsx";
+var socket = socketio({ transports: ['websocket', 'polling'] });
 
 const test = {
     un: undefined,
@@ -39,33 +36,49 @@ const test = {
     ds: undefined
 }
 
+var visitingG = undefined;
+
+
 class App extends Component {
-    state = {};
+
+    state = {
+        devicesView: "dashboardDevices",
+        isOpen: false,
+        isOpen2: false,
+        registrationPanel: false,
+        loginPanel: false,
+        public: undefined,
+        visituser: undefined
+    };
 
     constructor(props) {
         super(props);
+
+        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
+
+        socket.on("connect", a => {
+            socket.on("plugin_notifications", a => {
+                p.getAccount(account => {
+                    this.setState({ account });
+                })
+            })
+        });
+
+        p.getStates((states) => { this.setState({ states }) })
+        this.serviceworkerfunction();
+    }
+
+    componentWillMount = () => {
         p.getAccount(account => {
             this.setState({ account });
             if (account.level > 0) {
                 socket.emit("join", account.apikey);
                 this.setState({ loggedIn: true })
+                this.setState({ public: false })
+            } else {
+                this.setState({ public: true })
             }
         })
-
-        p.getVersion((version) => { this.setState({ version: version.version.toUpperCase() }); })
-
-        socket.on("connect", a => {
-            socket.on("notification", a => {
-                p.getAccount(account => {
-                    this.setState({ account });
-                })
-            })
-
-        });
-
-        p.getStates((states) => { this.setState({ states }) })
-
-        this.serviceworkerfunction();
     }
 
     serviceworkerfunction = () => {
@@ -83,29 +96,28 @@ class App extends Component {
         }
 
         async function workerInit() {
+            var publicVapidKey = "";
+            await fetch('/api/v3/notifications/publicKey', {
+                method: 'GET', headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then((key) => {
+                    publicVapidKey = key;
+                })
+
             const register = await navigator.serviceWorker.register('/serviceworker.js', {
                 scope: "/"
             });
-
-            socket.on("pushNotification", a => {
-                var message = "has been successfuly added to PROTOTYP3.";
-                if (a.type == "ALARM") {
-                    message = a.message;
-                } else if (a.type == "CONNECTION DOWN 24HR WARNING") {
-                    message = "hasn't sent data in the last 24hours";
-                }
-                register.showNotification(a.type, {
-                    body: '"' + a.device + '" ' + message,
-                    icon: "./iotnxtLogo.png"
-                });
-            })
 
             const subscription = await register.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
             });
 
-            await fetch("/subscribe", {
+            await fetch("/api/v3/iotnxt/subscribe", {
                 method: "POST",
                 body: JSON.stringify(subscription),
                 headers: {
@@ -176,23 +188,33 @@ class App extends Component {
     }
 
     home = ({ match }) => {
+        visitingG = false;
         if (this.state.account) {
+            if (match.params.username == undefined) {
+                match.params.username = this.state.account.username;
+            }
             if (this.state.account.level > 0) {
                 return (
                     <div>
-                        {/* <Dashboard state={this.state.states} /> */}
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={false} visiting={false} />
-                        <ApiInfo apikey={this.state.account.apikey} />
-                        <Stats />
-                        <Footer loggedIn={true} />
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={false} />
+                        <Suspense fallback={<div className="spinner"></div>}>
+                            <ApiInfo apikey={this.state.account.apikey} />
+                            <Stats />
+                            <Footer loggedIn={true} />
+                        </Suspense>
                     </div>
                 )
             } else {
                 return (
                     <div>
-                        <Account account={this.state.account} />
+                        <Account loginPanel={this.state.loginPanel} registrationPanel={this.state.registrationPanel} account={this.state.account} />
                         <Landing />
-                        <StatesViewer sendProps={this.setProps} username={this.state.account.username} account={this.state.account} public={true} visiting={false} />
+                        {/* 
+                        // Jan 5 2019
+                        // ROUAN: Disabled for now until we have more devices shared publicly, or built a proper way to explore devices for non-logged in users.
+
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} /> 
+                        */}
                         <Footer loggedIn={false} />
                     </div>)
             }
@@ -202,29 +224,52 @@ class App extends Component {
     }
 
     deviceView = ({ match }) => {
-        return (
-            <div>
-                <DeviceView
-                    devid={match.params.devid}
-                    username={match.params.username}
-                    acc={test.acc}
-                    deviceCall={test.dc}
-                    devices={test.ds}
-                    account={this.state.account}
-                />
-            </div>
-        )
+        if (this.state.account && this.state.public != undefined) {
+            if (this.state.account.username == match.params.username) {
+                visitingG = false;
+            } else {
+                visitingG = true;
+            }
+            return (
+                <div>
+                    <DeviceView
+                        openModal={this.openModal}
+                        mainView={this.state.devicesView}
+                        changeMainView={this.changeView}
+                        devid={match.params.devid}
+                        username={match.params.username}
+                        visituser={this.state.visituser}
+                        acc={test.acc}
+                        deviceCall={test.dc}
+                        devices={test.ds}
+                        sendProps={this.setProps}
+                        account={this.state.account}
+                        public={this.state.public}
+                        visiting={visitingG}
+                    />
+                </div>
+            )
+        } else {
+            return null
+        }
+    }
+
+    passUserInfo = (info) => {
+        this.setState({ visituser: info })
     }
 
     userView = ({ match }) => {
-        return (
-            <div>
-                <UserPage username={match.params.username} />
-                <StatesViewer sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
-                <Footer />
-            </div>
+        visitingG = true;
+        if (this.state.account) {
+            return (
+                <div>
+                    <UserPage visitu={this.passUserInfo} username={match.params.username} />
+                    <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={false} visiting={true} />
+                    <Footer />
+                </div>
 
-        )
+            )
+        } else return <div className="spinner"></div>
     }
 
     recoverPassword = ({ match }) => {
@@ -244,9 +289,27 @@ class App extends Component {
     }
 
     settings = ({ match }) => {
-        return (
-            <SettingsView />
-        )
+        if (this.state.account) {
+            if (this.state.account.level > 0) {
+                return (
+                    <Suspense fallback={<div className="spinner"></div>}>
+                        <SettingsView />
+                    </Suspense>
+                )
+            } else {
+                return (
+                    <div>
+                        <Account registrationPanel={this.state.registrationPanel} loginPanel={this.state.loginPanel} account={this.state.account} />
+                        <Landing />
+                        <StatesViewer openModal={this.openModal} mainView={"devices"} sendProps={this.setProps} username={match.params.username} account={this.state.account} public={true} visiting={false} />
+                        <Footer loggedIn={false} />
+                    </div>
+                )
+            }
+        }
+        else {
+            return null
+        }
     }
 
     notifications = ({ match }) => {
@@ -255,21 +318,51 @@ class App extends Component {
         )
     }
 
+    logs = ({ match }) => {
+        return (
+            <DeviceHistory devices={this.state} sendProps={this.setProps} username={match.params.username} account={this.state.account} />
+        )
+    }
+
+
+    changeView = (view) => {
+        this.setState({ devicesView: view });
+    }
+
+    openModal = (origination) => {
+        if (origination == "ChangePassword") {
+            this.setState({ isOpen2: true });
+
+        } else if (origination == "addDevice") {
+            this.setState({ isOpen: true });
+        }
+    }
+
+    addDevice = () => {
+        if (this.state.account) {
+            return (
+                <AddDevice register={() => { this.setState({ registrationPanel: true }) }} login={() => { this.setState({ loginPanel: true }) }} mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.isOpen} closeModel={() => { this.setState({ isOpen: false }) }} />
+            )
+        } else {
+            return null
+        }
+    }
+
     render() {
         return (
             <div className="App">
-
                 <Router>
                     <div>
-                        <NavBar version={this.state.version} account={this.state.account} />
+                        <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
+                        {this.addDevice()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
-                        <Route path="/view/:devid" component={this.deviceView} />
                         <Route exact path="/u/:username" component={this.userView} />
                         <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
                         <Route path="/settings" component={this.settings} />
                         <Route exact path="/accounts/secure" component={this.secure} />
                         <Route path="/notifications" component={this.notifications} account={this.state.account} />
+                        <Route path="/logs" component={this.logs} />
                     </div>
                 </Router>
             </div>

@@ -3,6 +3,8 @@ import * as geoip from "geoip-lite";
 
 var _ = require("lodash");
 
+import { log } from "./log"
+
 export function postState(
   db: any,
   user: any,
@@ -12,17 +14,53 @@ export function postState(
 ) {
 
   if (!user) {
-
-    //console.log(meta)
-    //console.log(request)
-    //console.log("user undefined")
-    //cb("user undefined", undefined)
+    log("state.ts", "postState", "user not defined!")
+    console.log(user);
     return;
   }
 
-
-
   var event = new Date();
+
+  // enables timestamp override if included in packet
+  if (request.timestamp) {
+    event = new Date(request.timestamp);
+  }
+
+  /// checks
+
+  if (request.id == "") {
+    var error = { "error": "id may not be empty" }
+    console.log(error);
+    cb(error); return
+  }
+
+  if (!request.id) {
+    var error = { "error": "id parameter missing" };
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (typeof request.id != "string") {
+    var error = { "error": "id must be a string" };
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (request.id.indexOf(" ") != -1) {
+    var error = { "error": "id may not contain spaces" }
+    console.log(error);
+    cb(error); return;
+  }
+
+  if (request.id.match(/^[a-z0-9_]+$/i) == null) {
+    var error = { "error": "id may only contain a-z A-Z 0-9 and _" }
+    console.log(error);
+    cb(error); return;
+  }
+
+  ////
+
+
   request.timestamp = event.toJSON();
 
   var packet: any = {
@@ -49,16 +87,16 @@ export function postState(
 
   if (meta.ip) {
     packet.meta.ip = meta.ip;
-    packet.meta.ipLoc = geoip.lookup(meta.ip);
-    if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
-      packet.meta.ipLoc = {
-        ll:
-          [
-            0.01,
-            0.01
-          ]
-      }
-    }
+    //   packet.meta.ipLoc = geoip.lookup(meta.ip);
+    //   if (packet.meta.ipLoc == undefined || packet.meta.ipLoc == null) {
+    //     packet.meta.ipLoc = {
+    //       ll:
+    //         [
+    //           0.01,
+    //           0.01
+    //         ]
+    //     }
+    //   }
   }
 
   if (meta.userAgent) {
@@ -76,9 +114,13 @@ export function postState(
       //     console.log(err)
       //   })
       // }
-      var packetToUpsert: any = {};
 
+      var deviceStateDBpreupdate = _.clone(findResult);
+
+      var packetToUpsert: any = {};
       var info: any = {}
+      info.deviceStateDBpreupdate = deviceStateDBpreupdate
+
       if (findResult) {
         delete findResult["_id"];
 
@@ -108,6 +150,7 @@ export function postState(
         packetToUpsert["boundaryLayer"] = undefined;
         packetToUpsert["selectedIcon"] = false;
         info.newdevice = true
+        info.deviceStateDBpreupdate = packetToUpsert; //if its a new device we'll use this as the previous state.
       }
 
       packet["key"] = packetToUpsert.key
@@ -305,6 +348,7 @@ export function validApiKey(db: any, testkey: string, cb: any) {
 
 
 export function getUserByApikey(db: any, apikey: string, cb: any) {
+  log("state.ts", "getUserByApikey", "start")
   db.users.findOne({ apikey: apikey }, (err: Error, user: any) => {
     if (user) {
       cb(undefined, user)

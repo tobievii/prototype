@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { SetUsername } from "./pluginAccount_username.jsx"
 
@@ -9,16 +9,16 @@ export class SettingsPanel extends React.Component {
     account: {},
     level: 0
   }
-  componentDidMount() {
+  componentWillMount() {
     this.getAccount();
   }
 
   getAccount = () => {
     fetch("/api/v3/account", { method: "GET" }).then(resp => resp.json()).then((data) => {
+      this.setState({ account: data })
       if (data.level) {
         this.setState({ level: data.level })
       }
-      this.setState({ account: data })
     })
   }
 
@@ -36,7 +36,7 @@ export class SettingsPanel extends React.Component {
           level:<span className="settingsDetails"> {this.state.account.level}</span><br />
           username:<span className="settingsDetails"> {this.state.account.username}</span><br />
 
-          <SetUsername username={this.state.account.username} usernameUpdated={this.usernameUpdated} />
+          <SetUsername username={this.state.account.username} account={this.state.account} usernameUpdated={this.usernameUpdated} />
           <div style={{ clear: "both" }} />
 
         </div>
