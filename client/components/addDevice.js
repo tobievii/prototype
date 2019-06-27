@@ -60,6 +60,9 @@ export default class AddDevice extends Component {
             this.setState({ popupInfo: "public" })
         } else if (this.state.search == "Efento" && call == "select") {
             this.setState({ popupInfo: "Efento" })
+        } else if (this.state.search == "Bosch TRACI" && call == "select") {
+            this.setState({ popupInfo: "Bosch TRACI" })
+
         } else {
             return null;
         }
@@ -89,6 +92,7 @@ export default class AddDevice extends Component {
                                 <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
                                 <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
                                 <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="Bosch TRACI" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
                             </datalist>
                         </div>
 
@@ -126,6 +130,22 @@ export default class AddDevice extends Component {
                     Your API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
                     <br /><br />
                     Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
+                </div>
+            )
+        } else if (this.state.popupInfo == "Bosch TRACI") {
+
+            return (
+                <div style={{ background: "#16202C", paddingLeft: "20px", paddingBottom: "45px" }}>
+                    <br></br>
+                    <h5>Bosch Asset Tracking Tag</h5>
+                    <br />
+                    Please enter the information below on your efento logger mobile application.
+                    <br /><br />
+                    TCP Host: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">40.115.63.112</span></span>
+                    <br /><br />
+                    API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
+                    <br /><br />
+                    {/* Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span> */}
                 </div>
             )
         }
