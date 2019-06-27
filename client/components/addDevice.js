@@ -84,8 +84,8 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                            <select id="devices" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search}>
-                                <option value="" disabled selected hidden>Select type of device..</option>
+                            <select id="devices" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                <option value='DEFAULT' disabled>Select type of device...</option>
                                 <option value="Arduino (Serialport)" className="optiondropdown" style={{ width: "90%" }} >Arduino (Serialport)</option>
                                 <option value="ESP32 (Wifi + MQTT)" className="optiondropdown" style={{ width: "90%" }} >ESP32 (Wifi + MQTT)</option>
                                 <option value="IoT.nxt raptor" className="optiondropdown" style={{ width: "90%" }} >IoT.nxt raptor</option>

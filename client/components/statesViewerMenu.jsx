@@ -145,8 +145,8 @@ export class StatesViewerMenu extends Component {
                 if (this.props.selectCount > 0) {
                     return (
                         <div>
-                            < select id="devices" style={{ width: "120px", marginTop: "7px" }} onChange={this.search}>
-                                <option value="" disabled selected hidden>MODIFY</option>
+                            < select id="devices" style={{ width: "120px", marginTop: "7px" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                <option value='DEFAULT' disabled>MODIFY...</option>
                                 <option className="optiondropdown" value="DASHBOARD PRESET" style={{ width: "90%" }}>DASHBOARD PRESET</option>
                                 <option className="optiondropdown" value="SCRIPT PRESET" style={{ width: "90%" }} >SCRIPT PRESET</option>
                                 <option className="optiondropdown" className="SHARE" value="SHARE" style={{ width: "90%" }} >SHARE</option>
@@ -156,8 +156,8 @@ export class StatesViewerMenu extends Component {
                     )
                 } else {
                     return (
-                        < select id="devices" title="Select some devices first..." style={{ marginTop: "7px", width: "120px", cursor: "not-allowed", opacity: "0.3" }}>
-                            <option className="optiondropdown" style={{ width: "90%" }} value="" disabled selected hidden>MODIFY</option></ select>
+                        < select id="devices" title="Select some devices first..." style={{ marginTop: "7px", width: "120px", cursor: "not-allowed", opacity: "0.3" }} defaultValue={'DEFAULT'}>
+                            <option className="optiondropdown" style={{ width: "90%" }} value='DEFAULT' disabled>MODIFY...</option></ select>
                     )
                 }
             }

@@ -246,8 +246,8 @@ export default class ModifyDevices extends Component {
                     </div>
 
                     <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} >
-                            <option value="" disabled selected hidden>SELECT OPTION...</option>
+                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                            <option value='DEFAULT' disabled>Select option...</option>
                             {this.options()}
                         </select>
                     </div>
