@@ -2,6 +2,7 @@ import * as request from "request"
 import { EventEmitter } from "events";
 
 import { iotnxt } from "./api_prototype_iotnxt"
+import { teltonika } from "./teltonika"
 
 
 export interface Packet {
@@ -85,6 +86,7 @@ export class Prototype extends EventEmitter {
 
 
         this.plugins.iotnxt = new iotnxt(this);
+        this.plugins.teltonika = new teltonika(this);
 
     }
 
@@ -307,5 +309,29 @@ export class Prototype extends EventEmitter {
             if (this.socketclient) this.socketclient.disconnect();
         }
     }
+
+    /*
+    Teltonika set port and verify port operation
+   */
+
+    setTeltonikaPort(cb?: any) {
+        this.plugins.teltonika.setport((err: Error, result: any) => {
+            cb(err, result);
+        })
+    }
+
+    getTeltonikaPort(cb?: any) {
+        this.plugins.teltonika.getport((err: Error, result: any) => {
+            cb(err, result);
+        })
+    }
+
+    teltonikaTest(port: any, host: any, cb: any) {
+        this.plugins.teltonika.teltonikaTest(port, host, (err: Error, result: any) => {
+            cb(err, result);
+        })
+    }
+
+    /*-----------------------------------------------------------------------------------------------*/
 
 }

@@ -32,6 +32,7 @@ export class PluginTeltonika extends Plugin {
         }
       })
     });
+
     app.get("/api/v3/teltonika/reqport", (req: any, res: any) => {
       // check if account has port assigned
       // console.log(req.user)
@@ -73,6 +74,7 @@ export class PluginTeltonika extends Plugin {
   findOpenPort(cb: Function) {
     this.db[this.collection].find({}, (e: Error, r: any) => {
       var ports = []
+      var found = false;
       for (var p of r) {
         ports.push(p.port);
       }
@@ -82,8 +84,12 @@ export class PluginTeltonika extends Plugin {
 
       //find first unused
       for (var m = this.minPort; m < this.maxPort; m++) {
-        if (ports.indexOf(m) == -1) {
+        if (ports.indexOf(m) == -1 && found == false) {
           cb(null, m);
+          found = true;
+          m = this.maxPort + 1;
+        } else {
+          found = false;
         }
       }
     })
