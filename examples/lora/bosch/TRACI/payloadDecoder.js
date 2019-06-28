@@ -36,7 +36,7 @@ var Int32 = function (value) {
 };
 
 var bytes = msg.payload;
-var port = 1;
+var port = msg.port;
 
 var decoded = {};
 
