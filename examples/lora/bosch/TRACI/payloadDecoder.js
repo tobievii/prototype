@@ -35,12 +35,9 @@ var Int32 = function (value) {
     return (ref > 0x7FFFFFFF) ? ref - 0x100000000 : ref;
 };
 
-
-
 var bytes = msg.payload;
 var port = 1;
-// Decode an uplink message from a buffer
-// (array) of bytes to an object of fields.
+
 var decoded = {};
 
 if (port === 1) {
@@ -58,9 +55,8 @@ if (port === 1) {
         decoded.GPSWeekNumber = (weekNumberTimeOfWeek >> 20) & 0x3FF;
         decoded.GPSTimeOfWeek = weekNumberTimeOfWeek & 0x000FFFFF;
 
-        var GPSDate = new Date(1980, 0, 1, 0, 0, 0, 0); // reference date 1. january 1980
+        var GPSDate = new Date(1980, 0, 1, 0, 0, 0, 0);
         var GPSWeekRollovers = 2;
-        // add weeknumber in days relative to 1st january 1980; add 6 because weeks started at 6th january 1980
         GPSDate.setDate(6 + ((decoded.GPSWeekNumber + (GPSWeekRollovers * 1024)) * 7));
         GPSDate.setSeconds(decoded.GPSTimeOfWeek); // add seconds to gps week
         decoded.GPSTimestamp = GPSDate.toString();
