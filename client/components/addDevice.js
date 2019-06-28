@@ -150,7 +150,7 @@ export default class AddDevice extends Component {
     addDevice = (call) => {
         if (this.props.account.level < 1) {
             this.setState({ popupInfo: "public" })
-        } else if (this.state.search == "Efento" && call == "select") {
+        } else if ((this.state.search == "Efento" || this.state.search == "efento") && call == "select") {
             this.setState({ popupInfo: "Efento" })
         } else if (this.state.search == "Bosch TRACI" && call == "select") {
             this.setState({ popupInfo: "Bosch TRACI" })
