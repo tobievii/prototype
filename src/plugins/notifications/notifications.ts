@@ -35,6 +35,10 @@ export class PluginNotifications extends Plugin {
 
     log("PLUGIN", this.name, "LOADED");
 
+    eventHub.on("deviceShare", (data: any) => {
+      this.createNotification(this.db, data.notification, data.device);
+    })
+
     // recieve device notification subscriptions
     app.post("/api/v3/iotnxt/subscribe", (req: any, res: any) => {
       this.subscribe(req.user.apikey, req.body);
@@ -292,51 +296,79 @@ export class PluginNotifications extends Plugin {
     // }
   }
 
+  sharedDevice(db: any, notification: any, device: any) {
+    db.users.findOne({ email: notification.to }, (err: Error, user: any) => {
+      notification.notified = false;
+
+      this.eventHub.emit("plugin", {
+        plugin: this.name,
+        event: {
+          notification: notification,
+          device: device
+        }
+      })
+
+      if (user.notifications) {
+        user.notifications.push(notification)
+      } else {
+        user.notifications = [notification]
+      }
+
+      db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+        if (err) console.log(err);
+      })
+    })
+  }
+
   createNotification(db: any, notification: any, device: any) {
 
-    db.users.findOne({ apikey: device.apikey }, (err: Error, user: any) => {
-      this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
-        for (var sub of dbSubscriptions) {
-          var subscription = {
-            endpoint: sub.subscriptionData.endpoint,
-            keys: {
-              p256dh: sub.subscriptionData.keys.p256dh,
-              auth: sub.subscriptionData.keys.auth
+    if (notification.type == "A DEVICE WAS SHARED WITH YOU") {
+      this.sharedDevice(db, notification, device);
+    } else {
+      db.users.findOne({ apikey: device.apikey }, (err: Error, user: any) => {
+        this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
+          for (var sub of dbSubscriptions) {
+            var subscription = {
+              endpoint: sub.subscriptionData.endpoint,
+              keys: {
+                p256dh: sub.subscriptionData.keys.p256dh,
+                auth: sub.subscriptionData.keys.auth
+              }
             }
-          }
 
-          var opt = {
-            vapidDetails: {
-              subject: "mailto:prototype@iotnxt.com",
-              publicKey: this.publicVapidKey,
-              privateKey: this.privateVapidKey
+            var opt = {
+              vapidDetails: {
+                subject: "mailto:prototype@iotnxt.com",
+                publicKey: this.publicVapidKey,
+                privateKey: this.privateVapidKey
+              }
             }
-          }
-          notification.notified = false;
+            notification.notified = false;
 
-          this.eventHub.emit("plugin", {
-            plugin: this.name,
-            event: {
-              notification: notification,
-              device: device
+            this.eventHub.emit("sharedDevice", {
+              plugin: this.name,
+              event: {
+                notification: notification,
+                user: user.username
+              }
+            })
+
+            if (user.notifications) {
+              user.notifications.push(notification)
+            } else {
+              user.notifications = [notification]
             }
-          })
 
-          if (user.notifications) {
-            user.notifications.push(notification)
-          } else {
-            user.notifications = [notification]
+            db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
+              if (err) console.log(err);
+            })
+
+            webpush.sendNotification(subscription, JSON.stringify({ notification }), opt).then((response: any) => {
+            }).catch((err: any) => console.error(err));
           }
-
-          db.users.update({ apikey: user.apikey }, user, (err: Error, updated: any) => {
-            if (err) console.log(err);
-          })
-
-          webpush.sendNotification(subscription, JSON.stringify({ notification }), opt).then((response: any) => {
-          }).catch((err: any) => console.error(err));
-        }
+        });
       });
-    });
+    }
   }
 
   subscribe(apikey: string, subscriptionData: any) {

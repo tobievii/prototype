@@ -82,6 +82,10 @@ eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 
+eventHub.on("deviceShared", (data: any) => {
+  io.to(data.user).emit("deviceShared", data);
+})
+
 eventHub.on("configChange", () => {
   //event to restart all servers on UI infor change
   // config = new Config(app, eventHub);

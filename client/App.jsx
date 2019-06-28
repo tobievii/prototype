@@ -62,6 +62,12 @@ class App extends Component {
                     this.setState({ account });
                 })
             })
+
+            socket.on("deviceShared", a => {
+                p.getAccount(account => {
+                    this.setState({ account });
+                })
+            })
         });
 
         p.getStates((states) => { this.setState({ states }) })
