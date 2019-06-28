@@ -1066,23 +1066,6 @@ function handleState(req: any, res: any, next: any) {
             io.to(req.user.username).emit("info", info);
           }
 
-          // var message = "";
-          // var AlarmNotification = {
-          //   type: "ALARM",
-          //   device: req.body.id,
-          //   created: Date.now(),
-          //   message: message,
-          //   notified: true,
-          //   seen: false
-          // }
-
-          // if (deviceState.boundaryLayer != undefined) {
-          //   if (deviceState.boundaryLayer.inbound == false) {
-          //     AlarmNotification.message = "has gone out of its boundary";
-          //     //createNotification(db, AlarmNotification, req.user, deviceState);
-          //   }
-          // }
-
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);

@@ -293,6 +293,7 @@ export class PluginNotifications extends Plugin {
   }
 
   createNotification(db: any, notification: any, device: any) {
+
     db.users.findOne({ apikey: device.apikey }, (err: Error, user: any) => {
       this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
         for (var sub of dbSubscriptions) {
@@ -362,6 +363,22 @@ export class PluginNotifications extends Plugin {
         seen: false
       }
       this.createNotification(this.db, newDeviceNotification, deviceState);
+    }
+
+    if (deviceState.boundaryLayer != undefined) {
+      if (deviceState.boundaryLayer.inbound == false) {
+        var message = "";
+        var AlarmNotification = {
+          type: "ALARM",
+          device: deviceState.devid,
+          created: Date.now(),
+          message: message,
+          notified: true,
+          seen: false
+        }
+        AlarmNotification.message = "has gone out of its boundary";
+        this.createNotification(this.db, AlarmNotification, deviceState);
+      }
     }
   };
 
