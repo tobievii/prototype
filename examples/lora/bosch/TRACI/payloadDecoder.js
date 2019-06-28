@@ -44,7 +44,6 @@ if (port === 1) {
     decoded.ProtocolVersion = bytes[0];
     decoded.MessageType = bytes[1];
     if (decoded.MessageType === 0x00) {
-        // Standard Message Type
         decoded.BattState = (bytes[2] >> 4) & 0x07;
         decoded.AccVector = (bytes[2] >> 1) & 0x07;
         decoded.AccState = (bytes[2]) & 0x01;
@@ -73,13 +72,11 @@ if (port === 1) {
     }
 
     if (decoded.MessageType === 0x01) {
-        // Alive message type
         decoded.Temperature = Int8(bytes[2]) + 23;
         decoded.BTNum = bytes[3];
     }
 
     if (decoded.MessageType === 0x02) {
-        // startup message type
         decoded.SoftwareVersion = bytes.slice(2, 17);
         decoded.BootblockVersion = bytes.slice(18, 33);
         decoded.HardwareVersion = bytes.slice(34, 49);
@@ -87,13 +84,11 @@ if (port === 1) {
     }
 
     if (decoded.MessageType === 0x5F) {
-        // configurtaion acknowledged message type
         decoded.ConfigurationMessageId = bytes[2];
         decoded.ConfigurationState = bytes[3];
     }
 
     if (decoded.MessageType === 0x10) {
-        // bluetooth collection message type
         var BluetoothBeacons = {};
         for (var cnt = 0; cnt < 4; cnt++) {
             MACAdress = bytes.slice((cnt * 7) + 2, (cnt * 7) + 8).map(function (byte) {
