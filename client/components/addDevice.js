@@ -167,14 +167,9 @@ export default class AddDevice extends Component {
     nodeRedConfig = () => {
         return (
             <div>
-              {/* <CopyToClipboard text={this.state.value}
-                onCopy={() => this.setState({copied: true})}>
-                <span>Copy to clipboard with span</span>
-              </CopyToClipboard> */}
-       
               <CopyToClipboard text={this.state.value}
                 onCopy={() => this.setState({copied: true})}>
-                <button>Copy to clipboard with button</button>
+                <button>Copy to clipboard</button>
               </CopyToClipboard>
               {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
             </div>
