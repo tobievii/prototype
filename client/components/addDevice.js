@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { plugins } from "../plugins/config.ts"
 import Modal from 'react-modal';
 
 const customStyles = {
@@ -58,8 +58,10 @@ export default class AddDevice extends Component {
     addDevice = (call) => {
         if (this.props.account.level < 1) {
             this.setState({ popupInfo: "public" })
-        } else if (this.state.search == "Efento" && call == "select") {
+        } else if ((this.state.search == "Efento" || this.state.search == "efento") && call == "select") {
             this.setState({ popupInfo: "Efento" })
+        } else if ((this.state.search == "Teltonika" || this.state.search == "teltonika") && call == "select") {
+            this.setState({ popupInfo: "Teltonika" })
         } else {
             return null;
         }
@@ -73,7 +75,7 @@ export default class AddDevice extends Component {
         if (this.state.popupInfo == "default") {
             return (
                 <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                    <div style={{}}>
+                    <div>
                         Search for your device, service and/or protocol:
                 </div>
                     <div className="row addDevice">
@@ -82,14 +84,14 @@ export default class AddDevice extends Component {
                         </div>
 
                         <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                            <input list="devices" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} placeholder="Type to filter options" />
-                            <datalist id="devices">
-                                <option value="Arduino (Serialport)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="ESP32 (Wifi + MQTT)" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="IoT.nxt raptor" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="Teltonika" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                                <option value="Efento" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
-                            </datalist>
+                            <select id="devices" style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                <option value='DEFAULT' disabled>Select type of device...</option>
+                                <option value="Arduino (Serialport)" className="optiondropdown" style={{ width: "90%" }} >Arduino (Serialport)</option>
+                                <option value="ESP32 (Wifi + MQTT)" className="optiondropdown" style={{ width: "90%" }} >ESP32 (Wifi + MQTT)</option>
+                                <option value="IoT.nxt raptor" className="optiondropdown" style={{ width: "90%" }} >IoT.nxt raptor</option>
+                                <option value="Teltonika" className="optiondropdown" style={{ width: "90%" }} >Teltonika</option>
+                                <option value="Efento" className="optiondropdown" style={{ width: "90%" }} >Efento</option>
+                            </select>
                         </div>
 
                         <div className="col" style={{ padding: 0, cursor: "pointer" }}>
@@ -126,6 +128,14 @@ export default class AddDevice extends Component {
                     Your API Key:<span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.props.account.apikey}</span></span>
                     <br /><br />
                     Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
+                </div>
+            )
+        } else if (this.state.popupInfo == "Teltonika") {
+
+            var SettingsPanel = plugins[5].SettingsPanel
+            return (
+                <div style={{ background: "#16202C", paddingBottom: 14 }}>
+                    <SettingsPanel {...this.props} />
                 </div>
             )
         }
