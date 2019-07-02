@@ -116,7 +116,7 @@ export class PluginIotnxt extends Plugin {
         GatewayId: req.body.GatewayId,
         HostAddress: req.body.HostAddress
       }
-      this.setgatewaydevice(req.user, req.body.key, gateway, (err: Error, result: any) => {
+      this.setgatewaydevice(req.user, req.body.key, gateway, req.body.id, req.body.ownerApikey, (err: Error, result: any) => {
         res.json(result);
       })
     });
@@ -340,20 +340,45 @@ export class PluginIotnxt extends Plugin {
     //
   }
 
-  setgatewaydevice(user: any, key: string, gateway: any, cb: Function) {
+  setgatewaydevice(user: any, key: any, gateway: any, id: any, ownerApikey: any, cb: Function) {
 
     if (user.level >= 100) {
       //admins
-      this.db.states.update(
-        { key },
-        { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
-        cb)
+      //if admin is setting other users device gateway through Prototype UI 
+      if (key) {
+        this.db.states.update(
+          { key },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
+      //if admin is setting other users device gateway through POst man 
+      else if (ownerApikey) {
+        this.db.states.update(
+          { devid: id, apikey: ownerApikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
+      //if admin is setting their own device 
+      else if (!key && !ownerApikey) {
+        this.db.states.update(
+          { devid: id, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
     } else {
       //users
-      this.db.states.update(
-        { key, apikey: user.apikey },
-        { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
-        cb)
+      if (key) {
+        this.db.states.update(
+          { key: key, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
+      else {
+        this.db.states.update(
+          { devid: id, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
     }
   }
 
