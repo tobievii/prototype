@@ -15,7 +15,7 @@ const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
 export class Editor extends Component {
 
     loadingState = 0;
-    count = undefined;
+    count = false;
     state = {
         message: "",
         messageOpacity: 0,
@@ -196,7 +196,6 @@ export class Editor extends Component {
     onChange = (code, e) => {
         // console.log(code)
         this.setState({ code: code, editorChanged: true, unsaved: true });
-        this.props.state.workflowCode = code;
         // this.props.onChange();
     };
 
@@ -255,7 +254,7 @@ export class Editor extends Component {
                 return (<div>loading....</div>)
             } else {
 
-                if (this.state.code != this.props.state.workflowCode & this.state.unsaved == false) {
+                if (this.state.code != this.props.state.workflowCode) {
                     if (this.props.state.workflowCode != null && this.props.state.workflowCode != undefined) {
                         this.setState({ code: this.props.state.workflowCode })
                         this.count = false;
@@ -285,11 +284,11 @@ export class Editor extends Component {
                         </div>
 
                         {/* <div>
-                                <span title="Check to your left under packet history">packet</span>            
-                                <span title={JSON.stringify(this.state.lastState, null, 2)}>state</span>                        
-                                <span title={JSON.stringify(this.state.lastStates, null, 2)}>states</span>                        
-                                <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>statesObj</span>                        
-                            </div> */}
+                            <span title="Check to your left under packet history">packet</span>            
+                            <span title={JSON.stringify(this.state.lastState, null, 2)}>state</span>                        
+                            <span title={JSON.stringify(this.state.lastStates, null, 2)}>states</span>                        
+                            <span title={JSON.stringify(this.state.lastStatesObj, null, 2)}>statesObj</span>                        
+                        </div> */}
 
                         <div style={{ backgroundColor: "red", height: "100%" }}>
                             <Suspense fallback={<div className="spinner"></div>}>
