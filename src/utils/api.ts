@@ -1,7 +1,6 @@
 import * as request from "request"
 import { EventEmitter } from "events";
-
-import { iotnxt } from "./api_prototype_iotnxt"
+import { iotnxt, Gateway } from "./api_prototype_iotnxt"
 import { teltonika } from "./teltonika"
 
 
@@ -334,4 +333,107 @@ export class Prototype extends EventEmitter {
 
     /*-----------------------------------------------------------------------------------------------*/
 
+    /*
+   IOTNXT Add gateway ,set gateway to device, get gateway and remove gateway
+   */
+    addgateway(gateway: Gateway, cb: any) {
+        this.plugins.iotnxt.addgateway(gateway, (err: Error, result: any) => {
+            cb(err, result);
+        })
+    }
+
+    setdevicegateway(id: string, GatewayId: string, HostAddress: string, cb: any) {
+        this.state(id, (err: any, device: any) => {
+            this.plugins.iotnxt.setgatewaydevice(device.key, id, GatewayId, HostAddress, (err: Error, result: any) => {
+                cb(err, result);
+            })
+        })
+    }
+
+    getgateways(cb?: any) {
+        this.plugins.iotnxt.getgateways((err: Error, result: any) => {
+            cb(err, result);
+        })
+    }
+
+    deletegateway(cb?: any) {
+        this.plugins.iotnxt.getgateways((err: Error, result: any) => {
+            this.plugins.iotnxt.removegateway(result, (err: Error, result: any) => {
+                cb(err, result);
+            })
+        })
+    }
+
+    /*-----------------------------------------------------------------------------------------------*/
+
+    /*
+Device sharing
+ */
+    shareDevice(id: any, cb: Function) {
+        this.state(id, (err: any, device: any) => {
+            request.post(this.uri + "/api/v3/setprivateorpublic", { json: { public: true, devid: device.key } }, (err, res, body) => {
+                if (err) cb(err);
+                else if (body) {
+                    if (body.nModified == 1) {
+                        cb(null, body);
+                    } else {
+                        cb(body);
+                    }
+                }
+            });
+        })
+    }
+
+    unshareDevice(id: any, cb: Function) {
+        this.state(id, (err: any, device: any) => {
+            request.post(this.uri + "/api/v3/setprivateorpublic", { json: { public: false, devid: device.key } }, (err, res, body) => {
+                if (err) cb(err);
+                else if (body) {
+                    if (body.nModified == 1) {
+                        cb(null, body);
+                    } else {
+                        cb(body);
+                    }
+                }
+            });
+        })
+    }
+    /*-----------------------------------------------------------------------------------------------*/
+
+    /*
+Device workflow code
+*/
+    assignDevWorkflow(code: any, id: any, cb: Function) {
+        request.post(this.uri + "/api/v3/workflow", { headers: this.headers, json: { code, id } }, (err, res, body) => {
+            if (err) cb(err);
+            else if (body) {
+                if (body.result == "success") {
+                    cb(null, body)
+                }
+                else {
+                    cb(body);
+                }
+            }
+        });
+    }
+    /*-----------------------------------------------------------------------------------------------*/
+
+    /*
+Device Dashboard
+*/
+    assignDevDasboard(id: any, layout: any, cb: Function) {
+        this.state(id, (err: any, device: any) => {
+            request.post(this.uri + "/api/v3/dashboard", { json: { key: device.key, layout } }, (err, res, body) => {
+                if (err) cb(err);
+                else if (body) {
+                    if (body.nModified == 1) {
+                        cb(null, body);
+                    } else {
+                        cb(body);
+                    }
+                }
+            });
+        })
+    }
+    /*-----------------------------------------------------------------------------------------------*/
 }
