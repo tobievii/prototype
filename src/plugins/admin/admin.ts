@@ -249,16 +249,32 @@ export class PluginAdmin extends Plugin {
             if (info) {
 
               res.json({ err: {}, result: { mail: "sent" } })
-              db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
-              db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
-                this.eventHub.emit("deviceShare", {
-                  plugin: this.name,
-                  notification: shareDeviceNotification,
-                  device: give,
-                  from: req.user.apikey
+              if (req.body.chosen) {
+                for (var i in req.body.chosen) {
+                  db.states.update({ $and: [{ devid: req.body.chosen[i].devid, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+                  db.states.findOne({ devid: req.body.chosen[i].devid }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                    this.eventHub.emit("deviceShare", {
+                      plugin: this.name,
+                      notification: shareDeviceNotification,
+                      device: give,
+                      from: req.user.apikey
+                    })
+                    db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+                  })
+                }
+              }
+              else if (!req.body.chosen) {
+                db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+                db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                  this.eventHub.emit("deviceShare", {
+                    plugin: this.name,
+                    notification: shareDeviceNotification,
+                    device: give,
+                    from: req.user.apikey
+                  })
+                  db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
                 })
-                db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give.key, timeshared: today }] } } })//adds users _id to keys 
-              })
+              }
             }
           })
         })

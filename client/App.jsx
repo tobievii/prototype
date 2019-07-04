@@ -63,7 +63,7 @@ class App extends Component {
                 })
             })
 
-            socket.on("deviceShared", a => {
+            socket.on("warningNotification", a => {
                 p.getAccount(account => {
                     this.setState({ account });
                 })

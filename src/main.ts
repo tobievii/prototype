@@ -82,8 +82,8 @@ eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 
-eventHub.on("deviceShared", (data: any) => {
-  io.to(data.user).emit("deviceShared", data);
+eventHub.on("warningNotification", (data: any) => {
+  io.to(data.device.apikey).emit("warningNotification", data);
 })
 
 eventHub.on("configChange", () => {
@@ -1094,17 +1094,6 @@ function handleState(req: any, res: any, next: any) {
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
-
-        // db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
-        //   if (findResult.notification24 == true) {
-        //     db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-        //       //console.log(result)
-        //       //console.log(err)
-        //     })
-        //   }
-        // })
-
-
 
         res.json({ result: "success" });
 

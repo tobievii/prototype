@@ -99,7 +99,7 @@ export class StatesViewerItem extends Component {
 
     var notifications = this.props.account.notifications;
     for (var s in notifications) {
-      if ((notifications[s].type == "CONNECTION DOWN 24HR WARNING" || notifications[s].type == "WARNING") && device.devid == notifications[s].device && notifications[s].seen == false) {
+      if (notifications[s].type == "WARNING" && device.devid == notifications[s].device && notifications[s].seen == false) {
         this.setState({ opacityw: "1" });
         this.setState({ warningNotification: notifications[s] });
       }

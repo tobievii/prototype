@@ -20,6 +20,10 @@ export class PluginNotifications extends Plugin {
   info: any;
   warning: any;
   workflowfunction: any;
+  stop: any;
+  start: any;
+  reset: any;
+  p = 0;
 
   publicVapidKey: any;
   privateVapidKey: any;
@@ -61,6 +65,15 @@ export class PluginNotifications extends Plugin {
       res.json(this.publicVapidKey)
     });
   }
+
+  timer = this.timerfunction(() => {
+    if (this.p == 0) {
+      console.log("Ran warning at " + new Date())
+      this.p = 1
+    } else {
+      this.getWarningNotification(this.db);
+    }
+  }, 1000);
 
   getNewNotification(db: any, user: any, res: any) {
     db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
@@ -118,22 +131,6 @@ export class PluginNotifications extends Plugin {
       })
     });
   }
-
-  // alarm = function (message: string, options: any) {
-  //   console.log(message + " is the alarm");
-  //   // var AlarmNotification = {
-  //   //   type: "ALARM",
-  //   //   device: options.devid,
-  //   //   created: Date.now(),
-  //   //   message: message,
-  //   //   notified: true,
-  //   //   seen: false
-  //   // }
-
-  //   // this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-  //   //   this.createNotification(this.db, AlarmNotification, options);
-  //   // })
-  // }
 
   workflow(options: any) {
     this.alarm = function (message: string) {
@@ -383,7 +380,16 @@ export class PluginNotifications extends Plugin {
   handlePacket(deviceState: any, packet: any, cb: Function) {
     log("PLUGIN", this.name, "HANDLE PACKET");
     //this.checkExisting(deviceState.apikey);
-
+    if (deviceState.notification24 == true) {
+      this.db.states.update({ key: deviceState.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+        this.eventHub.emit("plugin", {
+          plugin: this.name,
+          event: {
+            device: deviceState
+          }
+        })
+      })
+    }
 
     if (deviceState.newdevice) {
       var message = "Device Added";
@@ -455,6 +461,117 @@ export class PluginNotifications extends Plugin {
       }
       t.push(array[i]);
     }
+  }
+
+  timerfunction(fn: any, t: any) {
+    var timerObj: any = setInterval(fn, t);
+
+    this.stop = function () {
+      if (timerObj) {
+        clearInterval(timerObj);
+        timerObj = null;
+      }
+      return this;
+    }
+
+    // start timer using current settings (if it's not already running)
+    this.start = function () {
+      if (!timerObj) {
+        this.stop();
+        timerObj = setInterval(fn, t);
+      }
+      return this;
+    }
+
+    // start with new interval, stop current interval
+    this.reset = function (newT: any) {
+      if (newT != null || newT != undefined) {
+        t = newT;
+      }
+      return this.stop().start();
+    }
+  }
+
+  getWarningNotification(db: any) {
+    //console.log("Ran warning at " + new Date())
+    var deviceTime: any;
+
+    var now: any = new Date();
+    var dayago = new Date(now - (1000 * 60 * 60 * 24));
+
+    db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
+      // console.log(listDevices)
+      for (var s in listDevices) {
+        var device = listDevices[s]
+        this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
+          for (var sub of dbSubscriptions) {
+            var subscription = {
+              endpoint: sub.subscriptionData.endpoint,
+              keys: {
+                p256dh: sub.subscriptionData.keys.p256dh,
+                auth: sub.subscriptionData.keys.auth
+              }
+            }
+            db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
+
+              var WarningNotificationL = {
+                type: "CONNECTION DOWN 24HR WARNING",
+                device: device.devid,
+                created: new Date(),
+                notified: false,
+                seen: false
+              };
+              // this.createNotification(this.db, WarningNotificationL, device)
+              db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
+                console.log("here")
+                this.eventHub.emit("warningNotification", {
+                  plugin: "notifications",
+                  event: {
+                    notification: WarningNotificationL,
+                    device: { apikey: device.apikey, devid: device.devid }
+                  }
+                })
+              })
+              webpush.sendNotification(subscription, JSON.stringify(WarningNotificationL)).then((response: any) => {
+              }).catch((err: any) => console.error(err));
+            })
+          }
+        });
+      }
+
+      db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
+        var final: any;
+        var x = 0;
+        for (var state in states) {
+          if (x == 0) {
+            final = states[state];
+          } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
+            final = states[state];
+          }
+        }
+        deviceTime = final._last_seen.getTime() - dayago.getTime();
+        if (deviceTime < 0) {
+          deviceTime = 86000000;
+        }
+        this.reset(deviceTime);
+        this.stop();
+        this.start();
+        this.msToHMS(deviceTime);
+      })
+    })
+  }
+
+  msToHMS(ms: any) {
+
+    var seconds: any = ms / 1000;
+
+    var hours: any = seconds / 3600;
+    seconds = seconds % 3600;
+
+    var minutes: any = seconds / 60;
+
+    seconds = seconds % 60;
+    console.log("Next Run in:\t\t\t" + hours.toFixed(0) + ":" + minutes.toFixed(0) + ":" + seconds.toFixed(0))
   }
 
 }
