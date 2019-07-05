@@ -187,10 +187,6 @@ export class PluginNotifications extends Plugin {
         seen: false
       }
 
-      // this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => { //if this format is used, VM doesn't understand/access whats contained in "this", tried binding it nothing.
-      //   this.createNotification(this.db, AlarmNotification, options);
-      // })
-
       options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
         // this.createNotification(this.db, AlarmNotification, options);
         options.db["plugins_" + "notifications"].find({ apikey: options.apikey }, (e: Error, dbSubscriptions: any) => {
@@ -220,21 +216,6 @@ export class PluginNotifications extends Plugin {
         });
       })
     }
-    // this.warning = (message: string) => {
-    //   // console.log(message + " is the warning");
-    //   var AlarmNotification = {
-    //     type: "WARNING",
-    //     device: options.devid,
-    //     created: Date.now(),
-    //     message: message,
-    //     notified: true,
-    //     seen: false
-    //   }
-
-    //   this.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => { if In use this format it doesn't understand whats contained in this, tried binding it nothing.
-    //     this.createNotification(this.db, AlarmNotification, options);
-    //   })
-    // }
 
     this.info = function (message: string) {
       var AlarmNotification = {

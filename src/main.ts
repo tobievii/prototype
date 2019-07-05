@@ -83,7 +83,7 @@ eventHub.on("device", (data: any) => {
 })
 
 eventHub.on("warningNotification", (data: any) => {
-  io.to(data.device.apikey).emit("warningNotification", data);
+  io.sockets.emit("warningNotification", data.event);
 })
 
 eventHub.on("configChange", () => {
