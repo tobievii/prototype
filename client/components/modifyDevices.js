@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Modal from 'react-modal';
 import { CodeBlock } from "./codeBlock.jsx"
 import { ShareList } from './ShareList.jsx'
-
+import Media from "react-media";
 const customStyles = {
     content: {
         top: '50%',
@@ -15,7 +15,29 @@ const customStyles = {
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto',
         padding: "0",
-        width: "765px",
+        width: "50%",
+        height: "85%"
+    },
+
+    overlay: {
+        background: "rgba(23, 47, 64, 0.85)",
+        zIndex: 1002
+    }
+};
+
+const customStylesMobile = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: '50%',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        border: "none",
+        backgroundColor: "rgba(0, 0, 0, 0.0)",
+        maxHeight: 'calc(100vh - 210px)',
+        overflowY: 'auto',
+        padding: "0",
+        width: "100%",
         height: "85%"
     },
 
@@ -119,6 +141,24 @@ export default class ModifyDevices extends Component {
             }
         }
     }
+ 
+    clearGateway = () => {
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            return (
+                <option key="clear" value=" | " style={{ color: "red" }}>clear</option>
+            )
+        }
+        else null
+    }
+
+    clearGateway = () => {
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            return (
+                <option key="clear" value=" | " style={{ color: "red" }}>clear</option>
+            )
+        }
+        else null
+    }
 
     assignModify = () => {
         var devices = this.props.devices.filter((device) => { return device.selected == true; })
@@ -153,7 +193,31 @@ export default class ModifyDevices extends Component {
                     }
                 }
                 else {
-                    null;
+                    var devices = this.props.devices.filter((device) => { return device.selected == true; })
+                    for (var i in devices) {
+                        fetch('/api/v3/iotnxt/setgatewaydevice', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                key: devices[i].key,
+                                id: devices[i].devid,
+                                GatewayId: GatewayId,
+                                HostAddress: HostAddress
+                            })
+                        }).then(response => response.json()).then((data) => {
+                            if (data.nModified == 1) {
+                                this.setState({ confirmation: "Gateway successfully cleared from device" })
+                                this.props.closeModel()
+                                this.setState({ confirmation: "" })
+                            }
+                            else {
+                                this.setState({ confirmation: "Gateway could not be cleared from device" })
+                            }
+                        }).catch(err => console.error(this.props.url, err.toString()))
+                    }
                 }
             }
         }
@@ -175,6 +239,7 @@ export default class ModifyDevices extends Component {
                                     if (serverresponse.result == "success") {
                                         this.setState({ confirmation: "Workflow script code Successfully Modified" })
                                         this.props.closeModel()
+                                        this.setState({ confirmation: "" })
                                     }
                                     else {
                                         this.setState({ confirmation: "Could not modify Workflow script code" })
@@ -214,11 +279,11 @@ export default class ModifyDevices extends Component {
                                 if (result.nModified == 1) {
                                     this.setState({ confirmation: "Dashboard preset Successfully Modified" })
                                     this.props.closeModel()
+                                    this.setState({ confirmation: "" })
                                 }
                                 else {
                                     this.setState({ confirmation: "Could not modify Dashboard preset" })
                                 }
-
                             }).catch(err => {
                                 console.error(err.toString())
                                 if (cb) { cb(err, undefined); }
@@ -234,32 +299,62 @@ export default class ModifyDevices extends Component {
 
     popupInfo = () => {
         return (
-            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                {this.modificationPreview()}
-                <div>
-                    Search for your device or gateway :
+            <Media query="(max-width: 599px)">
+                {matches =>
+                    matches ? (
+                        <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                            {this.modificationPreview()}
+                            <div>
+                                Search for your device or gateway :
                 </div>
+                            <div className="row addDevice">
+                                <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                                    <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                                </div>
+                                <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer", width: "80%" }}>
+                                    <select style={{ width: "100%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                        <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
+                                        <option value='clear' className="optiondropdown" style={{ width: "90%" }} > Clear</option >
+                                        {this.options()}
+                                    </select>
+                                </div>
+                                <div className="row" style={{ cursor: "pointer", cursor: "not-allowed" }}>
+                                    <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "13px" }} onClick={this.assignModify}>
+                                        ASSIGN <i className="fas fa-chevron-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div style={{ color: "red" }}>{this.state.confirmation}</div>
+                        </div >
+                    ) : (
+                            <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                                {this.modificationPreview()}
+                                <div>
+                                    Search for your device or gateway :
+            </div>
+                                <div className="row addDevice">
+                                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                                    </div>
 
-                <div className="row addDevice">
-                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
-                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
-                    </div>
-
-                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
-                            <option value='DEFAULT' disabled>Select option...</option>
-                            {this.options()}
-                        </select>
-                    </div>
-
-                    <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
-                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
-                            ASSIGN <i className="fas fa-chevron-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div style={{ color: "red" }}>{this.state.confirmation}</div>
-            </div >
+                                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                            <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
+                                            {this.clearGateway()}
+                                            {this.options()}
+                                        </select>
+                                    </div>
+                                    <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
+                                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
+                                            ASSIGN <i className="fas fa-chevron-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div style={{ color: "red" }}>{this.state.confirmation}</div>
+                            </div >
+                        )
+                }
+            </Media>
         )
     }
 
@@ -267,9 +362,19 @@ export default class ModifyDevices extends Component {
         return (
             <div >
                 <center>
-                    <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        {this.modification()}
-                    </Modal>
+                    <Media query="(max-width: 599px)">
+                        {matches =>
+                            matches ? (
+                                <Modal style={customStylesMobile} isOpen={this.props.isOpen}>
+                                    {this.modification()}
+                                </Modal>
+                            ) : (
+                                    <Modal style={customStyles} isOpen={this.props.isOpen}>
+                                        {this.modification()}
+                                    </Modal>
+                                )
+                        }
+                    </Media>
                     <ShareList account={this.props.account} isOpen={this.props.isOpenshare} username={this.props.username} closeModel={this.props.closeModel} type={"multi"} chosen={this.props.devices.filter((device) => { return device.selected == true })} />
                 </center>
             </div >
