@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { plugins } from "../plugins/config.ts"
 import Modal from 'react-modal';
-
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import config from '../plugins/bosch/config.json'
 const customStyles = {
     content: {
         top: '50%',
@@ -36,7 +36,9 @@ export default class AddDevice extends Component {
         wifipass: "",
         code: [],
         pairedDevices: [],
-        bleDevices: []
+        bleDevices: [],
+        value: JSON.stringify(config),
+        copied: false
     }
 
     constructor(props) {
@@ -60,8 +62,9 @@ export default class AddDevice extends Component {
             this.setState({ popupInfo: "public" })
         } else if ((this.state.search == "Efento" || this.state.search == "efento") && call == "select") {
             this.setState({ popupInfo: "Efento" })
-        } else if ((this.state.search == "Teltonika" || this.state.search == "teltonika") && call == "select") {
-            this.setState({ popupInfo: "Teltonika" })
+        } else if (this.state.search == "Bosch TRACI" && call == "select") {
+            this.setState({ popupInfo: "Bosch TRACI" })
+
         } else {
             return null;
         }
@@ -69,6 +72,18 @@ export default class AddDevice extends Component {
 
     search = evt => {
         this.setState({ search: evt.target.value.toString() })
+    }
+
+    nodeRedConfig = () => {
+        return (
+            <div>
+              <CopyToClipboard text={this.state.value}
+                onCopy={() => this.setState({copied: true})}>
+                <button>Copy to clipboard</button>
+              </CopyToClipboard>
+              {this.state.copied ? <span style={{color: 'red'}}>Copied.</span> : null}
+            </div>
+          );
     }
 
     popupInfo = () => {
@@ -91,6 +106,7 @@ export default class AddDevice extends Component {
                                 <option value="IoT.nxt raptor" className="optiondropdown" style={{ width: "90%" }} >IoT.nxt raptor</option>
                                 <option value="Teltonika" className="optiondropdown" style={{ width: "90%" }} >Teltonika</option>
                                 <option value="Efento" className="optiondropdown" style={{ width: "90%" }} >Efento</option>
+                                <option value="Bosch TRACI" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
                             </select>
                         </div>
 
@@ -130,12 +146,20 @@ export default class AddDevice extends Component {
                     Port: <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">5683</span></span>
                 </div>
             )
-        } else if (this.state.popupInfo == "Teltonika") {
+        } else if (this.state.popupInfo == "Bosch TRACI") {
 
-            var SettingsPanel = plugins[5].SettingsPanel
             return (
-                <div style={{ background: "#16202C", paddingBottom: 14 }}>
-                    <SettingsPanel {...this.props} />
+                <div style={{ background: "#16202C", paddingLeft: "20px", paddingBottom: "45px" }}>
+                    <br></br>
+                    <h5>Bosch Asset Tracking Tag</h5>
+                    <br />
+                    The below config is is to be uploaded to Node-Red on a MultiTech MultiConnect Conduit.
+                    <br /><br />
+                    Please ensure that your Gateway is set up according to your region and set-up correctly.
+                    <br /><br />
+                    If you're using a different Gateway, please contact your Gateway manufacturer for configuration.
+                    Node-Red config: 
+                    <span className="commanderBgPanel" style={{ float: "right", width: "60%", marginRight: "15px", textAlign: "center" }}><span className="spot">{this.nodeRedConfig()}</span></span>
                 </div>
             )
         }
