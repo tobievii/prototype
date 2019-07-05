@@ -151,6 +151,15 @@ export default class ModifyDevices extends Component {
         else null
     }
 
+    clearGateway = () => {
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            return (
+                <option key="clear" value=" | " style={{ color: "red" }}>clear</option>
+            )
+        }
+        else null
+    }
+
     assignModify = () => {
         var devices = this.props.devices.filter((device) => { return device.selected == true; })
         if (this.props.modification == "SET IOTNXT GATEWAY") {
