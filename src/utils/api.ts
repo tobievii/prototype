@@ -342,9 +342,9 @@ export class Prototype extends EventEmitter {
         })
     }
 
-    setdevicegateway(id: string, GatewayId: string, HostAddress: string, cb: any) {
+    setdevicegateway(id: string, GatewayId: string, HostAddress: string, options: any, cb: any) {
         this.state(id, (err: any, device: any) => {
-            this.plugins.iotnxt.setgatewaydevice(device.key, id, GatewayId, HostAddress, (err: Error, result: any) => {
+            this.plugins.iotnxt.setgatewaydevice(device.key, id, GatewayId, HostAddress, options, (err: Error, result: any) => {
                 cb(err, result);
             })
         })
