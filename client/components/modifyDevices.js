@@ -142,6 +142,15 @@ export default class ModifyDevices extends Component {
         }
     }
 
+    clearGateway = () => {
+        if (this.props.modification == "SET IOTNXT GATEWAY") {
+            return (
+                <option key="clear" value=" | " style={{ color: "red" }}>clear</option>
+            )
+        }
+        else null
+    }
+
     assignModify = () => {
         var devices = this.props.devices.filter((device) => { return device.selected == true; })
         if (this.props.modification == "SET IOTNXT GATEWAY") {
@@ -175,7 +184,31 @@ export default class ModifyDevices extends Component {
                     }
                 }
                 else {
-                    null;
+                    var devices = this.props.devices.filter((device) => { return device.selected == true; })
+                    for (var i in devices) {
+                        fetch('/api/v3/iotnxt/setgatewaydevice', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                key: devices[i].key,
+                                id: devices[i].devid,
+                                GatewayId: GatewayId,
+                                HostAddress: HostAddress
+                            })
+                        }).then(response => response.json()).then((data) => {
+                            if (data.nModified == 1) {
+                                this.setState({ confirmation: "Gateway successfully cleared from device" })
+                                this.props.closeModel()
+                                this.setState({ confirmation: "" })
+                            }
+                            else {
+                                this.setState({ confirmation: "Gateway could not be cleared from device" })
+                            }
+                        }).catch(err => console.error(this.props.url, err.toString()))
+                    }
                 }
             }
         }
@@ -197,6 +230,7 @@ export default class ModifyDevices extends Component {
                                     if (serverresponse.result == "success") {
                                         this.setState({ confirmation: "Workflow script code Successfully Modified" })
                                         this.props.closeModel()
+                                        this.setState({ confirmation: "" })
                                     }
                                     else {
                                         this.setState({ confirmation: "Could not modify Workflow script code" })
@@ -236,6 +270,7 @@ export default class ModifyDevices extends Component {
                                 if (result.nModified == 1) {
                                     this.setState({ confirmation: "Dashboard preset Successfully Modified" })
                                     this.props.closeModel()
+                                    this.setState({ confirmation: "" })
                                 }
                                 else {
                                     this.setState({ confirmation: "Could not modify Dashboard preset" })
@@ -270,6 +305,7 @@ export default class ModifyDevices extends Component {
                                 <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer", width: "80%" }}>
                                     <select style={{ width: "100%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
                                         <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
+                                        <option value='clear' className="optiondropdown" style={{ width: "90%" }} > Clear</option >
                                         {this.options()}
                                     </select>
                                 </div>
@@ -295,6 +331,7 @@ export default class ModifyDevices extends Component {
                                     <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
                                         <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
                                             <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
+                                            {this.clearGateway()}
                                             {this.options()}
                                         </select>
                                     </div>
