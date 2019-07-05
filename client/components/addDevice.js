@@ -106,7 +106,7 @@ export default class AddDevice extends Component {
                                 <option value="IoT.nxt raptor" className="optiondropdown" style={{ width: "90%" }} >IoT.nxt raptor</option>
                                 <option value="Teltonika" className="optiondropdown" style={{ width: "90%" }} >Teltonika</option>
                                 <option value="Efento" className="optiondropdown" style={{ width: "90%" }} >Efento</option>
-                                <option value="Bosch TRACI" className="commanderBgPanel commanderBgPanelClickable" style={{ width: "90%" }} />
+                                <option value="Bosch TRACI" className="optiondropdown" style={{ width: "90%" }} >Bosch TRACI</option>
                             </select>
                         </div>
 
