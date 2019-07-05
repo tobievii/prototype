@@ -62,6 +62,12 @@ class App extends Component {
                     this.setState({ account });
                 })
             })
+
+            socket.on("warningNotification", a => {
+                p.getAccount(account => {
+                    this.setState({ account });
+                })
+            })
         });
 
         p.getStates((states) => { this.setState({ states }) })
