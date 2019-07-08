@@ -7,6 +7,24 @@ export class LineChart extends React.Component {
     lasttimestamp = "";
     final = false;
 
+    state = {
+        color: "#111111",
+        background: "#11cc88",
+        hourly: JSON.stringify({ "hourly": false }),
+        daily: JSON.stringify({ "daily": false }),
+        monthly: JSON.stringify({ "monthly": false }),
+        buttonText: "SEND"
+    }
+
+    options;
+
+    setOptions = (options) => {
+        this.setState(_.merge(this.state, options), () => {
+            this.updatedOptions();
+        })
+        this.props.dash.setOptions(options);
+    }
+
     constructor(props) {
         super(props);
 
@@ -107,6 +125,22 @@ export class LineChart extends React.Component {
         }
     }
 
+    updatedOptions = () => {
+        var options = [
+            { name: "hourly", type: "radio", value: this.state.hourly },
+            { name: "daily", type: "radio", value: this.state.daily },
+            { name: "monthly", type: "radio", value: this.state.monthly },
+        ]
+        this.options = options;
+    }
+
+    componentDidMount() {
+        if (this.props.data.options) {
+            this.setState(_.merge(this.state, this.props.data.options));
+        }
+        this.updatedOptions();
+    }
+
     componentWillMount = () => {
         this.getdata();
     }
@@ -200,11 +234,11 @@ export class LineChart extends React.Component {
     render() {
         if (this.state.series != null) {
             if ((this.state.series[0].data[0].String && this.final == false) || this.state.series[0].data[0].length == 0) {
-                return <Widget label={this.props.data.dataname} dash={this.props.dash}><div>This widget doesn't use strings</div></Widget>
+                return <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}><div>This widget doesn't use strings</div></Widget>
             } else {
                 return (
                     <div>
-                        <Widget label={this.props.data.dataname} dash={this.props.dash}>
+                        <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
                             <div id="chartz">
                                 <ReactApexChart options={this.state.options} series={this.state.series} type="area" />
                             </div>

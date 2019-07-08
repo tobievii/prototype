@@ -7,6 +7,7 @@ import { OptionsCode } from "./options/options_code.jsx"
 import { OptionsBool } from "./options/options_bool.jsx"
 import { OptionsTime } from "./options/options_time.jsx"
 import { OptionsDropdown } from "./options/options_dropdown.jsx"
+import { OptionsRadio } from "./options/options_radio.jsx"
 
 export class Widget extends React.Component {
   state = {
@@ -35,6 +36,7 @@ export class Widget extends React.Component {
         if (option.type == "bool") { return (<OptionsBool key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "time") { return (<OptionsTime key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "dropdown") { return (<OptionsDropdown key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "radio") { return (<OptionsRadio key={i} option={option} setOptions={this.props.setOptions} />) }
 
         return (<div key={i}></div>)
 
