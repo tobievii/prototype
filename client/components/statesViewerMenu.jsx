@@ -146,7 +146,7 @@ export class StatesViewerMenu extends Component {
                     return (
                         <div>
                             < select id="devices" style={{ width: "120px", marginTop: "7px" }} onChange={this.search} defaultValue={'DEFAULT'}>
-                                <option value='DEFAULT' disabled>MODIFY...</option>
+                                <option value='DEFAULT' style={{ color: "gray" }} disabled>MODIFY...</option>
                                 <option className="optiondropdown" value="DASHBOARD PRESET" style={{ width: "90%" }}>DASHBOARD PRESET</option>
                                 <option className="optiondropdown" value="SCRIPT PRESET" style={{ width: "90%" }} >SCRIPT PRESET</option>
                                 <option className="optiondropdown" className="SHARE" value="SHARE" style={{ width: "90%" }} >SHARE</option>
