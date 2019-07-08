@@ -1261,20 +1261,17 @@ input[type="color"] {
 }
 
 select {
-background : #1b394d;
+background : rgb(3, 4, 5);
 color: grey ;
 border:1px;
 border-color: grey
 }
 option{
-background : rgb(16, 23, 32);
-color:grey
+background : rgb(3, 4, 5);
+color:white
 }
 
-option:hover{
-  background : rgb(16, 23, 32);
-  color:white
-}
+
 
 .protoButtonClickable:hover {
   color: #f3353a;
@@ -1451,6 +1448,10 @@ div.rowList.dashboardDevices {
   display: inline-block;
   left: -100%;
 
+}
+
+#settingsMenu::-webkit-scrollbar{
+display:none
 }
 
 .dropdown-content {
