@@ -504,7 +504,6 @@ export class PluginNotifications extends Plugin {
               };
               // this.createNotification(this.db, WarningNotificationL, device)
               db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-                console.log("here")
                 this.eventHub.emit("warningNotification", {
                   plugin: "notifications",
                   event: {
