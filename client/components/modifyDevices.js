@@ -53,7 +53,9 @@ export default class ModifyDevices extends Component {
         serverGateways: [],
         preview: "",
         search: "",
-        confirmation: ""
+        confirmation: "",
+        replacedash: "",
+        selecticon: "far fa-square"
     }
 
     componentWillMount = () => {
@@ -140,15 +142,6 @@ export default class ModifyDevices extends Component {
                 }
             }
         }
-    }
- 
-    clearGateway = () => {
-        if (this.props.modification == "SET IOTNXT GATEWAY") {
-            return (
-                <option key="clear" value=" | " style={{ color: "red" }}>clear</option>
-            )
-        }
-        else null
     }
 
     clearGateway = () => {
@@ -265,12 +258,16 @@ export default class ModifyDevices extends Component {
                                 }
                                 else { null }
                             }
-                            for (var d in devices[r].layout) {
-                                if (devices[r].layout[d].i !== "0") {
-                                    dashboard.push(devices[r].layout[d])
+                            if (this.state.selecticon == "far fa-square" && this.state.replacedash == "") {
+                                for (var d in devices[r].layout) {
+                                    if (devices[r].layout[d].i !== "0") {
+                                        dashboard.push(devices[r].layout[d])
+                                    }
+                                    else { null }
                                 }
-                                else { null }
+
                             }
+                            else { null }
 
                             fetch("/api/v3/dashboard", {
                                 method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
@@ -297,6 +294,33 @@ export default class ModifyDevices extends Component {
         }
     }
 
+    replaceMessage = () => {
+        if (this.props.modification == "DASHBOARD PRESET") {
+            return (
+                <div style={{ color: "white" }}>(By Default new dashboard will be added to current dashboard)</div>
+            )
+        }
+        else { null }
+    }
+
+    replaceDashboard = () => {
+        if (this.props.modification == "DASHBOARD PRESET") {
+            return (<p onClick={this.selected}>Replace current Dashboard <i className={this.state.selecticon} style={{ color: this.state.replacedash }} /></p>)
+        }
+        else { null }
+    }
+
+    selected = () => {
+        if (this.state.selecticon == "far fa-square" && this.state.replacedash == "") {
+            this.setState({ selecticon: "fas fa-check" })
+            this.setState({ replacedash: "green" })
+        }
+        else {
+            this.setState({ selecticon: "far fa-square" })
+            this.setState({ replacedash: "" })
+        }
+    }
+
     popupInfo = () => {
         return (
             <Media query="(max-width: 599px)">
@@ -305,14 +329,14 @@ export default class ModifyDevices extends Component {
                         <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
                             {this.modificationPreview()}
                             <div>
-                                Search for your device or gateway :
-                </div>
+                                Search for your device or gateway :{this.replaceMessage()}
+                            </div>
                             <div className="row addDevice">
                                 <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
                                     <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
                                 </div>
                                 <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer", width: "80%" }}>
-                                    <select style={{ width: "100%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                    <select style={{ width: "100%", padding: "8px", color: "white", marginLeft: "10px" }} onChange={this.search} defaultValue={'DEFAULT'}>
                                         <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
                                         <option value='clear' className="optiondropdown" style={{ width: "90%" }} > Clear</option >
                                         {this.options()}
@@ -324,14 +348,15 @@ export default class ModifyDevices extends Component {
                                     </a>
                                 </div>
                             </div>
+                            {this.replaceDashboard()}
                             <div style={{ color: "red" }}>{this.state.confirmation}</div>
                         </div >
                     ) : (
                             <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
                                 {this.modificationPreview()}
                                 <div>
-                                    Search for your device or gateway :
-            </div>
+                                    Search for your device or gateway :{this.replaceMessage()}
+                                </div>
                                 <div className="row addDevice">
                                     <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
                                         <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
@@ -350,6 +375,7 @@ export default class ModifyDevices extends Component {
                                         </a>
                                     </div>
                                 </div>
+                                {this.replaceDashboard()}
                                 <div style={{ color: "red" }}>{this.state.confirmation}</div>
                             </div >
                         )
