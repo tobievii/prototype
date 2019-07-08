@@ -112,13 +112,27 @@ export class PluginIotnxt extends Plugin {
     });
 
     app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
-      var gateway = {
-        GatewayId: req.body.GatewayId,
-        HostAddress: req.body.HostAddress
+      
+      if (req.body.key) {
+        // newer key method:
+        var gateway = {
+          GatewayId: req.body.GatewayId,
+          HostAddress: req.body.HostAddress
+        }
+        this.setgatewaydevice(req.user, req.body.key, gateway, (err: Error, result: any) => {
+          res.json(result);
+        })
+      } else {
+        // users only changing own devices using {id, GatewayId, HostAddress}:
+        this.db.states.update(
+          { devid:req.body.id, apikey: req.user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: req.body.GatewayId, HostAddress: req.body.HostAddress } } },
+          (err:Error, result:any) => {
+            res.json(result);
+          })      
+        //
       }
-      this.setgatewaydevice(req.user, req.body.key, gateway, (err: Error, result: any) => {
-        res.json(result);
-      })
+      
     });
 
   }

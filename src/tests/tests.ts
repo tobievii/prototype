@@ -24,7 +24,7 @@ var testAccount: any = {
 
     /* dev server:                          */
     // host: "prototype.dev.iotnxt.io",
-    // https : true
+    // https: true
 
     /* localhost:                           */
     host: "localhost",
@@ -386,6 +386,146 @@ describe("PROTOTYPE", () => {
     })
 
     /* --------------------------------------------------------------------- */
+})
 
+describe("PLUGINS", () => {
+    describe("TELTONIKA", () => {
+        var portInfo: any;
+
+        it("Register Port", function (done) {
+            //this.timeout(5000);
+            new Prototype(testAccount).setTeltonikaPort((err: any, response: any) => {
+
+                if (err) { done(new Error(err)); return }
+                if (response) {
+                    portInfo = response;
+                    if (response.apikey == testAccount.apikey && response.port) {
+                        done(); return
+                    } else {
+                        done(new Error("The port was assigned to a different user.")); return
+                    }
+                }
+            })
+        })
+
+        it("Get Port", function (done) {
+            //this.timeout(5000);
+            new Prototype(testAccount).getTeltonikaPort((err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                if (response) {
+                    if (response.port == portInfo.port) {
+                        done(); return
+                    } else {
+                        done(new Error("The port returned it not the same as the port just created.")); return
+                    }
+                }
+            })
+        })
+
+        it("send data", function (done: any) {
+            new Prototype(testAccount).teltonikaTest(portInfo.port, testAccount.host, (e: Error, result: any) => {
+                if (e) { done(e); }
+                if (result) { done(); }
+            });
+        });
+    })
+
+    describe("IOTNXT", () => {
+        var packet = {
+            id: "protTestHttpSocket",
+            data: { random: generateDifficult(32) }
+        }
+        var gateway = {
+            GatewayId: "gateway",
+            Secret: generateDifficult(16),
+            HostAddress: "greenqueue.prod.iotnxt.io",
+            PublicKey: "<RSAKeyValue><Exponent>AQAB</Exponent><Modulus>rbltknM3wO5/TAEigft0RDlI6R9yPttweDXtmXjmpxwcuVtqJgNbIQ3VduGVlG6sOg20iEbBWMCdwJ3HZTrtn7qpXRdJBqDUNye4Xbwp1Dp+zMFpgEsCklM7c6/iIq14nymhNo9Cn3eBBM3yZzUKJuPn9CTZSOtCenSbae9X9bnHSW2qB1qRSQ2M03VppBYAyMjZvP1wSDVNuvCtjU2Lg/8o/t231E/U+s1Jk0IvdD6rLdoi91c3Bmp00rVMPxOjvKmOjgPfE5LESRPMlUli4kJFWxBwbXuhFY+TK2I+BUpiYYKX+4YL3OFrn/EpO4bNcI0NHelbWGqZg57x7rNe9Q==</Modulus></RSAKeyValue>"
+        }
+
+        it("Add Gateway", function (done) {
+            new Prototype(testAccount).addgateway(gateway, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("Set Device Gateway", function (done) {
+            new Prototype(testAccount).setdevicegateway(packet.id, gateway.GatewayId, gateway.HostAddress, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("Get Gateways", function (done) {
+            new Prototype(testAccount).getgateways((err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("Remove Gateway", function (done) {
+            new Prototype(testAccount).deletegateway((err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) {
+                    if (response.err) { done(new Error(response.err)); return }
+                    else {
+                        done(); return
+                    }
+                }
+            })
+        })
+    })
+})
+
+describe("FEATURES", () => {
+    var packet = {
+        id: "protTestHttpSocket",
+        data: { random: generateDifficult(32) }
+    }
+    var code = "// uncomment below to test \"workflow\" processing \n// packet.data.test = \"testing\"\nworkflow code;\ncallback(packet); "
+    var layout = [
+        {
+            "i": "0",
+            "x": 0,
+            "y": 0,
+            "w": 8,
+            "h": 4,
+            "type": "Calendar",
+            "dataname": "calendar"
+        },]
+
+    describe("DEVICE SHARING", () => {
+        it("SHARE DEVICE", function (done) {
+            new Prototype(testAccount).shareDevice(packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("UNSHARE DEVICE", function (done) {
+            new Prototype(testAccount).unshareDevice(packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+    })
+
+    describe("WORKFLOW", () => {
+        it("ASSIGN DEVICE WORKFLOW", function (done) {
+            new Prototype(testAccount).assignDevWorkflow(code, packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+    })
+
+    describe("DASHBOARD", () => {
+        it("ASSIGN DEVICE DASHBOARD", function (done) {
+            new Prototype(testAccount).assignDevDasboard(packet.id, layout, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+    })
 })
 
