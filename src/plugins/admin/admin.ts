@@ -213,6 +213,8 @@ export class PluginAdmin extends Plugin {
       var shareDeviceNotification = {
         type: "A DEVICE WAS SHARED WITH YOU", //req.body.email
         device: req.body.dev,
+        from: req.body.person,
+        to: req.body.email,
         created: today,
         notified: true,
         seen: false
@@ -247,23 +249,16 @@ export class PluginAdmin extends Plugin {
             if (info) {
 
               res.json({ err: {}, result: { mail: "sent" } })
-              db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
-                var t = result.notifications;
-                if (result.notifications) {
-                  t.push(shareDeviceNotification)
-                } else {
-                  t = [shareDeviceNotification]
-                }
-                db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-                  io.to(req.body.email).emit("info", info)
-                  if (err) res.json(err);
-                  if (updated) res.json(updated);
-                })
-              })
               if (req.body.chosen) {
                 for (var i in req.body.chosen) {
                   db.states.update({ $and: [{ devid: req.body.chosen[i].devid, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
                   db.states.findOne({ devid: req.body.chosen[i].devid }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                    this.eventHub.emit("deviceShare", {
+                      plugin: this.name,
+                      notification: shareDeviceNotification,
+                      device: give,
+                      from: req.user.apikey
+                    })
                     db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
                   })
                 }
@@ -271,6 +266,12 @@ export class PluginAdmin extends Plugin {
               else if (!req.body.chosen) {
                 db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
                 db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                  this.eventHub.emit("deviceShare", {
+                    plugin: this.name,
+                    notification: shareDeviceNotification,
+                    device: give,
+                    from: req.user.apikey
+                  })
                   db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
                 })
               }
@@ -328,6 +329,7 @@ export class PluginAdmin extends Plugin {
       log("ADMIN\tNew Account registration: email: " + req.body.email)
 
       req.user.email = req.body.email
+      req.user.username = req.body.username;
       req.user.level = 1
       const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
