@@ -201,7 +201,7 @@ export class Account extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: this.state.form.email,
+        email: this.state.form.email.toLocaleLowerCase(),
         pass: cryptr.encrypt(this.state.form.passwordSignin)
       })
     })
