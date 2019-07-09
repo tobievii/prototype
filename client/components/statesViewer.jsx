@@ -247,7 +247,11 @@ export class StatesViewer extends Component {
       })
 
 
-      this.socket.on("notificationState", a => {
+      this.socket.on("plugin_notifications", a => {
+        this.getDevices("notification");
+      })
+
+      this.socket.on("warningNotification", a => {
         this.getDevices("notification");
       })
 
@@ -279,6 +283,7 @@ export class StatesViewer extends Component {
             for (var device in this.state.devicesServer) {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
+
             this.setState({ devicesView: states }, () => {
               if (functionCall == "initial load") {
                 this.sort(this.state.sort);
