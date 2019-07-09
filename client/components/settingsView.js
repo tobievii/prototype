@@ -56,7 +56,7 @@ export default class SettingsView extends React.Component {
     if (this.state.activeMenu !== undefined) {
       if (plugins[this.state.activeMenu]) {
         var SettingsPanel = plugins[this.state.activeMenu].SettingsPanel
-        return <SettingsPanel {...this.props} />
+        return <SettingsPanel {...this.props} updateAccount={this.props.updateAccount} />
       } else {
         //default to 0 
         this.setState({ activeMenu: 0 })
@@ -84,7 +84,7 @@ export default class SettingsView extends React.Component {
 
   render() {
     return (
-      <div className="settingsPage" style={{ background: "rgba(0,0,0,0.2)", margin: 20, overflow: "hidden" }}>
+      <div className="settingsPage" style={{ background: "rgba(0,0,0,0.2)", margin: 20, marginTop: 30, overflow: "hidden" }}>
         <Media query="(max-width: 599px)">
           {matches =>
             matches ? (
