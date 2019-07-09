@@ -27,6 +27,7 @@ import * as p from "./prototype.ts"
 
 import socketio from "socket.io-client";
 import { DeviceHistory } from "./components/device_history.jsx";
+import { ChangeUsername } from "./components/changeUsername";
 var socket = socketio({ transports: ['websocket', 'polling'] });
 
 const test = {
@@ -48,7 +49,8 @@ class App extends Component {
         registrationPanel: false,
         loginPanel: false,
         public: undefined,
-        visituser: undefined
+        visituser: undefined,
+        usernameSet: true
     };
 
     constructor(props) {
@@ -58,9 +60,11 @@ class App extends Component {
 
         socket.on("connect", a => {
             socket.on("plugin_notifications", a => {
-                p.getAccount(account => {
-                    this.setState({ account });
-                })
+                this.getAccount()
+            })
+
+            socket.on("warningNotification", a => {
+                this.getAccount()
             })
         });
 
@@ -140,6 +144,12 @@ class App extends Component {
             }
             return outputArray;
         }
+    }
+
+    getAccount = () => {
+        p.getAccount(account => {
+            this.setState({ account });
+        })
     }
 
     // socketHandler = (socketDataIn) => {
@@ -293,7 +303,7 @@ class App extends Component {
             if (this.state.account.level > 0) {
                 return (
                     <Suspense fallback={<div className="spinner"></div>}>
-                        <SettingsView />
+                        <SettingsView updateAccount={() => this.getAccount()} />
                     </Suspense>
                 )
             } else {
@@ -348,6 +358,18 @@ class App extends Component {
         }
     }
 
+    changeUsername = () => {
+        if (this.state.account) {
+            if (!this.state.account.usernameSet && this.state.account.level > 0) {
+                return (
+                    <ChangeUsername mainView={"app"} account={this.state.account} isOpen={this.state.usernameSet} closeModel={() => { this.setState({ usernameSet: false }); this.getAccount() }} />
+                )
+            } else return null;
+        } else {
+            return null
+        }
+    }
+
     render() {
         return (
             <div className="App">
@@ -355,6 +377,7 @@ class App extends Component {
                     <div>
                         <NavBar openModal={this.openModal} mainView={this.changeView} version={this.state.version} account={this.state.account} />
                         {this.addDevice()}
+                        {this.changeUsername()}
                         <Route exact path="/" component={this.home} />
                         <Route path="/recover/:recoverToken" component={this.recoverPassword} />
                         <Route exact path="/u/:username" component={this.userView} />

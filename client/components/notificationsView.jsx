@@ -66,7 +66,7 @@ export class NotificationsView extends Component {
                         <div className="alarmNotificationItem" key={notification.device + i}>
                             <i className="fas fa-bullhorn"></i>
                             <span className="newdevice" >{notification.type}</span><br />
-                            <span className="devicename">{notification.device}</span><br />
+                            <span className="devicename">{notification.device} {notification.message}</span><br />
                             <span className="lastseen">{moment(notification.created).fromNow()}</span>
                         </div>
                     )
@@ -89,7 +89,7 @@ export class NotificationsView extends Component {
                         <div className="newNotificationItem" key={notification.device + i}>
                             <i className="fas fa-exclamation-circle"></i>
                             <span className="newdevice" >{notification.type}</span><br />
-                            <span className="devicename">{notification.device} has been added</span><br />
+                            <span className="devicename">{notification.from} shared "{notification.device}" with you</span><br />
                             <span className="lastseen">{moment(notification.created).fromNow()}</span>
                         </div>
                     )

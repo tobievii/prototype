@@ -224,7 +224,6 @@ export function registerExistingAccount(db: any, user: any, cb: any) {
 }
 
 export function Forgotpassword(db: any, user: any, cb: any) {
-  console.log("forgotpassword backend")
   if (user.email.length != 0) {
     if (validateEmail(user.email)) {
       db.users.find({ email: user.email }, (err: Error, result: any) => {
