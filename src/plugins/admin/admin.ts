@@ -329,6 +329,7 @@ export class PluginAdmin extends Plugin {
       log("ADMIN\tNew Account registration: email: " + req.body.email)
 
       req.user.email = req.body.email
+      req.user.username = req.body.username;
       req.user.level = 1
       const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
