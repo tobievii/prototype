@@ -93,15 +93,26 @@ export class ChangeUsername extends React.Component {
         }).catch(err => console.error(err.toString()))
     }
 
+    cancelButton = () => {
+        if (this.props.mainView == undefined || this.props.mainView == "settings") {
+            return (
+                <div className="col fas fa-times cross" style={{ flex: "0 0 40px", padding: "10px 7px 0px 13px", fontSize: "20px", margin: 10 }} onClick={() => { this.props.closeModel(); }}></div>
+            )
+        } else return null
+    }
+
     render() {
         return (
             <div style={{}}>
                 <center>
                     <Modal style={customStyles} isOpen={this.props.isOpen}>
                         <div className="container-fluid" style={{ background: "#0E1A26" }}>
-                            <h3 style={{ padding: 10, color: "rgba(174, 231, 241, 0.55)" }}> Username </h3>
+                            <div className="row">
+                                <div className="col" style={{ fontSize: 27, padding: 10, color: "rgba(174, 231, 241, 0.55)" }}> Username </div>
+                                {this.cancelButton()}
+                            </div>
                         </div>
-                        <div style={{ color: "rgba(174, 231, 241, 0.55)", padding: "10px 20px" }}>
+                        <div style={{ color: "rgb(174, 231, 241)", padding: "10px 20px" }}>
                             {/* <p>Here you can change your public username. This must be unique across the system. It will affect your public url in the form of /u/username</p> */}
                             <br /><p>Please Change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
                             <br /><input
@@ -112,8 +123,9 @@ export class ChangeUsername extends React.Component {
                                 placeholder={this.props.account.username}
                             />
                             {this.showButton()}<hr></hr>
+                            <br /><br />
                         </div>
-                        <br /><br />
+
                         <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
                             Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
                         </div>

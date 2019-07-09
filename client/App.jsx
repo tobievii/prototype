@@ -362,7 +362,7 @@ class App extends Component {
         if (this.state.account) {
             if (!this.state.account.usernameSet && this.state.account.level > 0) {
                 return (
-                    <ChangeUsername mainView={this.state.devicesView} account={this.state.account} isOpen={this.state.usernameSet} closeModel={() => { this.setState({ usernameSet: false }); this.getAccount() }} />
+                    <ChangeUsername mainView={"app"} account={this.state.account} isOpen={this.state.usernameSet} closeModel={() => { this.setState({ usernameSet: false }); this.getAccount() }} />
                 )
             } else return null;
         } else {
