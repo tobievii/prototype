@@ -13,7 +13,6 @@ export class LineChart extends React.Component {
         hourly: JSON.stringify({ "hourly": false }),
         daily: JSON.stringify({ "daily": false }),
         monthly: JSON.stringify({ "monthly": false }),
-        buttonText: "SEND"
     }
 
     options;
@@ -141,6 +140,16 @@ export class LineChart extends React.Component {
         this.updatedOptions();
     }
 
+    // onClick = () => {
+    //     //console.log(this.props)
+    //     fetch("/api/v3/data/post", {
+    //         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+    //         body: JSON.stringify({ id: this.props.state.devid, data: JSON.parse(this.state.command) })
+    //     }).then(response => response.json()).then(resp => {
+    //         // console.log(resp);
+    //     }).catch(err => console.error(err.toString()));
+    // }
+
     componentWillMount = () => {
         this.getdata();
     }
@@ -169,49 +178,75 @@ export class LineChart extends React.Component {
             this.dates = [];
             var verify = [];
 
-            if (result.length == 0) {
+            if (this.result == this.state.hourly) {// || this.state.getdata == this.state.daily || this.state.getdata == this.state.monthly) {
+                if (result.length == 0) {
+                    this.dates.push([{ String: true }]);
+                } else {
 
-                this.dates.push([{ String: true }]);
-            } else {
+                    for (var date in result) {
+                        var f = {
+                            x: new Date(result[date].x),
+                            y: parseInt(result[date].y).toFixed(0)
+                        }
+                        if (this.result == this.state.daily) {
+                            if (result.length == 0) {
+                                this.dates.push([{ String: true }]);
+                            } else {
 
-                for (var date in result) {
-                    var f = {
-                        //Limited way.
-                        //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
-                        x: new Date(result[date].x),
-                        y: parseInt(result[date].y).toFixed(0)
-                    }
-
-                    if (!Number.isNaN(parseInt(result[date].y))) {
-                        // if (date == 0) {
-                        //     console.log(result[date])
-                        //     console.log("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2)))
-                        // }
-
-                        if (typeof result[date].y == "string") {
-                            if (typeof parseInt(result[date].y) == "number") {
-                                this.dates.push([f.x, parseInt(f.y)]);
+                                for (var date in result) {
+                                    var f = {
+                                        x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                                        y: parseInt(result[date].y).toFixed(0)
+                                    }
+                                }
                             }
-                            verify.push(false);
+                        }
+                        if (this.result == this.state.monthly) {
+                            if (result.length == 0) {
+                                this.dates.push([{ String: true }]);
+                            } else {
+
+                                for (var date in result) {
+                                    var f = {
+                                        //x: new Date(result[date].x),
+                                        //y: parseInt(result[date].y).toFixed(0)
+                                    }
+                                }
+                            }
+                        }
+
+
+                        if (!Number.isNaN(parseInt(result[date].y))) {
+                            // if (date == 0) {
+                            //     console.log(result[date])
+                            //     console.log("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2)))
+                            // }
+
+                            if (typeof result[date].y == "string") {
+                                if (typeof parseInt(result[date].y) == "number") {
+                                    this.dates.push([f.x, parseInt(f.y)]);
+                                }
+                                verify.push(false);
+                            } else {
+                                verify.push(true);
+                                if (result[date].y == true) {
+                                    result[date].y = 1;
+                                } else if (result[date].y == false) {
+                                    result[date].y = 0;
+                                }
+                                var innerArr = [f.x, f.y];
+                                this.dates.push(innerArr)
+                            }
                         } else {
                             verify.push(true);
                             if (result[date].y == true) {
-                                result[date].y = 1;
+                                f.y = 1;
                             } else if (result[date].y == false) {
-                                result[date].y = 0;
+                                f.y = 0;
                             }
                             var innerArr = [f.x, f.y];
                             this.dates.push(innerArr)
                         }
-                    } else {
-                        verify.push(true);
-                        if (result[date].y == true) {
-                            f.y = 1;
-                        } else if (result[date].y == false) {
-                            f.y = 0;
-                        }
-                        var innerArr = [f.x, f.y];
-                        this.dates.push(innerArr)
                     }
                 }
 
