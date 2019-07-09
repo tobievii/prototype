@@ -17,14 +17,25 @@ export class OptionsRadio extends React.Component {
     }
 
     onKeyPress = (e) => {
-        if (e.key == "Enter") {
+        if (e.key == "Select") {
             this.apply();
         }
     }
 
-    onChange = (event) => {
-        //console.log(event.target.value)
-        this.setState({ value: event.target.value });
+    // onChange = (event) => {
+    //     //console.log(event.target.value)
+    //     this.setState({ value: event.target.value });
+    // }
+
+    onChange(event) {
+        this.setState({ value: event.target.value, unsavedChanges: true }, () => {
+        });
+    }
+
+    onSet() {
+        return (e) => {
+            this.apply();
+        }
     }
 
     render() {
