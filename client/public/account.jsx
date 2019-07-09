@@ -159,7 +159,7 @@ export class Account extends Component {
     };
   };
 
-  checkUpdateUsername = (username, cb) => {
+  checkUpdateUsername = (username) => {
     fetch('/api/v3/account/checkupdateusername', {
       method: 'POST',
       headers: {

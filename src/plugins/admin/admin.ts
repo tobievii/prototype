@@ -330,6 +330,7 @@ export class PluginAdmin extends Plugin {
 
       req.user.email = req.body.email
       req.user.username = req.body.username;
+      req.user.usernameSet = true;
       req.user.level = 1
       const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
