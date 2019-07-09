@@ -360,7 +360,7 @@ class App extends Component {
 
     changeUsername = () => {
         if (this.state.account) {
-            if (!this.state.account.usernameSet && this.state.account.level > 0) {
+            if (!this.state.account.usernameSet && this.state.account.level > 0 && this.state.account.username.length == 32) {
                 return (
                     <ChangeUsername mainView={"app"} account={this.state.account} isOpen={this.state.usernameSet} closeModel={() => { this.setState({ usernameSet: false }); this.getAccount() }} />
                 )

@@ -103,6 +103,7 @@ export class ShareList extends Component {
     }
 
     setValues = (isOpen) => {
+
         if (isOpen == true && count == 0) {
             count++;
             if (this.props.type) {
@@ -158,7 +159,7 @@ export class ShareList extends Component {
                     newDeviceList.push("|");
                 }
             });
-            temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email })
+            temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email && users.username !== this.props.account.username })
             for (var look in this.state.shared) {
                 for (var i in temp) {
                     if (temp[i].sharekey == this.state.shared[look]) {
@@ -176,10 +177,10 @@ export class ShareList extends Component {
                 {
                     this.state.userSearched.map((user, i) => {
                         if (user.shared == "no") {
-                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <i className={user.icon} style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /></div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.username} <i className={user.icon} style={{ float: "right" }} onClick={(e) => this.handleActionCall(user)} /></div>
                         }
                         else {
-                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.email} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.sharekey)}>Revoke Sharing </div></div>
+                            return <div id={user.email} key={i} className="commanderBgPanel commanderBgPanelClickable" style={{ display: this.state.checkboxstate }}>{user.username} <div style={{ float: "right" }} onClick={(e) => this.unshare(user.sharekey)}>Revoke Sharing </div></div>
                         }
                     })
                 }
