@@ -241,7 +241,8 @@ export class PluginAdmin extends Plugin {
             to: req.body.email,
             subject: req.body.subject,
             text: req.body.text,
-            html: req.body.html
+            html: req.body.html,
+            attachments: req.body.attachments
           }
 
           smtpTransport.sendMail(mail, (err: any, info: any, packet: any) => {

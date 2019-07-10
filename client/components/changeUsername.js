@@ -21,7 +21,7 @@ const customStyles = {
     },
     //bacground of Pop up Modal on search
     overlay: {
-        background: "rgba(23, 47, 64, 0.85)",
+        background: "rgba(23, 47, 64, 0.9)",
         zIndex: 1002
     }
 };
@@ -114,7 +114,7 @@ export class ChangeUsername extends React.Component {
                         </div>
                         <div style={{ color: "rgb(174, 231, 241)", padding: "10px 20px" }}>
                             {/* <p>Here you can change your public username. This must be unique across the system. It will affect your public url in the form of /u/username</p> */}
-                            <br /><p>Please Change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
+                            <br /><p>Please change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
                             <br /><input
                                 style={{ width: "50%" }}
                                 value={this.state.username}
