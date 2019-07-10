@@ -436,4 +436,40 @@ Device Dashboard
         })
     }
     /*-----------------------------------------------------------------------------------------------*/
+
+    /*
+CLEAR DEVICE DATA & WORKFLOW
+*/
+    //CLEAR DEVICE DATA
+    clearDeviceData(id: any, cb: Function) {
+        request.post(this.uri + "/api/v3/state/clear", { headers: this.headers, json: { id: id } }, (err, res, body) => {
+            if (err) cb(err);
+            else if (body) {
+                if (body.nModified == 1) {
+                    cb(null, body);
+                } else {
+                    cb(body);
+                }
+            }
+        });
+    }
+
+    //CEAR DEVICE DATA & HISTORY
+    clearDevDataHist(id: any, cb: Function) {
+        this.state(id, (err: any, device: any) => {
+            var devices = []
+            devices.push(device)
+            request.post(this.uri + "/api/v3/state/clear", { headers: this.headers, json: { id: devices, type: "multi", clearhistory: true } }, (err, res, body) => {
+                if (err) cb(err);
+                else if (body) {
+                    if (body.ok == 1) {
+                        cb(null, body);
+                    } else {
+                        cb(body);
+                    }
+                }
+            });
+        })
+    }
+    /*-----------------------------------------------------------------------------------------------*/
 }

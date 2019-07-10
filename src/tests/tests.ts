@@ -538,5 +538,21 @@ describe("FEATURES", () => {
             })
         })
     })
+
+    describe("CLEAR DATA", () => {
+        it("CLEAR DEVICE DATA", function (done) {
+            new Prototype(testAccount).clearDeviceData(packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("CLEAR DEVICE DATA & HISTORY", function (done) {
+            new Prototype(testAccount).clearDevDataHist(packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+    })
 })
 
