@@ -56,18 +56,19 @@ export class iotnxt {
             });
     }
 
-    setgatewaydevicefunction(key: string, id: string, GatewayId: string, HostAddress: string, cb: Function) {
+    setgatewaydevicefunction(key: string, id: string, GatewayId: string, HostAddress: string, options: any, cb: Function) {
         var setgatewayPacket = { key, id, GatewayId, HostAddress }
+        if (options == "devid") { delete setgatewayPacket.key }
         request.post(this.uri + "/api/v3/iotnxt/setgatewaydevice", {
             headers: this.parent.headers,
             json:
                 setgatewayPacket
         }
             , (err, res, body) => {
-                if (err) { if (cb) cb(err); }
+                if (err) { cb(new Error(body.err)); return; }
                 if (body) {
-                    if (body.err) { cb(new Error(body.err)); return; }
-                    if (body.n == 1) { cb(null, body); return; }
+                    if (body.nModified == 1) { cb(null, body); return; }
+                    else { cb(new Error(body.err)); return; }
                 }
             });
     }
