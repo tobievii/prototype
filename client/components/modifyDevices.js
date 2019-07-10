@@ -54,8 +54,9 @@ export default class ModifyDevices extends Component {
         preview: "",
         search: "",
         confirmation: "",
-        replacedash: "",
-        selecticon: "far fa-square"
+        replacedash: "white",
+        selecticon: "far fa-square",
+        clearhistory: false
     }
 
     componentWillMount = () => {
@@ -175,6 +176,7 @@ export default class ModifyDevices extends Component {
                                 HostAddress: HostAddress
                             })
                         }).then(response => response.json()).then((data) => {
+                            this.setState({ confirmation: "Pleasw Wait ..." })
                             if (data.nModified == 1) {
                                 this.setState({ confirmation: "Gateway Successfully Modified" })
                                 this.props.closeModel()
@@ -201,6 +203,7 @@ export default class ModifyDevices extends Component {
                                 HostAddress: HostAddress
                             })
                         }).then(response => response.json()).then((data) => {
+                            this.setState({ confirmation: "Pleasw Wait ..." })
                             if (data.nModified == 1) {
                                 this.setState({ confirmation: "Gateway successfully cleared from device" })
                                 this.props.closeModel()
@@ -229,6 +232,7 @@ export default class ModifyDevices extends Component {
                                 body: JSON.stringify({ id: devices[i].devid, code: this.props.devices[dev].workflowCode })
                             })
                                 .then(response => response.json()).then(serverresponse => {
+                                    this.setState({ confirmation: "Pleasw Wait ..." })
                                     if (serverresponse.result == "success") {
                                         this.setState({ confirmation: "Workflow script code Successfully Modified" })
                                         this.props.closeModel()
@@ -258,7 +262,7 @@ export default class ModifyDevices extends Component {
                                 }
                                 else { null }
                             }
-                            if (this.state.selecticon == "far fa-square" && this.state.replacedash == "") {
+                            if (this.state.selecticon == "far fa-square" && this.state.replacedash == "white") {
                                 for (var d in devices[r].layout) {
                                     if (devices[r].layout[d].i !== "0") {
                                         dashboard.push(devices[r].layout[d])
@@ -273,13 +277,16 @@ export default class ModifyDevices extends Component {
                                 method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                                 body: JSON.stringify({ key: devices[r].key, layout: dashboard })
                             }).then(response => response.json()).then(result => {
+                                this.setState({ confirmation: "Pleasw Wait ..." })
                                 if (result.nModified == 1) {
                                     this.setState({ confirmation: "Dashboard preset Successfully Modified" })
                                     this.props.closeModel()
                                     this.setState({ confirmation: "" })
+                                    this.selected
                                 }
                                 else {
                                     this.setState({ confirmation: "Could not modify Dashboard preset" })
+                                    this.selected
                                 }
                             }).catch(err => {
                                 console.error(err.toString())
@@ -291,6 +298,40 @@ export default class ModifyDevices extends Component {
                 }
                 else { null }
             }
+        }
+
+        else if (this.props.modification == "CLEAR DEVICE DATA") {
+            fetch("/api/v3/state/clear", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id: devices, type: "multi", clearhistory: this.state.clearhistory })
+            })
+                .then(response => response.json()).then(serverresponse => {
+                    this.setState({ confirmation: "Pleasw Wait ..." })
+                    if (this.state.clearhistory == true) {
+                        if (serverresponse.n > 0) {
+                            this.setState({ confirmation: "Device(s) data and history has been cleared successfully" })
+                            this.props.closeModel()
+                            this.setState({ confirmation: "" })
+                        }
+                        else {
+                            this.setState({ confirmation: "Could not clear device(s) history" })
+                        }
+                    }
+                    else {
+                        if (serverresponse.nModified == 1) {
+                            this.setState({ confirmation: "Device(s) data has been cleared successfully" })
+                            this.props.closeModel()
+                            this.setState({ confirmation: "" })
+                        }
+                        else {
+                            this.setState({ confirmation: "Could not clear device(s) data" })
+                        }
+                    }
+                }).catch(err => console.error(err.toString()));
         }
     }
 
@@ -311,23 +352,72 @@ export default class ModifyDevices extends Component {
     }
 
     selected = () => {
-        if (this.state.selecticon == "far fa-square" && this.state.replacedash == "") {
+        if (this.state.selecticon == "far fa-square" && this.state.replacedash == "white") {
             this.setState({ selecticon: "fas fa-check" })
             this.setState({ replacedash: "green" })
+            this.setState({ clearhistory: true })
         }
         else {
             this.setState({ selecticon: "far fa-square" })
-            this.setState({ replacedash: "" })
+            this.setState({ replacedash: "white" })
+            this.setState({ clearhistory: false })
         }
     }
 
-    popupInfo = () => {
-        return (
-            <Media query="(max-width: 599px)">
-                {matches =>
-                    matches ? (
-                        <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
-                            {this.modificationPreview()}
+    warning = () => {
+        if (this.props.modification == "CLEAR DEVICE DATA") {
+            return (
+                <p style={{ color: "#f3353a" }} >This will clear entire device(s) data, history and is irreversible <i className={this.state.selecticon} style={{ color: this.state.replacedash }} onClick={this.selected} /></p>
+            )
+        }
+        else { null }
+    }
+
+    modifyModal = () => {
+        if (this.props.modification == "CLEAR DEVICE DATA") {
+            return (
+                <Media query="(max-width: 599px)">
+                    {matches =>
+                        matches ? (
+                            <div>
+                                <div className="row addDevice">
+                                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                                    </div>
+                                    <div className="row" style={{ cursor: "pointer", cursor: "not-allowed", marginLeft: "30%" }}>
+                                        <a className="commanderBgPanel commanderBgPanelClickable fail" style={{ background: "red", width: "45%", marginBottom: 10, marginTop: 3, fontSize: "12px", textAlign: "center", marginRight: "5%" }} onClick={() => { this.props.closeModel() }}>
+                                            No, leave it!
+                        </a>
+                                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "45%", marginBottom: 10, marginTop: 3, fontSize: "12px", textAlign: "center" }} onClick={this.assignModify}>
+                                            Yes, Clear it!
+                        </a>
+                                    </div>
+                                </div >
+                            </div >
+                        ) : (
+                                <div>
+                                    <div className="row addDevice">
+                                        <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                                        </div>
+                                        <div className="row" style={{ cursor: "pointer", cursor: "not-allowed", marginLeft: "30%" }}>
+                                            <a className="commanderBgPanel commanderBgPanelClickable fail" style={{ background: "red", width: "38%", marginBottom: 10, marginTop: 3, fontSize: "15px", textAlign: "center", marginRight: "5%" }} onClick={() => { this.props.closeModel() }}>
+                                                No, leave it!
+                            </a>
+                                            <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "38%", marginBottom: 10, marginTop: 3, fontSize: "15px", textAlign: "center" }} onClick={this.assignModify}>
+                                                Yes, Clear it!
+                            </a>
+                                        </div>
+                                    </div >
+                                </div >
+                            )
+                    }
+                </Media >
+            )
+        }
+        else {
+            return (
+                <Media query="(max-width: 599px)">
+                    {matches =>
+                        matches ? (<div>
                             <div>
                                 Search for your device or gateway :{this.replaceMessage()}
                             </div>
@@ -348,34 +438,55 @@ export default class ModifyDevices extends Component {
                                     </a>
                                 </div>
                             </div>
+                        </div>
+                        ) : (
+                                <div>
+                                    <div>
+                                        Search for your device or gateway :{this.replaceMessage()}
+                                    </div>
+                                    <div className="row addDevice">
+                                        <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
+                                            <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
+                                        </div>
+                                        <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
+                                            <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
+                                                <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
+                                                {this.clearGateway()}
+                                                {this.options()}
+                                            </select>
+                                        </div>
+                                        <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
+                                            <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
+                                                ASSIGN <i className="fas fa-chevron-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                    }
+                </Media>
+            )
+        }
+    }
+
+    popupInfo = () => {
+        return (
+            <Media query="(max-width: 599px)">
+                {matches =>
+                    matches ? (
+                        <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
+                            {this.modificationPreview()}
+                            {this.modifyModal()}
                             {this.replaceDashboard()}
+                            {this.warning()}
                             <div style={{ color: "red" }}>{this.state.confirmation}</div>
                         </div >
                     ) : (
                             <div className="container-fluid" style={{ background: "#16202C", padding: "10px 30px" }}>
                                 {this.modificationPreview()}
-                                <div>
-                                    Search for your device or gateway :{this.replaceMessage()}
-                                </div>
-                                <div className="row addDevice">
-                                    <div className="col" style={{ padding: "12px 10px 0px 0px", cursor: "pointer", textAlign: "center" }}>
-                                        <i className="fas fa-search" style={{ fontSize: "22px" }}></i>
-                                    </div>
-
-                                    <div className="col" style={{ padding: "3px 0px 0px 0px", cursor: "pointer" }}>
-                                        <select style={{ width: "60%", padding: "8px 8px", color: "white" }} onChange={this.search} defaultValue={'DEFAULT'}>
-                                            <option value='DEFAULT' style={{ color: "gray" }} disabled>Select option...</option>
-                                            {this.clearGateway()}
-                                            {this.options()}
-                                        </select>
-                                    </div>
-                                    <div className="col" style={{ padding: 0, cursor: "pointer", cursor: "not-allowed" }}>
-                                        <a className="commanderBgPanel commanderBgPanelClickable sucess" style={{ width: "100%", marginBottom: 10, marginTop: 3, fontSize: "19px" }} onClick={this.assignModify}>
-                                            ASSIGN <i className="fas fa-chevron-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
+                                {this.modifyModal()}
                                 {this.replaceDashboard()}
+                                {this.warning()}
                                 <div style={{ color: "red" }}>{this.state.confirmation}</div>
                             </div >
                         )

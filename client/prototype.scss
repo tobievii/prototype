@@ -1540,7 +1540,16 @@ PLUGIN
   color: White;
 }
 
+.fail{
+  background: rgba(255, 0, 0, 0.6) !important;
+  color: White;
+}
+
 .sucess:hover {
+  color: White !important;
+}
+
+.fail:hover {
   color: White !important;
 }
 

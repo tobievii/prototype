@@ -101,7 +101,7 @@ export class StatesViewerMenu extends Component {
     }
 
     search = evt => {
-        if (evt.target.value == "DASHBOARD PRESET" || evt.target.value == "SET IOTNXT GATEWAY" || evt.target.value == "SCRIPT PRESET" || evt.target.value == "SHARE") {
+        if (evt.target.value == "DASHBOARD PRESET" || evt.target.value == "SET IOTNXT GATEWAY" || evt.target.value == "SCRIPT PRESET" || evt.target.value == "SHARE" || evt.target.value == "CLEAR DEVICE DATA") {
             this.props.openModifyModal(evt.target.value.toString())
             evt.target.value = ""
         }
@@ -151,6 +151,7 @@ export class StatesViewerMenu extends Component {
                                 <option className="optiondropdown" value="SCRIPT PRESET" style={{ width: "90%" }} >SCRIPT PRESET</option>
                                 <option className="optiondropdown" className="SHARE" value="SHARE" style={{ width: "90%" }} >SHARE</option>
                                 < option className="optiondropdown" value="SET IOTNXT GATEWAY" style={{ width: "90%" }} >SET IOTNXT GATEWAY</option>
+                                < option className="optiondropdown" value="CLEAR DEVICE DATA" style={{ width: "90%", color: "red" }} >CLEAR DEVICE DATA</option>
                             </select>
                         </div >
                     )
