@@ -19,23 +19,6 @@ import {
   SignUpContainer
 } from "@src/components/login";
 import {
-  AvatarContainer,
-  BottomNavigationContainer,
-  ButtonContainer,
-  ButtonGroupContainer,
-  CheckBoxContainer,
-  InputContainer,
-  ListContainer,
-  OverflowMenuContainer,
-  PopoverContainer,
-  RadioContainer,
-  TabViewContainer,
-  TextContainer,
-  ToggleContainer,
-  TooltipContainer,
-  TopNavigationContainer
-} from "@src/containers/components";
-import {
   MenuNavigationOptions,
 } from "./options";
 // import { SignIn } from "@src/components/signIn/signIn.component";
@@ -58,21 +41,6 @@ const ThemesNavigator: NavigationContainer = createStackNavigator(
 const ComponentsNavigator: NavigationContainer = createStackNavigator(
   {
     ["Map View"]: MapViewContainer,
-    ["Button"]: ButtonContainer,
-    ["Button Group"]: ButtonGroupContainer,
-    ["CheckBox"]: CheckBoxContainer,
-    ["Toggle"]: ToggleContainer,
-    ["Radio"]: RadioContainer,
-    ["Input"]: InputContainer,
-    ["Text"]: TextContainer,
-    ["Avatar"]: AvatarContainer,
-    ["Tab View"]: TabViewContainer,
-    ["Popover"]: PopoverContainer,
-    ["Tooltip"]: TooltipContainer,
-    ["Overflow Menu"]: OverflowMenuContainer,
-    ["List"]: ListContainer,
-    ["Top Navigation"]: TopNavigationContainer,
-    ["Bottom Navigation"]: BottomNavigationContainer
   },
   {
     defaultNavigationOptions: MenuNavigationOptions
