@@ -125,3 +125,4 @@ export const SignInForm = withStyles(SignInForm2Component, (theme: ThemeType) =>
     ...textStyle.subtitle,
   },
 }));
+
