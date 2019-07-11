@@ -81,12 +81,6 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
     return (
       <ScrollableAvoidKeyboard style={themedStyle.container}>
         <View style={themedStyle.headerContainer}>
-          {/* <ProfilePhoto
-            style={themedStyle.photo}
-            resizeMode='center'
-            source={{ uri: 'https://akveo.github.io/eva-icons/fill/png/128/person.png' }}
-            button={this.renderPhotoButton}
-          /> */}
         </View>
         <SignUpForm
           style={themedStyle.formContainer}
