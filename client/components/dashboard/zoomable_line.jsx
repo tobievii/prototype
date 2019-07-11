@@ -6,28 +6,42 @@ export class LineChart extends React.Component {
     dates = [];
     lasttimestamp = "";
     final = false;
-
-    state = {
-        color: "#111111",
-        background: "#11cc88",
-        hourly: JSON.stringify({ "hourly": false }),
-        daily: JSON.stringify({ "daily": false }),
-        monthly: JSON.stringify({ "monthly": false }),
-    }
-
     options;
 
     setOptions = (options) => {
-        this.setState(_.merge(this.state, options), () => {
-            this.updatedOptions();
-        })
-        this.props.dash.setOptions(options);
+        var finalOpt = this.props.data.options;
+        for (var opt in finalOpt) {
+            if (finalOpt[opt].name == "hourly") {
+                this.setState({ hourly: finalOpt[opt].value }, () => {
+                    if (opt == 2) {
+                        this.updatedOptions();
+                        this.props.dash.setOptions(options);
+                    }
+                })
+            } else if (finalOpt[opt].name == "daily") {
+                this.setState({ daily: finalOpt[opt].value }, () => {
+                    if (opt == 2) {
+                        this.updatedOptions();
+                        this.props.dash.setOptions(options);
+                    }
+                })
+            } else if (finalOpt[opt].name == "monthly") {
+                this.setState({ monthly: finalOpt[opt].value }, () => {
+                    if (opt == 2) {
+                        this.updatedOptions();
+                        this.props.dash.setOptions(options);
+                    }
+                })
+            }
+        }
     }
 
     constructor(props) {
         super(props);
-
         this.state = {
+            hourly: false,
+            daily: false,
+            monthly: false,
             options: {
                 zoomable_line: {
                     stacked: true,
@@ -133,25 +147,24 @@ export class LineChart extends React.Component {
         this.options = options;
     }
 
-    componentDidMount() {
-        if (this.props.data.options) {
-            this.setState(_.merge(this.state, this.props.data.options));
-        }
+    componentDidMount = () => {
         this.updatedOptions();
     }
 
-    // onClick = () => {
-    //     //console.log(this.props)
-    //     fetch("/api/v3/data/post", {
-    //         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-    //         body: JSON.stringify({ id: this.props.state.devid, data: JSON.parse(this.state.command) })
-    //     }).then(response => response.json()).then(resp => {
-    //         // console.log(resp);
-    //     }).catch(err => console.error(err.toString()));
-    // }
-
     componentWillMount = () => {
         this.getdata();
+        if (this.props.data.options) {
+            var finalOpt = this.props.data.options;
+            for (var opt in finalOpt) {
+                if (finalOpt[opt].name == "hourly") {
+                    this.setState({ hourly: finalOpt[opt].value })
+                } else if (finalOpt[opt].name == "daily") {
+                    this.setState({ daily: finalOpt[opt].value })
+                } else if (finalOpt[opt].name == "monthly") {
+                    this.setState({ monthly: finalOpt[opt].value })
+                }
+            }
+        }
     }
 
     componentDidUpdate() {
@@ -178,92 +191,77 @@ export class LineChart extends React.Component {
             this.dates = [];
             var verify = [];
 
-            if (this.hourly == this.date) {
-                console.log(this.hourly == this.date, "#1 Whats this?")
-                console.log(this.hourly, "#1")
-                if (result.length == 0) {
-                    this.dates.push([{ String: true }]);
-                } else {
+            if (result.length == 0) {
+                this.dates.push([{ String: true }]);
+            } else {
+                for (var date in result) {
+                    var f = undefined;
 
-                    for (var date in result) {
-                        var f = {
-                            x: new Date(result[date].x),
-                            y: parseInt(result[date].y).toFixed(0)
-                        }
-                    }
-                }
-            }
-            else if (this.daily == this.date) {
-                console.log(this.daily == this.date, "#2 Whats this?")
-                console.log(this.daily, "#2")
-                if (result.length == 0) {
-                    this.dates.push([{ String: true }]);
-                } else {
-
-                    for (var date in result) {
-                        var f = {
+                    if (this.daily) {
+                        // console.log(this.daily == this.date, "#2 Whats this?")
+                        // console.log(this.daily, "#2")
+                        f = {
                             x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
                             y: parseInt(result[date].y).toFixed(0)
                         }
                     }
-                }
-            }
-            else if (this.monthly == this.date) {
-                console.log(this.monthly == this.date, "#3 Whats this?")
-                console.log(this.monthly, "#3")
-                if (result.length == 0) {
-                    this.dates.push([{ String: true }]);
-                } else {
-
-                    for (var date in result) {
-                        var f = {
+                    else if (this.monthly) {
+                        // console.log(this.monthly == this.date, "#3 Whats this?")
+                        // console.log(this.monthly, "#3")
+                        f = {
                             x: parseInt((new Date("." + result[date].x.substr(5, 2)))),
                             y: parseInt(result[date].y).toFixed(0)
                         }
+                    } else {
+                        // console.log(this.hourly == this.date, "#1 Whats this?")
+                        // console.log(this.hourly, "#1")
+                        f = {
+                            //Limited way.
+                            //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                            x: new Date(result[date].x),
+                            y: parseInt(result[date].y).toFixed(0)
+                        }
+                    }
+
+                    if (!Number.isNaN(parseInt(result[date].y))) {
+                        // if (date == 0) {
+                        //     console.log(result[date])
+                        //     console.log("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2)))
+                        // }
+
+                        if (typeof result[date].y == "string") {
+                            if (typeof parseInt(result[date].y) == "number") {
+                                this.dates.push([f.x, parseInt(f.y)]);
+                            }
+                            verify.push(false);
+                        } else {
+                            verify.push(true);
+                            if (result[date].y == true) {
+                                result[date].y = 1;
+                            } else if (result[date].y == false) {
+                                result[date].y = 0;
+                            }
+                            var innerArr = [f.x, f.y];
+                            this.dates.push(innerArr)
+                        }
+                    } else {
+                        verify.push(true);
+                        if (result[date].y == true) {
+                            f.y = 1;
+                        } else if (result[date].y == false) {
+                            f.y = 0;
+                        }
+                        var innerArr = [f.x, f.y];
+                        this.dates.push(innerArr)
+                    }
+                }
+
+                for (var n in verify) {
+                    if (verify[n] == true) {
+                        this.final = true;
                     }
                 }
             }
-
-            if (!Number.isNaN(parseInt(result[date].y))) {
-                // if (date == 0) {
-                //     console.log(result[date])
-                //     console.log("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2)))
-                // }
-
-                if (typeof result[date].y == "string") {
-                    if (typeof parseInt(result[date].y) == "number") {
-                        this.dates.push([f.x, parseInt(f.y)]);
-                    }
-                    verify.push(false);
-                } else {
-                    verify.push(true);
-                    if (result[date].y == true) {
-                        result[date].y = 1;
-                    } else if (result[date].y == false) {
-                        result[date].y = 0;
-                    }
-                    var innerArr = [f.x, f.y];
-                    this.dates.push(innerArr)
-                }
-            } else {
-                verify.push(true);
-                if (result[date].y == true) {
-                    f.y = 1;
-                } else if (result[date].y == false) {
-                    f.y = 0;
-                }
-                var innerArr = [f.x, f.y];
-                this.dates.push(innerArr)
-            }
-
-
-
-            for (var n in verify) {
-                if (verify[n] == true) {
-                    this.final = true;
-                }
-            }
-
 
             this.setState({
                 series: [{

@@ -18,7 +18,15 @@ export class Widget extends React.Component {
   // componentWillUpdate = (update) => {
   //   console.log()
   // }
-
+  setOption = (newoption) => {
+    var options = this.props.options;
+    for (var option in options) {
+      if (options[option].value == newoption.value && options[option].name != newoption.name) {
+        options[option].value = !newoption.value
+      }
+    }
+    this.props.setOptions(options)
+  }
 
 
   removeWidget = () => {
@@ -36,7 +44,7 @@ export class Widget extends React.Component {
         if (option.type == "bool") { return (<OptionsBool key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "time") { return (<OptionsTime key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "dropdown") { return (<OptionsDropdown key={i} option={option} setOptions={this.props.setOptions} />) }
-        if (option.type == "radio") { return (<OptionsRadio key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "radio") { return (<OptionsRadio key={i} option={option} setOptions={this.setOption} />) }
 
         return (<div key={i}></div>)
 
