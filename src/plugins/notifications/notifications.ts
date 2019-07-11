@@ -24,6 +24,7 @@ export class PluginNotifications extends Plugin {
   start: any;
   reset: any;
   p = 0;
+  config: any;
 
   publicVapidKey: any;
   privateVapidKey: any;
@@ -34,6 +35,7 @@ export class PluginNotifications extends Plugin {
     this.privateVapidKey = config.webpushkeys.privateVapidKey
     this.db = db;
     this.eventHub = eventHub;
+    this.config = config;
 
     webpush.setVapidDetails("mailto:prototype@iotnxt.com", this.publicVapidKey, this.privateVapidKey);
 
@@ -67,9 +69,10 @@ export class PluginNotifications extends Plugin {
   }
 
   timer = this.timerfunction(() => {
-    if (this.p == 0) {
-      console.log("Ran warning at " + new Date())
-      this.p = 1
+    if (this.config.redis && process.env.pm_id) {
+      if (process.env.pm_id == "0") {
+        this.getWarningNotification(this.db);
+      }
     } else {
       this.getWarningNotification(this.db);
     }
@@ -474,7 +477,7 @@ export class PluginNotifications extends Plugin {
   }
 
   getWarningNotification(db: any) {
-    //console.log("Ran warning at " + new Date())
+    console.log("Ran warning at " + new Date())
     var deviceTime: any;
 
     var now: any = new Date();
