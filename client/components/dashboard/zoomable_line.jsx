@@ -9,31 +9,22 @@ export class LineChart extends React.Component {
     options;
 
     setOptions = (options) => {
+        // console.log(options)
+        // console.log(this.props.data.options)
         var finalOpt = this.props.data.options;
-        for (var opt in finalOpt) {
-            if (finalOpt[opt].name == "hourly") {
-                this.setState({ hourly: finalOpt[opt].value }, () => {
-                    if (opt == 2) {
-                        this.updatedOptions();
-                        this.props.dash.setOptions(options);
-                    }
-                })
-            } else if (finalOpt[opt].name == "daily") {
-                this.setState({ daily: finalOpt[opt].value }, () => {
-                    if (opt == 2) {
-                        this.updatedOptions();
-                        this.props.dash.setOptions(options);
-                    }
-                })
-            } else if (finalOpt[opt].name == "monthly") {
-                this.setState({ monthly: finalOpt[opt].value }, () => {
-                    if (opt == 2) {
-                        this.updatedOptions();
-                        this.props.dash.setOptions(options);
-                    }
+        finalOpt.map((final) => {
+            if (final.name == "hourly") {
+                this.setState({ hourly: final.value })
+            } else if (final.name == "daily") {
+                this.setState({ daily: final.value })
+            } else if (final.name == "monthly") {
+                this.setState({ monthly: final.value }, () => {
+                    this.updatedOptions();
+                    this.props.dash.setOptions(options);
+                    this.getdata();
                 })
             }
-        }
+        })
     }
 
     constructor(props) {
@@ -155,15 +146,15 @@ export class LineChart extends React.Component {
         this.getdata();
         if (this.props.data.options) {
             var finalOpt = this.props.data.options;
-            for (var opt in finalOpt) {
-                if (finalOpt[opt].name == "hourly") {
-                    this.setState({ hourly: finalOpt[opt].value })
-                } else if (finalOpt[opt].name == "daily") {
-                    this.setState({ daily: finalOpt[opt].value })
-                } else if (finalOpt[opt].name == "monthly") {
-                    this.setState({ monthly: finalOpt[opt].value })
+            finalOpt.map((final) => {
+                if (final.name == "hourly") {
+                    this.setState({ hourly: final.value })
+                } else if (final.name == "daily") {
+                    this.setState({ daily: final.value })
+                } else if (final.name == "monthly") {
+                    this.setState({ monthly: final.value })
                 }
-            }
+            })
         }
     }
 
@@ -197,24 +188,21 @@ export class LineChart extends React.Component {
                 for (var date in result) {
                     var f = undefined;
 
-                    if (this.daily) {
+                    if (this.state.daily) {
                         // console.log(this.daily == this.date, "#2 Whats this?")
-                        // console.log(this.daily, "#2")
                         f = {
                             x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
                             y: parseInt(result[date].y).toFixed(0)
                         }
                     }
-                    else if (this.monthly) {
+                    else if (this.state.monthly) {
                         // console.log(this.monthly == this.date, "#3 Whats this?")
-                        // console.log(this.monthly, "#3")
                         f = {
                             x: parseInt((new Date("." + result[date].x.substr(5, 2)))),
                             y: parseInt(result[date].y).toFixed(0)
                         }
                     } else {
                         // console.log(this.hourly == this.date, "#1 Whats this?")
-                        // console.log(this.hourly, "#1")
                         f = {
                             //Limited way.
                             //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
