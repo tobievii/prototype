@@ -24,13 +24,13 @@ interface ComponentProps {
   onForgotPasswordPress: () => void;
 }
 
-export type SignIn2Props = ThemedComponentProps & ComponentProps;
+export type SignInProps = ThemedComponentProps & ComponentProps;
 
 interface State {
   formData: SignInFormData | undefined;
 }
 
-class SignInComponent extends React.Component<SignIn2Props> {
+class SignInComponent extends React.Component<SignInProps> {
 
   public state: State = {
     formData: undefined,
