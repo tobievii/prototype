@@ -158,13 +158,15 @@ export function init(app: any, db: any) {
       db.users.find({ level: { $gt: 0 } }, (err: Error, userList: any) => {
         var nameList: any = [];
         for (var user of userList) {
-          nameList.push({
-            email: user.email,
-            username: user.username,
-            selected: "deselected",
-            sharekey: user.publickey,
-            shared: "no"
-          });
+          if (user.username != null && user.username != undefined) {
+            nameList.push({
+              email: user.email,
+              username: user.username,
+              selected: "deselected",
+              sharekey: user.publickey,
+              shared: "no"
+            });
+          }
         }
         resolve(nameList);
       });

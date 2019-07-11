@@ -46,23 +46,31 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
-
-    } else if (this.props.notification.type == "INFO") {
-      this.props.notification.type = "INFO"
     }
 
-    if (this.props.notification.type == "NEW DEVICE ADDED" || this.props.notification.type == "INFO") {
+    if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="newNotificationItem">
             <i className="fas fa-exclamation-circle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" has been successfully added.</span><br />
             <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
 
+      )
+    } else if (this.props.notification.type == "INFO") {
+      return (
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="newNotificationItem">
+            <i className="fas fa-exclamation-circle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
+            <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
       )
     }
 
@@ -72,7 +80,7 @@ export class Notification extends Component {
         <div className="newNotificationItem">
           <i className="fas fa-exclamation-circle"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename">{this.device()} message: {this.message()}</span><br />
+          <span className="devicename">{this.props.notification.from} shared "{this.props.notification.device}" with you.</span><br />
           <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
         </div>
       )
@@ -85,7 +93,7 @@ export class Notification extends Component {
           <div className="alarmNotificationItem">
             <i className="fas fa-bullhorn"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
             <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
@@ -93,14 +101,24 @@ export class Notification extends Component {
       )
     }
 
-    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING" || this.props.notification.type == "WARNING") {
+    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
-
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="warningNotificationItem">
             <i className="fas fa-exclamation-triangle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" has not been seen for 24hrs.</span><br />
+            <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
+      )
+    } else if (this.props.notification.type == "WARNING") {
+      return (
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="warningNotificationItem">
+            <i className="fas fa-exclamation-triangle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
             <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
