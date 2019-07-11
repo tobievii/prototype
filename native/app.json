@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "PROTOTYP3 Mobile",
+    "icon": "./src/assets/icons/icon.png",
+    "version": "1.0.0",
+    "slug": "PROTOTYP3",
+    "sdkVersion": "33.0.0",
+    "privacy": "public",
+    "orientation": "portrait",
+    "githubUrl": "https://github.com/IoT-nxt/prototype",
+    "ios": {
+      "bundleIdentifier": "com.iotnxt.prototype",
+      "appStoreUrl": "Enter this when app is published"
+    },
+    "android": {
+      "package": "com.iotnxt.prototype",
+      "versionCode": 17,
+      "playStoreUrl": "Enter this when app is published"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#FFFFFF"
+    },
+    "assetBundlePatterns": [
+      "src/assets/images/source/*",
+      "src/assets/icons/**/*.png",
+      "src/assets/fonts"
+    ],
+    "splash": {
+      "image": "src/assets/images/source/splash.png",
+      "resizeMode": "contain"
+    }
+  }
+}
