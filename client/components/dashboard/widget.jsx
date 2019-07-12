@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
@@ -7,6 +7,7 @@ import { OptionsCode } from "./options/options_code.jsx"
 import { OptionsBool } from "./options/options_bool.jsx"
 import { OptionsTime } from "./options/options_time.jsx"
 import { OptionsDropdown } from "./options/options_dropdown.jsx"
+import { OptionsRadio } from "./options/options_radio.jsx"
 
 export class Widget extends React.Component {
   state = {
@@ -14,10 +15,27 @@ export class Widget extends React.Component {
     boundaryVisible: false
   }
 
-  // componentWillUpdate = (update) => {
-  //   console.log()
-  // }
-
+  setOption = (newoption) => {
+    var options = this.props.options;
+    var finalOptions = {
+      hourly: undefined,
+      daily: undefined,
+      monthly: undefined
+    }
+    for (var option in options) {
+      if (options[option].value == newoption.value && options[option].name != newoption.name) {
+        options[option].value = !newoption.value
+      }
+      if (options[option].name == "hourly") {
+        finalOptions.hourly = options[option].value;
+      } else if (options[option].name == "daily") {
+        finalOptions.daily = options[option].value;
+      } else if (options[option].name == "monthly") {
+        finalOptions.monthly = options[option].value;
+        this.props.setOptions(finalOptions)
+      }
+    }
+  }
 
 
   removeWidget = () => {
@@ -35,6 +53,7 @@ export class Widget extends React.Component {
         if (option.type == "bool") { return (<OptionsBool key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "time") { return (<OptionsTime key={i} option={option} setOptions={this.props.setOptions} />) }
         if (option.type == "dropdown") { return (<OptionsDropdown key={i} option={option} setOptions={this.props.setOptions} />) }
+        if (option.type == "radio") { return (<OptionsRadio key={i} option={option} setOptions={this.setOption} />) }
 
         return (<div key={i}></div>)
 
@@ -101,7 +120,6 @@ export class Widget extends React.Component {
       }
     }
   }
-
 
   devicePathButton = (name) => {
     if (name == "map") {
