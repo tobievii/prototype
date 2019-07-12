@@ -295,7 +295,7 @@ export class DeviceView extends PureComponent {
                   {
                     fetch("/api/v3/state/clear", {
                       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                      body: JSON.stringify({ id: this.state.devid, username: this.props.username })
+                      body: JSON.stringify({ id: this.state.devid })
                     }).then(response => response.json()).then(serverresponse => {
                       onClose();
                     }).catch(err => console.error(err.toString()));

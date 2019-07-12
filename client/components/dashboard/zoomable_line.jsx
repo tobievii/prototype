@@ -6,11 +6,22 @@ export class LineChart extends React.Component {
     dates = [];
     lasttimestamp = "";
     final = false;
+    options;
+
+    setOptions = (options) => {
+        this.setState(_.merge(this.state, options), () => {
+            this.updatedOptions();
+            this.props.dash.setOptions(options);
+            this.getdata();
+        })
+    }
 
     constructor(props) {
         super(props);
-
         this.state = {
+            hourly: false,
+            daily: false,
+            monthly: false,
             options: {
                 zoomable_line: {
                     stacked: true,
@@ -107,8 +118,28 @@ export class LineChart extends React.Component {
         }
     }
 
+    updatedOptions = () => {
+        var options = [
+            { name: "hourly", type: "radio", value: this.state.hourly },
+            { name: "daily", type: "radio", value: this.state.daily },
+            { name: "monthly", type: "radio", value: this.state.monthly },
+        ]
+        this.options = options;
+    }
+
+    componentDidMount = () => {
+        this.updatedOptions();
+    }
+
     componentWillMount = () => {
-        this.getdata();
+        if (this.props.data.options) {
+            this.setState(_.merge(this.state, this.props.data.options), () => {
+                this.updatedOptions();
+                this.getdata();
+            })
+        } else {
+            this.getdata();
+        }
     }
 
     componentDidUpdate() {
@@ -136,16 +167,31 @@ export class LineChart extends React.Component {
             var verify = [];
 
             if (result.length == 0) {
-
                 this.dates.push([{ String: true }]);
             } else {
-
                 for (var date in result) {
-                    var f = {
-                        //Limited way.
-                        //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
-                        x: new Date(result[date].x),
-                        y: parseInt(result[date].y).toFixed(0)
+                    var f = undefined;
+
+                    if (this.state.daily) {
+                        // console.log(this.daily == this.date, "#2 Whats this?")
+                        f = {
+                            x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                            y: parseInt(result[date].y).toFixed(0)
+                        }
+                    } else if (this.state.monthly) {
+                        // console.log(this.monthly == this.date, "#3 Whats this?")
+                        f = {
+                            x: new Date(parseInt(result[date].x.substr(0, 4)), parseInt(result[date].x.substr(5, 2), parseInt(result[date].x.substr(8, 2)))),
+                            y: parseInt(result[date].y).toFixed(0)
+                        }
+                    } else {
+                        // console.log(this.hourly == this.date, "#1 Whats this?")
+                        f = {
+                            //Limited way.
+                            //x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
+                            x: new Date(result[date].x),
+                            y: parseInt(result[date].y).toFixed(0)
+                        }
                     }
 
                     if (!Number.isNaN(parseInt(result[date].y))) {
@@ -200,11 +246,11 @@ export class LineChart extends React.Component {
     render() {
         if (this.state.series != null) {
             if ((this.state.series[0].data[0].String && this.final == false) || this.state.series[0].data[0].length == 0) {
-                return <Widget label={this.props.data.dataname} dash={this.props.dash}><div>This widget doesn't use strings</div></Widget>
+                return <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}><div>This widget doesn't use strings</div></Widget>
             } else {
                 return (
                     <div>
-                        <Widget label={this.props.data.dataname} dash={this.props.dash}>
+                        <Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
                             <div id="chartz">
                                 <ReactApexChart options={this.state.options} series={this.state.series} type="area" />
                             </div>
