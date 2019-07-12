@@ -9,21 +9,10 @@ export class LineChart extends React.Component {
     options;
 
     setOptions = (options) => {
-        // console.log(options)
-        // console.log(this.props.data.options)
-        var finalOpt = this.props.data.options;
-        finalOpt.map((final) => {
-            if (final.name == "hourly") {
-                this.setState({ hourly: final.value })
-            } else if (final.name == "daily") {
-                this.setState({ daily: final.value })
-            } else if (final.name == "monthly") {
-                this.setState({ monthly: final.value }, () => {
-                    this.updatedOptions();
-                    this.props.dash.setOptions(options);
-                    this.getdata();
-                })
-            }
+        this.setState(_.merge(this.state, options), () => {
+            this.updatedOptions();
+            this.props.dash.setOptions(options);
+            this.getdata();
         })
     }
 
@@ -130,6 +119,8 @@ export class LineChart extends React.Component {
     }
 
     updatedOptions = () => {
+        console.log("here")
+        console.log(this.state)
         var options = [
             { name: "hourly", type: "radio", value: this.state.hourly },
             { name: "daily", type: "radio", value: this.state.daily },
@@ -143,18 +134,13 @@ export class LineChart extends React.Component {
     }
 
     componentWillMount = () => {
-        this.getdata();
         if (this.props.data.options) {
-            var finalOpt = this.props.data.options;
-            finalOpt.map((final) => {
-                if (final.name == "hourly") {
-                    this.setState({ hourly: final.value })
-                } else if (final.name == "daily") {
-                    this.setState({ daily: final.value })
-                } else if (final.name == "monthly") {
-                    this.setState({ monthly: final.value })
-                }
+            this.setState(_.merge(this.state, this.props.data.options), () => {
+                this.updatedOptions();
+                this.getdata();
             })
+        } else {
+            this.getdata();
         }
     }
 
@@ -194,11 +180,10 @@ export class LineChart extends React.Component {
                             x: parseInt((new Date("" + parseInt(result[date].x.substr(0, 4)) + "." + result[date].x.substr(5, 2) + "." + parseInt(result[date].x.substr(8, 2))).getTime())),
                             y: parseInt(result[date].y).toFixed(0)
                         }
-                    }
-                    else if (this.state.monthly) {
+                    } else if (this.state.monthly) {
                         // console.log(this.monthly == this.date, "#3 Whats this?")
                         f = {
-                            x: parseInt((new Date("." + result[date].x.substr(5, 2)))),
+                            x: new Date(parseInt(result[date].x.substr(0, 4)), parseInt(result[date].x.substr(5, 2), parseInt(result[date].x.substr(8, 2)))),
                             y: parseInt(result[date].y).toFixed(0)
                         }
                     } else {

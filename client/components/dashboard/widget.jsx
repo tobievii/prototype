@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { OptionsInput } from "./options/options_input.jsx"
 import { OptionsColor } from "./options/options_color.jsx"
@@ -15,17 +15,26 @@ export class Widget extends React.Component {
     boundaryVisible: false
   }
 
-  // componentWillUpdate = (update) => {
-  //   console.log()
-  // }
   setOption = (newoption) => {
     var options = this.props.options;
+    var finalOptions = {
+      hourly: undefined,
+      daily: undefined,
+      monthly: undefined
+    }
     for (var option in options) {
       if (options[option].value == newoption.value && options[option].name != newoption.name) {
         options[option].value = !newoption.value
       }
+      if (options[option].name == "hourly") {
+        finalOptions.hourly = options[option].value;
+      } else if (options[option].name == "daily") {
+        finalOptions.daily = options[option].value;
+      } else if (options[option].name == "monthly") {
+        finalOptions.monthly = options[option].value;
+        this.props.setOptions(finalOptions)
+      }
     }
-    this.props.setOptions(options)
   }
 
 
@@ -111,7 +120,6 @@ export class Widget extends React.Component {
       }
     }
   }
-
 
   devicePathButton = (name) => {
     if (name == "map") {

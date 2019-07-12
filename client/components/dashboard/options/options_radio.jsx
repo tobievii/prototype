@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 export class OptionsRadio extends React.Component {
     state = { value: this.props.option.value }
@@ -35,6 +35,7 @@ export class OptionsRadio extends React.Component {
                         />
                     </div>
                 </div>
-            </div>)
+            </div>
+        )
     }
 }
