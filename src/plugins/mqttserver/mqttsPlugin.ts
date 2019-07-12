@@ -21,7 +21,7 @@ export class PluginMQTTS extends Plugin {
     isCluster: boolean = false;
     ev: any;
     clustersubs: string[] = [];
-    config:any;
+    config: any;
 
     constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
         super(app, db, eventHub);
@@ -30,8 +30,8 @@ export class PluginMQTTS extends Plugin {
         this.app = app;
         this.eventHub = eventHub;
 
-        if (!config.configGen) { log("PLUGIN", this.name, "NO CONFIG SSL. DISABLING."); return; }
-        if (!config.configGen.ssl) { log("PLUGIN", this.name, "NO SSL. DISABLING."); return; }
+        if (!config) { log("PLUGIN", this.name, "NO CONFIG SSL. DISABLING."); return; }
+        if (!config.ssl) { log("PLUGIN", this.name, "NO SSL. DISABLING."); return; }
 
         log("PLUGIN", this.name, "LOADED");
         // if redis is on and this is running inside PM2
@@ -45,7 +45,7 @@ export class PluginMQTTS extends Plugin {
             });
         }
 
-        var server = tls.createServer(config.configGen.sslOptions, (socket: any) => {
+        var server = tls.createServer(config.sslOptions, (socket: any) => {
             var client = new mqttConnection(socket)
 
             client.on("connect", (data) => {
@@ -104,8 +104,8 @@ export class PluginMQTTS extends Plugin {
     handlePacket(deviceState: any, packet: any, cb: any) {
 
         // no ssl config then we just return and do nothing.
-        if (!this.config.configGen) { return; }
-        if (!this.config.configGen.ssl) {  return; }
+        if (!this.config) { return; }
+        if (!this.config.ssl) { return; }
 
         log(this.name, "HANDLE PACKET");
 
