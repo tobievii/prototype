@@ -1261,20 +1261,21 @@ input[type="color"] {
 }
 
 select {
-background : #1b394d;
+background : rgb(3, 4, 5);
 color: grey ;
 border:1px;
 border-color: grey
 }
 option{
-background : rgb(16, 23, 32);
-color:grey
+background : rgb(3, 4, 5);
+color: grey ;
 }
 
 option:hover{
-  background : rgb(16, 23, 32);
-  color:white
+color:white
 }
+
+
 
 .protoButtonClickable:hover {
   color: #f3353a;
@@ -1453,6 +1454,10 @@ div.rowList.dashboardDevices {
 
 }
 
+#settingsMenu::-webkit-scrollbar{
+display:none
+}
+
 .dropdown-content {
   display: block;
   color: #e1e1e1;
@@ -1539,7 +1544,16 @@ PLUGIN
   color: White;
 }
 
+.fail{
+  background: rgba(255, 0, 0, 0.6) !important;
+  color: White;
+}
+
 .sucess:hover {
+  color: White !important;
+}
+
+.fail:hover {
   color: White !important;
 }
 

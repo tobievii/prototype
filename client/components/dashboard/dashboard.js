@@ -288,7 +288,6 @@ class Dashboard extends React.Component {
           }
         }
       }
-
       this.setState({ layout }, () => {
         this.updateServer(cb);
       })

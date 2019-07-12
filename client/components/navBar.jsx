@@ -404,11 +404,11 @@ export class NavBar extends Component {
       if (window.innerWidth > 667) {
         return (
           <div style={{ position: "fixed", top: "48px", bottom: "0", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
-            <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden" }}>
+            <div id="data" style={{ marginLeft: "349px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "auto" }}>
               {this.state.allUsers.map((user, i) =>
                 <div style={{ height: "5%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                  <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
-                    <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
+                  <Link to={"/u/" + user.username} onClick={this.out}><option className="optiondropdown">{user.username}</option>
+                    <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p>
                   </Link>
                 </div>
               )}</div>
@@ -530,12 +530,12 @@ export class NavBar extends Component {
               {this.searchUser()}
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px", border: "1px solid rgba(169, 169, 169, 0.2)" }} list="data" onChange={this.search} maxLength="32" />
-            {this.searchUser()}
+            <select placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px", border: "1px solid rgba(169, 169, 169, 0.2)" }} onChange={this.search} maxLength="32" >
+              {this.searchUser()}
+            </select>
           </div>
         </div>
-      </div>
-
+      </div >
     );
   }
 }

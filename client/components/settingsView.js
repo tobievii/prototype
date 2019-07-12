@@ -3,9 +3,9 @@ import React, { Component } from "react";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSave } from '@fortawesome/free-solid-svg-icons'
 library.add(faSave)
-
 import Media from "react-media";
 import { plugins } from "../plugins/config.ts"
+import { Swipeable } from 'react-swipeable'
 
 export default class SettingsView extends React.Component {
   state = { menuList: [] }
@@ -68,7 +68,7 @@ export default class SettingsView extends React.Component {
 
   genMenu = () => {
     return (
-      <div style={{ padding: 20 }}>
+      <div id="settingsMenu" style={{ padding: 20, overflowX: "auto" }}>
         {
           plugins.map((item, i) => {
             return <div key={i} className={this.getMenuClasses(i)} onClick={this.onClickMenuTab(i)}>{item.name}</div>
@@ -77,10 +77,6 @@ export default class SettingsView extends React.Component {
       </div>
     )
   }
-
-  // <div className="settingsPage" style={{ background: "rgba(0,0,0,0.2)", margin: 20, overflow: "hidden" }}>
-
-  //     </div>
 
   render() {
     return (
@@ -94,14 +90,16 @@ export default class SettingsView extends React.Component {
                     {this.genMenu()}
                   </div>
                 </div>
-
-                <div className="row" style={{ marginTop: 5 }}>
-                  <div className="col" style={{ display: "", padding: "0 20px 0 20px", boxSizing: "border-box" }}>
-                    {this.genPage()}
+                <Swipeable
+                  onSwipedLeft={() => { if (this.state.activeMenu > 0) { this.setState({ activeMenu: this.state.activeMenu - 1 }) } }}
+                  onSwipedRight={() => { if (this.state.activeMenu < plugins.length) { this.setState({ activeMenu: this.state.activeMenu + 1 }) } }}>
+                  <div className="row" style={{ marginTop: 5 }}>
+                    <div className="col" style={{ display: "", padding: "0 20px 0 20px", boxSizing: "border-box" }}>
+                      {this.genPage()}
+                    </div>
                   </div>
-                </div>
+                </Swipeable>
               </div>
-
             ) : (
                 <div className="row">
                   <div className="col-2" style={{ background: "rgba(0,0,0,0.2)", padding: 20 }} >
