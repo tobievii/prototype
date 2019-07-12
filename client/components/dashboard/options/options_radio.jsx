@@ -2,9 +2,10 @@ import React from "react";
 
 export class OptionsRadio extends React.Component {
     state = { value: this.props.option.value }
-
+    update = undefined;
     constructor(props) {
         super(props)
+        this.update = this.props.option.value;
     }
 
     apply() {
@@ -13,8 +14,15 @@ export class OptionsRadio extends React.Component {
         this.props.setOptions(option)
     }
 
+    componentDidUpdate() {
+        if (this.props.option.value != this.update) {
+            this.update = this.props.option.value;
+            this.setState({ value: this.props.option.value })
+        }
+    }
+
     onChange = (event) => {
-        this.setState({ value: !this.state.value }, () => { this.apply(); })
+        this.setState({ value: !this.state.value }, () => { this.update = this.state.value; this.apply(); })
     }
 
     render() {
@@ -31,7 +39,7 @@ export class OptionsRadio extends React.Component {
                             value={this.state.value}
                             name={"zoomable"}
                             onChange={this.onChange}
-                            checked={this.state.value}
+                            checked={this.update}
                         />
                     </div>
                 </div>

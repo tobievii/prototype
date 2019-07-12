@@ -119,8 +119,6 @@ export class LineChart extends React.Component {
     }
 
     updatedOptions = () => {
-        console.log("here")
-        console.log(this.state)
         var options = [
             { name: "hourly", type: "radio", value: this.state.hourly },
             { name: "daily", type: "radio", value: this.state.daily },
