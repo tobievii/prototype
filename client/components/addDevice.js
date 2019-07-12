@@ -12,7 +12,6 @@ const customStyles = {
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
         border: "none",
-        // background: "rgba(23, 47, 64, 0.85)",
         background: "rgba(0, 0, 0, 0.1)",
         backgroundColor: "rgba(0, 0, 0, 0.1)",
         maxHeight: 'calc(100vh - 210px)',
@@ -21,7 +20,6 @@ const customStyles = {
         width: "50%",
         height: "470px"
     },
-    //bacground of Pop up Modal on search
     overlay: {
         background: "rgba(23, 47, 64, 0.85)",
         zIndex: 1002
@@ -37,7 +35,6 @@ const customStylesMobile = {
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
         border: "none",
-        // background: "rgba(23, 47, 64, 0.85)",
         background: "rgba(0, 0, 0, 0.1)",
         backgroundColor: "rgba(0, 0, 0, 0.1)",
         maxHeight: 'calc(100vh - 210px)',
@@ -46,7 +43,6 @@ const customStylesMobile = {
         width: "100%",
         height: "470px"
     },
-    //bacground of Pop up Modal on search
     overlay: {
         background: "rgba(23, 47, 64, 0.85)",
         zIndex: 1002

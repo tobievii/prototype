@@ -16,7 +16,6 @@ const customStyles = {
         maxHeight: 'calc(100vh - 210px)',
         overflow: 'auto'
     },
-    //bacground of Pop up Modal on search
     overlay: {
         background: "rgba(27, 57, 77,0.9)",
     }
@@ -36,7 +35,6 @@ const customStylesMobile = {
         overflow: 'auto',
         width: "100%"
     },
-    //bacground of Pop up Modal on search
     overlay: {
         background: "rgba(27, 57, 77,0.9)",
     }
