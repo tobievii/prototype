@@ -1295,14 +1295,37 @@ app.post("/api/v3/state/clear", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
+  if (req.body.type) {
+    for (var i in req.body.id) {
+      db.states.update({ apikey: req.user.apikey, devid: req.body.id[i].devid }, { "$set": { payload: { id: req.body.id[i].devid, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
+        if (req.body.clearhistory == false) {
+          if (err) res.json(err);
+          if (cleared) res.json(cleared);
+        }
+        else {
+          clearhistoryfunction(req, res);
+        }
+      })
+    }
+  }
 
-
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$set": { payload: { id: req.body.id, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
-    if (err) res.json(err);
-    if (cleared) res.json(cleared);
-  })
+  else {
+    db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$set": { payload: { id: req.body.id, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
+      if (err) res.json(err);
+      if (cleared) res.json(cleared);
+    })
+  }
 }
 )
+
+async function clearhistoryfunction(req: any, res: any) {
+  for (var i in req.body.id) {
+    await db.packets.remove({ key: req.body.id[i].key }, (err: Error, clearedhistory: any) => {
+      if (err) res.json(err);
+      if (clearedhistory) res.json(clearedhistory);
+    })
+  }
+}
 
 app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (!req.user) { return; }

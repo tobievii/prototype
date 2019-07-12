@@ -431,8 +431,13 @@ describe("PLUGINS", () => {
     })
 
     describe("IOTNXT", () => {
+        var options: any;
         var packet = {
             id: "protTestHttpSocket",
+            data: { random: generateDifficult(32) }
+        }
+        var packet2 = {
+            id: "protTestHttpMqtt",
             data: { random: generateDifficult(32) }
         }
         var gateway = {
@@ -449,8 +454,17 @@ describe("PLUGINS", () => {
             })
         })
 
-        it("Set Device Gateway", function (done) {
-            new Prototype(testAccount).setdevicegateway(packet.id, gateway.GatewayId, gateway.HostAddress, (err: any, response: any) => {
+        it("Set Device Gateway(KEY)", function (done) {
+            options = "key"
+            new Prototype(testAccount).setdevicegateway(packet.id, gateway.GatewayId, gateway.HostAddress, options, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("Set Device Gateway(DEVID)", function (done) {
+            options = "devid"
+            new Prototype(testAccount).setdevicegateway(packet2.id, gateway.GatewayId, gateway.HostAddress, options, (err: any, response: any) => {
                 if (err) { done(new Error(err)); return }
                 else if (response) { done(); return }
             })
@@ -467,10 +481,7 @@ describe("PLUGINS", () => {
             new Prototype(testAccount).deletegateway((err: any, response: any) => {
                 if (err) { done(new Error(err)); return }
                 else if (response) {
-                    if (response.err) { done(new Error(response.err)); return }
-                    else {
-                        done(); return
-                    }
+                    done(); return
                 }
             })
         })
@@ -522,6 +533,22 @@ describe("FEATURES", () => {
     describe("DASHBOARD", () => {
         it("ASSIGN DEVICE DASHBOARD", function (done) {
             new Prototype(testAccount).assignDevDasboard(packet.id, layout, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+    })
+
+    describe("CLEAR DATA", () => {
+        it("CLEAR DEVICE DATA", function (done) {
+            new Prototype(testAccount).clearDeviceData(packet.id, (err: any, response: any) => {
+                if (err) { done(new Error(err)); return }
+                else if (response) { done(); return }
+            })
+        })
+
+        it("CLEAR DEVICE DATA & HISTORY", function (done) {
+            new Prototype(testAccount).clearDevDataHist(packet.id, (err: any, response: any) => {
                 if (err) { done(new Error(err)); return }
                 else if (response) { done(); return }
             })
