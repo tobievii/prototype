@@ -7,7 +7,7 @@ import { ResponsiveCalendar } from '@nivo/calendar'
 import { Widget } from "./widget.jsx"
 
 export class Calendar extends React.Component {
-  state = { activity: [], from: "2019-01-01", to: "2019-12-28" }
+  state = { activity: [], from: "2019-01-01", to: "2019-12-28", current: "" }
 
   componentDidMount = () => {
     if (this.props.state) {
@@ -20,7 +20,7 @@ export class Calendar extends React.Component {
       method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
       body: JSON.stringify({ key: this.props.state.key })
     }).then(response => response.json()).then(activity => {
-
+      this.setState({ current: this.props.state.key })
       if (activity.length > 2) {
         this.setState({ from: activity[0].day })
         this.setState({ to: activity[activity.length - 1].day })
@@ -30,7 +30,15 @@ export class Calendar extends React.Component {
     }).catch(err => console.error(err.toString()));
   }
 
+  updateActiviy = () => {
+    if (this.props.state.key !== this.state.current) {
+      this.fetchData()
+    }
+    else null
+  }
+
   render() {
+    { this.updateActiviy() }
     return (<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash}>
       <ResponsiveCalendar
         data={this.state.activity}
