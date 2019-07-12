@@ -941,6 +941,11 @@ export class StatesViewer extends Component {
         this.setState({ selectedModification: choice })
         this.setState({ isOpenshare: true })
         break;
+      case "CLEAR DEVICE DATA":
+        this.setState({ modificationinfo: "Are you sure you want to clear device(s) data ?" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenModify: true })
+        break;
       default:
         this.setState({ modificationinfo: "" });
     }
