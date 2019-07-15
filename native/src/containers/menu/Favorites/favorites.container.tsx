@@ -1,5 +1,5 @@
 import React from 'react';
-import { Themes } from './themes.component';
+import { Themes } from './favorites.component';
 import {
   ThemeContextType,
   ThemeContext,
@@ -8,7 +8,7 @@ import {
 } from '@src/core/themes';
 import { Theme } from './type';
 
-export class ThemesContainer extends React.Component {
+export class FavoritesContainer extends React.Component {
 
   private EXCLUDE_THEMES: ThemeKey[] = [
     'App Theme',

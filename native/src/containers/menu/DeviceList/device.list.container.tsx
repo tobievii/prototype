@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { Layouts } from './layouts.component';
+import { Layouts } from './device.list.component';
 import { LayoutsContainerData } from './type';
 import { routes } from './routes';
 
