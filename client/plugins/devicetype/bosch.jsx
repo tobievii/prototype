@@ -118,7 +118,7 @@ export class AddDevice extends React.PureComponent {
             <div style={{ background: "#16202C", paddingLeft: "20px", paddingBottom: "35px" }}>
                 <br></br>
                 <h5>Bosch Asset Tracking Tag</h5>
-                The below config is is to be uploaded to Node-Red on a MultiTech MultiConnect Conduit. Please ensure that your Gateway is set up according to your region and set-up correctly.
+                The below config is to be uploaded to Node-Red on a MultiTech MultiConnect Conduit. Please ensure that your Gateway is set up according to your region and set-up correctly.
                 <br /><br />
                 If you're using a different Gateway, please contact your Gateway manufacturer for configuration.
                 Node-Red config:

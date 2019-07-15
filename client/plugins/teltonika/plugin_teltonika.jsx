@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Component } from "react";
+
+import { TeltonikaConfigure } from "./plugin_teltonika_add.jsx"
 
 export const name = "Teltonika";
 
-
-export class AddDevice extends React.PureComponent {
+export class SettingsPanel extends React.Component {
 
     state = {
         teltonikaServiceEnabled: false,
@@ -18,7 +19,9 @@ export class AddDevice extends React.PureComponent {
         fetch("/api/v3/teltonika/info")
             .then(res => res.json())
             .then((result) => {
+                // console.log(result);
                 if (result.port) {
+                    // console.log(result.port);
                     this.setState({ port: result.port })
                 }
             }).catch((err) => {
@@ -30,12 +33,15 @@ export class AddDevice extends React.PureComponent {
         fetch("/api/v3/teltonika/reqport")
             .then(res => res.json())
             .then((result) => {
+                // console.log(result);
                 if (result.port) {
                     this.setState({ port: result.port });
                 }
             }).catch((err) => {
                 console.log(err);
             })
+
+        //this.setState({ teltonikaServiceEnabled: true })
     }
 
     render() {
@@ -43,15 +49,14 @@ export class AddDevice extends React.PureComponent {
             <div className="blockstyle">
                 <h4>TELTONIKA</h4>
 
-                <div className="blockstyle" style={{ marginBottom: 20 }}>
-                    <h3>PUBLIC PORT</h3>
+                <div className="blockstyle" style={{ marginBottom: 20, display: "none" }}>
+                    <h4>PUBLIC PORT</h4>
                     DEFAULT PORT: 12000
-                    <p>If you set Teltonika device to connect to this port devices will be visible to administrators only.
-                        Any user can type in IMEI to add device to their account.
-                    </p>
-                    To set a port, go to <span className="commanderBgPanel">Settings -> Teltonika -> Click Enable</span> to get a private port assigned to your account.
+          <p>If you set Teltonika device to connect to this port devices will be visible to administrators only.
+            Any user can type in IMEI to add device to their account.</p>
                 </div>
 
+                <TeltonikaConfigure enable={this.enable} port={this.state.port} />
             </div>
         );
     }

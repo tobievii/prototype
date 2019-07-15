@@ -278,7 +278,6 @@ export class ShareList extends Component {
     shareDevice = () => {
         var path = window.location.origin;
         if (this.props.type) {
-            console.log(this.props)
             this.setState({ show: "noDisplayShare" });
             this.state.EmailsharedDevice = _.clone(this.state.SelectedUsers) //#region 
             for (let dev in this.state.EmailsharedDevice) {
