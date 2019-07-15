@@ -29,9 +29,9 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
   ["Forgot Password"]: ForgotPasswordContainer
 };
 
-const ThemesNavigator: NavigationContainer = createStackNavigator(
+const LayoutsNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Themes"]: ThemesContainer
+    ["Device List"]: DeviceListContainer
   },
   {
     defaultNavigationOptions: MenuNavigationOptions
@@ -47,9 +47,10 @@ const ComponentsNavigator: NavigationContainer = createStackNavigator(
   }
 );
 
-const LayoutsNavigator: NavigationContainer = createStackNavigator(
+
+const ThemesNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Device List"]: DeviceListContainer
+    ["Themes"]: ThemesContainer
   },
   {
     defaultNavigationOptions: MenuNavigationOptions
@@ -70,7 +71,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ["Home"]:
-    SignInContainer,
+    // SignInContainer,
     MenuNavigator,
     ...AuthNavigationMap,
   },
