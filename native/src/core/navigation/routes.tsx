@@ -17,7 +17,7 @@ import {
   ForgotPasswordContainer,
   SignInContainer,
   SignUpContainer,
-} from '@src/components/login';
+} from '@src/components/auth';
 import {
   MenuNavigationOptions,
 } from './options';
@@ -71,7 +71,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ['Home']:
-    // SignInContainer,
+    SignInContainer,
     MenuNavigator,
     ...AuthNavigationMap,
   },

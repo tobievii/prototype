@@ -13,3 +13,6 @@ export {
   SignUpFormProps,
   SignUpFormData,
 } from './signUpForm';
+export { ForgotPasswordContainer } from './forgotPassword/forgotPassword.container';
+export { SignInContainer } from './signIn/signIn.container';
+export { SignUpContainer } from './signUp/signUp.container';
