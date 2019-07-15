@@ -15,7 +15,7 @@ import {
   FavoritesContainer,
   MenuContainer,
   // DocsContainer,
-  // SupportContainer,
+  SupportContainer,
 } from '@src/containers/menu';
 
 import {
@@ -71,14 +71,14 @@ const FavoritesNavigator: NavigationContainer = createStackNavigator(
 //   },
 // );
 
-// const SupportNavigator: NavigationContainer = createStackNavigator(
-//   {
-//     ['Support']: SupportContainer,
-//   },
-//   {
-//     defaultNavigationOptions: MenuNavigationOptions,
-//   },
-// );
+const SupportNavigator: NavigationContainer = createStackNavigator(
+  {
+    ['Support']: SupportContainer,
+  },
+  {
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
+);
 
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
@@ -86,7 +86,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
     ['MapView']: MapViewNavigator,
     ['Favorites']: FavoritesNavigator,
     // ['Docs']: DocsNavigator,
-    // ['Support']: SupportNavigator,
+    ['Support']: SupportNavigator,
   },
   {
     tabBarComponent: MenuContainer,
@@ -96,7 +96,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ['Home']:
-    SignInContainer,
+    // SignInContainer,
     MenuNavigator,
     ...AuthNavigationMap,
   },

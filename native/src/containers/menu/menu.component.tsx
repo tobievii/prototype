@@ -11,7 +11,6 @@ import {
   BottomNavigationTab,
 } from '@kitten/ui';
 import {
-  ColorPaletteIconOutline,
   DeviceList,
   MapView,
   Favorites,
@@ -56,12 +55,12 @@ class MenuComponent extends React.Component<Props> {
               icon={Favorites}
             />
             <BottomNavigationTab
-              title='Docs'
-              icon={Documentation}
-            />
-            <BottomNavigationTab
               title='Support'
               icon={Support}
+            />
+            <BottomNavigationTab
+              title='Docs'
+              icon={Documentation}
             />
           </BottomNavigation>
         </ThemeProvider>

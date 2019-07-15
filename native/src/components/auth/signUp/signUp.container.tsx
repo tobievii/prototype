@@ -18,7 +18,6 @@ export class SignUpContainer extends React.Component<NavigationScreenProps> {
     });
   };
 
-
   private onPhotoPress = () => {
 
   };
