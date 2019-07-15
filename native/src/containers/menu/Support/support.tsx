@@ -1,12 +1,7 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { ComponentsContainerData } from './type';
 import MapView from 'react-native-maps';
 import {Dimensions, Alert} from 'react-native';
-
-interface State {
-  data: ComponentsContainerData[];
-}
 
 const {width, height} = Dimensions.get('window');
 
