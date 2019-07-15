@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { ForgotPasswordFormData } from '@src/components/login/auth';
+import { ForgotPasswordFormData } from '@src/components/auth';
 import { ForgotPassword } from './forgotPassword.component';
 
 export class ForgotPasswordContainer extends React.Component<NavigationScreenProps> {
