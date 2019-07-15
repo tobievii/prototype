@@ -892,6 +892,17 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
+  var modifier;
+  if (req.user.username) {
+    if (req.user.level > 0) { modifier = req.user.username }
+    else {
+      modifier = "[UNREGISTERED USER]"
+    }
+  }
+  else {
+    modifier = "[UNREGISTERED USER]"
+  }
+  db.states.update({ key: req.body.key }, { $push: { history: { $each: [{ date: new Date(), user: modifier, publickey: req.user.publickey, change: "modifided dashboard" }] } } })
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {

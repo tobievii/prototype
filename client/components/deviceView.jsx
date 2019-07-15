@@ -4,28 +4,24 @@ const SyntaxHighlighter = React.lazy(() => import('react-syntax-highlighter'));
 const tomorrowNightBright = React.lazy(() => import("react-syntax-highlighter/styles/hljs"));
 import * as _ from "lodash"
 import { confirmAlert } from 'react-confirm-alert';
+import { Link } from "react-router-dom";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faHdd, faEraser, faDigitalTachograph } from "@fortawesome/free-solid-svg-icons";
 import { DevicePluginPanel } from "../plugins/iotnxt/iotnxt_device.jsx";
-
+import Modal from 'react-modal';
 import { ShareList } from "./ShareList.jsx";
 import { DataView } from "./dataView.jsx";
 const Dashboard = React.lazy(() => import('./dashboard/dashboard'))
 import moment from 'moment'
-
 library.add(faDigitalTachograph)
 library.add(faHdd);
 library.add(faTrash);
 library.add(faEraser);
-
 import * as p from "../prototype.ts"
-
 import socketio from "socket.io-client";
 import { Editor } from "./editor.jsx"
 import { StatesViewer } from "./statesViewer.jsx";
-
-var loggedInUser = "";
 
 const customStyles = {
   content: {
@@ -79,7 +75,10 @@ export class DeviceView extends PureComponent {
     owner: "",
     dataButton: "HIDE DATA",
     dataview: "",
-    dashboard: "col-lg-9"
+    dashboard: "col-lg-9",
+    history: false,
+    historyList: [],
+    devicehistory: {}
   };
 
   socket;
@@ -425,28 +424,75 @@ export class DeviceView extends PureComponent {
     }
   }
 
+  historyList = () => {
+    if (this.props.account.level > 0) {
+      if (this.props.account.username == this.props.username || this.props.account.level >= 100)
+        this.setState({ history: !this.state.history })
+      const arrayToObject = (array) =>
+        array.reduce((obj, item) => {
+          obj = item
+          return obj
+        }, {})
+      this.state.historyList = _.clone(arrayToObject(this.state.devicesServer.filter((find) => find.devid == this.props.devid)));
+    }
+    else null
+  }
+
+  trackedHisory = () => {
+    if (this.state.historyList.history) {
+      return (
+        this.state.historyList.history.reverse().map((user, i) => {
+          if (i == 0) { return < div className="commanderBgPanel commanderBgPanelClickable" key={i} title={"change made by " + user.user}><Link to={'/u/' + user.user} style={{ color: "white" }}><span style={{ color: "red" }}>*Latest*</span> {user.date} <u style={{ color: "red" }}>{user.user}</u> {user.change}</Link></div> }
+          else { return < div className="commanderBgPanel commanderBgPanelClickable" key={i} title={"change made by " + user.user}><Link to={'/u/' + user.user} style={{ color: "white" }}>{user.date} <u style={{ color: "red" }}>{user.user}</u> {user.change}</Link></div> }
+        })
+      )
+    }
+    else {
+      return (
+        <div className="commanderBgPanel commanderBgPanel" style={{ marginLeft: "250px", width: "200px" }}>Device has no history</div>
+      )
+    }
+  }
+
+  devicehistory = () => {
+    if (this.state.history == true) {
+      return (< Modal style={customStyles} isOpen={this.state.history} onRequestClose={this.toggle} >
+        <i className={"fas fa-times " + this.state.show} onClick={this.historyList} style={{ color: "red" }} />
+        <center style={{ color: "white" }}>
+          <h1>Device history</h1>
+        </center>
+        <hr></hr>
+        {this.trackedHisory()}
+      </Modal >)
+    }
+    else null
+  }
+
   orderScreenSize = () => {
     if (window.innerWidth < 667) {
       return (<div className="row" >
-        <div className="col-12" style={{ display: this.state.shareDisplay, marginTop: 12 }}>
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
+        <div className="col-12" style={{ display: this.state.shareDisplay, marginTop: 12, overflow: "auto" }}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }} onClick={() => this.deleteDevice(this.state.devid)}>
             <FontAwesomeIcon icon="trash" />
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.clearState}>
             <FontAwesomeIcon icon="eraser" />
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.toggleModal}>
 
             <i className="fas fa-share-alt"></i>
           </div>
 
-          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }}   >
+          <div className="commanderBgPanel commanderBgPanelClickable" onClick={this.ShowEditor} style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }}   >
             <i className="fas fa-edit"></i>
           </div>
-          <div onClick={this.hideData} style={{ width: "20%", fontSize: 15, float: "right", textAlign: "center" }} className="commanderBgPanel commanderBgPanelClickable"  >
+          <div onClick={this.hideData} style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }} className="commanderBgPanel commanderBgPanelClickable"  >
             <i className="fas fa-database"></i>
+          </div>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.60%", fontSize: 15, float: "right", textAlign: "center" }}>
+            <i className="fas fa-history"></i>
           </div>
         </div>
         {this.dashboardColumn()}
@@ -532,9 +578,8 @@ export class DeviceView extends PureComponent {
                 <div className="" style={{ display: this.state.shareDisplay }}>
                   {this.deleteClearButtons()}
 
-                  <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal}>
-
-                    <i className="fas fa-share-alt" title="Share device"></i>
+                  <div className="" style={{ width: "auto", float: "right", marginRight: 15, fontSize: 18, cursor: "pointer" }} onClick={this.toggleModal} title="Share Device">
+                    <i className="fas fa-share-alt" ></i>
                   </div>
 
                   <div onClick={this.ShowEditor} style={{ width: "auto", float: "right", marginRight: 14, fontSize: 18, cursor: "pointer" }} className=""  >
@@ -548,9 +593,14 @@ export class DeviceView extends PureComponent {
                     <FontAwesomeIcon icon="digital-tachograph" title="Show/Hide devices" />
                   </div>
 
+                  <div style={{ width: "auto", fontSize: 15, float: "right", textAlign: "center", marginTop: 3, cursor: "pointer", marginRight: 16 }} title="Show Device History" onClick={this.historyList}>
+                    <i className="fas fa-history"></i>
+                  </div>
+
                   <div className="faded" style={{ width: "auto", float: "right", marginRight: 16, marginTop: 8, fontSize: 12 }}>{this.state.timeago}</div>
 
                   <ShareList devid={this.props.devid} isOpen={this.state.isOpen} username={this.props.username} account={this.props.account} closeModel={() => { this.setState({ isOpen: false }) }} />
+                  {this.devicehistory()}
                 </div>
               </div>
             </div>
