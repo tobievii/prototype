@@ -42,6 +42,26 @@ const customStyles = {
   }
 };
 
+const customStylesMobile = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: '50%',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    border: "none",
+    background: "rgba(3, 4, 5,0.6)",
+    maxHeight: 'calc(100vh - 210px)',
+    overflowY: 'auto',
+    width: "100%",
+    height: "85%"
+  },
+  //bacground of Pop up Modal on search
+  overlay: {
+    background: "rgba(27, 57, 77,0.9)",
+  }
+};
 var viewController = "";
 
 export class DeviceView extends PureComponent {
@@ -456,14 +476,26 @@ export class DeviceView extends PureComponent {
 
   devicehistory = () => {
     if (this.state.history == true) {
-      return (< Modal style={customStyles} isOpen={this.state.history} onRequestClose={this.toggle} >
-        <i className={"fas fa-times " + this.state.show} onClick={this.historyList} style={{ color: "red" }} />
-        <center style={{ color: "white" }}>
-          <h1>Device history</h1>
-        </center>
-        <hr></hr>
-        {this.trackedHisory()}
-      </Modal >)
+      if (window.innerWidth < 667) {
+        return (< Modal style={customStylesMobile} isOpen={this.state.history} onRequestClose={this.toggle} >
+          <i className={"fas fa-times " + this.state.show} onClick={this.historyList} style={{ color: "red" }} />
+          <center style={{ color: "white" }}>
+            <h1>Device history</h1>
+          </center>
+          <hr></hr>
+          {this.trackedHisory()}
+        </Modal >)
+      }
+      else {
+        return (< Modal style={customStyles} isOpen={this.state.history} onRequestClose={this.toggle} >
+          <i className={"fas fa-times " + this.state.show} onClick={this.historyList} style={{ color: "red" }} />
+          <center style={{ color: "white" }}>
+            <h1>Device history</h1>
+          </center>
+          <hr></hr>
+          {this.trackedHisory()}
+        </Modal >)
+      }
     }
     else null
   }
@@ -491,7 +523,7 @@ export class DeviceView extends PureComponent {
           <div onClick={this.hideData} style={{ width: "16.67%", fontSize: 15, float: "right", textAlign: "center" }} className="commanderBgPanel commanderBgPanelClickable"  >
             <i className="fas fa-database"></i>
           </div>
-          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.60%", fontSize: 15, float: "right", textAlign: "center" }}>
+          <div className="commanderBgPanel commanderBgPanelClickable" style={{ width: "16.60%", fontSize: 15, float: "right", textAlign: "center" }} onClick={this.historyList}>
             <i className="fas fa-history"></i>
           </div>
         </div>
