@@ -1,5 +1,6 @@
 import React from 'react';
 import { useScreens } from 'react-native-screens';
+
 import {
   createAppContainer,
   createBottomTabNavigator,
@@ -7,17 +8,20 @@ import {
   NavigationContainer,
   NavigationRouteConfigMap,
 } from 'react-navigation';
+
 import {
   MapViewContainer,
   DeviceListContainer,
   MenuContainer,
   ThemesContainer,
 } from '@src/containers/menu';
+
 import {
   ForgotPasswordContainer,
   SignInContainer,
   SignUpContainer,
 } from '@src/components/auth';
+
 import {
   MenuNavigationOptions,
 } from './options';
@@ -28,18 +32,18 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
   ['Forgot Password']: ForgotPasswordContainer,
 };
 
-const LayoutsNavigator: NavigationContainer = createStackNavigator(
+const DeviceListNavigator: NavigationContainer = createStackNavigator(
   {
-    ['Device List']: DeviceListContainer,
+    ['DeviceList']: DeviceListContainer,
   },
   {
     defaultNavigationOptions: MenuNavigationOptions,
   },
 );
 
-const ComponentsNavigator: NavigationContainer = createStackNavigator(
+const MapViewNavigator: NavigationContainer = createStackNavigator(
   {
-    ['Map View']: MapViewContainer,
+    ['MapView']: MapViewContainer,
   },
   {
     defaultNavigationOptions: MenuNavigationOptions,
@@ -47,9 +51,9 @@ const ComponentsNavigator: NavigationContainer = createStackNavigator(
 );
 
 
-const ThemesNavigator: NavigationContainer = createStackNavigator(
+const FavoritesNavigator: NavigationContainer = createStackNavigator(
   {
-    ['Themes']: ThemesContainer,
+    ['Favorites']: ThemesContainer,
   },
   {
     defaultNavigationOptions: MenuNavigationOptions,
@@ -58,9 +62,9 @@ const ThemesNavigator: NavigationContainer = createStackNavigator(
 
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
-    ['Layouts']: LayoutsNavigator,
-    ['Components']: ComponentsNavigator,
-    ['Themes']: ThemesNavigator,
+    ['DeviceList']: DeviceListNavigator,
+    ['MapView']: MapViewNavigator,
+    ['Favorites']: FavoritesNavigator,
   },
   {
     tabBarComponent: MenuContainer,
