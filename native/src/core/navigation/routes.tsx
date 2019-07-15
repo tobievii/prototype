@@ -1,90 +1,90 @@
-import React from "react";
-import { useScreens } from "react-native-screens";
+import React from 'react';
+import { useScreens } from 'react-native-screens';
 import {
   createAppContainer,
   createBottomTabNavigator,
   createStackNavigator,
   NavigationContainer,
-  NavigationRouteConfigMap
-} from "react-navigation";
+  NavigationRouteConfigMap,
+} from 'react-navigation';
 import {
   MapViewContainer,
   DeviceListContainer,
   MenuContainer,
-  ThemesContainer
-} from "@src/containers/menu";
+  ThemesContainer,
+} from '@src/containers/menu';
 import {
   ForgotPasswordContainer,
   SignInContainer,
-  SignUpContainer
-} from "@src/components/login";
+  SignUpContainer,
+} from '@src/components/login';
 import {
   MenuNavigationOptions,
-} from "./options";
+} from './options';
 // import { SignIn } from "@src/components/signIn/signIn.component";
 
 const AuthNavigationMap: NavigationRouteConfigMap = {
-  ["Sign In"]: SignInContainer,
-  ["Sign Up"]: SignUpContainer,
-  ["Forgot Password"]: ForgotPasswordContainer
+  ['Sign In']: SignInContainer,
+  ['Sign Up']: SignUpContainer,
+  ['Forgot Password']: ForgotPasswordContainer,
 };
 
 const LayoutsNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Device List"]: DeviceListContainer
+    ['Device List']: DeviceListContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 const ComponentsNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Map View"]: MapViewContainer,
+    ['Map View']: MapViewContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 
 const ThemesNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Themes"]: ThemesContainer
+    ['Themes']: ThemesContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
-    ["Layouts"]: LayoutsNavigator,
-    ["Components"]: ComponentsNavigator,
-    ["Themes"]: ThemesNavigator
+    ['Layouts']: LayoutsNavigator,
+    ['Components']: ComponentsNavigator,
+    ['Themes']: ThemesNavigator,
   },
   {
-    tabBarComponent: MenuContainer
-  }
+    tabBarComponent: MenuContainer,
+  },
 );
 
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Home"]:
+    ['Home']:
     // SignInContainer,
     MenuNavigator,
     ...AuthNavigationMap,
   },
   {
-    headerMode: "screen",
+    headerMode: 'screen',
     defaultNavigationOptions: {
-      header: null
-    }
-  }
+      header: null,
+    },
+  },
 );
 
 const createAppRouter = (
-  container: NavigationContainer
+  container: NavigationContainer,
 ): NavigationContainer => {
   useScreens();
   return createAppContainer(container);
