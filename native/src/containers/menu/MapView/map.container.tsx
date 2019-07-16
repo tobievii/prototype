@@ -44,7 +44,10 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
       };
       this.setState({initialPosition: initRegion});
       this.setState({markedPosition: initRegion});
-    }, (error) => alert(JSON.stringify(error)),
+    },
+
+    (error) => alert(JSON.stringify(error)),
+
     {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
     this.watchID = navigator.geolocation.watchPosition((position) => {

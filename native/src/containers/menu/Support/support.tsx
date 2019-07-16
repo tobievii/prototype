@@ -11,7 +11,7 @@ const ASPECT_RATIO = width / height;
 const LATTITUDE_DELTA = 0.0922;
 const LONGTITUDE_DELTA = LATTITUDE_DELTA * ASPECT_RATIO;
 
-export class SupportContainer extends React.Component<NavigationScreenProps, State> {
+export class SupportContainer extends React.Component<NavigationScreenProps> {
 
   constructor(props: any) {
     super(props);
@@ -21,7 +21,7 @@ export class SupportContainer extends React.Component<NavigationScreenProps, Sta
         latitude: 0,
         longitude: 0,
         latitudeDelta: 0,
-        longitudeDelta: 0
+        longitudeDelta: 0,
       },
       markedPosition: {
         latitude: 0,

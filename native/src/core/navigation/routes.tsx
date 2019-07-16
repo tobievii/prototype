@@ -36,7 +36,7 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
 
 const DeviceListNavigator: NavigationContainer = createStackNavigator(
   {
-    ['DeviceList']: DeviceListContainer,
+    ['Device List']: DeviceListContainer,
   },
   {
     defaultNavigationOptions: MenuNavigationOptions,
@@ -45,7 +45,7 @@ const DeviceListNavigator: NavigationContainer = createStackNavigator(
 
 const MapViewNavigator: NavigationContainer = createStackNavigator(
   {
-    ['MapView']: MapViewContainer,
+    ['Map View']: MapViewContainer,
   },
   {
     defaultNavigationOptions: MenuNavigationOptions,
@@ -82,8 +82,8 @@ const SupportNavigator: NavigationContainer = createStackNavigator(
 
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
-    ['DeviceList']: DeviceListNavigator,
-    ['MapView']: MapViewNavigator,
+    ['Device List']: DeviceListNavigator,
+    ['Map View']: MapViewNavigator,
     ['Favorites']: FavoritesNavigator,
     // ['Docs']: DocsNavigator,
     ['Support']: SupportNavigator,
@@ -96,7 +96,8 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ['Home']:
-    // SignInContainer,
+    // SignInContainer,+
+    // AuthNavigationMap,
     MenuNavigator,
     ...AuthNavigationMap,
   },
