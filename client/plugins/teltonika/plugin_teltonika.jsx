@@ -1,8 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { TeltonikaConfigure } from "./plugin_teltonika_add.jsx"
 
 export const name = "Teltonika";
+export const AddDevice = require("../devicetype/teltonika.jsx");
 
 export class SettingsPanel extends React.Component {
 
