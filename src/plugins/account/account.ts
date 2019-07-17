@@ -55,6 +55,7 @@ export class PluginAccount extends Plugin {
         this.db.users.findOne({ uuid: uuid }, (e: Error, user: any) => {
             user["_last_seen"] = new Date();
             user["username"] = this.cleaner(username);
+            user["usernameSet"] = true;
             this.db.users.update({ uuid: uuid }, user, (e2: Error, r2: any) => {
                 cb();
             })

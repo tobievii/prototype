@@ -83,6 +83,10 @@ eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
 })
 
+eventHub.on("warningNotification", (data: any) => {
+  io.sockets.emit("warningNotification", data.event);
+})
+
 eventHub.on("configChange", () => {
   //event to restart all servers on UI infor change
   // config = new Config(app, eventHub);
@@ -1097,39 +1101,11 @@ function handleState(req: any, res: any, next: any) {
             io.to(req.user.username).emit("info", info);
           }
 
-          // var message = "";
-          // var AlarmNotification = {
-          //   type: "ALARM",
-          //   device: req.body.id,
-          //   created: Date.now(),
-          //   message: message,
-          //   notified: true,
-          //   seen: false
-          // }
-
-          // if (deviceState.boundaryLayer != undefined) {
-          //   if (deviceState.boundaryLayer.inbound == false) {
-          //     AlarmNotification.message = "has gone out of its boundary";
-          //     //createNotification(db, AlarmNotification, req.user, deviceState);
-          //   }
-          // }
-
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
-
-        // db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
-        //   if (findResult.notification24 == true) {
-        //     db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-        //       //console.log(result)
-        //       //console.log(err)
-        //     })
-        //   }
-        // })
-
-
 
         res.json({ result: "success" });
 
