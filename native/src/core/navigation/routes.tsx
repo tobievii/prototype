@@ -96,7 +96,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ['Home']:
-    // SignInContainer,+
+    // SignInContainer,
     // AuthNavigationMap,
     MenuNavigator,
     ...AuthNavigationMap,
