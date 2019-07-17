@@ -16,23 +16,20 @@ import {
   MenuContainer,
   // DocsContainer,
   SupportContainer,
-} from '@src/containers/menu';
+} from '../../../src/containers/menu';
 
 import {
   ForgotPasswordContainer,
   SignInContainer,
   SignUpContainer,
-} from '@src/components/auth';
+} from '../../../src/components/auth';
 
 import {
   MenuNavigationOptions,
 } from './options';
 
-const AuthNavigationMap: NavigationRouteConfigMap = {
-  ['Sign In']: SignInContainer,
-  ['Sign Up']: SignUpContainer,
-  ['Forgot Password']: ForgotPasswordContainer,
-};
+import { AsyncStorage } from 'react-native'
+var auth;
 
 const DeviceListNavigator: NavigationContainer = createStackNavigator(
   {
@@ -93,12 +90,17 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   },
 );
 
+const AuthNavigationMap: NavigationRouteConfigMap = {
+  ['Sign In']: SignInContainer,
+  ['Sign Up']: SignUpContainer,
+  ['Forgot Password']: ForgotPasswordContainer,
+  ['logged']: MenuNavigator
+};
+
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
     ['Home']:
-    // SignInContainer,
-    // AuthNavigationMap,
-    MenuNavigator,
+      SignInContainer,
     ...AuthNavigationMap,
   },
   {
@@ -115,5 +117,9 @@ const createAppRouter = (
   useScreens();
   return createAppContainer(container);
 };
+// var user = async () => {
+//   var view = await AsyncStorage.getItem('user')
+//   console.log(view)//view user stored in device serilzed dictionary
+// }
 
-export const Router: NavigationContainer = createAppRouter(AppNavigator);
+export var Router: NavigationContainer = createAppRouter(AppNavigator);

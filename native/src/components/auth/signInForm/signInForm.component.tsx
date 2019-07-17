@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, ViewProps} from 'react-native';
-import { ThemedComponentProps, ThemeType, withStyles} from '@kitten/theme';
-import { Button } from '@kitten/ui';
-import { textStyle, ValidationInput } from '@src/components/common';
-import { EyeOffIconFill, PersonIconFill} from '@src/assets/icons';
-import { PasswordValidator, EmailValidator} from '@src/core/validators';
+import { View, ViewProps } from 'react-native';
+import { ThemedComponentProps, ThemeType, withStyles } from 'react-native-ui-kitten';
+import { Button } from 'react-native-ui-kitten';
+import { textStyle, ValidationInput } from '../../../../src/components/common';
+import { EyeOffIconFill, PersonIconFill } from '../../../../src/assets/icons';
+import { PasswordValidator, EmailValidator } from '../../../../src/core/validators';
 import { SignInFormData } from './type';
 
 interface ComponentProps {
@@ -25,7 +25,7 @@ interface State {
 
 class SignInForm2Component extends React.Component<SignInFormProps, State> {
 
-  public state: State = {
+  state: State = {
     username: undefined,
     password: undefined,
   };
@@ -53,11 +53,11 @@ class SignInForm2Component extends React.Component<SignInFormProps, State> {
   };
 
   private onUsernameInputTextChange = (username: string) => {
-    this.setState({ username });
+    this.setState({ username: username });
   };
 
   private onPasswordInputTextChange = (password: string) => {
-    this.setState({ password });
+    this.setState({ password: password });
   };
 
   private isValid = (value: SignInFormData): boolean => {
