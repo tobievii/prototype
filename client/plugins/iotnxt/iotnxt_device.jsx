@@ -109,6 +109,7 @@ export class DevicePluginPanel extends React.PureComponent {
         id: this.props.stateId,
         GatewayId: e.target.value.split("|")[0],
         HostAddress: e.target.value.split("|")[1],
+        currentGateway: this.props.device.plugins_iotnxt_gateway.GatewayId
       })
     }).then(response => response.json()).then((data) => {
       this.getDevice();
