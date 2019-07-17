@@ -57,7 +57,6 @@ export default class AddDevice extends Component {
         code: [],
         pairedDevices: [],
         bleDevices: [],
-        value: JSON.stringify(config),
         copied: false
     }
 
