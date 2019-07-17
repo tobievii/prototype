@@ -343,7 +343,7 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
   if (req.body) {
     trex.log("WORKFLOW UPDATE");
 
-    state.updateWorkflow(db, req.user.apikey, req.body.id, req.body.code, (err: Error, result: any) => {
+    state.updateWorkflow(db, req.user, req.body.id, req.body.code, (err: Error, result: any) => {
       if (err) res.json(err);
       if (result) res.json(result);
     })
