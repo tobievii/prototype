@@ -46,23 +46,31 @@ export class Notification extends Component {
   render() {
     if (this.props.notification.type == "New Device Added") {
       this.props.notification.type = "NEW DEVICE ADDED"
-
-    } else if (this.props.notification.type == "INFO") {
-      this.props.notification.type = "INFO"
     }
 
-    if (this.props.notification.type == "NEW DEVICE ADDED" || this.props.notification.type == "INFO") {
+    if (this.props.notification.type == "NEW DEVICE ADDED") {
       return (
 
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="newNotificationItem">
             <i className="fas fa-exclamation-circle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" has been successfully added.</span><br />
             <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
 
+      )
+    } else if (this.props.notification.type == "INFO") {
+      return (
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="newNotificationItem">
+            <i className="fas fa-exclamation-circle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
+            <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
       )
     }
 
@@ -72,7 +80,7 @@ export class Notification extends Component {
         <div className="newNotificationItem">
           <i className="fas fa-exclamation-circle"></i>
           <span className="newdevice" >{this.newDevice()}</span><br />
-          <span className="devicename">{this.device()} message: {this.message()}</span><br />
+          <span className="devicename">{this.props.notification.from} shared "{this.props.notification.device}" with you.</span><br />
           <span className="lastseen" >{moment(this.props.notification.created).fromNow()}</span>
         </div>
       )
@@ -85,7 +93,7 @@ export class Notification extends Component {
           <div className="alarmNotificationItem">
             <i className="fas fa-bullhorn"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
             <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
@@ -93,14 +101,24 @@ export class Notification extends Component {
       )
     }
 
-    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING" || this.props.notification.type == "WARNING") {
+    if (this.props.notification.type == "CONNECTION DOWN 24HR WARNING") {
       return (
-
         <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
           <div className="warningNotificationItem">
             <i className="fas fa-exclamation-triangle"></i>
             <span className="newdevice" >{this.newDevice()}</span><br />
-            <span className="devicename">{this.device()} message: {this.message()}</span><br />
+            <span className="devicename">"{this.device()}" has not been seen for 24hrs.</span><br />
+            <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
+          </div>
+        </Link>
+      )
+    } else if (this.props.notification.type == "WARNING") {
+      return (
+        <Link to={"/u/" + this.props.account.username + "/view/" + this.device()} title="View Device Data">
+          <div className="warningNotificationItem">
+            <i className="fas fa-exclamation-triangle"></i>
+            <span className="newdevice" >{this.newDevice()}</span><br />
+            <span className="devicename">"{this.device()}" message: {this.message()}.</span><br />
             <span className="lastseen">{moment(this.props.notification.created).fromNow()}</span>
           </div>
         </Link>
@@ -386,11 +404,11 @@ export class NavBar extends Component {
       if (window.innerWidth > 667) {
         return (
           <div style={{ position: "fixed", top: "48px", bottom: "0", right: "0", left: "0", width: "100%", height: "100%", backgroundColor: "transparent" }} onClick={this.closeUserList}>
-            <div id="data" style={{ marginLeft: "284px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "hidden" }}>
+            <div id="data" style={{ marginLeft: "349px", width: "300px", position: "absolute", backgroundColor: "black", overflowY: "scroll", overflowX: "auto" }}>
               {this.state.allUsers.map((user, i) =>
                 <div style={{ height: "5%", marginLeft: "5px", borderBottom: "0.5px solid red" }} key={i}>
-                  <Link to={"/u/" + user.username} onClick={this.out}><div>{user.username}<br></br>
-                    <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p></div>
+                  <Link to={"/u/" + user.username} onClick={this.out}><option className="optiondropdown">{user.username}</option>
+                    <p style={{ color: "grey" }}>{"Joined " + moment(user._created_on).format("DD-MMMM-YYYY")}</p>
                   </Link>
                 </div>
               )}</div>
@@ -512,12 +530,12 @@ export class NavBar extends Component {
               {this.searchUser()}
             </div>
             <div style={{ marginLeft: "10px", marginTop: "17px", width: "3%", position: "relative", float: "left", display: this.state.showSearch }} onClick={this.normalNav}><i className="fas fa-arrow-left"></i></div>
-            <input type="search" placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px", border: "1px solid rgba(169, 169, 169, 0.2)" }} list="data" onChange={this.search} maxLength="32" />
-            {this.searchUser()}
+            <select placeholder="username or email.." style={{ width: "80%", display: this.state.showSearch, marginTop: "10px", marginBottom: "15px", marginLeft: "20px", border: "1px solid rgba(169, 169, 169, 0.2)" }} onChange={this.search} maxLength="32" >
+              {this.searchUser()}
+            </select>
           </div>
         </div>
-      </div>
-
+      </div >
     );
   }
 }

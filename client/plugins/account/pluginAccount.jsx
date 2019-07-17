@@ -23,6 +23,7 @@ export class SettingsPanel extends React.Component {
   }
 
   usernameUpdated = () => {
+    this.props.updateAccount();
     this.getAccount();
   }
 
@@ -30,7 +31,6 @@ export class SettingsPanel extends React.Component {
     return (
       <div>
         <div className="adminBlocks" >
-          <a href="/signout"><button className="btn-spot" style={{ float: "right" }} > SIGN OUT</button></a>
           <h4>ACCOUNT</h4>
           email:<span className="settingsDetails"> {this.state.account.email}</span><br />
           level:<span className="settingsDetails"> {this.state.account.level}</span><br />
