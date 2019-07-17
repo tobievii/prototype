@@ -4,6 +4,7 @@ log("MAIN \tStart ===============================")
 // console.log("PM2 instance id:" + process.env.pm_id)
 // console.log(process.env.NODE_APP_INSTANCE)
 
+
 require('source-map-support').install();
 var nodemailer = require("nodemailer")
 var _ = require('lodash');
@@ -896,6 +897,17 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
+  var modifier;
+  if (req.user.username) {
+    if (req.user.level > 0) { modifier = "" }
+    else {
+      modifier = "[UNREGISTERED USER]"
+    }
+  }
+  else {
+    modifier = "[UNREGISTERED USER]"
+  }
+  db.states.update({ key: req.body.key }, { $push: { history: { $each: [{ date: new Date(), user: req.user.username, publickey: req.user.publickey, change: "modifided dashboard" + modifier }] } } })
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
