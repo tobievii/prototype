@@ -122,4 +122,4 @@ const createAppRouter = (
 //   console.log(view)//view user stored in device serilzed dictionary
 // }
 
-export var Router: NavigationContainer = createAppRouter(AppNavigator);
+export let Router: NavigationContainer = createAppRouter(AppNavigator);
