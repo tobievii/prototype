@@ -3,24 +3,24 @@ import {
   ThemedComponentProps,
   ThemeType,
   withStyles,
-} from '@kitten/theme';
+} from 'react-native-ui-kitten';
 import {
   Button,
   Text,
-} from '@kitten/ui';
+} from 'react-native-ui-kitten';
 import {
   ForgotPasswordForm,
   ForgotPasswordFormData,
-} from '@src/components/auth';
+} from '../../../../src/components/auth';
 import {
   ScrollableAvoidKeyboard,
   ImageOverlay,
   textStyle,
-} from '@src/components/common';
+} from '../../../../src/components/common';
 import {
   imageForgotPasswordBg,
   ImageSource,
-} from '@src/assets/images';
+} from '../../../../src/assets/images';
 
 interface ComponentProps {
   onResetPress: (formData: ForgotPasswordFormData) => void;

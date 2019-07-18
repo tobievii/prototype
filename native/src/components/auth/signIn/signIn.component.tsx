@@ -3,20 +3,21 @@ import {
   ThemedComponentProps,
   ThemeType,
   withStyles,
-} from '@kitten/theme';
+} from 'react-native-ui-kitten';
 import {
   Button,
   Text,
-} from '@kitten/ui';
+} from 'react-native-ui-kitten';
 import {
   SignInForm,
   SignInFormData,
-} from '@src/components/auth';
+} from '../../../../src/components/auth';
 import {
   ScrollableAvoidKeyboard,
   textStyle,
-} from '@src/components/common';
+} from '../../../../src/components/common';
 import { View } from 'react-native';
+import { AsyncStorage } from 'react-native'
 
 interface ComponentProps {
   onSignInPress: (formData: SignInFormData) => void;
@@ -37,6 +38,7 @@ class SignInComponent extends React.Component<SignInProps> {
   };
 
   private onSignInButtonPress = () => {
+    AsyncStorage.setItem('user', JSON.stringify(this.state.formData))
     this.props.onSignInPress(this.state.formData);
   };
 
@@ -52,6 +54,16 @@ class SignInComponent extends React.Component<SignInProps> {
     this.setState({ formData });
   };
 
+  private user = async () => {
+    var view = await AsyncStorage.getItem('user')
+    console.log(view)//view user stored in device serilzed dictionary
+  };
+
+  private removeuser = async () => {
+    await AsyncStorage.clear()
+    this.user()
+  };
+
   public render(): React.ReactNode {
     const { themedStyle } = this.props;
 
@@ -60,12 +72,14 @@ class SignInComponent extends React.Component<SignInProps> {
         <View style={themedStyle.headerContainer}>
           <Text
             style={themedStyle.helloLabel}
-            category='h1'>
+            category='h1'
+            onPress={this.user}>
             PROTOTYP3
           </Text>
           <Text
             style={themedStyle.signInLabel}
-            category='s1'>
+            category='s1'
+            onPress={this.removeuser}>
             Sign in to your account
           </Text>
         </View>

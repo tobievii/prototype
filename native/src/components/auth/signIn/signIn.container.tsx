@@ -1,14 +1,37 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { SignInFormData } from '@src/components/auth';
+import { SignInFormData } from '../../../../src/components/auth';
 import { SignIn } from './signIn.component';
+import { AsyncStorage } from 'react-native'
 
 export class SignInContainer extends React.Component<NavigationScreenProps> {
-
+  state: {
+    view: undefined
+  }
   private navigationKey: string = 'SignInContainer';
 
   private onSignInPress = (data: SignInFormData) => {
-    this.props.navigation.goBack();
+    this.props.navigation.navigate({
+      key: this.navigationKey,
+      routeName: 'logged',
+    });
+  };
+
+
+  user = async () => {
+    this.setState({ view: await AsyncStorage.getItem('user') })
+    if (this.state.view) {
+      this.props.navigation.navigate({
+        key: this.navigationKey,
+        routeName: 'Home',
+      });
+    }
+    else {
+      this.props.navigation.navigate({
+        key: this.navigationKey,
+        routeName: 'Home',
+      });
+    }
   };
 
   private onSignUpPress = () => {
@@ -26,6 +49,7 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   };
 
   public render(): React.ReactNode {
+    this.user()
     return (
       <SignIn
         onSignInPress={this.onSignInPress}

@@ -2,8 +2,8 @@ import React from 'react';
 import { ImageRequireSource } from 'react-native';
 import { NavigationState } from 'react-navigation';
 import { mapping } from '@eva-design/eva';
-import { ApplicationProvider } from '@kitten/theme';
-import { DynamicStatusBar } from '@src/components/common';
+import { ApplicationProvider } from 'react-native-ui-kitten';
+import { DynamicStatusBar } from '../src/components/common';
 import {
   ApplicationLoader,
   Assets,
@@ -17,7 +17,7 @@ import {
   ThemeKey,
   themes,
   ThemeStore,
-} from '@src/core/themes';
+} from '../src/core/themes';
 
 const images: ImageRequireSource[] = [
 
@@ -74,8 +74,8 @@ export default class App extends React.Component<{}, State> {
           <ApplicationProvider
             mapping={mapping}
             theme={themes[this.state.theme]}>
-            <DynamicStatusBar currentTheme={this.state.theme}/>
-            <Router onNavigationStateChange={this.onNavigationStateChange}/>
+            <DynamicStatusBar currentTheme={this.state.theme} />
+            <Router onNavigationStateChange={this.onNavigationStateChange} />
           </ApplicationProvider>
         </ThemeContext.Provider>
       </ApplicationLoader>
