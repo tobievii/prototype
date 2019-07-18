@@ -55,8 +55,8 @@ class SignInComponent extends React.Component<SignInProps> {
   };
 
   private user = async () => {
-    var view = await AsyncStorage.getItem('user')
-    console.log(view)//view user stored in device serilzed dictionary
+    const view = await AsyncStorage.getItem('user');
+    console.log(view); // view user stored in device serilzed dictionary
   };
 
   private removeuser = async () => {
