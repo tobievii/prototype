@@ -2,12 +2,12 @@ import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { SignInFormData } from '../../../../src/components/auth';
 import { SignIn } from './signIn.component';
-import { AsyncStorage } from 'react-native'
+import { AsyncStorage } from 'react-native';
 
 export class SignInContainer extends React.Component<NavigationScreenProps> {
   state: {
-    view: undefined
-  }
+    view: undefined,
+  };
   private navigationKey: string = 'SignInContainer';
 
   private onSignInPress = (data: SignInFormData) => {
@@ -17,16 +17,14 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
     });
   };
 
-
   user = async () => {
-    this.setState({ view: await AsyncStorage.getItem('user') })
+    this.setState({ view: await AsyncStorage.getItem('user') });
     if (this.state.view) {
       this.props.navigation.navigate({
         key: this.navigationKey,
-        routeName: 'Home',
+        routeName: 'logged',
       });
-    }
-    else {
+    } else {
       this.props.navigation.navigate({
         key: this.navigationKey,
         routeName: 'Home',
@@ -49,7 +47,7 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   };
 
   public render(): React.ReactNode {
-    this.user()
+    this.user();
     return (
       <SignIn
         onSignInPress={this.onSignInPress}

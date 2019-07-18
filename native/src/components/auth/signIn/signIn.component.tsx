@@ -60,8 +60,8 @@ class SignInComponent extends React.Component<SignInProps> {
   };
 
   private removeuser = async () => {
-    await AsyncStorage.clear()
-    this.user()
+    await AsyncStorage.clear();
+    this.user();
   };
 
   public render(): React.ReactNode {
