@@ -76,7 +76,7 @@ export class PluginNotifications extends Plugin {
     } else {
       this.getWarningNotification(this.db);
     }
-  }, 1000);
+  }, 1000 * 60 * 5);
 
   getNewNotification(db: any, user: any, res: any) {
     db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
@@ -523,6 +523,8 @@ export class PluginNotifications extends Plugin {
       }
 
       db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
+        if (states.length == 0) { return; }
+
         var final: any;
         var x = 0;
         for (var state in states) {
