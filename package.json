@@ -63,6 +63,7 @@
     "mocha-jenkins-reporter": "^0.4.1",
     "mongojs": "^2.6.0",
     "mqtt": "^2.18.8",
+    "mqtt-packet": "^6.2.0",
     "nodemailer": "^4.7.0",
     "nodemon": "^1.18.10",
     "pm2": "^3.5.1",
