@@ -2,8 +2,8 @@ import { ImageStyle, StyleProp } from "react-native";
 import {
   MenuIconAuth,
   MenuIconAuthDark,
-} from "@src/assets/icons";
-import { ThemeKey, ThemeService } from "@src/core/themes";
+} from "../../../../src/assets/icons";
+import { ThemeKey, ThemeService } from "../../../../src/core/themes";
 import { LayoutsContainerData } from "./type";
 
 export const routes: LayoutsContainerData[] = [

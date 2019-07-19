@@ -11,10 +11,36 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   private navigationKey: string = 'SignInContainer';
 
   private onSignInPress = (data: SignInFormData) => {
-    this.props.navigation.navigate({
-      key: this.navigationKey,
-      routeName: 'logged',
-    });
+    fetch('https://prototype.dev.iotnxt.io/signin', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: data.username.toLowerCase(),
+        pass: data.password
+      }),
+    }).then((response) => response.text())
+      .then((responseJson) => {
+        var res = JSON.parse(responseJson)
+        if (res.signedin == true) {
+          this.props.navigation.navigate({
+            key: this.navigationKey,
+            routeName: 'logged',
+          });
+        }
+        else {
+          this.props.navigation.navigate({
+            key: this.navigationKey,
+            routeName: 'Home',
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      });
+
   };
 
   user = async () => {
@@ -47,7 +73,6 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   };
 
   public render(): React.ReactNode {
-    this.user();
     return (
       <SignIn
         onSignInPress={this.onSignInPress}

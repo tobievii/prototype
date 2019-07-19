@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-import { ThemeKey } from '@src/core/themes';
+import { ThemeKey } from '../../../src/core/themes';
 
 class ThemeStoreType {
 

@@ -9,18 +9,18 @@ import {
   ThemedComponentProps,
   ThemeType,
   withStyles,
-} from '@kitten/theme';
-import { Button } from '@kitten/ui';
+} from 'react-native-ui-kitten';
+import { Button } from 'react-native-ui-kitten';
 import {
   SignUpForm,
   SignUpFormData,
-} from '@src/components/auth';
+} from '../../../../src/components/auth';
 // import { ProfilePhoto } from '@src/components/social';
 import {
   ScrollableAvoidKeyboard,
   textStyle,
-} from '@src/components/common';
-import { PlusIconFill } from '@src/assets/icons';
+} from '../../../../src/components/common';
+import { PlusIconFill } from '../../../../src/assets/icons';
 
 interface ComponentProps {
   onSignUpPress: (formData: SignUpFormData) => void;

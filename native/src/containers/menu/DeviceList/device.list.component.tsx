@@ -3,8 +3,8 @@ import {
   withStyles,
   ThemeType,
   ThemedComponentProps,
-} from '@kitten/theme';
-import { LayoutsList } from '@src/components/menu';
+} from 'react-native-ui-kitten';
+import { LayoutsList } from '../../../../src/components/menu';
 import { LayoutsData } from './type';
 
 interface ComponentProps {
@@ -15,6 +15,22 @@ interface ComponentProps {
 type Props = ThemedComponentProps & ComponentProps;
 
 class LayoutsComponent extends React.Component<Props> {
+
+  componentWillMount() {
+    // fetch('https://prototype.iotnxt.io/api/v3/states', {
+    //   method: 'GET',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    // }).then((response) => response.text())
+    //   .then((responseJson) => {
+    //     console.log(responseJson)
+    //   })
+    //   .catch((error) => {
+    //     //console.error(error);
+    //   });
+  }
 
   private onItemPress = (index: number) => {
     this.props.onItemSelect(index);

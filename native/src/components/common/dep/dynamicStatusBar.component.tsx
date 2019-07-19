@@ -10,8 +10,8 @@ import {
   ThemedComponentProps,
   ThemeType,
   withStyles,
-} from '@kitten/theme';
-import { ThemeKey } from '@src/core/themes';
+} from 'react-native-ui-kitten';
+import { ThemeKey } from '../../../../src/core/themes';
 import Constants from 'expo-constants';
 
 interface ComponentProps {

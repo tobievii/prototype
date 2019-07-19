@@ -1,4 +1,4 @@
-import { LayoutsListItemData } from '@src/components/menu';
+import { LayoutsListItemData } from '../../../../src/components/menu';
 
 export type LayoutsData = LayoutsListItemData;
 
