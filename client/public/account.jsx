@@ -14,8 +14,6 @@ import Media from "react-media";
 library.add(faUserCheck);
 library.add(faUserPlus);
 library.add(faDice);
-const Cryptr = require("cryptr");
-const cryptr = new Cryptr("prototype");
 var openMenu = false;
 export class Account extends Component {
   state = {
@@ -223,7 +221,7 @@ export class Account extends Component {
       },
       body: JSON.stringify({
         email: this.state.form.email.toLocaleLowerCase(),
-        pass: cryptr.encrypt(this.state.form.passwordSignin)
+        pass: this.state.form.passwordSignin
       })
     })
       .then(response => response.json())
@@ -249,7 +247,7 @@ export class Account extends Component {
       body: JSON.stringify({
         email: this.state.form.emailSignup,
         username: this.state.form.username,
-        pass: cryptr.encrypt(this.state.form.passwordSignup)
+        pass: this.state.form.passwordSignup
       })
     })
       .then(response => response.json())
