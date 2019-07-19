@@ -57,7 +57,7 @@
     "google-protobuf": "^3.8.0-rc.1",
     "leaflet": "^1.4.0",
     "leaflet-draw": "^1.0.4",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "mailcomposer": "^4.0.2",
     "mocha": "^5.2.0",
     "mocha-jenkins-reporter": "^0.4.1",
@@ -93,7 +93,7 @@
   },
   "devDependencies": {
     "@types/bull": "^3.5.14",
-    "cypress": "^3.3.1",
+    "cypress": "^3.4.0",
     "pre-commit": "^1.2.2"
   }
 }
