@@ -27,6 +27,8 @@ const customStyles = {
 
 export default class ChangePassword extends React.PureComponent {
 
+    minlength = 6;
+
     state = {
         password: "",
         confirm: "",
@@ -86,9 +88,9 @@ export default class ChangePassword extends React.PureComponent {
     validate = (e) => {
         let password = this.state.password
         this.measureStrength(password)
-        if (password.length < 8) {
+        if (password.length < this.minlength) {
             this.setState({
-                passwordStrength: "Password must be minimum of 8 Characters",
+                passwordStrength: "Password must be minimum of " + this.minlength + " Characters",
             })
         }
     }
@@ -147,9 +149,9 @@ export default class ChangePassword extends React.PureComponent {
                 }).then(response => response.json()).then(data => {
                     if (data == false) {
                         this.setState({ message: "The current password you entered is incorrect" })
-                    } else if (this.state.password.length < 8) {
+                    } else if (this.state.password.length < this.minlength) {
                         this.setState({
-                            message: "Password must be minimum of 8 Characters",
+                            message: "Password must be minimum of " + this.minlength + " Characters",
                         })
                     }
                     else if (this.state.currentpassword == this.state.password) {
@@ -175,7 +177,7 @@ export default class ChangePassword extends React.PureComponent {
 
     changepassbutton = () => {
         if (this.state.password == this.state.confirm) {
-            if (this.state.password.length > 8 && this.state.confirm.length > 8) {
+            if (this.state.password.length > this.minlength && this.state.confirm.length > this.minlength) {
                 return (
                     <button
                         className="btn-spot floatLeft"
