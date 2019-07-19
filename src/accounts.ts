@@ -1,13 +1,8 @@
 import * as geoip from 'geoip-lite' // https://www.npmjs.com/package/geoip-lite
-
 import { generate, generateDifficult, log } from './utils';
 import * as _ from 'lodash';
 var scrypt = require("scrypt");
 var dbglobal: any;
-
-const Cryptr = require('cryptr');
-
-const cryptr = new Cryptr('prototype');
 
 export function midware(db: any) {
   dbglobal = db;
@@ -94,14 +89,13 @@ export function signInFromWeb(db: any) {
       if (req.body.email) {
 
         if (validateEmail(req.body.email) && req.body.pass) {
-          const decryptedString = cryptr.decrypt(req.body.pass);
           db.users.findOne(
             { email: req.body.email },
             (err: Error, user: any | undefined) => {
               if (user == null) {
                 res.json({ error: "Account not registered" });
               }
-              scrypt.verifyKdf(user.password.buffer, decryptedString, function (err: Error, result: any) {
+              scrypt.verifyKdf(user.password.buffer, req.body.pass, function (err: Error, result: any) {
                 if (result == true) {
                   req.user = user;
                   cookieSetFromUser(user, req, res, () => {

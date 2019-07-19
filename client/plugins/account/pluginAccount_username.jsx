@@ -1,9 +1,6 @@
 import React, { Component } from "react";
 import ChangePassword from "../../components/changePassword";
 import { ChangeUsername } from "../../components/changeUsername";
-
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
 export class SetUsername extends React.Component {
 
     state = {

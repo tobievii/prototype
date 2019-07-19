@@ -3,9 +3,6 @@ import ReactDOM from 'react-dom'
 import App from '../App.jsx'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
-
 export class Recovery extends Component {
   state = {
     changebutton: "",
@@ -23,7 +20,7 @@ export class Recovery extends Component {
       fetch("/api/v3/admin/changepassword", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({
-          pass: cryptr.encrypt(this.state.password),
+          pass: this.state.password,
           person: this.props.recoverToken
         })
       }).then(response => response.json()).then(data => {

@@ -2,9 +2,6 @@ import { describe, it } from "mocha";
 import { generateDifficult } from "../utils"
 import { Prototype } from "../utils/api"
 
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
-
 import * as _ from "lodash"
 
 /*
@@ -20,7 +17,7 @@ import * as _ from "lodash"
 
 var testAccount: any = {
     email: "test" + generateDifficult(32) + "@iotlocalhost.com",
-    password: cryptr.encrypt("newUser"),
+    password: "newUser",
 
     /* dev server:                          */
     // host: "prototype.dev.iotnxt.io",
