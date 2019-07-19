@@ -11,6 +11,7 @@ import {
 
 import {
   MapViewContainer,
+  SettingsViewContainer,
   DeviceListContainer,
   FavoritesContainer,
   MenuContainer,
@@ -77,6 +78,15 @@ const SupportNavigator: NavigationContainer = createStackNavigator(
   },
 );
 
+const SettingsNavigator: NavigationContainer = createStackNavigator(
+  {
+    ['Settings']: SettingsViewContainer,
+  },
+  {
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
+);
+
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
     ['Device List']: DeviceListNavigator,
@@ -84,6 +94,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
     ['Favorites']: FavoritesNavigator,
     // ['Docs']: DocsNavigator,
     ['Support']: SupportNavigator,
+    ['Settings']: SettingsNavigator,
   },
   {
     tabBarComponent: MenuContainer,

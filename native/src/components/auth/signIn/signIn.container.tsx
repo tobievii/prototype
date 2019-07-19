@@ -47,7 +47,7 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   };
 
   public render(): React.ReactNode {
-    this.user();
+    // this.user();
     return (
       <SignIn
         onSignInPress={this.onSignInPress}
