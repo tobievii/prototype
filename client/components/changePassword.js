@@ -1,8 +1,6 @@
 import React from "react";
 import Modal from 'react-modal';
 import zxcvbn from "zxcvbn"
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
 
 const customStyles = {
     content: {
@@ -142,9 +140,9 @@ export default class ChangePassword extends React.PureComponent {
 
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        pass: cryptr.encrypt(this.state.password),
+                        pass:this.state.password,
                         user: this.props.account.username,
-                        current: cryptr.encrypt(this.state.currentpassword)
+                        current:this.state.currentpassword
                     })
                 }).then(response => response.json()).then(data => {
                     if (data == false) {
