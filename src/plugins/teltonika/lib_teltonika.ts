@@ -13,6 +13,7 @@ export class Teltonika extends EventEmitter {
   imei: any;
   config: any;
   id:string;
+  apikey:string;
 
   constructor(socket: Socket, config: any) {
     super();
@@ -22,6 +23,7 @@ export class Teltonika extends EventEmitter {
     this.avldata = {};
     this.deviceip = socket.remoteAddress;
     this.config = config;
+    if (config.apikey) {this.apikey = config.apikey};
     socket.on("data", this.handleData(socket))
     socket.on("end", ()=>{
       console.log("teltonika disconnected");

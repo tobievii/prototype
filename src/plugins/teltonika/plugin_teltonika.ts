@@ -101,7 +101,11 @@ export class PluginTeltonika extends Plugin {
     // send data to device if its connected to this node
     for (var dev of this.connections) {
       if (packet.payload.data.command) {
-        dev.tcpwrite(packet.payload.data.command)
+        if (deviceState.devid == dev.id) {
+          if (deviceState.apikey == dev.apikey) {
+            dev.tcpwrite(packet.payload.data.command)
+          }          
+        }
       }
     }
   }
@@ -144,8 +148,7 @@ export class PluginTeltonika extends Plugin {
 
   connectPort(userPort: any) {
     var server = net.createServer((client: any) => {
-      var device:any = new Teltonika(client, {});
-      device.apikey = userPort.apikey;
+      var device:any = new Teltonika(client, {apikey:userPort.apikey});
 
       if (this.isCluster) {
         var sub = this.name + ":" + userPort.apikey
