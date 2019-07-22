@@ -360,14 +360,15 @@ export function getUserByApikey(db: any, apikey: string, cb: any) {
 }
 
 
-export function updateWorkflow(db: any, apikey: string, deviceId: string, workflowCode: string, cb: any) {
-  db.states.findOne({ apikey: apikey, devid: deviceId }, (err: Error, state: any) => {
+export function updateWorkflow(db: any, user: any, deviceId: string, workflowCode: string, cb: any) {
+  db.states.update({ apikey: user.apikey, devid: deviceId }, { $push: { history: { $each: [{ date: new Date(), user: user.username, publickey: user.publickey, change: "modifided workflow" }] } } })
+  db.states.findOne({ apikey: user.apikey, devid: deviceId }, (err: Error, state: any) => {
     if (err) cb(err, undefined);
     if (state) {
       state.workflowCode = workflowCode;
 
 
-      db.states.update({ apikey: apikey, devid: deviceId }, state, { upsert: true }, (err2: Error, resUp: any) => {
+      db.states.update({ apikey: user.apikey, devid: deviceId }, state, { upsert: true }, (err2: Error, resUp: any) => {
         if (err2) cb(err2, undefined);
         if (resUp) cb(undefined, { result: "success" });
       });

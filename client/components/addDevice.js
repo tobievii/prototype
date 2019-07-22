@@ -56,7 +56,8 @@ export default class AddDevice extends Component {
         wifipass: "",
         code: [],
         pairedDevices: [],
-        bleDevices: []
+        bleDevices: [],
+        copied: false
     }
 
     constructor(props) {

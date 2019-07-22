@@ -10,11 +10,7 @@ var server;
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
-
 var scrypt = require("scrypt");
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
-
 import { Plugin } from "../plugin"
 import express = require('express');
 import { log } from "../../log"
@@ -101,9 +97,8 @@ export class PluginAdmin extends Plugin {
     app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
       var today = new Date();
       today.setHours(today.getHours() + 2);
-      const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
-      var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+      var kdfResult = scrypt.kdfSync(req.body.pass, scryptParameters);
       db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { "password": kdfResult } }, (err: Error, response: any) => {
         if (response) {
           if (response.nModified == 0) {
@@ -136,15 +131,13 @@ export class PluginAdmin extends Plugin {
 
     //Changing password while logged in
     app.post("/api/v3/admin/userpassword", (req: any, res: any) => {
-      const decryptedString = cryptr.decrypt(req.body.current);
-      const decryptedString2 = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
       var uuid = generate(128)
       db.users.findOne({ username: req.body.user }, (err: Error, found: any) => {
 
-        scrypt.verifyKdf(found.password.buffer, decryptedString, function (err: Error, result: any) {
+        scrypt.verifyKdf(found.password.buffer, req.body.current, function (err: Error, result: any) {
           if (result == true) {
-            var newpass = scrypt.kdfSync(decryptedString2, scryptParameters);
+            var newpass = scrypt.kdfSync(req.body.pass, scryptParameters);
             db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass, uuid: uuid } }, (err: Error, response: any) => {
               if (response) {
                 if (response.nModified == 0) {
@@ -333,10 +326,9 @@ export class PluginAdmin extends Plugin {
       req.user.username = req.body.username;
       req.user.usernameSet = true;
       req.user.level = 1
-      const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
       //encrypts password
-      var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+      var kdfResult = scrypt.kdfSync(req.body.pass, scryptParameters);
       req.user.password = kdfResult;
       accounts.registerExistingAccount(this.db, req.user, (error: Error, result: any) => {
         db.users.update({ email: req.user.email }, { $set: { encrypted: true } })
