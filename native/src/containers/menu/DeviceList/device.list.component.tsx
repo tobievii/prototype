@@ -5,32 +5,17 @@ import {
   ThemedComponentProps,
 } from 'react-native-ui-kitten';
 import { LayoutsList } from '../../../../src/components/menu';
-import { LayoutsData } from './type';
+import { DeviceData } from './type';
 
 interface ComponentProps {
-  data: LayoutsData[];
+  data: DeviceData[];
   onItemSelect: (index: number) => void;
 }
 
 type Props = ThemedComponentProps & ComponentProps;
 
-class LayoutsComponent extends React.Component<Props> {
 
-  componentWillMount() {
-    // fetch('https://prototype.iotnxt.io/api/v3/states', {
-    //   method: 'GET',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json',
-    //   },
-    // }).then((response) => response.text())
-    //   .then((responseJson) => {
-    //     console.log(responseJson)
-    //   })
-    //   .catch((error) => {
-    //     //console.error(error);
-    //   });
-  }
+class LayoutsComponent extends React.Component<Props> {
 
   private onItemPress = (index: number) => {
     this.props.onItemSelect(index);

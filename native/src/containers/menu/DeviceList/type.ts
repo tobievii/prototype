@@ -1,7 +1,7 @@
 import { LayoutsListItemData } from '../../../../src/components/menu';
 
-export type LayoutsData = LayoutsListItemData;
+export type DeviceData = LayoutsListItemData;
 
-export interface LayoutsContainerData extends LayoutsData {
+export interface DeviceListContainerData extends DeviceData {
   route: string;
 }

@@ -4,9 +4,9 @@ import {
   MenuIconAuthDark,
 } from "../../../../src/assets/icons";
 import { ThemeKey, ThemeService } from "../../../../src/core/themes";
-import { LayoutsContainerData } from "./type";
+import { DeviceListContainerData } from "./type";
 
-export const routes: LayoutsContainerData[] = [
+export const routes: DeviceListContainerData[] = [
   // {
   //   title: "Auth",
   //   icon: (style: StyleProp<ImageStyle>, theme: ThemeKey) => {
