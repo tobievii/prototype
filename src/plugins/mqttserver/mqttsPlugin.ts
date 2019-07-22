@@ -101,8 +101,8 @@ export class PluginMQTTS extends Plugin {
         server.listen(8883);
     }
 
-    handlePacket(deviceState: any, packet: any, cb: any) {
-
+    handlePacket(deviceState: any, packetIn: any, cb: any) {
+        var packet = _.clone(packetIn);
         // no ssl config then we just return and do nothing.
         if (!this.config) { return; }
         if (!this.config.ssl) { return; }
@@ -114,7 +114,7 @@ export class PluginMQTTS extends Plugin {
         // if this is not from the cluster (ie.. some other protocol on this server)
         // then if we are running as part of a cluster
         // we send it out and flag the packet as "fromCluster"
-        if ((this.isCluster) && (packet.fromCluster != true)) {
+        if ((this.isCluster) && (packet.fromCluster == undefined)) {
             log(this.name, "CLUSTER", "EVENT PUBLISH")
             packet.fromCluster = true;
             packet.fromId = process.env.pm_id

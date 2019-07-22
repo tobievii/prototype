@@ -12,22 +12,28 @@ export class Teltonika extends EventEmitter {
   deviceip: any;
   imei: any;
   config: any;
+  id:string;
 
   constructor(socket: Socket, config: any) {
     super();
+    this.id = "TELTONIKA_unknown";
     this.state = "init";
     this.socket = socket;
     this.avldata = {};
     this.deviceip = socket.remoteAddress;
     this.config = config;
     socket.on("data", this.handleData(socket))
+    socket.on("end", ()=>{
+      console.log("teltonika disconnected");
+      this.emit("end")
+    })
   }
 
   tcpwrite = (command: string) => {
-    //console.log("writing to device:")
+    console.log("writing to device:")
     var commandBuffer = genCommand(command)
-    //console.log("command:\t"+command)
-    //console.log(commandBuffer.toString("hex"));
+    console.log("command:\t"+command)
+    console.log(commandBuffer.toString("hex"));
     this.socket.write(commandBuffer);
   }
 
@@ -65,8 +71,10 @@ export class Teltonika extends EventEmitter {
 
             // could be a command reply response
 
+            this.id = "TELTONIKA_"+ this.imei
+
             var devicePacket: any = {
-              id: "teltonika_" + this.imei,
+              id: this.id,
               data: {
                 imei: this.avldata.imei,
                 deviceip: this.deviceip,
@@ -202,8 +210,10 @@ export class Teltonika extends EventEmitter {
           //------------------------------------------------------
           //parse
 
+          this.id = "TELTONIKA_" + this.avldata.imei;
+
           var devicePacket: any = {
-            id: "teltonika_" + this.avldata.imei,
+            id: "TELTONIKA_" + this.avldata.imei,
             data: {
               imei: this.avldata.imei,
               timestamp: this.avldata.date,
