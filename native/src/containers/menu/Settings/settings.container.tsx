@@ -7,27 +7,21 @@ import Icon from '@expo/vector-icons/Ionicons';
 import Plugin from '../../../components/plugins/admin'
 import Account from '../../../components/plugins/account'
 import Iotnxt from '../../../components/plugins/iotnxt'
+import { FavoritesContainer } from '../../../components/common/themes/favorites.container'
 
 import {
     createSwitchNavigator,
     createAppContainer,
     createDrawerNavigator,
-    createStackNavigator
+    createStackNavigator,
+    NavigationScreenProps
 } from 'react-navigation';
 
-export const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#101720",
-        color: "white",
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-    }
-});
+export var styles: any = {};
 
-export class SettingsViewContainer extends React.Component {
-    render() {
-        return <AppContainer style={styles.container} />;
+export class SettingsViewContainer extends React.Component<NavigationScreenProps> {
+    public render(): React.ReactNode {
+        return <AppContainer />;
     }
 }
 
@@ -48,11 +42,9 @@ const AccountNavigator = createStackNavigator({
 const IotnxtNavigator = createStackNavigator({
     Iotnxt: {
         screen: Iotnxt,
-        headerStyle: styles.container,
         navigationOptions: ({ navigation }) => {
             return {
                 headerTitle: 'Iot.nxt',
-                headerContainer: { styles },
                 headerLeft: (
                     <Icon onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
                 )
@@ -64,10 +56,23 @@ const IotnxtNavigator = createStackNavigator({
 const DashboardStackNavigator = createStackNavigator({
     Admin: {
         screen: Plugin,
-        headerStyle: styles.container,
         navigationOptions: ({ navigation }) => {
             return {
                 headerTitle: "Admin",
+                headerLeft: (
+                    <Icon onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
+                )
+            };
+        }
+    },
+});
+
+const ThemeStackNavigator = createStackNavigator({
+    Themes: {
+        screen: FavoritesContainer,
+        navigationOptions: ({ navigation }) => {
+            return {
+                headerTitle: "Themes",
                 headerLeft: (
                     <Icon onPress={() => navigation.openDrawer()} name="md-menu" size={30} />
                 )
@@ -85,6 +90,9 @@ const AppDrawerNavigator = createDrawerNavigator({
     },
     Iotnxt: {
         screen: IotnxtNavigator
+    },
+    Theme: {
+        screen: ThemeStackNavigator
     },
 });
 

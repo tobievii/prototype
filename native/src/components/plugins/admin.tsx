@@ -7,7 +7,7 @@ export const name = "ADMIN";
 class Plugin extends Component {
     render() {
         return (
-            <View style={styles.container}>
+            <View>
                 <Text>ADMIN Screen</Text>
             </View>
         );
