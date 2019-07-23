@@ -80,7 +80,7 @@ export class Account extends Component {
     return str;
   };
 
-  getMenuPageStyle = function(menu) {
+  getMenuPageStyle = function (menu) {
     if (menu == this.state.menu) {
       return { display: "" };
     } else {
@@ -88,7 +88,7 @@ export class Account extends Component {
     }
   };
 
-  getMenuClasses = function(num) {
+  getMenuClasses = function (num) {
     if (num == this.state.menu) {
       return "menuTab borderTopSpot paddingButton";
     } else {
@@ -96,7 +96,7 @@ export class Account extends Component {
     }
   };
 
-  onClickMenuTab = function(menu) {
+  onClickMenuTab = function (menu) {
     return event => {
       if (this.state.menu == menu) {
         this.setState({ menu: 0 });
@@ -111,86 +111,66 @@ export class Account extends Component {
       var form = { ...this.state.form };
       form[name] = evt.target.value;
       if (name == "emailSignup") {
-        if (form.emailSignup.indexOf("@") == -1) {
-          form["username"] = evt.target.value
-            .replace(/[^a-zA-Z0-9]/g, "")
-            .toLowerCase();
-          this.checkUpdateUsername(form["username"]);
-          if (!this.state.available) {
-            form["username"] = (
-              evt.target.value.replace(/[^a-zA-Z0-9]/g, "") +
-              this.generateDifficult(3)
-            ).toLowerCase();
-            this.setState(
-              {
-                serverError:
-                  "username not available, suggestion" + form["username"]
-              },
-              () => {
-                setTimeout(() => {
-                  this.setState({ serverError: "" });
-                }, 1000);
-              }
-            );
-          } else {
-            this.setState({ serverError: "username available" }, () => {
-              setTimeout(() => {
-                this.setState({ serverError: "" });
-              }, 1000);
-            });
-          }
-        }
         this.validateEmail(evt.target.value);
-      } else if (name == "username") {
-        form["username"] = evt.target.value
-          .replace(/[^a-zA-Z0-9]/g, "")
-          .toLowerCase();
-
-        if (!this.state.available) {
-          form["username"] = (
-            evt.target.value.replace(/[^a-zA-Z0-9]/g, "") +
-            this.generateDifficult(3)
-          ).toLowerCase();
-          this.setState(
-            {
-              serverError:
-                "username not available, suggestion" + form["username"]
-            },
-            () => {
-              setTimeout(() => {
-                this.setState({ serverError: "" });
-              }, 1000);
-            }
-          );
+        if (form.emailSignup.indexOf("@") == -1) {
+          form["username"] = evt.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+          this.setState({ form });
+        } else if (form.emailSignup.indexOf("@") != -1 && !this.state.available) {
+          form["username"] = (evt.target.value.replace(/[^a-zA-Z0-9]/g, "") + this.generateDifficult(3)).toLowerCase();
+          this.checkUpdateUsername(form, name);
         } else {
-          this.setState({ serverError: "username available" }, () => {
-            setTimeout(() => {
-              this.setState({ serverError: "" });
-            }, 1000);
-          });
+          this.setState({ form });
         }
+      } else if (name == "username") {
+        form["username"] = evt.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+        this.checkUpdateUsername(form, name);
+      } else {
+        this.setState({ form });
       }
-
-      this.setState({ form });
     };
   };
 
-  checkUpdateUsername = username => {
+  checkUpdateUsername = (form, from) => {
     fetch("/api/v3/account/checkupdateusername", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ username: username })
+      body: JSON.stringify({ username: form["username"] })
     })
       .then(response => response.json())
       .then(data => {
-        if (data.available == true) {
+        if (!data.available == true) {
+          var timeout = 20000;
+          if (from == "emailSignup") {
+            form["username"] = (form["username"].replace(/[^a-zA-Z0-9]/g, "") + this.generateDifficult(3)).toLowerCase();
+            timeout = 5000;
+          }
+
+          this.setState(
+            {
+              serverError:
+                "username not available, suggestion  " + (form["username"].replace(/[^a-zA-Z0-9]/g, "") + this.generateDifficult(3)).toLowerCase()
+            },
+            () => {
+              setTimeout(() => {
+                this.setState({ serverError: "" });
+              }, timeout);
+            }
+          );
+          this.setState({ available: false });
+        } else if (form["username"] != "" && data.available) {
           this.setState({ available: true });
+          this.setState({ serverError: "username available" }, () => {
+            setTimeout(() => {
+              this.setState({ serverError: "" });
+            }, 2000);
+          });
         } else {
           this.setState({ available: false });
         }
+        this.setState({ form });
       })
       .catch(err => console.error(err.toString()));
   };
@@ -329,14 +309,14 @@ export class Account extends Component {
                   REGISTER
                 </div>
               ) : (
-                <div
-                  className={"register " + this.getMenuClasses(2)}
-                  onClick={this.onClickMenuTab(2)}
-                  style={{ width: "150", float: "right" }}
-                >
-                  REGISTER
+                  <div
+                    className={"register " + this.getMenuClasses(2)}
+                    onClick={this.onClickMenuTab(2)}
+                    style={{ width: "150", float: "right" }}
+                  >
+                    REGISTER
                 </div>
-              )
+                )
             }
           </Media>
         );
@@ -565,17 +545,17 @@ export class Account extends Component {
                     title="Copied."
                   />
                 ) : (
-                  <CopyToClipboard
-                    text={this.state.form.passwordSignup}
-                    onCopy={() => this.setState({ copied: true })}
-                  >
-                    <span
-                      style={{ paddingLeft: 8 }}
-                      className="fas fa-clipboard smallIconClickable"
-                      title="Copy to clipboard"
-                    />
-                  </CopyToClipboard>
-                )}
+                    <CopyToClipboard
+                      text={this.state.form.passwordSignup}
+                      onCopy={() => this.setState({ copied: true })}
+                    >
+                      <span
+                        style={{ paddingLeft: 8 }}
+                        className="fas fa-clipboard smallIconClickable"
+                        title="Copy to clipboard"
+                      />
+                    </CopyToClipboard>
+                  )}
               </div>
             </div>
           </div>
@@ -597,18 +577,18 @@ export class Account extends Component {
                   <FontAwesomeIcon icon="user-plus" /> Register
                 </button>
               ) : (
-                <button
-                  className="btn-spot"
-                  style={{
-                    float: "right",
-                    opacity: 0.3,
-                    cursor: "not-allowed"
-                  }}
-                  title="Check above details"
-                >
-                  <FontAwesomeIcon icon="user-plus" /> Register
+                  <button
+                    className="btn-spot"
+                    style={{
+                      float: "right",
+                      opacity: 0.3,
+                      cursor: "not-allowed"
+                    }}
+                    title="Check above details"
+                  >
+                    <FontAwesomeIcon icon="user-plus" /> Register
                 </button>
-              )}
+                )}
             </div>
           </div>
         </div>
