@@ -95,7 +95,8 @@ export class PluginMQTT extends Plugin {
         server.listen(1883);
     }
 
-    handlePacket(deviceState: any, packet: any, cb: any) {
+    handlePacket(deviceState: any, packetIn: any, cb: any) {
+        var packet = _.clone(packetIn);
         log(this.name, "HANDLE PACKET");
 
         if (!deviceState) { console.error("MQTT plugin handlePacket deviceState is not defined"); return; }
@@ -103,7 +104,8 @@ export class PluginMQTT extends Plugin {
         // if this is not from the cluster (ie.. some other protocol on this server)
         // then if we are running as part of a cluster
         // we send it out and flag the packet as "fromCluster"
-        if ((this.isCluster) && (packet.fromCluster != true)) {
+
+        if ((this.isCluster) && (packet.fromCluster == undefined)) {
             log(this.name, "CLUSTER", "EVENT PUBLISH")
             packet.fromCluster = true;
             packet.fromId = process.env.pm_id
