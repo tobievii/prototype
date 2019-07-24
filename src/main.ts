@@ -4,6 +4,7 @@ log("MAIN \tStart ===============================")
 // console.log("PM2 instance id:" + process.env.pm_id)
 // console.log(process.env.NODE_APP_INSTANCE)
 
+
 require('source-map-support').install();
 var nodemailer = require("nodemailer")
 var _ = require('lodash');
@@ -80,6 +81,10 @@ var plugins: any = [];
 
 eventHub.on("device", (data: any) => {
   handleDeviceUpdate(data.apikey, data.packet, { socketio: true }, (e: Error, r: any) => { });
+})
+
+eventHub.on("warningNotification", (data: any) => {
+  io.sockets.emit("warningNotification", data.event);
 })
 
 eventHub.on("configChange", () => {
@@ -342,7 +347,7 @@ app.post("/api/v3/workflow", (req: any, res: any) => {
   if (req.body) {
     trex.log("WORKFLOW UPDATE");
 
-    state.updateWorkflow(db, req.user.apikey, req.body.id, req.body.code, (err: Error, result: any) => {
+    state.updateWorkflow(db, req.user, req.body.id, req.body.code, (err: Error, result: any) => {
       if (err) res.json(err);
       if (result) res.json(result);
     })
@@ -892,6 +897,17 @@ app.get("/api/v3/states/usernameToDevice", (req: any, res: any) => {
 })
 
 app.post("/api/v3/dashboard", (req: any, res: any) => {
+  var modifier;
+  if (req.user.username) {
+    if (req.user.level > 0) { modifier = "" }
+    else {
+      modifier = "[UNREGISTERED USER]"
+    }
+  }
+  else {
+    modifier = "[UNREGISTERED USER]"
+  }
+  db.states.update({ key: req.body.key }, { $push: { history: { $each: [{ date: new Date(), user: req.user.username, publickey: req.user.publickey, change: "modifided dashboard" + modifier }] } } })
   db.states.findOne({ key: req.body.key }, (e: Error, dev: any) => {
     dev.layout = req.body.layout
     db.states.update({ key: req.body.key }, dev, (errorUpdating: Error, resultUpdating: any) => {
@@ -1085,39 +1101,11 @@ function handleState(req: any, res: any, next: any) {
             io.to(req.user.username).emit("info", info);
           }
 
-          // var message = "";
-          // var AlarmNotification = {
-          //   type: "ALARM",
-          //   device: req.body.id,
-          //   created: Date.now(),
-          //   message: message,
-          //   notified: true,
-          //   seen: false
-          // }
-
-          // if (deviceState.boundaryLayer != undefined) {
-          //   if (deviceState.boundaryLayer.inbound == false) {
-          //     AlarmNotification.message = "has gone out of its boundary";
-          //     //createNotification(db, AlarmNotification, req.user, deviceState);
-          //   }
-          // }
-
         })
 
         io.to(req.user.apikey).emit('post', packet.payload);
         io.to(req.user.apikey + "|" + req.body.id).emit('post', packet.payload);
         io.to(packet.key).emit('post', packet.payload)
-
-        // db.states.findOne({ apikey: req.user.apikey, devid: req.body.id }, (findErr: Error, findResult: any) => {
-        //   if (findResult.notification24 == true) {
-        //     db.states.update({ key: findResult.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-        //       //console.log(result)
-        //       //console.log(err)
-        //     })
-        //   }
-        // })
-
-
 
         res.json({ result: "success" });
 
@@ -1295,14 +1283,37 @@ app.post("/api/v3/state/clear", (req: any, res: any) => {
   if (req.user.level < 1) { return; }
   if (!req.body.id) { res.json({ "error": "id parameter missing" }); return; }
 
+  if (req.body.type) {
+    for (var i in req.body.id) {
+      db.states.update({ apikey: req.user.apikey, devid: req.body.id[i].devid }, { "$set": { payload: { id: req.body.id[i].devid, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
+        if (req.body.clearhistory == false) {
+          if (err) res.json(err);
+          if (cleared) res.json(cleared);
+        }
+        else {
+          clearhistoryfunction(req, res);
+        }
+      })
+    }
+  }
 
-
-  db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$set": { payload: { id: req.body.id, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
-    if (err) res.json(err);
-    if (cleared) res.json(cleared);
-  })
+  else {
+    db.states.update({ apikey: req.user.apikey, devid: req.body.id }, { "$set": { payload: { id: req.body.id, data: {} }, "meta.method": "clear", "meta.userAgent": "api" } }, (err: Error, cleared: any) => {
+      if (err) res.json(err);
+      if (cleared) res.json(cleared);
+    })
+  }
 }
 )
+
+async function clearhistoryfunction(req: any, res: any) {
+  for (var i in req.body.id) {
+    await db.packets.remove({ key: req.body.id[i].key }, (err: Error, clearedhistory: any) => {
+      if (err) res.json(err);
+      if (clearedhistory) res.json(clearedhistory);
+    })
+  }
+}
 
 app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
   if (!req.user) { return; }

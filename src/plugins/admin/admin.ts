@@ -10,11 +10,7 @@ var server;
 import * as accounts from "../../accounts"
 import * as events from "events";
 import * as _ from "lodash";
-
 var scrypt = require("scrypt");
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr('prototype');
-
 import { Plugin } from "../plugin"
 import express = require('express');
 import { log } from "../../log"
@@ -101,9 +97,8 @@ export class PluginAdmin extends Plugin {
     app.post("/api/v3/admin/changepassword", (req: any, res: any) => {
       var today = new Date();
       today.setHours(today.getHours() + 2);
-      const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
-      var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+      var kdfResult = scrypt.kdfSync(req.body.pass, scryptParameters);
       db.users.update({ 'recover.recoverToken': req.body.person }, { $set: { "password": kdfResult } }, (err: Error, response: any) => {
         if (response) {
           if (response.nModified == 0) {
@@ -136,15 +131,13 @@ export class PluginAdmin extends Plugin {
 
     //Changing password while logged in
     app.post("/api/v3/admin/userpassword", (req: any, res: any) => {
-      const decryptedString = cryptr.decrypt(req.body.current);
-      const decryptedString2 = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
       var uuid = generate(128)
       db.users.findOne({ username: req.body.user }, (err: Error, found: any) => {
 
-        scrypt.verifyKdf(found.password.buffer, decryptedString, function (err: Error, result: any) {
+        scrypt.verifyKdf(found.password.buffer, req.body.current, function (err: Error, result: any) {
           if (result == true) {
-            var newpass = scrypt.kdfSync(decryptedString2, scryptParameters);
+            var newpass = scrypt.kdfSync(req.body.pass, scryptParameters);
             db.users.update({ $and: [{ username: req.body.user }] }, { $set: { "password": newpass, uuid: uuid } }, (err: Error, response: any) => {
               if (response) {
                 if (response.nModified == 0) {
@@ -213,6 +206,8 @@ export class PluginAdmin extends Plugin {
       var shareDeviceNotification = {
         type: "A DEVICE WAS SHARED WITH YOU", //req.body.email
         device: req.body.dev,
+        from: req.body.person,
+        to: req.body.email,
         created: today,
         notified: true,
         seen: false
@@ -239,7 +234,8 @@ export class PluginAdmin extends Plugin {
             to: req.body.email,
             subject: req.body.subject,
             text: req.body.text,
-            html: req.body.html
+            html: req.body.html,
+            attachments: req.body.attachments
           }
 
           smtpTransport.sendMail(mail, (err: any, info: any, packet: any) => {
@@ -247,23 +243,16 @@ export class PluginAdmin extends Plugin {
             if (info) {
 
               res.json({ err: {}, result: { mail: "sent" } })
-              db.users.findOne({ email: req.body.email }, (err: Error, result: any) => {
-                var t = result.notifications;
-                if (result.notifications) {
-                  t.push(shareDeviceNotification)
-                } else {
-                  t = [shareDeviceNotification]
-                }
-                db.users.update({ email: req.body.email }, { $set: { notifications: t } }, (err: Error, updated: any) => {
-                  io.to(req.body.email).emit("info", info)
-                  if (err) res.json(err);
-                  if (updated) res.json(updated);
-                })
-              })
               if (req.body.chosen) {
                 for (var i in req.body.chosen) {
                   db.states.update({ $and: [{ devid: req.body.chosen[i].devid, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
                   db.states.findOne({ devid: req.body.chosen[i].devid }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                    this.eventHub.emit("deviceShare", {
+                      plugin: this.name,
+                      notification: shareDeviceNotification,
+                      device: give,
+                      from: req.user.apikey
+                    })
                     db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
                   })
                 }
@@ -271,6 +260,12 @@ export class PluginAdmin extends Plugin {
               else if (!req.body.chosen) {
                 db.states.update({ $and: [{ devid: req.body.dev, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
                 db.states.findOne({ devid: req.body.dev }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+                  this.eventHub.emit("deviceShare", {
+                    plugin: this.name,
+                    notification: shareDeviceNotification,
+                    device: give,
+                    from: req.user.apikey
+                  })
                   db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
                 })
               }
@@ -328,11 +323,12 @@ export class PluginAdmin extends Plugin {
       log("ADMIN\tNew Account registration: email: " + req.body.email)
 
       req.user.email = req.body.email
+      req.user.username = req.body.username;
+      req.user.usernameSet = true;
       req.user.level = 1
-      const decryptedString = cryptr.decrypt(req.body.pass);
       var scryptParameters = scrypt.paramsSync(0.1);
       //encrypts password
-      var kdfResult = scrypt.kdfSync(decryptedString, scryptParameters);
+      var kdfResult = scrypt.kdfSync(req.body.pass, scryptParameters);
       req.user.password = kdfResult;
       accounts.registerExistingAccount(this.db, req.user, (error: Error, result: any) => {
         db.users.update({ email: req.user.email }, { $set: { encrypted: true } })

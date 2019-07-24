@@ -3,20 +3,17 @@ import React, { Component } from "react";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faHdd,
   faUserCheck,
   faUserPlus,
   faDice
 } from "@fortawesome/free-solid-svg-icons";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import Media from "react-media";
 
 library.add(faUserCheck);
 library.add(faUserPlus);
 library.add(faDice);
-const Cryptr = require("cryptr");
-const cryptr = new Cryptr("prototype");
 var openMenu = false;
 export class Account extends Component {
   state = {
@@ -24,14 +21,21 @@ export class Account extends Component {
     url: "/",
     form: {
       email: "",
+      emailSignup: "",
       passwordSignin: "",
-      passwordSignup: ""
+      passwordSignup: "",
+      username: "",
+      type: "password"
     },
     serverError: "",
     resetButton: "",
     forgotButton: "FORGOT PASSWORD",
     loginButton: "LOGIN",
-    usedButton: null
+    usedButton: null,
+    clipboard: "",
+    copied: false,
+    available: false,
+    availableEmail: false
   };
 
   // find out if the server allows registration
@@ -63,6 +67,11 @@ export class Account extends Component {
 
   generateDifficult = count => {
     var _sym = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+
+    if (count == 3) {
+      _sym = "1234567890";
+    }
+
     var str = "";
     for (var i = 0; i < count; i++) {
       var tmp = _sym[Math.round(Math.random() * (_sym.length - 1))];
@@ -71,7 +80,7 @@ export class Account extends Component {
     return str;
   };
 
-  getMenuPageStyle = function (menu) {
+  getMenuPageStyle = function(menu) {
     if (menu == this.state.menu) {
       return { display: "" };
     } else {
@@ -79,7 +88,7 @@ export class Account extends Component {
     }
   };
 
-  getMenuClasses = function (num) {
+  getMenuClasses = function(num) {
     if (num == this.state.menu) {
       return "menuTab borderTopSpot paddingButton";
     } else {
@@ -87,8 +96,8 @@ export class Account extends Component {
     }
   };
 
-  onClickMenuTab = function (menu) {
-    return (event) => {
+  onClickMenuTab = function(menu) {
+    return event => {
       if (this.state.menu == menu) {
         this.setState({ menu: 0 });
       } else {
@@ -101,13 +110,99 @@ export class Account extends Component {
     return evt => {
       var form = { ...this.state.form };
       form[name] = evt.target.value;
+      if (name == "emailSignup") {
+        if (form.emailSignup.indexOf("@") == -1) {
+          form["username"] = evt.target.value
+            .replace(/[^a-zA-Z0-9]/g, "")
+            .toLowerCase();
+          this.checkUpdateUsername(form["username"]);
+          if (!this.state.available) {
+            form["username"] = (
+              evt.target.value.replace(/[^a-zA-Z0-9]/g, "") +
+              this.generateDifficult(3)
+            ).toLowerCase();
+            this.setState(
+              {
+                serverError:
+                  "username not available, suggestion" + form["username"]
+              },
+              () => {
+                setTimeout(() => {
+                  this.setState({ serverError: "" });
+                }, 1000);
+              }
+            );
+          } else {
+            this.setState({ serverError: "username available" }, () => {
+              setTimeout(() => {
+                this.setState({ serverError: "" });
+              }, 1000);
+            });
+          }
+        }
+        this.validateEmail(evt.target.value);
+      } else if (name == "username") {
+        form["username"] = evt.target.value
+          .replace(/[^a-zA-Z0-9]/g, "")
+          .toLowerCase();
+
+        if (!this.state.available) {
+          form["username"] = (
+            evt.target.value.replace(/[^a-zA-Z0-9]/g, "") +
+            this.generateDifficult(3)
+          ).toLowerCase();
+          this.setState(
+            {
+              serverError:
+                "username not available, suggestion" + form["username"]
+            },
+            () => {
+              setTimeout(() => {
+                this.setState({ serverError: "" });
+              }, 1000);
+            }
+          );
+        } else {
+          this.setState({ serverError: "username available" }, () => {
+            setTimeout(() => {
+              this.setState({ serverError: "" });
+            }, 1000);
+          });
+        }
+      }
+
       this.setState({ form });
     };
   };
 
+  checkUpdateUsername = username => {
+    fetch("/api/v3/account/checkupdateusername", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username: username })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.available == true) {
+          this.setState({ available: true });
+        } else {
+          this.setState({ available: false });
+        }
+      })
+      .catch(err => console.error(err.toString()));
+  };
+
   validateEmail = email => {
     var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+    // return re.test(String(email).toLowerCase());
+    if (re.test(String(email).toLowerCase())) {
+      this.setState({ availableEmail: true });
+    } else {
+      this.setState({ availableEmail: false });
+    }
   };
 
   signInKey = e => {
@@ -125,8 +220,8 @@ export class Account extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: this.state.form.email,
-        pass: cryptr.encrypt(this.state.form.passwordSignin)
+        email: this.state.form.email.toLocaleLowerCase(),
+        pass: this.state.form.passwordSignin
       })
     })
       .then(response => response.json())
@@ -150,8 +245,9 @@ export class Account extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: this.state.form.email,
-        pass: cryptr.encrypt(this.state.form.passwordSignup)
+        email: this.state.form.emailSignup,
+        username: this.state.form.username,
+        pass: this.state.form.passwordSignup
       })
     })
       .then(response => response.json())
@@ -211,7 +307,9 @@ export class Account extends Component {
     if (this.state.registration) {
       if (this.state.registration.userRegistration) {
         if (this.props.registrationPanel == true && openMenu == false) {
-          this.setState({ menu: 2 }, () => { openMenu = true; })
+          this.setState({ menu: 2 }, () => {
+            openMenu = true;
+          });
         }
 
         return (
@@ -231,14 +329,14 @@ export class Account extends Component {
                   REGISTER
                 </div>
               ) : (
-                  <div
-                    className={"register " + this.getMenuClasses(2)}
-                    onClick={this.onClickMenuTab(2)}
-                    style={{ width: "150", float: "right" }}
-                  >
-                    REGISTER
+                <div
+                  className={"register " + this.getMenuClasses(2)}
+                  onClick={this.onClickMenuTab(2)}
+                  style={{ width: "150", float: "right" }}
+                >
+                  REGISTER
                 </div>
-                )
+              )
             }
           </Media>
         );
@@ -297,7 +395,9 @@ export class Account extends Component {
 
   levelZero = () => {
     if (this.props.loginPanel == true && openMenu == false) {
-      this.setState({ menu: 1 }, () => { openMenu = true; })
+      this.setState({ menu: 1 }, () => {
+        openMenu = true;
+      });
     }
     return (
       <div
@@ -335,7 +435,7 @@ export class Account extends Component {
             <div className="col-9">
               {" "}
               <input
-                id="emailInput"
+                id="emailInput2"
                 placeholder="email"
                 style={{ width: "100%" }}
                 spellCheck="false"
@@ -357,6 +457,7 @@ export class Account extends Component {
             </div>
             <div className="col-9">
               <input
+                id="password2"
                 placeholder="password"
                 type="password"
                 style={{ width: "100%" }}
@@ -384,9 +485,31 @@ export class Account extends Component {
                 placeholder="email"
                 type="email"
                 style={{ width: "100%" }}
-                onChange={this.changeInput("email")}
+                onChange={this.changeInput("emailSignup")}
                 spellCheck="false"
-                value={this.state.form.email}
+                value={this.state.form.emailSignup}
+              />
+            </div>
+          </div>
+
+          <div className="row" style={{ marginTop: 2, marginBottom: 5 }}>
+            <div
+              className="col-3"
+              style={{ textAlign: "right", paddingTop: 10 }}
+            >
+              {" "}
+              username:{" "}
+            </div>
+
+            <div className="col-9">
+              <input
+                id="usernameInput"
+                placeholder="username"
+                type="text"
+                style={{ width: "100%" }}
+                onChange={this.changeInput("username")}
+                spellCheck="false"
+                value={this.state.form.username}
               />
             </div>
           </div>
@@ -399,9 +522,11 @@ export class Account extends Component {
               {" "}
               password:{" "}
             </div>
-            <div className="col-8">
+            <div className="col-7" style={{ paddingRight: 8 }}>
               <input
+                id="password"
                 className="password"
+                type={this.state.form.type}
                 placeholder="password"
                 spellCheck="false"
                 style={{ width: "100%" }}
@@ -411,7 +536,7 @@ export class Account extends Component {
             </div>
 
             <div
-              className="col-1"
+              className="col-2"
               style={{ padding: "8px 10px 0px 0px", fontSize: "120%" }}
             >
               <div>
@@ -420,7 +545,37 @@ export class Account extends Component {
                   className="smallIconClickable"
                   icon="dice"
                   title="Generate random"
+                  onMouseOver={() => {
+                    var form = { ...this.state.form };
+                    if (this.state.form.type == "password") {
+                      form["type"] = "text";
+                      this.setState({ form });
+                    }
+                    setTimeout(() => {
+                      form["type"] = "password";
+                      this.setState({ form });
+                    }, 1900);
+                  }}
                 />
+
+                {this.state.copied ? (
+                  <i
+                    style={{ paddingLeft: 8, color: "green" }}
+                    className="fas fa-clipboard-check smallIconClickable"
+                    title="Copied."
+                  />
+                ) : (
+                  <CopyToClipboard
+                    text={this.state.form.passwordSignup}
+                    onCopy={() => this.setState({ copied: true })}
+                  >
+                    <span
+                      style={{ paddingLeft: 8 }}
+                      className="fas fa-clipboard smallIconClickable"
+                      title="Copy to clipboard"
+                    />
+                  </CopyToClipboard>
+                )}
               </div>
             </div>
           </div>
@@ -433,13 +588,27 @@ export class Account extends Component {
             </div>
 
             <div className="col-5">
-              <button
-                className="btn-spot"
-                style={{ float: "right" }}
-                onClick={this.register}
-              >
-                <FontAwesomeIcon icon="user-plus" /> Register
-              </button>
+              {this.state.available && this.state.availableEmail ? (
+                <button
+                  className="btn-spot"
+                  style={{ float: "right" }}
+                  onClick={this.register}
+                >
+                  <FontAwesomeIcon icon="user-plus" /> Register
+                </button>
+              ) : (
+                <button
+                  className="btn-spot"
+                  style={{
+                    float: "right",
+                    opacity: 0.3,
+                    cursor: "not-allowed"
+                  }}
+                  title="Check above details"
+                >
+                  <FontAwesomeIcon icon="user-plus" /> Register
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { PluginHTTP } from "./http/pluginHTTP_serverside"
 import { PluginTCP } from "./tcp/pluginTcp_serverside"
 import { PluginTeltonika } from "./teltonika/plugin_teltonika"
 import { PluginMQTT } from "./mqttserver/mqttPlugin"
+import { PluginMQTTS } from "./mqttserver/mqttsPlugin"
 import { pluginHF2111A } from "./HF2111A/plugin_HF2111A"
 import { PluginEFENTO } from "./efento/plugin_efento"
 import { PluginScheduler } from "./scheduler/scheduler"
@@ -24,6 +25,7 @@ export function pluginsInitialize(config: any, app: express.Express, db: any, ev
   plugins.push(new PluginAccount(config, app, db, eventHub));
   plugins.push(new PluginIotnxt(config, app, db, eventHub));
   plugins.push(new PluginMQTT(config, app, db, eventHub));
+  plugins.push(new PluginMQTTS(config, app, db, eventHub));
   plugins.push(new PluginHTTP(config, app, db, eventHub));
   plugins.push(new PluginTCP(config, app, db, eventHub));
   plugins.push(new PluginTeltonika(config, app, db, eventHub));

@@ -1,6 +1,7 @@
 
 import * as events from "events"
 import * as net from "net";
+import * as tls from "tls";
 import { mqttConnection } from "./mqttConnection"
 import * as _ from "lodash"
 
@@ -9,23 +10,28 @@ import { Plugin } from "../plugin"
 import express = require('express');
 var RedisEvent = require('redis-event');
 
-export class PluginMQTT extends Plugin {
+export class PluginMQTTS extends Plugin {
     serversMem: any[] = [];
     db: any;
     app: any;
     eventHub: events.EventEmitter;
-    name = "MQTT";
+    name = "MQTTS";
 
     mqttConnections: any = [];
     isCluster: boolean = false;
     ev: any;
     clustersubs: string[] = [];
+    config: any;
 
     constructor(config: any, app: express.Express, db: any, eventHub: events.EventEmitter) {
         super(app, db, eventHub);
+        this.config = config;
         this.db = db;
         this.app = app;
         this.eventHub = eventHub;
+
+        if (!config) { log("PLUGIN", this.name, "NO CONFIG SSL. DISABLING."); return; }
+        if (!config.ssl) { log("PLUGIN", this.name, "NO SSL. DISABLING."); return; }
 
         log("PLUGIN", this.name, "LOADED");
         // if redis is on and this is running inside PM2
@@ -39,7 +45,7 @@ export class PluginMQTT extends Plugin {
             });
         }
 
-        var server = net.createServer((socket: any) => {
+        var server = tls.createServer(config.sslOptions, (socket: any) => {
             var client = new mqttConnection(socket)
 
             client.on("connect", (data) => {
@@ -92,19 +98,22 @@ export class PluginMQTT extends Plugin {
             client.on("ping", () => { })
         });
 
-        server.listen(1883);
+        server.listen(8883);
     }
 
     handlePacket(deviceState: any, packetIn: any, cb: any) {
         var packet = _.clone(packetIn);
+        // no ssl config then we just return and do nothing.
+        if (!this.config) { return; }
+        if (!this.config.ssl) { return; }
+
         log(this.name, "HANDLE PACKET");
 
-        if (!deviceState) { console.error("MQTT plugin handlePacket deviceState is not defined"); return; }
+        if (!deviceState) { console.error(this.name + " plugin handlePacket deviceState is not defined"); return; }
 
         // if this is not from the cluster (ie.. some other protocol on this server)
         // then if we are running as part of a cluster
         // we send it out and flag the packet as "fromCluster"
-
         if ((this.isCluster) && (packet.fromCluster == undefined)) {
             log(this.name, "CLUSTER", "EVENT PUBLISH")
             packet.fromCluster = true;

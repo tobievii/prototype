@@ -112,27 +112,13 @@ export class PluginIotnxt extends Plugin {
     });
 
     app.post("/api/v3/iotnxt/setgatewaydevice", (req: any, res: any) => {
-      
-      if (req.body.key) {
-        // newer key method:
-        var gateway = {
-          GatewayId: req.body.GatewayId,
-          HostAddress: req.body.HostAddress
-        }
-        this.setgatewaydevice(req.user, req.body.key, gateway, (err: Error, result: any) => {
-          res.json(result);
-        })
-      } else {
-        // users only changing own devices using {id, GatewayId, HostAddress}:
-        this.db.states.update(
-          { devid:req.body.id, apikey: req.user.apikey },
-          { "$set": { "plugins_iotnxt_gateway": { GatewayId: req.body.GatewayId, HostAddress: req.body.HostAddress } } },
-          (err:Error, result:any) => {
-            res.json(result);
-          })      
-        //
+      var gateway = {
+        GatewayId: req.body.GatewayId,
+        HostAddress: req.body.HostAddress
       }
-      
+      this.setgatewaydevice(req.user, req.body.key, gateway, req.body.id, req.body.currentGateway, (err: Error, result: any) => {
+        res.json(result);
+      })
     });
 
   }
@@ -354,20 +340,46 @@ export class PluginIotnxt extends Plugin {
     //
   }
 
-  setgatewaydevice(user: any, key: string, gateway: any, cb: Function) {
+  setgatewaydevice(user: any, key: any, gateway: any, id: any, current: any, cb: Function) {
+    var changes;
+    if (current) {
+      changes = "changed gateway from " + current + " to " + gateway.GatewayId
+    }
+    else {
+      changes = "changed gateway to " + gateway.GatewayId + " [via POSTMAN]"
+    }
 
     if (user.level >= 100) {
       //admins
-      this.db.states.update(
-        { key },
-        { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
-        cb)
+      if (key) {
+        this.db.states.update({ key }, { $push: { history: { $each: [{ date: new Date(), user: user.username, publickey: user.publickey, change: changes }] } } })
+        this.db.states.update(
+          { key },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
+      else {
+        this.db.states.update({ devid: id, apikey: user.apikey }, { $push: { history: { $each: [{ date: new Date(), user: user.username, publickey: user.publickey, change: changes }] } } })
+        this.db.states.update(
+          { devid: id, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
     } else {
-      //users
-      this.db.states.update(
-        { key, apikey: user.apikey },
-        { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
-        cb)
+      if (key) {
+        this.db.states.update({ key }, { $push: { history: { $each: [{ date: new Date(), user: user.username, publickey: user.publickey, change: changes }] } } })
+        this.db.states.update(
+          { key: key, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
+      else {
+        this.db.states.update({ devid: id, apikey: user.apikey }, { $push: { history: { $each: [{ date: new Date(), user: user.username, publickey: user.publickey, change: changes }] } } })
+        this.db.states.update(
+          { devid: id, apikey: user.apikey },
+          { "$set": { "plugins_iotnxt_gateway": { GatewayId: gateway.GatewayId, HostAddress: gateway.HostAddress } } },
+          cb)
+      }
     }
   }
 

@@ -247,7 +247,11 @@ export class StatesViewer extends Component {
       })
 
 
-      this.socket.on("notificationState", a => {
+      this.socket.on("plugin_notifications", a => {
+        this.getDevices("notification");
+      })
+
+      this.socket.on("warningNotification", a => {
         this.getDevices("notification");
       })
 
@@ -279,6 +283,7 @@ export class StatesViewer extends Component {
             for (var device in this.state.devicesServer) {
               this.socket.emit("join", this.state.devicesServer[device].key);
             }
+
             this.setState({ devicesView: states }, () => {
               if (functionCall == "initial load") {
                 this.sort(this.state.sort);
@@ -940,6 +945,11 @@ export class StatesViewer extends Component {
         this.setState({ modificationinfo: "You can now share multiple devices" })
         this.setState({ selectedModification: choice })
         this.setState({ isOpenshare: true })
+        break;
+      case "CLEAR DEVICE DATA":
+        this.setState({ modificationinfo: "Are you sure you want to clear device(s) data ?" })
+        this.setState({ selectedModification: choice })
+        this.setState({ isOpenModify: true })
         break;
       default:
         this.setState({ modificationinfo: "" });
