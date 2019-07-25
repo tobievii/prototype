@@ -1,31 +1,24 @@
 import React from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, AsyncStorage } from 'react-native';
 // import { styles } from '../../containers/menu/Settings/settings.container'
-import { withStyles, ThemeType, ThemedComponentProps } from 'react-native-ui-kitten';
+// import { withStyles, ThemeType, ThemedComponentProps } from 'react-native-ui-kitten';
+import { NavigationScreenProps } from 'react-navigation';
 
 export const name = "Account";
 
-type Props = ThemedComponentProps
+class Account extends React.Component<NavigationScreenProps>{
 
-class Account extends React.Component<Props> {
-
-    cookie = undefined;
-    platform: "https://prototype.dev.iotnxt.io"
-
-    private signout = () => {
-        fetch(this.platform + '/signout', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.cookie),
-        }).then((response) => response.text())
+    private signout = async () => {
+        try {
+            await AsyncStorage.removeItem("user");
+        }
+        catch (exception) {
+            console.log(exception)
+        }
+        this.props.navigation.navigate('Signout');
     }
 
     public render(): React.ReactNode {
-        const { themedStyle } = this.props;
-        console.log(this.props)
         return (
             <View>
                 <Button title="SIGN OUT" onPress={this.signout} />

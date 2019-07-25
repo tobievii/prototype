@@ -10,8 +10,15 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   };
   private navigationKey: string = 'SignInContainer';
 
-  private onSignInPress = (data: SignInFormData) => {
-    fetch('https://prototype.dev.iotnxt.io/signin', {
+  componentWillMount = async () => {
+    var user = await AsyncStorage.getItem('user')
+    if (user) {
+      this.user(user);
+    }
+  }
+
+  private onSignInPress = async (data: SignInFormData) => {
+    await fetch('https://prototype.dev.iotnxt.io/signin', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -25,10 +32,11 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
       .then((responseJson) => {
         var res = JSON.parse(responseJson)
         if (res.signedin == true) {
-          this.props.navigation.navigate({
-            key: this.navigationKey,
-            routeName: 'logged',
-          });
+          AsyncStorage.setItem('user', JSON.stringify({
+            email: data.username.toLowerCase(),
+            pass: data.password
+          }));
+          this.user(undefined);
         }
         else {
           this.props.navigation.navigate({
@@ -43,19 +51,12 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
 
   };
 
-  user = async () => {
-    this.setState({ view: await AsyncStorage.getItem('user') });
-    if (this.state.view) {
-      this.props.navigation.navigate({
-        key: this.navigationKey,
-        routeName: 'logged',
-      });
-    } else {
-      this.props.navigation.navigate({
-        key: this.navigationKey,
-        routeName: 'Home',
-      });
+  user = async (user: any) => {
+    if (!user) {
+      user = await AsyncStorage.getItem('user')
     }
+
+    this.props.navigation.navigate('Device List', { "user": user });
   };
 
   private onSignUpPress = () => {

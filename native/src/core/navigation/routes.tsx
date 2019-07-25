@@ -106,7 +106,7 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
 
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Home"]: MenuNavigator,
+    ["Home"]: SignInContainer,
     ...AuthNavigationMap
   },
   {

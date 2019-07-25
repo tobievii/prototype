@@ -24,7 +24,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
         },
       });
       const data = await response.json();
-
+      // console.log(data)
       this.setState({ data: data });
       // const data = responseJson;
       // console.log(data)
@@ -36,6 +36,8 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
   }
 
   componentDidMount = () => {
+    const { navigation } = this.props;
+    this.setState({ user: navigation.getParam('user') });
     this.getDeviceList();
   }
 

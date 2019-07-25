@@ -18,9 +18,11 @@ import {
 } from 'react-navigation';
 
 export var styles: any = {};
+var navigator: any;
 
 export class SettingsViewContainer extends React.Component<NavigationScreenProps> {
     public render(): React.ReactNode {
+        navigator = this.props.navigation;
         return <AppContainer />;
     }
 }
@@ -81,8 +83,25 @@ const ThemeStackNavigator = createStackNavigator({
     },
 });
 
+class Signoutcomp extends React.Component<NavigationScreenProps>{
+
+    public render(): React.ReactNode {
+        navigator.navigate('Home');
+        return (
+            <View>
+            </View>
+        );
+    }
+}
+
+const SignStackNavigator = createStackNavigator({
+    Signout: {
+        screen: Signoutcomp,
+    },
+});
+
 const AppDrawerNavigator = createDrawerNavigator({
-    ADMIN: {
+    Admin: {
         screen: DashboardStackNavigator,
     },
     Account: {
@@ -94,10 +113,20 @@ const AppDrawerNavigator = createDrawerNavigator({
     Theme: {
         screen: ThemeStackNavigator
     },
+    Signout: {
+        screen: SignStackNavigator,
+    },
+});
+
+const SignoutNavigator = createDrawerNavigator({
+    Signout: {
+        screen: SignStackNavigator
+    },
 });
 
 const AppSwitchNavigator = createSwitchNavigator({
-    Dashboard: { screen: AppDrawerNavigator }
+    Dashboard: { screen: AppDrawerNavigator },
+    Signout: { screen: SignoutNavigator }
 });
 
 const AppContainer = createAppContainer(AppSwitchNavigator);
