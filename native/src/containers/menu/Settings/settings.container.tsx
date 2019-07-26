@@ -8,6 +8,7 @@ import Plugin from '../../../components/plugins/admin'
 import Account from '../../../components/plugins/account'
 import Iotnxt from '../../../components/plugins/iotnxt'
 import { FavoritesContainer } from '../../../components/common/themes/favorites.container'
+import { AsyncStorage } from 'react-native'
 
 import {
     createSwitchNavigator,
@@ -84,8 +85,12 @@ const ThemeStackNavigator = createStackNavigator({
 });
 
 class Signoutcomp extends React.Component<NavigationScreenProps>{
+    unsetUser = async () => {
+        await AsyncStorage.clear();
+    }
 
     public render(): React.ReactNode {
+        this.unsetUser()
         navigator.navigate('Home');
         return (
             <View>

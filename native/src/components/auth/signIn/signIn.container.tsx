@@ -17,6 +17,13 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
     }
   }
 
+  componentDidUpdate = async () => {
+    var user = await AsyncStorage.getItem('user')
+    if (user) {
+      this.user(user);
+    }
+  }
+
   private onSignInPress = async (data: SignInFormData) => {
     await fetch('https://prototype.dev.iotnxt.io/signin', {
       method: 'POST',
@@ -26,7 +33,8 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
       },
       body: JSON.stringify({
         email: data.username.toLowerCase(),
-        pass: data.password
+        pass: data.password,
+        mobile: true
       }),
     }).then((response) => response.text())
       .then((responseJson) => {
@@ -34,7 +42,8 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
         if (res.signedin == true) {
           AsyncStorage.setItem('user', JSON.stringify({
             email: data.username.toLowerCase(),
-            pass: data.password
+            pass: data.password,
+            auth: "userheader"
           }));
           this.user(undefined);
         }

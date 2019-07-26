@@ -38,7 +38,6 @@ class SignInComponent extends React.Component<SignInProps> {
   };
 
   private onSignInButtonPress = () => {
-    AsyncStorage.setItem('user', JSON.stringify(this.state.formData))
     this.props.onSignInPress(this.state.formData);
   };
 
