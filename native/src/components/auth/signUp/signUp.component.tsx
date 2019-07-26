@@ -3,6 +3,7 @@ import {
   ButtonProps,
   ImageProps,
   View,
+  Text
 } from 'react-native';
 import {
   StyleType,
@@ -32,12 +33,14 @@ export type SignUp2Props = ThemedComponentProps & ComponentProps;
 
 interface State {
   formData: SignUpFormData;
+  response: string;
 }
 
 class SignUp2Component extends React.Component<SignUp2Props, State> {
 
   public state: State = {
     formData: undefined,
+    response: ""
   };
 
   private onFormDataChange = (formData: SignUpFormData) => {
@@ -53,9 +56,32 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
   };
 
   private onSignUpButtonPress = () => {
-    this.props.onSignUpPress(this.state.formData);
+    this.setState({ response: "Please Wait ...." })
+    fetch("https://prototype.dev.iotnxt.io/api/v3/admin/register", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: this.state.formData.email.toLowerCase(),
+        username: this.state.formData.username,
+        pass: this.state.formData.password
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          this.setState({ response: data.error })
+        }
+        else {
+          this.setState({ response: "Registration Successfull" })
+          this.props.onSignUpPress(this.state.formData);
+          this.setState({ response: "" })
+        }
+      })
+      .catch(err => console.error(err.toString()));
   };
-
   private renderPhotoButtonIcon = (style: StyleType): React.ReactElement<ImageProps> => {
     const { themedStyle } = this.props;
 
@@ -82,6 +108,9 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
       <ScrollableAvoidKeyboard style={themedStyle.container}>
         <View style={themedStyle.headerContainer}>
         </View>
+        <Text style={themedStyle.error}>
+          {this.state.response}
+        </Text>
         <SignUpForm
           style={themedStyle.formContainer}
           onDataChange={this.onFormDataChange}
@@ -117,6 +146,11 @@ export const SignUp2 = withStyles(SignUp2Component, (theme: ThemeType) => ({
     alignItems: 'center',
     minHeight: 216,
     backgroundColor: theme['color-primary-default'],
+  },
+  error: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    color: 'red'
   },
   formContainer: {
     flex: 1,
