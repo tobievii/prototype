@@ -17,12 +17,6 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
     }
   }
 
-  componentDidUpdate = async () => {
-    var user = await AsyncStorage.getItem('user')
-    if (user) {
-      this.user(user);
-    }
-  }
 
   private onSignInPress = async (data: SignInFormData) => {
     await fetch('https://prototype.dev.iotnxt.io/signin', {

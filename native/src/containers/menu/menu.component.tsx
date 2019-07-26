@@ -16,6 +16,7 @@ import {
   Favorites,
   Documentation,
   Support,
+  Settings
 } from '@src/assets/icons';
 import { themes } from '@src/core/themes';
 
@@ -64,7 +65,7 @@ class MenuComponent extends React.Component<Props> {
             /> */}
             <BottomNavigationTab
               title='Settings'
-              icon={Support}
+              icon={Settings}
             />
           </BottomNavigation>
         </ThemeProvider>

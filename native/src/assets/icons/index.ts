@@ -479,6 +479,13 @@ export const Support = (style: StyleProp<ImageStyle>): IconElement => {
   return Icon(source, style);
 };
 
+export const Settings = (style: StyleProp<ImageStyle>): IconElement => {
+  const source: IconSource = {
+    imageSource: require('./eva/person.png'),
+  };
+  return Icon(source, style);
+};
+
 export const LockIconFill = (style: StyleProp<ImageStyle>): IconElement => {
   const source: IconSource = {
     imageSource: require('./eva/lock.png'),
@@ -595,7 +602,7 @@ export const StarIconFill = (style: StyleProp<ImageStyle>): IconElement => {
 
 export const MapView = (style: StyleProp<ImageStyle>): IconElement => {
   const source: IconSource = {
-    imageSource: require('./eva/map.png'),
+    imageSource: require('./eva/pin-outline.png'),
   };
 
   return Icon(source, style);
