@@ -99,7 +99,13 @@ export function signInFromWeb(db: any) {
                 if (result == true) {
                   req.user = user;
                   cookieSetFromUser(user, req, res, () => {
-                    res.json({ signedin: true });
+                    if (req.body.mobile) {
+                      var authheader = 'Basic ' + Buffer.from("api:key-" + user.apikey).toString('base64')
+                      res.json({ signedin: true, auth: authheader })
+                    }
+                    else {
+                      res.json({ signedin: true })
+                    }
                   })
                 }
                 else {
