@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from 'react-modal';
 import zxcvbn from "zxcvbn"
+import Media from "react-media";
 
 const customStyles = {
     content: {
@@ -16,6 +17,28 @@ const customStyles = {
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto',
         padding: "0"
+    },
+    overlay: {
+        background: "rgba(23, 47, 64, 0.85)",
+        zIndex: 1002
+    }
+};
+
+const customStylesMobile = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: '50%',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        border: "none",
+        background: "rgba(0, 0, 0, 0.1)",
+        backgroundColor: "rgba(0, 0, 0, 0.1)",
+        maxHeight: 'calc(100vh - 210px)',
+        overflowY: 'auto',
+        padding: "0",
+        width: "100%"
     },
     overlay: {
         background: "rgba(23, 47, 64, 0.85)",
@@ -140,9 +163,9 @@ export default class ChangePassword extends React.PureComponent {
 
                     method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        pass:this.state.password,
+                        pass: this.state.password,
                         user: this.props.account.username,
-                        current:this.state.currentpassword
+                        current: this.state.currentpassword
                     })
                 }).then(response => response.json()).then(data => {
                     if (data == false) {
@@ -212,81 +235,163 @@ export default class ChangePassword extends React.PureComponent {
     render() {
         const { suggestions } = this.state
         return (
-            <div >
-                <center>
-                    <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel(); }} style={{ paddingRight: 10, float: "right" }}></span>
-                        <center>
-                            <div>
-                                <div style={{ paddingTop: "25px" }}>
-                                </div>
+            <Media query="(max-width: 599px)">
+                {matches =>
+                    matches ? (
+                        <div >
+                            <center>
+                                <Modal style={customStylesMobile} isOpen={this.props.isOpen}>
+                                    <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel(); }} style={{ paddingRight: 10, float: "right" }}></span>
+                                    <center>
+                                        <div>
+                                            <div style={{ paddingTop: "25px" }}>
+                                            </div>
+                                            <br></br>
+                                            Current password:
                                 <br></br>
-                                Current password:
+                                            <input
+                                                className="fullWidth"
+                                                type="password"
+                                                placeholder="current password"
+                                                name="current"
+                                                style={{ marginBottom: 5, width: "50%" }}
+                                                onChange={this.currentpassword("current")}
+                                                value={this.state.currentpassword}
+                                                spellCheck="false"
+                                            />
+                                            <br></br>
+                                            <br></br>
+                                            New password:
                                 <br></br>
-                                <input
-                                    className="fullWidth"
-                                    type="password"
-                                    placeholder="current password"
-                                    name="current"
-                                    style={{ marginBottom: 5, width: "50%" }}
-                                    onChange={this.currentpassword("current")}
-                                    value={this.state.currentpassword}
-                                    spellCheck="false"
-                                />
+                                            <input
+                                                className="fullWidth"
+                                                type="password"
+                                                placeholder="new password"
+                                                name="password"
+                                                onChange={this.passwordInput("password")}
+                                                value={this.state.password}
+                                                style={{ marginBottom: 5, width: "50%", borderColor: this.state.color }}
+                                                autoComplete="off"
+                                                spellCheck="false"
+                                            />
+                                            <br></br>
+                                            <span style={{ textColor: this.state.color }}>{this.state.passwordStrength}</span>
+                                            <br></br>
+                                            Confirm password:
                                 <br></br>
+                                            <input
+                                                className="fullWidth"
+                                                type="password"
+                                                placeholder="confirm password"
+                                                name="confirm"
+                                                style={{ marginBottom: 5, width: "50%", borderColor: this.state.color2 }}
+                                                onChange={this.confirmInput("confirm")}
+                                                value={this.state.confirm}
+                                                autoComplete="off"
+                                                spellCheck="false"
+                                            />
+                                            <br></br>
+                                            <br></br>
+                                            <span
+                                                className="serverError"
+                                                style={{ fontSize: "11px" }}
+                                            >
+                                                {this.state.message}
+                                            </span>
+                                            <br></br>
+                                            <br></br>
+                                            <div style={{ textAlign: "left" }}>
+                                                {suggestions.map((s, index) =>
+                                                    <li key={index}>
+                                                        {"Tip: " + s}
+                                                    </li>
+                                                )}
+                                            </div>
+                                            {this.changepassbutton()}
+                                        </div>
+                                    </center>
+                                </Modal>
+                            </center>
+                        </div >
+                    ) : (
+                            <div >
+                                <center>
+                                    <Modal style={customStyles} isOpen={this.props.isOpen}>
+                                        <span className={"fas fa-times navLink cross"} onClick={() => { this.props.closeModel(); }} style={{ paddingRight: 10, float: "right" }}></span>
+                                        <center>
+                                            <div>
+                                                <div style={{ paddingTop: "25px" }}>
+                                                </div>
+                                                <br></br>
+                                                Current password:
                                 <br></br>
-                                New password:
+                                                <input
+                                                    className="fullWidth"
+                                                    type="password"
+                                                    placeholder="current password"
+                                                    name="current"
+                                                    style={{ marginBottom: 5, width: "50%" }}
+                                                    onChange={this.currentpassword("current")}
+                                                    value={this.state.currentpassword}
+                                                    spellCheck="false"
+                                                />
+                                                <br></br>
+                                                <br></br>
+                                                New password:
                                 <br></br>
-                                <input
-                                    className="fullWidth"
-                                    type="password"
-                                    placeholder="new password"
-                                    name="password"
-                                    onChange={this.passwordInput("password")}
-                                    value={this.state.password}
-                                    style={{ marginBottom: 5, width: "50%", borderColor: this.state.color }}
-                                    autoComplete="off"
-                                    spellCheck="false"
-                                />
+                                                <input
+                                                    className="fullWidth"
+                                                    type="password"
+                                                    placeholder="new password"
+                                                    name="password"
+                                                    onChange={this.passwordInput("password")}
+                                                    value={this.state.password}
+                                                    style={{ marginBottom: 5, width: "50%", borderColor: this.state.color }}
+                                                    autoComplete="off"
+                                                    spellCheck="false"
+                                                />
+                                                <br></br>
+                                                <span style={{ textColor: this.state.color }}>{this.state.passwordStrength}</span>
+                                                <br></br>
+                                                Confirm password:
                                 <br></br>
-                                <span style={{ textColor: this.state.color }}>{this.state.passwordStrength}</span>
-                                <br></br>
-                                Confirm password:
-                                <br></br>
-                                <input
-                                    className="fullWidth"
-                                    type="password"
-                                    placeholder="confirm password"
-                                    name="confirm"
-                                    style={{ marginBottom: 5, width: "50%", borderColor: this.state.color2 }}
-                                    onChange={this.confirmInput("confirm")}
-                                    value={this.state.confirm}
-                                    autoComplete="off"
-                                    spellCheck="false"
-                                />
-                                <br></br>
-                                <br></br>
-                                <span
-                                    className="serverError"
-                                    style={{ fontSize: "11px" }}
-                                >
-                                    {this.state.message}
-                                </span>
-                                <br></br>
-                                <br></br>
-                                <div style={{ textAlign: "left" }}>
-                                    {suggestions.map((s, index) =>
-                                        <li key={index}>
-                                            {"Tip: " + s}
-                                        </li>
-                                    )}
-                                </div>
-                                {this.changepassbutton()}
-                            </div>
-                        </center>
-                    </Modal>
-                </center>
-            </div >
+                                                <input
+                                                    className="fullWidth"
+                                                    type="password"
+                                                    placeholder="confirm password"
+                                                    name="confirm"
+                                                    style={{ marginBottom: 5, width: "50%", borderColor: this.state.color2 }}
+                                                    onChange={this.confirmInput("confirm")}
+                                                    value={this.state.confirm}
+                                                    autoComplete="off"
+                                                    spellCheck="false"
+                                                />
+                                                <br></br>
+                                                <br></br>
+                                                <span
+                                                    className="serverError"
+                                                    style={{ fontSize: "11px" }}
+                                                >
+                                                    {this.state.message}
+                                                </span>
+                                                <br></br>
+                                                <br></br>
+                                                <div style={{ textAlign: "left" }}>
+                                                    {suggestions.map((s, index) =>
+                                                        <li key={index}>
+                                                            {"Tip: " + s}
+                                                        </li>
+                                                    )}
+                                                </div>
+                                                {this.changepassbutton()}
+                                            </div>
+                                        </center>
+                                    </Modal>
+                                </center>
+                            </div >
+                        )
+                }
+            </Media>
         )
     }
 }
