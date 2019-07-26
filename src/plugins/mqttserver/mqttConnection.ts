@@ -73,7 +73,7 @@ export class mqttConnection extends EventEmitter {
 
                             if (result) {
                                 this.apikey = apikey[1];
-                                this.emit("connect", { apikey })
+                                this.emit("connect", { apikey: this.apikey })
 
                                 this.socket.write(mqttpacket.generate({
                                     cmd: 'connack',
