@@ -138,18 +138,32 @@ export function init(app: any, db: any) {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // returns general server statistics
-  app.get("/api/v3/stats", async (req: any, res: any) => {
-    var stats = {
-      users24h: await usersActiveLastDays(1),
-      users24hList: await usersActiveLastDaysNames(1),
-      userList: await usersNames(),
-      users1w: await usersActiveLastDays(7),
-      users1m: await usersActiveLastDays(30),
-      states24h: await statesActiveLastDays(1),
-      packets24h: await packetsActiveLastDays(1)
-    };
+  var statsCache: any;
+  var statsCacheTimestamp: any = new Date("1980");
 
-    res.json(stats);
+  app.get("/api/v3/stats", async (req: any, res: any) => {
+
+    var now: any = new Date();
+
+    // update stats every 5 minutes only
+    if ((now - statsCacheTimestamp) > 1000 * 60 * 5) {
+      var stats = {
+        users24h: await usersActiveLastDays(1),
+        users24hList: await usersActiveLastDaysNames(1),
+        userList: await usersNames(),
+        users1w: await usersActiveLastDays(7),
+        users1m: await usersActiveLastDays(30),
+        states24h: await statesActiveLastDays(1),
+        packets24h: await packetsActiveLastDays(1)
+      };
+
+      statsCacheTimestamp = now;
+      statsCache = stats;
+      res.json(stats);
+    } else {
+      res.json(statsCache);
+    }
+
   });
 
   //all users
@@ -181,11 +195,13 @@ export function init(app: any, db: any) {
         (err: Error, userList: any) => {
           var nameList: any = [];
           for (var user of userList) {
-            nameList.push({
-              //email: user.email,
-              username: user.username,
-              //uuid: user.uuid
-            });
+            if (user.username != null && user.username != undefined) {
+              nameList.push({
+                //email: user.email,
+                username: user.username,
+                //uuid: user.uuid
+              });
+            }
           }
           resolve(nameList);
         }
