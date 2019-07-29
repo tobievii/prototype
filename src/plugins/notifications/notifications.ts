@@ -76,7 +76,7 @@ export class PluginNotifications extends Plugin {
     } else {
       this.getWarningNotification(this.db);
     }
-  }, 20000);
+  }, 1000 * 60 * 5); // 5minutes
 
   getNewNotification(db: any, user: any, res: any) {
     db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
@@ -523,27 +523,32 @@ export class PluginNotifications extends Plugin {
           });
         }
 
-        db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
-          if (states.length == 0) { return; }
+        // note: you can not find {} this will pull too many objects from db when you have a large db.
+        //
 
-          var final: any;
-          var x = 0;
-          for (var state in states) {
-            if (x == 0) {
-              final = states[state];
-            } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
-              final = states[state];
-            }
-          }
-          deviceTime = final._last_seen.getTime() - dayago.getTime();
-          if (deviceTime < 0) {
-            deviceTime = 86000000;
-          }
-          this.reset(deviceTime);
-          this.stop();
-          this.start();
-          this.msToHMS(deviceTime);
-        })
+        // db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
+        //   if (states.length == 0) { return; }
+
+        //   var final: any;
+        //   var x = 0;
+        //   for (var state in states) {
+        //     if (x == 0) {
+        //       final = states[state];
+        //     } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
+        //       final = states[state];
+        //     }
+        //   }
+        //   deviceTime = final._last_seen.getTime() - dayago.getTime();
+        //   if (deviceTime < 0) {
+        //     deviceTime = 86000000;
+        //   }
+        //   this.reset(deviceTime);
+        //   this.stop();
+        //   this.start();
+        //   this.msToHMS(deviceTime);
+        // })
+
+
       } else {
         log("No devices found older than 24hr");
         this.reset(86000000);
