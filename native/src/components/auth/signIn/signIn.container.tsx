@@ -37,7 +37,7 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
           AsyncStorage.setItem('user', JSON.stringify({
             email: data.username.toLowerCase(),
             pass: data.password,
-            auth: "userheader"
+            auth: res.auth
           }));
           this.user(undefined);
         }

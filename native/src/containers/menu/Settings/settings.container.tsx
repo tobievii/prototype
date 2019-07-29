@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import Icon from '@expo/vector-icons/Ionicons';
 
 // import { plugins } from '../index
@@ -31,6 +31,7 @@ export class SettingsViewContainer extends React.Component<NavigationScreenProps
 const AccountNavigator = createStackNavigator({
     AccountScreen: {
         screen: Account,
+        // params: { account: "heyyyyyyyyyyyyyyyyyyy" },
         navigationOptions: ({ navigation }) => {
             return {
                 headerTitle: 'Account',
@@ -40,7 +41,36 @@ const AccountNavigator = createStackNavigator({
             };
         }
     }
-});
+},
+    {
+        headerMode: 'none',
+        mode: 'modal',
+        defaultNavigationOptions: {
+            gesturesEnabled: false,
+        },
+        transitionConfig: () => ({
+            transitionSpec: {
+                duration: 300
+            },
+            screenInterpolator: sceneProps => {
+                const { layout, position, scene } = sceneProps;
+                const { index } = scene;
+
+                const height = layout.initHeight;
+                const translateY = position.interpolate({
+                    inputRange: [index - 1, index, index + 1],
+                    outputRange: [height, 0, 0],
+                });
+
+                const opacity = position.interpolate({
+                    inputRange: [index - 1, index - 0.99, index],
+                    outputRange: [0, 1, 1],
+                });
+
+                return { opacity, transform: [{ translateY }] };
+            },
+        }),
+    });
 
 const IotnxtNavigator = createStackNavigator({
     Iotnxt: {
