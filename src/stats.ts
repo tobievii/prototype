@@ -160,7 +160,7 @@ export function init(app: any, db: any) {
         for (var user of userList) {
           if (user.username != null && user.username != undefined) {
             nameList.push({
-              email: user.email,
+              //email: user.email,
               username: user.username,
               selected: "deselected",
               sharekey: user.publickey,
@@ -182,9 +182,9 @@ export function init(app: any, db: any) {
           var nameList: any = [];
           for (var user of userList) {
             nameList.push({
-              email: user.email,
+              //email: user.email,
               username: user.username,
-              uuid: user.uuid
+              //uuid: user.uuid
             });
           }
           resolve(nameList);
