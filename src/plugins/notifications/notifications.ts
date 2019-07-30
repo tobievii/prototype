@@ -260,21 +260,6 @@ export class PluginNotifications extends Plugin {
         });
       })
     }
-    // this.info = function (message: string) {
-    //   var AlarmNotification = {
-    //     type: "INFO",
-    //     device: options.devid,
-    //     created: Date.now(),
-    //     message: message,
-    //     notified: true,
-    //     seen: false
-    //   }
-    //   console.log(options)
-    //   options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-    //     console.log(result)
-    //     this.createNotification(this.db, AlarmNotification, options);
-    //   })
-    // }
   }
 
   sharedDevice(db: any, notification: any, device: any) {
@@ -476,79 +461,78 @@ export class PluginNotifications extends Plugin {
     }
   }
 
-  getWarningNotification(db: any) {
+  async getWarningNotification(db: any) {
     log("Ran warning notification check.")
-    var deviceTime: any;
+    var deviceTime = 86000000;
 
     var now: any = new Date();
     var dayago = new Date(now - (1000 * 60 * 60 * 24));
 
-    db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
+    await db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
       // console.log(listDevices)
       if (listDevices.length > 0) {
         for (var s in listDevices) {
           var device = listDevices[s]
-          this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
-            for (var sub of dbSubscriptions) {
-              var subscription = {
-                endpoint: sub.subscriptionData.endpoint,
-                keys: {
-                  p256dh: sub.subscriptionData.keys.p256dh,
-                  auth: sub.subscriptionData.keys.auth
-                }
-              }
-              db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
+          // this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
+          //   console.log(dbSubscriptions.length)
+          //   for (var sub of dbSubscriptions) {
+          //     var subscription = {
+          //       endpoint: sub.subscriptionData.endpoint,
+          //       keys: {
+          //         p256dh: sub.subscriptionData.keys.p256dh,
+          //         auth: sub.subscriptionData.keys.auth
+          //       }
+          //     }
+          db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
 
-                var WarningNotificationL = {
-                  type: "CONNECTION DOWN 24HR WARNING",
-                  device: device.devid,
-                  created: new Date(),
-                  notified: false,
-                  seen: false
-                };
-                // this.createNotification(this.db, WarningNotificationL, device)
-                db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-                  this.eventHub.emit("warningNotification", {
-                    plugin: "notifications",
-                    event: {
-                      notification: WarningNotificationL,
-                      device: { apikey: device.apikey, devid: device.devid }
-                    }
-                  })
-                })
-                webpush.sendNotification(subscription, JSON.stringify(WarningNotificationL)).then((response: any) => {
-                }).catch((err: any) => console.error(err));
+            var WarningNotificationL = {
+              type: "CONNECTION DOWN 24HR WARNING",
+              device: device.devid,
+              created: new Date(),
+              notified: false,
+              seen: false
+            };
+            // this.createNotification(this.db, WarningNotificationL, device)
+            db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
+              this.eventHub.emit("warningNotification", {
+                plugin: "notifications",
+                event: {
+                  notification: WarningNotificationL,
+                  device: { apikey: device.apikey, devid: device.devid }
+                }
               })
-            }
+            })
+            //   webpush.sendNotification(subscription, JSON.stringify(WarningNotificationL)).then((response: any) => {
+            //   }).catch((err: any) => console.error(err));
+            // })
+            // }
           });
         }
 
-        // note: you can not find {} this will pull too many objects from db when you have a large db.
-        //
+        db.states.find({ "_last_seen": { $gte: dayago }, }, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
+          if (states.length == 0) {
+            deviceTime = 86000000;
+          } else {
+            var final: any;
+            var x = 0;
+            for (var state in states) {
+              if (x == 0) {
+                final = states[state];
+              } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
+                final = states[state];
+              }
+            }
+            deviceTime = final._last_seen.getTime() - dayago.getTime();
+            if (deviceTime < 0 || deviceTime == undefined) {
+              deviceTime = 86000000;
+            }
+          }
 
-        // db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
-        //   if (states.length == 0) { return; }
-
-        //   var final: any;
-        //   var x = 0;
-        //   for (var state in states) {
-        //     if (x == 0) {
-        //       final = states[state];
-        //     } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
-        //       final = states[state];
-        //     }
-        //   }
-        //   deviceTime = final._last_seen.getTime() - dayago.getTime();
-        //   if (deviceTime < 0) {
-        //     deviceTime = 86000000;
-        //   }
-        //   this.reset(deviceTime);
-        //   this.stop();
-        //   this.start();
-        //   this.msToHMS(deviceTime);
-        // })
-
-
+          this.reset(deviceTime);
+          this.stop();
+          this.start();
+          this.msToHMS(deviceTime);
+        })
       } else {
         log("No devices found older than 24hr");
         this.reset(86000000);
