@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "@types/bull": "^3.5.14",
-    "cypress": "^3.4.0",
+    "cypress": "^3.4.1",
     "pre-commit": "^1.2.2"
   }
 }
