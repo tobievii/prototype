@@ -37,7 +37,7 @@ export class PluginNotifications extends Plugin {
     this.eventHub = eventHub;
     this.config = config;
 
-    webpush.setVapidDetails("mailto:prototype@iotnxt.com", this.publicVapidKey, this.privateVapidKey);
+    //webpush.setVapidDetails("mailto:prototype@iotnxt.com", this.publicVapidKey, this.privateVapidKey);
 
     log("PLUGIN", this.name, "LOADED");
 
@@ -68,15 +68,15 @@ export class PluginNotifications extends Plugin {
     });
   }
 
-  timer = this.timerfunction(() => {
-    if (this.config.redis && process.env.pm_id) {
-      if (process.env.pm_id == "0") {
-        this.getWarningNotification(this.db);
-      }
-    } else {
-      this.getWarningNotification(this.db);
-    }
-  }, 1000 * 60 * 5); // 5minutes
+  // timer = this.timerfunction(() => {
+  //   if (this.config.redis && process.env.pm_id) {
+  //     if (process.env.pm_id == "0") {
+  //       this.getWarningNotification(this.db);
+  //     }
+  //   } else {
+  //     this.getWarningNotification(this.db);
+  //   }
+  // }, 1000 * 60 * 5); // 5minutes
 
   getNewNotification(db: any, user: any, res: any) {
     db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
@@ -364,44 +364,44 @@ export class PluginNotifications extends Plugin {
   handlePacket(deviceState: any, packet: any, cb: Function) {
     log("PLUGIN", this.name, "HANDLE PACKET");
     //this.checkExisting(deviceState.apikey);
-    if (deviceState.notification24 == true) {
-      this.db.states.update({ key: deviceState.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-        this.eventHub.emit("plugin", {
-          plugin: this.name,
-          event: {
-            device: deviceState
-          }
-        })
-      })
-    }
+    // if (deviceState.notification24 == true) {
+    //   this.db.states.update({ key: deviceState.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+    //     this.eventHub.emit("plugin", {
+    //       plugin: this.name,
+    //       event: {
+    //         device: deviceState
+    //       }
+    //     })
+    //   })
+    // }
 
-    if (deviceState.newdevice) {
-      var message = "Device Added";
-      var newDeviceNotification = {
-        type: "NEW DEVICE ADDED",
-        device: deviceState.devid,
-        created: packet._created_on,
-        notified: true,
-        seen: false
-      }
-      this.createNotification(this.db, newDeviceNotification, deviceState);
-    }
+    // if (deviceState.newdevice) {
+    //   var message = "Device Added";
+    //   var newDeviceNotification = {
+    //     type: "NEW DEVICE ADDED",
+    //     device: deviceState.devid,
+    //     created: packet._created_on,
+    //     notified: true,
+    //     seen: false
+    //   }
+    //   this.createNotification(this.db, newDeviceNotification, deviceState);
+    // }
 
-    if (deviceState.boundaryLayer != undefined) {
-      if (deviceState.boundaryLayer.inbound == false) {
-        var message = "";
-        var AlarmNotification = {
-          type: "ALARM",
-          device: deviceState.devid,
-          created: Date.now(),
-          message: message,
-          notified: true,
-          seen: false
-        }
-        AlarmNotification.message = "has gone out of its boundary";
-        this.createNotification(this.db, AlarmNotification, deviceState);
-      }
-    }
+    // if (deviceState.boundaryLayer != undefined) {
+    //   if (deviceState.boundaryLayer.inbound == false) {
+    //     var message = "";
+    //     var AlarmNotification = {
+    //       type: "ALARM",
+    //       device: deviceState.devid,
+    //       created: Date.now(),
+    //       message: message,
+    //       notified: true,
+    //       seen: false
+    //     }
+    //     AlarmNotification.message = "has gone out of its boundary";
+    //     this.createNotification(this.db, AlarmNotification, deviceState);
+    //   }
+    // }
   };
 
   checkExisting(apikey: string) {
@@ -447,34 +447,34 @@ export class PluginNotifications extends Plugin {
     }
   }
 
-  timerfunction(fn: any, t: any) {
-    var timerObj: any = setInterval(fn, t);
+  // timerfunction(fn: any, t: any) {
+  //   var timerObj: any = setInterval(fn, t);
 
-    this.stop = function () {
-      if (timerObj) {
-        clearInterval(timerObj);
-        timerObj = null;
-      }
-      return this;
-    }
+  //   this.stop = function () {
+  //     if (timerObj) {
+  //       clearInterval(timerObj);
+  //       timerObj = null;
+  //     }
+  //     return this;
+  //   }
 
-    // start timer using current settings (if it's not already running)
-    this.start = function () {
-      if (!timerObj) {
-        this.stop();
-        timerObj = setInterval(fn, t);
-      }
-      return this;
-    }
+  //   // start timer using current settings (if it's not already running)
+  //   this.start = function () {
+  //     if (!timerObj) {
+  //       this.stop();
+  //       timerObj = setInterval(fn, t);
+  //     }
+  //     return this;
+  //   }
 
-    // start with new interval, stop current interval
-    this.reset = function (newT: any) {
-      if (newT != null || newT != undefined) {
-        t = newT;
-      }
-      return this.stop().start();
-    }
-  }
+  //   // start with new interval, stop current interval
+  //   this.reset = function (newT: any) {
+  //     if (newT != null || newT != undefined) {
+  //       t = newT;
+  //     }
+  //     return this.stop().start();
+  //   }
+  // }
 
   getWarningNotification(db: any) {
     log("Ran warning notification check.")

@@ -142,27 +142,28 @@ export function init(app: any, db: any) {
   var statsCacheTimestamp: any = new Date("1980");
 
   app.get("/api/v3/stats", async (req: any, res: any) => {
+    res.json({}); //disable stats
 
-    var now: any = new Date();
+    // var now: any = new Date();
 
-    // update stats every 5 minutes only
-    if ((now - statsCacheTimestamp) > 1000 * 60 * 5) {
-      var stats = {
-        users24h: await usersActiveLastDays(1),
-        users24hList: await usersActiveLastDaysNames(1),
-        userList: await usersNames(),
-        users1w: await usersActiveLastDays(7),
-        users1m: await usersActiveLastDays(30),
-        states24h: await statesActiveLastDays(1),
-        packets24h: await packetsActiveLastDays(1)
-      };
+    // // update stats every 5 minutes only
+    // if ((now - statsCacheTimestamp) > 1000 * 60 * 5) {
+    //   var stats = {
+    //     users24h: await usersActiveLastDays(1),
+    //     users24hList: await usersActiveLastDaysNames(1),
+    //     userList: await usersNames(),
+    //     users1w: await usersActiveLastDays(7),
+    //     users1m: await usersActiveLastDays(30),
+    //     states24h: await statesActiveLastDays(1),
+    //     packets24h: await packetsActiveLastDays(1)
+    //   };
 
-      statsCacheTimestamp = now;
-      statsCache = stats;
-      res.json(stats);
-    } else {
-      res.json(statsCache);
-    }
+    //   statsCacheTimestamp = now;
+    //   statsCache = stats;
+    //   res.json(stats);
+    // } else {
+    //   res.json(statsCache);
+    // }
 
   });
 
