@@ -489,7 +489,7 @@ export class PluginNotifications extends Plugin {
               type: "CONNECTION DOWN 24HR WARNING",
               device: device.devid,
               created: new Date(),
-              notified: false,
+              notified: true,
               seen: false
             };
             // this.createNotification(this.db, WarningNotificationL, device)
