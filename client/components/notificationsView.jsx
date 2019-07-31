@@ -27,7 +27,6 @@ export class NotificationsView extends Component {
     }
 
     ClearNotificationsList = () => {
-
         fetch('/api/v3/u/notifications/delete', {
             method: 'POST',
             headers: {
@@ -35,8 +34,9 @@ export class NotificationsView extends Component {
                 'Content-Type': 'application/json',
             }
         })
-            .then(data => this.setState({ notifications: data }));
-        window.location.reload();
+            .then(data => {
+                window.location.reload();
+            });
     }
 
     showDeleteLink() {
