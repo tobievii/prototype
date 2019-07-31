@@ -10,24 +10,23 @@ export const name = "Account";
 class Account extends React.Component<NavigationScreenProps>{
 
     state = {
-        user: { auth: "undefined" }
+        user: undefined
     }
 
     constructor(props) {
         super(props)
-
-        // console.log(props)
     }
 
     componentWillMount = async () => {
-        if (this.state.user == undefined) {
-            var user = JSON.parse(await AsyncStorage.getItem('user'))
-            if (user && user.auth) {
-                this.setState({ user: user })
-            } else {
-                this.setState({ user: { auth: "user" } })
-            }
-        }
+        // if (this.state.user == undefined) {
+        //     var user = JSON.parse(await AsyncStorage.getItem('user'))
+        //     console.log(user)
+        //     if (user && user.auth) {
+        //         this.setState({ user: user })
+        //     } else {
+        //         this.setState({ user: { auth: "user" } })
+        //     }
+        // }
     }
 
     // componentDidMount = () => {
@@ -48,7 +47,7 @@ class Account extends React.Component<NavigationScreenProps>{
         return (
             <View>
                 <View>
-                    <ChangeUsername auth={this.state.user.auth} />
+                    <ChangeUsername auth={"this.props.navigation.state.params.account._55"} />
                 </View>
                 <View>
                     <Button title="SIGN OUT" onPress={this.signout} />

@@ -11,10 +11,40 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   private navigationKey: string = 'SignInContainer';
 
   componentWillMount = async () => {
-    var user = await AsyncStorage.getItem('user')
-    if (user) {
-      this.user(user);
+    var user = JSON.parse(await AsyncStorage.getItem('user'))
+    if (user && user.auth) {
+      await fetch("https://prototype.dev.iotnxt.io/api/v3/account", {
+        method: "GET",
+        headers: {
+          "Authorization": user.auth,
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(resp => resp.json())
+        .then((data) => {
+          if (data.uuid == user.uuid) {
+            this.user(user);
+          } else {
+            AsyncStorage.clear();
+          }
+        })
     }
+  }
+
+  private getAccount = async (res: any) => {
+    await fetch("https://prototype.dev.iotnxt.io/api/v3/account", {
+      method: "GET",
+      headers: {
+        "Authorization": res.auth,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(resp => resp.json())
+      .then((data) => {
+        data["auth"] = res.auth
+        AsyncStorage.setItem('user', JSON.stringify(data));
+        this.user(undefined);
+      })
   }
 
 
@@ -33,13 +63,8 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
     }).then((response) => response.text())
       .then((responseJson) => {
         var res = JSON.parse(responseJson)
-        if (res.signedin == true) {
-          AsyncStorage.setItem('user', JSON.stringify({
-            email: data.username.toLowerCase(),
-            pass: data.password,
-            auth: res.auth
-          }));
-          this.user(undefined);
+        if (res.signedin == true && res.auth) {
+          this.getAccount(res)
         }
         else {
           this.props.navigation.navigate({

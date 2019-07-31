@@ -20,8 +20,17 @@ import {
 
 export var styles: any = {};
 var navigator: any;
+var account: any;
 
 export class SettingsViewContainer extends React.Component<NavigationScreenProps> {
+    state = {
+        // account: undefined
+    }
+
+    constructor(props) {
+        super(props);
+    }
+
     public render(): React.ReactNode {
         navigator = this.props.navigation;
         return <AppContainer />;
@@ -31,7 +40,7 @@ export class SettingsViewContainer extends React.Component<NavigationScreenProps
 const AccountNavigator = createStackNavigator({
     AccountScreen: {
         screen: Account,
-        // params: { account: "heyyyyyyyyyyyyyyyyyyy" },
+        // params: { account: AsyncStorage.getItem('user') },
         navigationOptions: ({ navigation }) => {
             return {
                 headerTitle: 'Account',
@@ -147,10 +156,7 @@ const AppDrawerNavigator = createDrawerNavigator({
     },
     Theme: {
         screen: ThemeStackNavigator
-    },
-    Signout: {
-        screen: SignStackNavigator,
-    },
+    }
 });
 
 const SignoutNavigator = createDrawerNavigator({

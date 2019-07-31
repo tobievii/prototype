@@ -11,19 +11,24 @@ class ChangeUsername extends React.Component<Props> {
         username: undefined,
         disablebutton: true,
         usernameInfo: "Username must be more than 3 characters.",
-        auth: this.props.auth
+        account: undefined
     }
 
     constructor(props) {
         super(props)
-        console.log(props)
+
+        this.getAccount();
+    }
+
+    private getAccount = async () => {
+        this.setState({ account: JSON.parse(await AsyncStorage.getItem('user')) })
     }
 
     private changeUn = async () => {
         await fetch('https://prototype.dev.iotnxt.io/api/v3/account/updateusername', {
             method: 'POST',
             headers: {
-                "Authorization": this.state.auth,
+                "Authorization": this.state.account.auth,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -31,8 +36,7 @@ class ChangeUsername extends React.Component<Props> {
             }),
         }).then((response) => response.text())
             .then((responseJson) => {
-                // console.log(responseJson)
-                this.setState({ usernameInfo: "Password Update" }, () => {
+                this.setState({ usernameInfo: "Username Updated" }, () => {
                     this.setState({ disablebutton: true })
                 })
             })
@@ -55,7 +59,6 @@ class ChangeUsername extends React.Component<Props> {
                 }),
             }).then((response) => response.text())
                 .then((responseJson) => {
-                    // console.log(responseJson)
                     if (JSON.parse(responseJson).available == true) {
                         this.setState({ usernameInfo: "" }, () => {
                             this.setState({ disablebutton: false })
@@ -72,9 +75,6 @@ class ChangeUsername extends React.Component<Props> {
                 .catch((error) => {
                     console.log(error)
                 });
-
-            // this.setState({ username })
-            // console.log(username)
         } else {
             this.setState({ usernameInfo: "Username must be more than 3 characters." }, () => {
                 this.setState({ disablebutton: true })
