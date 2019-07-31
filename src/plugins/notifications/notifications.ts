@@ -37,7 +37,7 @@ export class PluginNotifications extends Plugin {
     this.eventHub = eventHub;
     this.config = config;
 
-    webpush.setVapidDetails("mailto:prototype@iotnxt.com", this.publicVapidKey, this.privateVapidKey);
+    //webpush.setVapidDetails("mailto:prototype@iotnxt.com", this.publicVapidKey, this.privateVapidKey);
 
     log("PLUGIN", this.name, "LOADED");
 
@@ -68,15 +68,15 @@ export class PluginNotifications extends Plugin {
     });
   }
 
-  timer = this.timerfunction(() => {
-    if (this.config.redis && process.env.pm_id) {
-      if (process.env.pm_id == "0") {
-        this.getWarningNotification(this.db);
-      }
-    } else {
-      this.getWarningNotification(this.db);
-    }
-  }, 20000);
+  // timer = this.timerfunction(() => {
+  //   if (this.config.redis && process.env.pm_id) {
+  //     if (process.env.pm_id == "0") {
+  //       this.getWarningNotification(this.db);
+  //     }
+  //   } else {
+  //     this.getWarningNotification(this.db);
+  //   }
+  // }, 1000 * 60 * 5); // 5minutes
 
   getNewNotification(db: any, user: any, res: any) {
     db.users.findOne({ apikey: user.apikey }, (err: Error, result: any) => {
@@ -260,21 +260,6 @@ export class PluginNotifications extends Plugin {
         });
       })
     }
-    // this.info = function (message: string) {
-    //   var AlarmNotification = {
-    //     type: "INFO",
-    //     device: options.devid,
-    //     created: Date.now(),
-    //     message: message,
-    //     notified: true,
-    //     seen: false
-    //   }
-    //   console.log(options)
-    //   options.db.users.findOne({ apikey: options.apikey }, (err: Error, result: any) => {
-    //     console.log(result)
-    //     this.createNotification(this.db, AlarmNotification, options);
-    //   })
-    // }
   }
 
   sharedDevice(db: any, notification: any, device: any) {
@@ -364,44 +349,44 @@ export class PluginNotifications extends Plugin {
   handlePacket(deviceState: any, packet: any, cb: Function) {
     log("PLUGIN", this.name, "HANDLE PACKET");
     //this.checkExisting(deviceState.apikey);
-    if (deviceState.notification24 == true) {
-      this.db.states.update({ key: deviceState.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
-        this.eventHub.emit("plugin", {
-          plugin: this.name,
-          event: {
-            device: deviceState
-          }
-        })
-      })
-    }
+    // if (deviceState.notification24 == true) {
+    //   this.db.states.update({ key: deviceState.key }, { $unset: { notification24: 1 } }, (err: any, result: any) => {
+    //     this.eventHub.emit("plugin", {
+    //       plugin: this.name,
+    //       event: {
+    //         device: deviceState
+    //       }
+    //     })
+    //   })
+    // }
 
-    if (deviceState.newdevice) {
-      var message = "Device Added";
-      var newDeviceNotification = {
-        type: "NEW DEVICE ADDED",
-        device: deviceState.devid,
-        created: packet._created_on,
-        notified: true,
-        seen: false
-      }
-      this.createNotification(this.db, newDeviceNotification, deviceState);
-    }
+    // if (deviceState.newdevice) {
+    //   var message = "Device Added";
+    //   var newDeviceNotification = {
+    //     type: "NEW DEVICE ADDED",
+    //     device: deviceState.devid,
+    //     created: packet._created_on,
+    //     notified: true,
+    //     seen: false
+    //   }
+    //   this.createNotification(this.db, newDeviceNotification, deviceState);
+    // }
 
-    if (deviceState.boundaryLayer != undefined) {
-      if (deviceState.boundaryLayer.inbound == false) {
-        var message = "";
-        var AlarmNotification = {
-          type: "ALARM",
-          device: deviceState.devid,
-          created: Date.now(),
-          message: message,
-          notified: true,
-          seen: false
-        }
-        AlarmNotification.message = "has gone out of its boundary";
-        this.createNotification(this.db, AlarmNotification, deviceState);
-      }
-    }
+    // if (deviceState.boundaryLayer != undefined) {
+    //   if (deviceState.boundaryLayer.inbound == false) {
+    //     var message = "";
+    //     var AlarmNotification = {
+    //       type: "ALARM",
+    //       device: deviceState.devid,
+    //       created: Date.now(),
+    //       message: message,
+    //       notified: true,
+    //       seen: false
+    //     }
+    //     AlarmNotification.message = "has gone out of its boundary";
+    //     this.createNotification(this.db, AlarmNotification, deviceState);
+    //   }
+    // }
   };
 
   checkExisting(apikey: string) {
@@ -447,98 +432,102 @@ export class PluginNotifications extends Plugin {
     }
   }
 
-  timerfunction(fn: any, t: any) {
-    var timerObj: any = setInterval(fn, t);
+  // timerfunction(fn: any, t: any) {
+  //   var timerObj: any = setInterval(fn, t);
 
-    this.stop = function () {
-      if (timerObj) {
-        clearInterval(timerObj);
-        timerObj = null;
-      }
-      return this;
-    }
+  //   this.stop = function () {
+  //     if (timerObj) {
+  //       clearInterval(timerObj);
+  //       timerObj = null;
+  //     }
+  //     return this;
+  //   }
 
-    // start timer using current settings (if it's not already running)
-    this.start = function () {
-      if (!timerObj) {
-        this.stop();
-        timerObj = setInterval(fn, t);
-      }
-      return this;
-    }
+  //   // start timer using current settings (if it's not already running)
+  //   this.start = function () {
+  //     if (!timerObj) {
+  //       this.stop();
+  //       timerObj = setInterval(fn, t);
+  //     }
+  //     return this;
+  //   }
 
-    // start with new interval, stop current interval
-    this.reset = function (newT: any) {
-      if (newT != null || newT != undefined) {
-        t = newT;
-      }
-      return this.stop().start();
-    }
-  }
+  //   // start with new interval, stop current interval
+  //   this.reset = function (newT: any) {
+  //     if (newT != null || newT != undefined) {
+  //       t = newT;
+  //     }
+  //     return this.stop().start();
+  //   }
+  // }
 
-  getWarningNotification(db: any) {
+  async getWarningNotification(db: any) {
     log("Ran warning notification check.")
-    var deviceTime: any;
+    var deviceTime = 86000000;
 
     var now: any = new Date();
     var dayago = new Date(now - (1000 * 60 * 60 * 24));
 
-    db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
+    await db.states.find({ "_last_seen": { $lte: dayago }, notification24: { $exists: false } }, (e: Error, listDevices: any) => {
       // console.log(listDevices)
       if (listDevices.length > 0) {
         for (var s in listDevices) {
           var device = listDevices[s]
-          this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
-            for (var sub of dbSubscriptions) {
-              var subscription = {
-                endpoint: sub.subscriptionData.endpoint,
-                keys: {
-                  p256dh: sub.subscriptionData.keys.p256dh,
-                  auth: sub.subscriptionData.keys.auth
-                }
-              }
-              db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
+          // this.db["plugins_" + this.name].find({ apikey: device.apikey }, (e: Error, dbSubscriptions: any) => {
+          //   console.log(dbSubscriptions.length)
+          //   for (var sub of dbSubscriptions) {
+          //     var subscription = {
+          //       endpoint: sub.subscriptionData.endpoint,
+          //       keys: {
+          //         p256dh: sub.subscriptionData.keys.p256dh,
+          //         auth: sub.subscriptionData.keys.auth
+          //       }
+          //     }
+          db.states.update({ key: device.key }, { $set: { notification24: true } }, (err: any, result: any) => {
 
-                var WarningNotificationL = {
-                  type: "CONNECTION DOWN 24HR WARNING",
-                  device: device.devid,
-                  created: new Date(),
-                  notified: false,
-                  seen: false
-                };
-                // this.createNotification(this.db, WarningNotificationL, device)
-                db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
-                  this.eventHub.emit("warningNotification", {
-                    plugin: "notifications",
-                    event: {
-                      notification: WarningNotificationL,
-                      device: { apikey: device.apikey, devid: device.devid }
-                    }
-                  })
-                })
-                webpush.sendNotification(subscription, JSON.stringify(WarningNotificationL)).then((response: any) => {
-                }).catch((err: any) => console.error(err));
+            var WarningNotificationL = {
+              type: "CONNECTION DOWN 24HR WARNING",
+              device: device.devid,
+              created: new Date(),
+              notified: true,
+              seen: false
+            };
+            // this.createNotification(this.db, WarningNotificationL, device)
+            db.users.update({ apikey: device.apikey }, { $push: { notifications: WarningNotificationL } }, (err: Error, updated: any) => {
+              this.eventHub.emit("warningNotification", {
+                plugin: "notifications",
+                event: {
+                  notification: WarningNotificationL,
+                  device: { apikey: device.apikey, devid: device.devid }
+                }
               })
-            }
+            })
+            //   webpush.sendNotification(subscription, JSON.stringify(WarningNotificationL)).then((response: any) => {
+            //   }).catch((err: any) => console.error(err));
+            // })
+            // }
           });
         }
 
-        db.states.find({}, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
-          if (states.length == 0) { return; }
-
-          var final: any;
-          var x = 0;
-          for (var state in states) {
-            if (x == 0) {
-              final = states[state];
-            } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
-              final = states[state];
+        db.states.find({ "_last_seen": { $gte: dayago }, }, { devid: 1, apikey: 1, _last_seen: 1 }, (err: Error, states: any) => {
+          if (states.length == 0) {
+            deviceTime = 86000000;
+          } else {
+            var final: any;
+            var x = 0;
+            for (var state in states) {
+              if (x == 0) {
+                final = states[state];
+              } else if (states[state]._last_seen <= dayago && states[state]._last_seen > final._last_seen) {
+                final = states[state];
+              }
+            }
+            deviceTime = final._last_seen.getTime() - dayago.getTime();
+            if (deviceTime < 0 || deviceTime == undefined) {
+              deviceTime = 86000000;
             }
           }
-          deviceTime = final._last_seen.getTime() - dayago.getTime();
-          if (deviceTime < 0) {
-            deviceTime = 86000000;
-          }
+
           this.reset(deviceTime);
           this.stop();
           this.start();

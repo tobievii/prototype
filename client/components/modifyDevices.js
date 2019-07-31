@@ -173,8 +173,8 @@ export default class ModifyDevices extends Component {
                                 key: devices[i].key,
                                 id: devices[i].devid,
                                 GatewayId: GatewayId,
-                                HostAddress: HostAddress,
-                                currentGateway: devices[i].plugins_iotnxt_gateway.GatewayId
+                                HostAddress: HostAddress
+                                //currentGateway: devices[i].plugins_iotnxt_gateway.GatewayId
                             })
                         }).then(response => response.json()).then((data) => {
                             this.setState({ confirmation: "Pleasw Wait ..." })
@@ -201,8 +201,8 @@ export default class ModifyDevices extends Component {
                                 key: devices[i].key,
                                 id: devices[i].devid,
                                 GatewayId: GatewayId,
-                                HostAddress: HostAddress,
-                                currentGateway: devices[i].plugins_iotnxt_gateway.GatewayId
+                                HostAddress: HostAddress
+                                //currentGateway: devices[i].plugins_iotnxt_gateway.GatewayId
                             })
                         }).then(response => response.json()).then((data) => {
                             this.setState({ confirmation: "Pleasw Wait ..." })

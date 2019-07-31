@@ -102,14 +102,6 @@ export default class Stats extends React.Component {
     return (
       <div>
         <div className="panel" style={{ marginLeft: 10, marginRight: 10 }}>{this.accountStats()}</div>
-        <div className="panel" style={{ marginLeft: 10, marginRight: 10 }}>
-          In the last 24 hours {this.state.stats.users24h} active users,{" "}
-          {this.state.stats.states24h} devices and {this.state.stats.packets24h}{" "}
-          packets of data.
-          {/* ( {this.state.stats.users1w} this week,  {this.state.stats.users1m} this month ) */}
-          {/* { JSON.stringify(this.state.stats.users24hList)} */}
-          {this.userNameList()}
-        </div>
       </div>
     );
   }
