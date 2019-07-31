@@ -169,6 +169,8 @@ app.use((req: any, res: any, next: any) => {
 
 
     db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
+      if (!user) { return; }
+
       user["_last_seen"] = new Date();
       db.users.update({ apikey: req.user.apikey }, user, (e2: Error, r2: any) => {
         next();
@@ -941,6 +943,7 @@ app.post("/api/v3/boundaryLayer", (req: any, res: any) => {
       db.states.update({ key: req.body.key }, dev)
       // update user account activity timestamp
       db.users.findOne({ apikey: req.user.apikey }, (e: Error, user: any) => {
+        if (!user) { return; }
         user["_last_seen"] = new Date();
         db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
           if (e2) {

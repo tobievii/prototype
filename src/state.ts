@@ -174,6 +174,8 @@ export function postState(
 
             // update user account activity timestamp
             db.users.findOne({ apikey: user.apikey }, (e: Error, user: any) => {
+              if (!user) { return; }
+
               user["_last_seen"] = new Date();
               db.users.update({ apikey: user.apikey }, user, (e2: Error, r2: any) => {
                 cb(resSave, info);
