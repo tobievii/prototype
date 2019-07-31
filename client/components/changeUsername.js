@@ -1,5 +1,6 @@
 import React from "react";
 import Modal from 'react-modal';
+import Media from "react-media";
 
 const customStyles = {
     content: {
@@ -20,6 +21,29 @@ const customStyles = {
         height: "437px"
     },
     //bacground of Pop up Modal on search
+    overlay: {
+        background: "rgba(23, 47, 64, 0.9)",
+        zIndex: 1002
+    }
+};
+
+const customStylesMobile = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: '50%',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        border: "none",
+        background: "rgba(0, 0, 0, 0.1)",
+        backgroundColor: "rgba(0, 0, 0, 0.1)",
+        maxHeight: 'calc(100vh - 210px)',
+        overflowY: 'auto',
+        padding: "0",
+        width: "100%",
+        height: "800%"
+    },
     overlay: {
         background: "rgba(23, 47, 64, 0.9)",
         zIndex: 1002
@@ -103,36 +127,67 @@ export class ChangeUsername extends React.Component {
 
     render() {
         return (
-            <div style={{}}>
-                <center>
-                    <Modal style={customStyles} isOpen={this.props.isOpen}>
-                        <div className="container-fluid" style={{ background: "#0E1A26" }}>
-                            <div className="row">
-                                <div className="col" style={{ fontSize: 27, padding: 10, color: "rgba(174, 231, 241, 0.55)" }}> Username </div>
-                                {this.cancelButton()}
+            <Media query="(max-width: 599px)">
+                {matches =>
+                    matches ? (
+                        <div >
+                            <center>
+                                <Modal style={customStylesMobile} isOpen={this.props.isOpen}>
+                                    <div className="container-fluid" style={{ background: "#0E1A26" }}>
+                                        <div className="row">
+                                            <div className="col" style={{ fontSize: 27, padding: 10, color: "rgba(174, 231, 241, 0.55)" }}> Username </div>
+                                            {this.cancelButton()}
+                                        </div>
+                                    </div>
+                                    <div style={{ color: "rgb(174, 231, 241)", padding: "10px 20px" }}>
+                                        <br /><p>Please change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
+                                        <br /><input
+                                            style={{ width: "50%" }}
+                                            value={this.state.username}
+                                            onChange={this.onChange()}
+                                            autoFocus={true}
+                                            placeholder={this.props.account.username}
+                                        />
+                                        {this.showButton()}<hr></hr>
+                                        <br /><br />
+                                    </div>
+                                    <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
+                                        Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
+                                    </div>
+                                </Modal>
+                            </center>
+                        </div>
+                    ) : (
+                            <div >
+                                <center>
+                                    <Modal style={customStyles} isOpen={this.props.isOpen}>
+                                        <div className="container-fluid" style={{ background: "#0E1A26" }}>
+                                            <div className="row">
+                                                <div className="col" style={{ fontSize: 27, padding: 10, color: "rgba(174, 231, 241, 0.55)" }}> Username </div>
+                                                {this.cancelButton()}
+                                            </div>
+                                        </div>
+                                        <div style={{ color: "rgb(174, 231, 241)", padding: "10px 20px" }}>
+                                            <br /><p>Please change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
+                                            <br /><input
+                                                style={{ width: "50%" }}
+                                                value={this.state.username}
+                                                onChange={this.onChange()}
+                                                autoFocus={true}
+                                                placeholder={this.props.account.username}
+                                            />
+                                            {this.showButton()}<hr></hr>
+                                            <br /><br />
+                                        </div>
+                                        <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
+                                            Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
+                                        </div>
+                                    </Modal>
+                                </center>
                             </div>
-                        </div>
-                        <div style={{ color: "rgb(174, 231, 241)", padding: "10px 20px" }}>
-                            {/* <p>Here you can change your public username. This must be unique across the system. It will affect your public url in the form of /u/username</p> */}
-                            <br /><p>Please change your username below.<br /> This must be unique across the system. It will affect your public url in the form of /u/username</p>
-                            <br /><input
-                                style={{ width: "50%" }}
-                                value={this.state.username}
-                                onChange={this.onChange()}
-                                autoFocus={true}
-                                placeholder={this.props.account.username}
-                            />
-                            {this.showButton()}<hr></hr>
-                            <br /><br />
-                        </div>
-
-                        <div style={{ background: "#0E1A26", padding: "15px 30px", color: "rgba(174, 231, 241, 0.55)", textAlign: "right" }}>
-                            Need help? Please contact our <span style={{ color: "red", opacity: 0.7 }}><a href="#">support</a></span>
-                        </div>
-                    </Modal>
-                </center>
-            </div>
+                        )
+                }
+            </Media>
         )
     }
-
 }

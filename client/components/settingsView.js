@@ -91,8 +91,8 @@ export default class SettingsView extends React.Component {
                   </div>
                 </div>
                 <Swipeable
-                  onSwipedLeft={() => { if (this.state.activeMenu > 0) { this.setState({ activeMenu: this.state.activeMenu - 1 }) } }}
-                  onSwipedRight={() => { if (this.state.activeMenu < plugins.length) { this.setState({ activeMenu: this.state.activeMenu + 1 }) } }}>
+                  onSwipedRight={() => { if (this.state.activeMenu > 0) { this.setState({ activeMenu: this.state.activeMenu - 1 }) } }}
+                  onSwipedLeft={() => { if (this.state.activeMenu < plugins.length) { this.setState({ activeMenu: this.state.activeMenu + 1 }) } }}>
                   <div className="row" style={{ marginTop: 5 }}>
                     <div className="col" style={{ display: "", padding: "0 20px 0 20px", boxSizing: "border-box" }}>
                       {this.genPage()}
