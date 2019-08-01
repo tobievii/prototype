@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Button, Text, TextInput, AsyncStorage } from 'react-native';
 
 interface Props {
-    auth: string;
+    account: string;
 }
 
 class ChangeUsername extends React.Component<Props> {
@@ -11,17 +11,11 @@ class ChangeUsername extends React.Component<Props> {
         username: undefined,
         disablebutton: true,
         usernameInfo: "Username must be more than 3 characters.",
-        account: undefined
+        account: this.props["navigation"].state.params.account
     }
 
     constructor(props) {
         super(props)
-
-        this.getAccount();
-    }
-
-    private getAccount = async () => {
-        this.setState({ account: JSON.parse(await AsyncStorage.getItem('user')) })
     }
 
     private changeUn = async () => {
@@ -43,7 +37,6 @@ class ChangeUsername extends React.Component<Props> {
             .catch((error) => {
                 console.log(error)
             });
-
     }
 
     private onUnChange = async (username) => {
@@ -80,7 +73,6 @@ class ChangeUsername extends React.Component<Props> {
                 this.setState({ disablebutton: true })
             })
         }
-
     }
 
     public render(): React.ReactNode {

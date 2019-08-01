@@ -44,6 +44,7 @@
     "querystring-es3": "^0.2.1",
     "react": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
+    "react-native-elements": "^1.1.0",
     "react-native-gesture-handler": "^1.2.2",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
     "react-native-level-fs": "^3.0.0",

@@ -1,37 +1,27 @@
 import React from 'react';
-import { View, Button, AsyncStorage, TextInput } from 'react-native';
+import { View, AsyncStorage } from 'react-native';
+import { Button, Avatar } from 'react-native-elements';
 // import { styles } from '../../containers/menu/Settings/settings.container'
 // import { withStyles, ThemeType, ThemedComponentProps } from 'react-native-ui-kitten';
 import { NavigationScreenProps } from 'react-navigation';
-import ChangeUsername from '../common/changUsername'
 
 export const name = "Account";
 
 class Account extends React.Component<NavigationScreenProps>{
 
     state = {
-        user: undefined
+        user: undefined,
+        account: undefined
     }
 
     constructor(props) {
         super(props)
+        this.getAccount();
     }
 
-    componentWillMount = async () => {
-        // if (this.state.user == undefined) {
-        //     var user = JSON.parse(await AsyncStorage.getItem('user'))
-        //     console.log(user)
-        //     if (user && user.auth) {
-        //         this.setState({ user: user })
-        //     } else {
-        //         this.setState({ user: { auth: "user" } })
-        //     }
-        // }
+    private getAccount = async () => {
+        this.setState({ account: JSON.parse(await AsyncStorage.getItem('user')) })
     }
-
-    // componentDidMount = () => {
-    //     console.log(this.state)
-    // }
 
     private signout = async () => {
         try {
@@ -44,16 +34,35 @@ class Account extends React.Component<NavigationScreenProps>{
     }
 
     public render(): React.ReactNode {
-        return (
-            <View>
-                <View>
-                    <ChangeUsername auth={"this.props.navigation.state.params.account._55"} />
+        if (this.state.account) {
+            return (
+                <View style={{ height: 40, margin: 10 }}>
+                    <View style={{ marginHorizontal: "30%", marginVertical: 10 }}>
+                        <Avatar
+                            title={"Prototype"}
+                            size="xlarge"
+                            rounded
+                            source={{
+                                uri:
+                                    'https://prototype.dev.iotnxt.io/avatar.jpg',
+                            }}
+                            showEditButton
+                        />
+                    </View>
+                    <View >
+                        <Button style={{ width: "40%", marginRight: "5%", marginBottom: 20 }} title="Change Password" onPress={() => { this.props.navigation.navigate("changePassword", { account: this.state.account }) }} />
+                    </View>
+                    <View >
+                        <Button style={{ width: "40%", marginLeft: "5%" }} title="Change Username" onPress={() => { this.props.navigation.navigate("changePassword", { account: this.state.account }) }} />
+                    </View>
+                    <View style={{ width: "50%" }}>
+                        <Button title="SIGN OUT" onPress={this.signout} />
+                    </View>
                 </View>
-                <View>
-                    <Button title="SIGN OUT" onPress={this.signout} />
-                </View>
-            </View>
-        );
+            )
+        } else {
+            return (<View style={{ height: 40, margin: 10 }}></View>)
+        }
     }
 }
 

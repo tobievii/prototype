@@ -2,12 +2,16 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from '@expo/vector-icons/Ionicons';
 
+
 // import { plugins } from '../index
 //temporary plugin imports. Idealy should be in ../index 
 import Plugin from '../../../components/plugins/admin'
 import Account from '../../../components/plugins/account'
 import Iotnxt from '../../../components/plugins/iotnxt'
 import { FavoritesContainer } from '../../../components/common/themes/favorites.container'
+import ChangeUsername from '../../../components/common/changUsername'
+import ChangePassword from '../../../components/common/changePassword';
+
 import { AsyncStorage } from 'react-native'
 
 import {
@@ -50,36 +54,7 @@ const AccountNavigator = createStackNavigator({
             };
         }
     }
-},
-    {
-        headerMode: 'none',
-        mode: 'modal',
-        defaultNavigationOptions: {
-            gesturesEnabled: false,
-        },
-        transitionConfig: () => ({
-            transitionSpec: {
-                duration: 300
-            },
-            screenInterpolator: sceneProps => {
-                const { layout, position, scene } = sceneProps;
-                const { index } = scene;
-
-                const height = layout.initHeight;
-                const translateY = position.interpolate({
-                    inputRange: [index - 1, index, index + 1],
-                    outputRange: [height, 0, 0],
-                });
-
-                const opacity = position.interpolate({
-                    inputRange: [index - 1, index - 0.99, index],
-                    outputRange: [0, 1, 1],
-                });
-
-                return { opacity, transform: [{ translateY }] };
-            },
-        }),
-    });
+});
 
 const IotnxtNavigator = createStackNavigator({
     Iotnxt: {
@@ -99,6 +74,7 @@ const DashboardStackNavigator = createStackNavigator({
     Admin: {
         screen: Plugin,
         navigationOptions: ({ navigation }) => {
+            navigation.openDrawer();
             return {
                 headerTitle: "Admin",
                 headerLeft: (
@@ -165,9 +141,35 @@ const SignoutNavigator = createDrawerNavigator({
     },
 });
 
+const AccountNav = createStackNavigator({
+    changeUsername: {
+        screen: ChangeUsername,
+        navigationOptions: ({ navigation }) => {
+            return {
+                headerTitle: "Change Username",
+                headerLeft: (
+                    <Icon onPress={() => navigation.navigate("Account")} name="md-arrow-back" size={30} />
+                )
+            };
+        }
+    },
+    changePassword: {
+        screen: ChangePassword,
+        navigationOptions: ({ navigation }) => {
+            return {
+                headerTitle: "Change Password",
+                headerLeft: (
+                    <Icon onPress={() => navigation.navigate("Account")} name="md-arrow-back" size={30} />
+                )
+            };
+        }
+    }
+});
+
 const AppSwitchNavigator = createSwitchNavigator({
     Dashboard: { screen: AppDrawerNavigator },
-    Signout: { screen: SignoutNavigator }
+    Signout: { screen: SignoutNavigator },
+    AccountNav: { screen: AccountNav }
 });
 
 const AppContainer = createAppContainer(AppSwitchNavigator);
