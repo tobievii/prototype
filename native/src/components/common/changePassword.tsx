@@ -22,29 +22,45 @@ class ChangePassword extends React.Component<Props> {
 
     constructor(props) {
         super(props)
+        // console.log(props)
+        // if (props.navigation) {
+        //     this.setState({ account: props.navigation.state.params.account })
+        // }
 
-        this.setState({ account: props.navigation.state.params.account })
+    }
+
+    private changeCookie = async (username) => {
+        fetch("https://prototype.dev.iotnxt.io/api/v3/passChanged", {
+            method: "POST", body: JSON.stringify({ username: username }), headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        }).then(response => response.json()).then(serverresponse => {
+            this.setState({ passwordInfo: "Password successfully changed", disablebutton: true })
+        }).catch(err => console.error(err.toString()));
     }
 
     private changePassword = async () => {
-        // await fetch('https://prototype.dev.iotnxt.io/api/v3/account/updateusername', {
-        //     method: 'POST',
-        //     headers: {
-        //         "Authorization": this.state.account.auth,
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         username: this.state.password
-        //     }),
-        // }).then((response) => response.text())
-        //     .then((responseJson) => {
-        //         this.setState({ usernameInfo: "Username Updated" }, () => {
-        //             this.setState({ disablebutton: true })
-        //         })
-        //     })
-        //     .catch((error) => {
-        //         console.log(error)
-        //     });
+        if (this.state.password == undefined || this.state.password == "" || this.state.newPasswordConfirm == this.state.password) {
+            this.setState({ passwordInfo: "Please check the current password and verify information above. Current password and new must be different." })
+            this.setState({ disablebutton: true })
+        } else {
+            await fetch("https://prototype.dev.iotnxt.io/api/v3/admin/userpassword", {
+                method: "POST",
+                headers: {
+                    "Authorization": this.state.account.auth,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    pass: this.state.newPasswordConfirm,
+                    user: this.state.account.username,
+                    current: this.state.password
+                })
+            }).then(response => response.json()).then(data => {
+                if (data == false) {
+                    this.setState({ passwordInfo: "The current password you entered is incorrect" })
+                } else {
+                    this.changeCookie(this.state.account.username)
+                }
+            }).catch(err => console.error(err.toString()))
+        }
     }
 
     private onPassChange = async (info) => {
@@ -65,22 +81,29 @@ class ChangePassword extends React.Component<Props> {
                 }
             })
         }
+
+        if (this.state.newPasswordConfirm == this.state.password) {
+            this.setState({ passwordInfo: "New password must not be the same as the current password" })
+            this.setState({ disablebutton: true })
+        }
     }
 
-    private currentP = (p: string) => {
-        console.log(p)
+    private currentP = (password: string) => {
+        if (password != undefined) {
+            this.setState({ password })
+        }
     }
 
     public render(): React.ReactNode {
         return (
-            <View>
+            <View style={{ margin: 10 }}>
                 <Text>Password</Text>
                 <View>
                     <Text>Current Password</Text>
                     <ValidationInput
                         secureTextEntry={true}
                         validator={PasswordValidator}
-                        style={{ height: 40, color: "white", margin: 10 }}
+                        style={{ height: 40, color: "white", marginBottom: 10 }}
                         placeholder="Current Password"
                         onChangeText={this.currentP}
                     />
@@ -90,7 +113,7 @@ class ChangePassword extends React.Component<Props> {
                     <ValidationInput
                         secureTextEntry={true}
                         validator={PasswordValidator}
-                        style={{ height: 40, color: "white", margin: 10 }}
+                        style={{ height: 40, color: "white", marginBottom: 10 }}
                         placeholder="New Password"
                         onChangeText={(pass) => { if (pass != undefined) { this.onPassChange({ pass: pass, field: "new" }) } }}
                     />
@@ -100,13 +123,13 @@ class ChangePassword extends React.Component<Props> {
                     <ValidationInput
                         secureTextEntry={true}
                         validator={PasswordValidator}
-                        style={{ height: 40, color: "white", margin: 10 }}
+                        style={{ height: 40, color: "white", marginBottom: 10 }}
                         placeholder="New Password Confirmation"
                         onChangeText={(pass) => { if (pass != undefined) { this.onPassChange({ pass: pass, field: "confirm" }) } }}
                     />
                 </View>
                 <View>
-                    <Text>{this.state.passwordInfo}</Text>
+                    <Text style={{ marginVertical: 10 }}>{this.state.passwordInfo}</Text>
                     <Button title="Change Password" onPress={this.changePassword} disabled={this.state.disablebutton} />
                 </View>
             </View>

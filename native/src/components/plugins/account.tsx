@@ -49,11 +49,11 @@ class Account extends React.Component<NavigationScreenProps>{
                             showEditButton
                         />
                     </View>
-                    <View >
-                        <Button style={{ width: "40%", marginRight: "5%", marginBottom: 20 }} title="Change Password" onPress={() => { this.props.navigation.navigate("changePassword", { account: this.state.account }) }} />
+                    <View style={{ width: "40%", marginBottom: 20 }}>
+                        <Button title="Change Password" onPress={() => { this.props.navigation.navigate("changePassword", { account: this.state.account }) }} />
                     </View>
-                    <View >
-                        <Button style={{ width: "40%", marginLeft: "5%" }} title="Change Username" onPress={() => { this.props.navigation.navigate("changePassword", { account: this.state.account }) }} />
+                    <View style={{ width: "40%", marginBottom: 20 }}>
+                        <Button title="Change Username" onPress={() => { this.props.navigation.navigate("changeUsername", { account: this.state.account }) }} />
                     </View>
                     <View style={{ width: "50%" }}>
                         <Button title="SIGN OUT" onPress={this.signout} />

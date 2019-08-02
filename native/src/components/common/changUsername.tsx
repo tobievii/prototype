@@ -11,11 +11,12 @@ class ChangeUsername extends React.Component<Props> {
         username: undefined,
         disablebutton: true,
         usernameInfo: "Username must be more than 3 characters.",
-        account: this.props["navigation"].state.params.account
+        account: undefined
     }
 
     constructor(props) {
         super(props)
+        // this.setState({ account: props.navigation.state.params.account })
     }
 
     private changeUn = async () => {
@@ -48,7 +49,7 @@ class ChangeUsername extends React.Component<Props> {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username: username
+                    username: username.toLowerCase()
                 }),
             }).then((response) => response.text())
                 .then((responseJson) => {
@@ -77,14 +78,14 @@ class ChangeUsername extends React.Component<Props> {
 
     public render(): React.ReactNode {
         return (
-            <View>
+            <View style={{ margin: 10 }}>
                 <View>
                     <Text>Username</Text>
                     <Text>Please change your username below.</Text>
                     <Text>This must be unique across the system.</Text>
 
                     <TextInput
-                        style={{ height: 40, borderColor: 'gray', borderWidth: 1, color: "black", margin: 10 }}
+                        style={{ height: 40, borderColor: 'gray', borderWidth: 1, color: "black", marginBottom: 10 }}
                         placeholder="Gateway ID"
                         onChangeText={(username) => { this.onUnChange(username) }}
                     // value={this.state.text}
