@@ -1,12 +1,12 @@
-import { useScreens } from "react-native-screens";
+import { useScreens } from 'react-native-screens';
 
 import {
   createAppContainer,
   createBottomTabNavigator,
   createStackNavigator,
   NavigationContainer,
-  NavigationRouteConfigMap
-} from "react-navigation";
+  NavigationRouteConfigMap,
+} from 'react-navigation';
 
 import {
   MapViewContainer,
@@ -15,45 +15,45 @@ import {
   FavoritesContainer,
   MenuContainer,
   // DocsContainer,
-  SupportContainer
-} from "../../../src/containers/menu";
+  SupportContainer,
+} from '../../../src/containers/menu';
 
 import {
   ForgotPasswordContainer,
   SignInContainer,
-  SignUpContainer
-} from "../../../src/components/auth";
+  SignUpContainer,
+} from '../../../src/components/auth';
 
-import { MenuNavigationOptions } from "./options";
+import { MenuNavigationOptions } from './options';
 
 // import { AsyncStorage } from 'react-native'
 // var auth;
 
 const DeviceListNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Device List"]: DeviceListContainer
+    ['Device List']: DeviceListContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 const MapViewNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Map View"]: MapViewContainer
+    ['Map View']: MapViewContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 const FavoritesNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Favorites"]: FavoritesContainer
+    ['Favorites']: FavoritesContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 // const DocsNavigator: NavigationContainer = createStackNavigator(
@@ -67,11 +67,11 @@ const FavoritesNavigator: NavigationContainer = createStackNavigator(
 
 const SupportNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Support"]: SupportContainer
+    ['Support']: SupportContainer,
   },
   {
-    defaultNavigationOptions: MenuNavigationOptions
-  }
+    defaultNavigationOptions: MenuNavigationOptions,
+  },
 );
 
 const SettingsNavigator: NavigationContainer = createStackNavigator(
@@ -85,40 +85,40 @@ const SettingsNavigator: NavigationContainer = createStackNavigator(
 
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
-    ["Device List"]: DeviceListNavigator,
-    ["Map View"]: MapViewNavigator,
-    ["Favorites"]: FavoritesNavigator,
+    ['Device List']: DeviceListNavigator,
+    ['Map View']: MapViewNavigator,
+    ['Favorites']: FavoritesNavigator,
     // ['Docs']: DocsNavigator,
     ['Support']: SupportNavigator,
     ['Settings']: SettingsNavigator,
   },
   {
-    tabBarComponent: MenuContainer
-  }
+    tabBarComponent: MenuContainer,
+  },
 );
 
 const AuthNavigationMap: NavigationRouteConfigMap = {
-  ["Sign In"]: SignInContainer,
-  ["Sign Up"]: SignUpContainer,
-  ["Forgot Password"]: ForgotPasswordContainer,
-  ["logged"]: MenuNavigator
+  ['Sign In']: SignInContainer,
+  ['Sign Up']: SignUpContainer,
+  ['Forgot Password']: ForgotPasswordContainer,
+  ['logged']: MenuNavigator,
 };
 
 const AppNavigator: NavigationContainer = createStackNavigator(
   {
-    ["Home"]: SignInContainer,
-    ...AuthNavigationMap
+    ['Home']: SignInContainer,
+    ...AuthNavigationMap,
   },
   {
-    headerMode: "screen",
+    headerMode: 'screen',
     defaultNavigationOptions: {
-      header: null
-    }
-  }
+      header: null,
+    },
+  },
 );
 
 const createAppRouter = (
-  container: NavigationContainer
+  container: NavigationContainer,
 ): NavigationContainer => {
   useScreens();
   return createAppContainer(container);
