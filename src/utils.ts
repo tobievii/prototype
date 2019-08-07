@@ -268,6 +268,7 @@ export function createDBIndexes(db: any) {
     db.states.createIndex({ apikey: 1, devid: 1 })
     db.states.createIndex({ "_last_seen": 1 })
     db.states.createIndex({ key: 1 })
+    db.states.createIndex({ "plugins_iotnxt_gateway.GatewayId": 1, "plugins_iotnxt_gateway.HostAddress": 1 }, { background: 1 })
 
     db.packets.createIndex({ "_created_on": 1 })
     db.packets.createIndex({ apikey: 1 })
@@ -278,7 +279,8 @@ export function createDBIndexes(db: any) {
     db.users.createIndex({ apikey: 1 })
     db.users.createIndex({ "_last_seen": 1 })
     db.users.createIndex({ username: 1 }, { background: 1 })
-    db.users.createIndex({email:1},{background:1}) // gert's fix
+    db.users.createIndex({ email: 1 }, { background: 1 }) // gert's fix
+    db.users.createIndex({email: "text", username: "text"}, {background: 1})
 }
 
 export function checkFirstRun(db: any) {

@@ -20,12 +20,11 @@ export class pluginHF2111A extends Plugin {
     super(app, db, eventHub);
     this.db = db;
     this.eventHub = eventHub;
-    log("PLUGIN", this.name, "LOADED");
+    log("PLUGIN", this.constructor.name, "LOADED");
     this.init(app, db, eventHub);
   }
 
   public init(app: express.Express, db: any, eventHub: events.EventEmitter) {
-    this.log("INIT HFHAKSFL")
 
     app.get("/api/v3/plugins/" + this.name + "/info", (req: Express.Request, res: express.Response) => {
       console.log("!!")
@@ -68,7 +67,7 @@ export class pluginHF2111A extends Plugin {
       // })
     })
 
-    console.log(this.name + " starting on port " + this.port);
+    log(this.name + " starting on port " + this.port);
     server.listen(this.port);
   }
 }

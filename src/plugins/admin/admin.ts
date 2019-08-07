@@ -202,6 +202,24 @@ export class PluginAdmin extends Plugin {
     //####################################################################
     //Shared Device email
     app.post("/api/v3/admin/shareDevice", (req: any, res: any) => {
+
+      console.log(req.body);
+      res.json({})
+      
+      // for (var i in req.body.chosen) {
+      //   db.states.update({ $and: [{ devid: req.body.chosen[i].devid, apikey: req.user.apikey }] }, { $push: { access: req.body.publickey } })
+      //   db.states.findOne({ devid: req.body.chosen[i].devid }, { key: 1, _id: 0 }, (err: Error, give: any) => {
+      //     this.eventHub.emit("deviceShare", {
+      //       plugin: this.name,
+      //       notification: shareDeviceNotification,
+      //       device: give,
+      //       from: req.user.apikey
+      //     })
+      //     db.users.update({ email: req.body.email }, { $push: { shared: { $each: [{ keys: give, timeshared: today }] } } })//adds users _id to keys 
+      //   })
+      // }
+
+      /*
       var today = new Date();
       var shareDeviceNotification = {
         type: "A DEVICE WAS SHARED WITH YOU", //req.body.email
@@ -275,6 +293,7 @@ export class PluginAdmin extends Plugin {
       } catch (err) {
         res.json({ err })
       }
+      */
     })
     //Shared Device email
     //####################################################################

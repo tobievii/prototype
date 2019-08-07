@@ -146,19 +146,20 @@ export class StatesViewerMenu extends Component {
                     return (
                         <div>
                             < select id="devices" style={{ width: "120px", marginTop: "7px" }} onChange={this.search} defaultValue={'DEFAULT'}>
-                                <option value='DEFAULT' style={{ color: "gray" }} disabled>MODIFY...</option>
+                                <option value='DEFAULT' style={{ color: "gray" }} disabled >MODIFY...</option>
                                 <option className="optiondropdown" value="DASHBOARD PRESET" style={{ width: "90%" }}>DASHBOARD PRESET</option>
                                 <option className="optiondropdown" value="SCRIPT PRESET" style={{ width: "90%" }} >SCRIPT PRESET</option>
-                                <option className="optiondropdown" className="SHARE" value="SHARE" style={{ width: "90%" }} >SHARE</option>
-                                < option className="optiondropdown" value="SET IOTNXT GATEWAY" style={{ width: "90%" }} >SET IOTNXT GATEWAY</option>
-                                < option className="optiondropdown" value="CLEAR DEVICE DATA" style={{ width: "90%", color: "red" }} >CLEAR DEVICE DATA</option>
+                                <option className="optiondropdown" value="SHARE" style={{ width: "90%" }} >SHARE</option>
+                                <option className="optiondropdown" value="SET IOTNXT GATEWAY" style={{ width: "90%" }} >SET IOTNXT GATEWAY</option>
+                                <option className="optiondropdown" value="CLEAR DEVICE DATA" style={{ width: "90%", color: "red" }} >CLEAR DEVICE DATA</option>
                             </select>
                         </div >
                     )
                 } else {
                     return (
-                        < select id="devices" title="Select some devices first..." style={{ marginTop: "7px", width: "120px", cursor: "not-allowed", opacity: "0.3" }} defaultValue={'DEFAULT'}>
-                            <option className="optiondropdown" style={{ width: "90%" }} value='DEFAULT' disabled>MODIFY...</option></ select>
+                        < select disabled id="devices" title="Select some devices first..." style={{ marginTop: "7px", width: "120px", cursor: "not-allowed", opacity: "0.3" }} defaultValue={'DEFAULT'}>
+                            <option className="optiondropdown" style={{ width: "90%" }} value='DEFAULT' disabled>MODIFY...</option>
+                        </ select>
                     )
                 }
             }

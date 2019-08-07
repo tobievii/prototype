@@ -514,7 +514,14 @@ export default class ModifyDevices extends Component {
                                 )
                         }
                     </Media>
-                    <ShareList account={this.props.account} isOpen={this.props.isOpenshare} username={this.props.username} closeModel={this.props.closeModel} type={"multi"} chosen={this.props.devices.filter((device) => { return device.selected == true })} />
+                    <ShareList
+                        test={"test123"}
+                        account={this.props.account}
+                        isOpen={this.props.isOpenshare}
+                        username={this.props.username}
+                        closeModel={this.props.closeModel}
+                        type={"multi"}
+                        chosen={this.props.devices.filter((device) => { return device.selected == true })} />
                 </center>
             </div >
         )

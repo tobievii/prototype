@@ -389,9 +389,12 @@ export class NavBar extends Component {
       fetch("/api/v3/allUsers", {
         method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
         body: JSON.stringify({ search: evt.target.value.toLowerCase() })
-      }).then(response => response.json()).then(stats => {
-        this.setState({ users: stats })
-        this.setState({ allUsers: this.state.users })
+      }).then(response => response.json()).then(users => {
+        console.log(users);
+        if (!users) return;
+        if (users.error) return;
+        this.setState({ users })
+        this.setState({ allUsers: users })
       }).catch(err => console.error(err.toString()));
     }
   }
@@ -447,41 +450,6 @@ export class NavBar extends Component {
     this.setState({ showNav: "" })
     this.setState({ showSearch: "none" })
   }
-
-  // setView = (view) => {
-  //   this.setState({ devicesView: view });
-  //   this.props.mainView(view)
-  // }
-
-  // changeViews = (account) => {
-  //   return (
-  //     <div className="dropdown">
-  //       <FontAwesomeIcon icon="eye" title="Change main view" onClick={() => this.showDropdownMenu("views")} />
-  //       {this.state.displayViews ? (
-  //         <div className="arrow-up">
-  //           <div className="dropdown-content" style={{ background: "#131e27", width: "max-content", left: "-1000%", marginTop: "45%" }}>
-  //             <div style={{ background: "#131e27", padding: "10px", opacity: "0.7" }}>
-  //               {/*Must move changeViews to dashboard 
-  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("devices")}>
-  //                 <FontAwesomeIcon icon="tasks" />  DEVICES ONLY
-  //               </div> */}
-  //               {/* <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboard")}>
-  //                 <FontAwesomeIcon icon="chart-bar" />   DASHBOARD ONLY
-  //               </div> */}
-  //               <div className="navLink" style={{ padding: "15px", fontSize: 15 }} onClick={() => this.setView("dashboardDevices")}>
-  //                 <FontAwesomeIcon icon="digital-tachograph" />  DASHBOARD WITH DEVICES
-  //               </div>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       ) :
-  //         (
-  //           null
-  //         )
-  //       }
-  //     </div>
-  //   );
-  // }
 
   addDeviceButton = () => {
     return (
