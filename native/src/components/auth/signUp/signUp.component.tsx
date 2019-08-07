@@ -57,6 +57,27 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
 
   private onSignUpButtonPress = () => {
     this.setState({ response: "Please Wait ...." })
+    fetch("https://prototype.dev.iotnxt.io/api/v3/account/checkupdateusername", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username: this.state.formData.username.toLowerCase() })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.available == true) {
+          this.register()
+        }
+        else {
+          this.setState({ response: "username has been taken" })
+        }
+      })
+      .catch(err => console.error(err.toString()));
+  };
+
+  private register = () => {
     fetch("https://prototype.dev.iotnxt.io/api/v3/admin/register", {
       method: "POST",
       headers: {
@@ -65,7 +86,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
       },
       body: JSON.stringify({
         email: this.state.formData.email.toLowerCase(),
-        username: this.state.formData.username,
+        username: this.state.formData.username.toLowerCase(),
         pass: this.state.formData.password
       })
     })
@@ -81,7 +102,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
         }
       })
       .catch(err => console.error(err.toString()));
-  };
+  }
   private renderPhotoButtonIcon = (style: StyleType): React.ReactElement<ImageProps> => {
     const { themedStyle } = this.props;
 
