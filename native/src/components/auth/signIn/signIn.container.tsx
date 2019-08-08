@@ -11,40 +11,40 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
   private navigationKey: string = 'SignInContainer';
 
   componentWillMount = async () => {
-    var user = JSON.parse(await AsyncStorage.getItem('user'))
+    const user = JSON.parse(await AsyncStorage.getItem('user'));
     if (user && user.auth) {
-      await fetch("https://prototype.dev2.iotnxt.io/api/v3/account", {
-        method: "GET",
+      await fetch('https://prototype.dev2.iotnxt.io/api/v3/account', {
+        method: 'GET',
         headers: {
-          "Authorization": user.auth,
+          'Authorization': user.auth,
           'Content-Type': 'application/json',
         },
       })
         .then(resp => resp.json())
         .then((data) => {
-          if (data.uuid == user.uuid) {
+          if (data.uuid === user.uuid) {
             this.user(user);
           } else {
             AsyncStorage.clear();
           }
-        })
+        });
     }
   }
 
   private getAccount = async (res: any) => {
-    await fetch("https://prototype.dev2.iotnxt.io/api/v3/account", {
-      method: "GET",
+    await fetch('https://prototype.dev2.iotnxt.io/api/v3/account', {
+      method: 'GET',
       headers: {
-        "Authorization": res.auth,
+        'Authorization': res.auth,
         'Content-Type': 'application/json',
       },
     })
       .then(resp => resp.json())
       .then((data) => {
-        data["auth"] = res.auth
+        data.auth = res.auth;
         AsyncStorage.setItem('user', JSON.stringify(data));
         this.user(undefined);
-      })
+      });
   }
 
 
@@ -58,15 +58,14 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
       body: JSON.stringify({
         email: data.username.toLowerCase(),
         pass: data.password,
-        mobile: true
+        mobile: true,
       }),
     }).then((response) => response.text())
       .then((responseJson) => {
-        var res = JSON.parse(responseJson)
-        if (res.signedin == true && res.auth) {
-          this.getAccount(res)
-        }
-        else {
+        const res = JSON.parse(responseJson);
+        if (res.signedin === true && res.auth) {
+          this.getAccount(res);
+        } else {
           this.props.navigation.navigate({
             key: this.navigationKey,
             routeName: 'Home',
@@ -74,17 +73,18 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
         }
       })
       .catch((error) => {
-        console.log(error)
+        // tslint:disable-next-line: no-console
+        console.log(error);
       });
 
   };
 
   user = async (user: any) => {
     if (!user) {
-      user = await AsyncStorage.getItem('user')
+      user = await AsyncStorage.getItem('user');
     }
 
-    this.props.navigation.navigate('Device List', { "user": user });
+    this.props.navigation.navigate('Device List', { 'user': user });
   };
 
   private onSignUpPress = () => {
