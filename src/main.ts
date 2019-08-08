@@ -756,7 +756,7 @@ app.post('/api/v3/shared', (req: any, res: any) => {
   API to modify the sharing of device(s).
 */
 app.post('/api/v3/share', (req: any, res: any) => {
-  console.log('/api/v3/share')
+  console.log('\r\n/api/v3/share')
   console.log(req.body);
 
   if ((!req.body.devicekeys) || (!req.body.userkeys)) { res.json({ error: "expected { devicekeys: [ key : \"xxxx\" ], userkeys: [ publickey: \"xxxx\" ] }" }); return; }
@@ -776,15 +776,32 @@ app.post('/api/v3/share', (req: any, res: any) => {
 
 //unshare Device
 app.post('/api/v3/unshare', (req: any, res: any) => {
-  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
-  db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-    db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
-  })
+  console.log('\r\n/api/v3/share')
+  console.log(req.body);
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
-    res.json(states)
-  })
-  //unshare device
+  if ((!req.body.devicekeys) || (!req.body.userkeys)) { res.json({ error: "expected { devicekeys: [ key : \"xxxx\" ], userkeys: [ publickey: \"xxxx\" ] }" }); return; }
+
+  var count = 0;
+  for (var key of req.body.devicekeys) {
+    db.states.update({ key }, { $pull: { access: { $in: req.body.userkeys } } }, { "multi": true }, (err: Error | undefined, result: any) => {
+      console.log(err)
+      console.log(result);
+      count++;
+      if (count == req.body.devicekeys.length) { res.json({ result: "success" }) }
+    })
+  }
+
+  // if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+  // db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
+  //   db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
+  // })
+
+  // db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
+  //   res.json(states)
+  // })
+  // //unshare device
+
+
 })
 //unshare device
 

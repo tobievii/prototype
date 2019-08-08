@@ -16,31 +16,15 @@ const customStyles = {
         border: "none",
         background: "rgb(23, 35, 43)",
         maxHeight: 'calc(100vh - 210px)',
-        overflow: 'auto'
+        overflow: 'auto',
+        padding: 0
     },
     overlay: {
         background: "rgba(27, 57, 77,0.9)",
     }
 };
 
-const customStylesMobile = {
-    content: {
-        top: '50%',
-        left: '50%',
-        right: '50%',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-        border: "none",
-        background: "rgb(23, 35, 43)",
-        maxHeight: 'calc(100vh - 210px)',
-        overflow: 'auto',
-        width: "100%"
-    },
-    overlay: {
-        background: "rgba(27, 57, 77,0.9)",
-    }
-};
+
 var count = 0;
 export class ShareList extends Component {
     state = {
@@ -85,47 +69,42 @@ export class ShareList extends Component {
 
     handleActionCall(clickuser) {
         return (evt) => {
-            console.log("handleActionCall");
-            console.log(evt);
-            console.log(clickuser);
-            var users = _.clone(this.state.userSearched)
-            for (var user of users) {
-                if (user.publickey == clickuser.publickey) {
-                    if (clickuser.shared) { user.shared = false } else { user.shared = true }
-                }
-            }
-            this.setState({ userSearched: users })
-
-            var userkeys = _.map(users, "publickey");
             var devicekeys = _.map(_.clone(this.props.chosen), "key");
 
-            fetch("/api/v3/share", {
-                method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ devicekeys, userkeys })
-            }).then(response => response.json()).then(result => {
-                console.log(result);
-            }).catch(err => console.error(err.toString()));
-
+            if (clickuser.sharedCount == this.props.chosen.length) {
+                fetch("/api/v3/unshare", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ devicekeys, userkeys: [clickuser.publickey] })
+                }).then(response => response.json()).then(result => {
+                    //update list to show shared with user
+                    var updatedUserlist = _.clone(this.state.userSearched);
+                    for (var user of updatedUserlist) {
+                        if (user.publickey == clickuser.publickey) {
+                            user.shared = false;
+                            user.sharedCount = 0;
+                            console.log("user marked unshared")
+                        }
+                    }
+                    this.setState({ userSearched: updatedUserlist })
+                }).catch(err => console.error(err.toString()));
+            } else {
+                fetch("/api/v3/share", {
+                    method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                    body: JSON.stringify({ devicekeys, userkeys: [clickuser.publickey] })
+                }).then(response => response.json()).then(result => {
+                    //update list to show shared with user
+                    var updatedUserlist = _.clone(this.state.userSearched);
+                    for (var user of updatedUserlist) {
+                        if (user.publickey == clickuser.publickey) {
+                            user.shared = true;
+                            user.sharedCount = this.props.chosen.length
+                            console.log("user marked shared")
+                        }
+                    }
+                    this.setState({ userSearched: updatedUserlist })
+                }).catch(err => console.error(err.toString()));
+            }
         }
-
-
-        // var newEmailList = _.clone(this.state.userSearched)
-        // var temp = [];
-        // for (var dev in newEmailList) {
-        //     if (newEmailList[dev] == clickdata) {
-        //         if (clickdata.selected == "deselected") {
-        //             newEmailList[dev].selected = "selected";
-        //             newEmailList[dev].icon = "fas fa-check-square";
-        //         }
-        //         else {
-        //             newEmailList[dev].selected = "deselected";
-        //             newEmailList[dev].icon = "far fa-square";
-        //         }
-        //         temp = newEmailList.filter((users) => { return users.selected !== "deselected" })
-        //         this.state.SelectedUsers = _.clone(temp)
-        //     }
-        // }
-        // this.setState({ userSearched: newEmailList })
     }
 
     unshare = (remove) => {
@@ -189,48 +168,35 @@ export class ShareList extends Component {
         }
     }
 
+
+
     search = evt => {
 
         fetch("/api/v3/allUsers", {
             method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({ search: evt.target.value.toString() })
         }).then(response => response.json()).then(users => {
-            console.log(users);
             if (!users) { return; }
             if (users.error) { this.setState({ error: users.error }); return; }
 
-            // deselect all
-            for (var user of users) user.shared = false;
+            // marks users if shared to already
+
+            for (var user of users) {
+                user.shared = false;
+                user.sharedCount = 0;
+                for (var device of this.props.chosen) {
+                    if (device.access) {
+                        for (var access of device.access) {
+                            if (access == user.publickey) { user.sharedCount += 1; }
+                        }
+                    }
+                }
+            }
 
             this.setState({ userSearched: users })
+
+
         }).catch(err => console.error(err.toString()));
-
-        // this.setState({ search: evt.target.value.toString() }, () => {
-        //     var temp = [];
-        //     var newDeviceList = [];
-        //     var statsl = this.state.stats.userList;
-        //     for (var i in statsl) {
-        //         statsl[i].icon = "far fa-square"
-        //     }
-        //     statsl.map((person, i) => {
-        //         temp = [...temp, person.email]
-        //         if (person.email.toLowerCase().includes(this.state.search.toLowerCase())) {
-        //             newDeviceList.push(person);
-        //         } else {
-        //             newDeviceList.push("|");
-        //         }
-        //     });
-        //     temp = newDeviceList.filter((users) => { return users !== "|" && users.email !== this.props.account.email && users.username !== this.props.account.username })
-        //     for (var look in this.state.shared) {
-        //         for (var i in temp) {
-        //             if (temp[i].sharekey == this.state.shared[look]) {
-        //                 temp[i].shared = "yes"
-        //             }
-        //         }
-        //     }
-        //     this.setState({ userSearched: temp })
-        // })
-
 
     }
 
@@ -239,18 +205,27 @@ export class ShareList extends Component {
         return (<div style={{ overflow: "auto" }}>
             {
                 this.state.userSearched.map((user, i) => {
-                    if (user.shared) {
+
+                    // full shared
+                    if (user.sharedCount == this.props.chosen.length) {
                         return (
                             <div key={i} className="commanderBgPanel commanderBgPanelClickable" onClick={this.handleActionCall(user)} style={{ padding: "3px 7px 7px 5px" }}>
                                 <i className="statesViewerCheckBoxes fas fa-check" style={{ width: 28, color: "rgba(125, 255, 175, 1)", paddingRight: 10, filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
-                                {user.username}
+                                {user.username} ({user.sharedCount}/{this.props.chosen.length})
                             </div>
                         )
-                    } else {
+                    } else if (user.sharedCount > 0) {
+                        return (
+                            <div key={i} className="commanderBgPanel commanderBgPanelClickable" onClick={this.handleActionCall(user)} style={{ padding: "3px 7px 7px 5px" }}>
+                                <i className="statesViewerCheckBoxes fas fa-check" style={{ width: 28, color: "rgba(125, 255, 175, 0.25)", paddingRight: 10, filter: "drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.35))", fontSize: 14 }}></i>
+                                {user.username} ({user.sharedCount}/{this.props.chosen.length})
+                            </div>
+                        )
+                    } else if (user.sharedCount == 0) {
                         return (
                             <div key={i} className="commanderBgPanel commanderBgPanelClickable" onClick={this.handleActionCall(user)} style={{ padding: "3px 7px 7px 5px" }}>
                                 <i className="statesViewerCheckBoxes fas fa-square" style={{ width: 28, fontSize: 14, color: "rgb(42, 53, 62)", paddingRight: 10 }}></i>
-                                {user.username}
+                                {user.username} ({user.sharedCount}/{this.props.chosen.length})
                             </div>)
                     }
                 })
@@ -542,29 +517,46 @@ export class ShareList extends Component {
         if (!this.props.chosen) { return <div style={{ display: "none" }}></div> }
         return (<div ><center>
             {this.setValues(this.props.isOpen)}
+
             <Modal style={customStyles} isOpen={this.props.isOpen} onRequestClose={this.onRequestClose}>
-                <i className={"fas fa-times " + this.state.show} onClick={this.onClose} style={{ color: "red" }}></i>
 
-                <center style={{ color: "white", display: this.state.checkboxstate }}>
-                    <br></br> Search For users to share {this.props.chosen.length} device(s) with<br></br>
-
-                    <div style={{ color: "white", width: "100%" }}>
-                        <i className="fas fa-search" style={{ color: "white", paddingRight: 10 }}></i>
-                        <input type="text" name="search" placeholder="Partial Username or full email" onChange={this.search} style={{ width: "90%" }} />
+                <div className="container-fluid" style={{ background: "#16202C" }}>
+                    <div className="row">
+                        <div className="col" style={{ textAlign: "center", opacity: 0.8, padding: "7px", paddingBottom: "5px", fontSize: "18px" }}>SHARE</div>
+                        <div className="col fas fa-times cross" onClick={this.onClose} style={{ flex: "0 0 40px", padding: "10px 8px 0px 12px", fontSize: "20px" }}></div>
                     </div>
-                </center><br></br>
-
-                {this.userNameList()}
-
-                <br></br>{this.DevicePublic()}<div>
-                    {this.ShareButton()}</div><hr></hr>
-                <br></br>{this.selectedUserCount()}<div>
-
-
-
                 </div>
-                <center>
-                </center>
+
+                <div style={{ padding: 20 }}>
+                    <div style={{ width: "100%", paddingBottom: "10px" }}>Search For users to share {this.props.chosen.length} device(s) with:</div>
+
+                    <div style={{ color: "white", paddingBottom: "10px" }}>
+
+                        <div style={{ width: "30px", float: "left" }}>
+                            <i className="fas fa-search" style={{ color: "white", paddingTop: "10px", paddingLeft: "5px" }}></i>
+                        </div>
+
+                        <div style={{ overflow: "hidden" }}>
+                            <div>
+                                <input type="text" name="search" placeholder="Partial Username or full email" onChange={this.search} style={{ width: "100%" }} />
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    {this.userNameList()}
+
+                    {this.DevicePublic()}
+                </div>
+
+
+
+
+
+                {/* {this.ShareButton()}</div><hr></hr> */}
+                {/* <br></br>{this.selectedUserCount()}<div> */}
+
             </Modal>
         </center>
         </div >)
