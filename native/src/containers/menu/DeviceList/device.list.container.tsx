@@ -14,7 +14,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     const user = JSON.parse(await AsyncStorage.getItem('user'));
 
     try {
-      const response = await fetch('https://prototype.dev2.iotnxt.io/api/v3/states', {
+      const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/states', {
         method: 'GET',
         headers: {
           'Authorization': user.auth,
