@@ -4,7 +4,6 @@ log("MAIN \tStart ===============================")
 // console.log("PM2 instance id:" + process.env.pm_id)
 // console.log(process.env.NODE_APP_INSTANCE)
 
-
 require('source-map-support').install();
 var nodemailer = require("nodemailer")
 var _ = require('lodash');
@@ -753,26 +752,64 @@ app.post('/api/v3/shared', (req: any, res: any) => {
 })
 //Share Device
 
+/*
+  API to modify the sharing of device(s).
+*/
+app.post('/api/v3/share', (req: any, res: any) => {
+  console.log('\r\n/api/v3/share')
+  console.log(req.body);
+
+  if ((!req.body.devicekeys) || (!req.body.userkeys)) { res.json({ error: "expected { devicekeys: [ key : \"xxxx\" ], userkeys: [ publickey: \"xxxx\" ] }" }); return; }
+
+  var count = 0;
+  for (var key of req.body.devicekeys) {
+    db.states.update({ key }, { $addToSet: { access: { $each: req.body.userkeys } } }, { "upsert": true }, (err: Error | undefined, result: any) => {
+      console.log(err)
+      console.log(result);
+      count++;
+      if (count == req.body.devicekeys.length) { res.json({ result: "success" }) }
+    })
+  }
+
+
+})
+
 //unshare Device
 app.post('/api/v3/unshare', (req: any, res: any) => {
-  if (!req.user) { res.json({ error: "user not authenticated" }); return; }
-  db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
-    db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
-  })
+  console.log('\r\n/api/v3/share')
+  console.log(req.body);
 
-  db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
-    res.json(states)
-  })
-  //unshare device
+  if ((!req.body.devicekeys) || (!req.body.userkeys)) { res.json({ error: "expected { devicekeys: [ key : \"xxxx\" ], userkeys: [ publickey: \"xxxx\" ] }" }); return; }
+
+  var count = 0;
+  for (var key of req.body.devicekeys) {
+    db.states.update({ key }, { $pull: { access: { $in: req.body.userkeys } } }, { "multi": true }, (err: Error | undefined, result: any) => {
+      console.log(err)
+      console.log(result);
+      count++;
+      if (count == req.body.devicekeys.length) { res.json({ result: "success" }) }
+    })
+  }
+
+  // if (!req.user) { res.json({ error: "user not authenticated" }); return; }
+  // db.states.findOne({ $and: [{ devid: req.body.dev }, { apikey: req.user.apikey }] }, { _id: 0, key: 1 }, (err: Error, result: any) => {
+  //   db.users.update({ publickey: req.body.removeuser }, { "$pull": { shared: { keys: { key: result.key } } } })
+  // })
+
+  // db.states.update({ apikey: req.user.apikey, devid: req.body.dev }, { "$pull": { access: { $in: [req.body.removeuser] } } }, (err: Error, states: any) => {
+  //   res.json(states)
+  // })
+  // //unshare device
+
+
 })
 //unshare device
 
 // new in 5.0.34:
 app.post("/api/v3/states", (req: any, res: any, packet: any) => {
-  changePassword(req, res)
   findstates(req, res)
-
 })
+
 async function findstates(req: any, res: any) {
   if (req.body) {
     // find state by username
@@ -1033,19 +1070,6 @@ app.post("/api/v3/passChanged", (req: any, res: any) => {
     if (updated) res.json(updated);
   })
 })
-
-function changePassword(req: any, res: any) {
-  db.users.findOne({ apikey: req.user.apikey }, (err: Error, user: any) => {
-    if (user.email == "admin@localhost.com") {
-      if (user.passChange == undefined || user.passChange == null) {
-        db.users.update({ apikey: req.user.apikey }, { $set: { passChange: false } }, (err: Error, updated: any) => {
-          if (err) res.json(err);
-          if (updated) res.json(updated);
-        })
-      }
-    }
-  })
-}
 
 function handleState(req: any, res: any, next: any) {
   var hrstart = process.hrtime()
@@ -1332,14 +1356,30 @@ app.post("/api/v3/state/deleteBoundary", (req: any, res: any) => {
 })
 
 app.post("/api/v3/allUsers", (req: any, res: any) => {
+
+  if (req.body.search.length <= 2) {
+    res.json({ error: "you need atleast 3 characters" })
+    return;
+  }
+
   db.users.find({
-    $or: [{ 'username': { '$regex': req.body.search } }, { 'email': { '$regex': req.body.search } }],
+    $or: [
+      { 'username': { '$regex': req.body.search } },
+      { 'email': req.body.search }
+    ],
     level: { $gte: 1 },
     "username": { "$exists": true },
     "$expr": { "$ne": [{ "$strLenCP": "$username" }, 32] } // default random usernames are 32 so we skip these.. usernames shouldnt be this long anyways. I know its kinda a hack.
-  }, { username: 1, "_created_on": 1 }, //only return data we need
+  }, {  // only return data we need
+      "username": 1,
+      "_created_on": 1,
+      "_last_seen": 1,
+      "publickey": 1,
+      "email": 1
+    },
     (err: Error, resp: any) => {
-      res.json(resp)
+      if (err) res.json({ error: "db error" })
+      if (resp) res.json(resp)
     })
 });
 
