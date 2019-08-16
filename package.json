@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --exit ./build/tests/tests.js",
-    "watch": "tsc --sourcemap --w --lib es2015 ./server/*.ts ./server/tests/*.ts --outDir ./build"
+    "watch": "tsc --sourcemap --w --lib es2015 ./server/main.ts ./server/tests/tests.ts --outDir ./build"
   },
   "keywords": [],
   "author": "",
