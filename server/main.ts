@@ -2,15 +2,17 @@ import * as fs from 'fs';
 import { Webserver } from "./core/webserver"
 import { DocumentStore } from "./core/data"
 import { Core } from "./core/core"
-
 import * as cluster from "cluster"
 import { logger } from './core/log';
-import { Package } from "./interfaces/interfaces"
+import { Package, DBchange } from "./interfaces/interfaces"
 import * as repl from "repl";
+import { SocketServer } from './core/socketserver';
+import { MQTTServer } from "./components/mqttserver/mqtt"
 
-var nodePackage : Package = JSON.parse(fs.readFileSync("../package.json").toString());
 
-logger.log({message: "process start", data : { name: nodePackage.name, version: nodePackage.version }, level:"info"})
+var nodePackage: Package = JSON.parse(fs.readFileSync("../package.json").toString());
+
+logger.log({ message: "process start", data: { name: nodePackage.name, version: nodePackage.version }, level: "info" })
 
 const numCPUs = require('os').cpus().length;
 
@@ -30,7 +32,7 @@ interface State {
 var state: State = {
     isMaster: cluster.isMaster,
     pid: process.pid,
-    numCPUs : require('os').cpus().length
+    numCPUs: require('os').cpus().length
 }
 
 //console.log(state)
@@ -39,7 +41,7 @@ var state: State = {
 
 if (cluster.isMaster) {
 
-    logger.log({ message: "cluster isMaster", data: { state } , level: "info" })
+    logger.log({ message: "cluster isMaster", data: { state }, level: "info" })
 
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {
@@ -49,14 +51,14 @@ if (cluster.isMaster) {
     }
 
     cluster.on('exit', (worker, code, signal) => {
-        logger.log({message: "cluster fork died", data: {workerpid: worker.process.pid, signal, code}, level: "warn"})
+        logger.log({ message: "cluster fork died", data: { workerpid: worker.process.pid, signal, code }, level: "warn" })
     });
 
-    setTimeout( ()=>{
+    setTimeout(() => {
         var replserver = repl.start("");
         // expose state to repl context
         replserver.context.state = state;
-    },2000)
+    }, 2000)
 
 
 } else {
@@ -64,12 +66,23 @@ if (cluster.isMaster) {
 
     var core;
     var webserver;
+    var socketserver: SocketServer;
+    var mqttserver: MQTTServer;
+
     var documentstore = new DocumentStore({ mongoConnection: config.mongoConnection });
 
     documentstore.on("ready", () => {
         // only allow webserver to recieve api calls once db is ready.
         core = new Core({ documentstore, config })
         webserver = new Webserver({ core });
+        socketserver = new SocketServer({ server: webserver.server });
+        mqttserver = new MQTTServer({ core })
+
+        documentstore.on("packets", (data: DBchange) => {
+            socketserver.emit("packets", data);
+            mqttserver.emit("packets", data);
+        })
+
         webserver.listen();
     });
 }

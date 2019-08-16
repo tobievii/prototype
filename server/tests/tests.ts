@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { generateDifficult } from "../utils/utils"
 import { Prototype } from "../utils/api"
 
-import * as _ from "lodash" 
+import * as _ from "lodash"
 
 /*
 
@@ -16,17 +16,17 @@ import * as _ from "lodash"
 
 var toggle = true; //local or online
 
-var testAccount:any = {};
+var testAccount: any = {};
 
 if (toggle) {
     testAccount = {
         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
         password: "newUser",
-    
+
         /* dev server:                          */
         // host: "prototype.dev.iotnxt.io",
         // https: true
-    
+
         /* localhost:                           */
         host: "localhost",
         https: false,
@@ -36,11 +36,11 @@ if (toggle) {
     testAccount = {
         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
         password: "newUser",
-    
+
         /* dev server:                          */
         host: "prototype.dev.iotnxt.io",
         https: true
-    
+
         /* localhost:                           */
         // host: "localhost",
         // https: false,
@@ -68,7 +68,7 @@ describe("PROTOTYPE", () => {
 
     it("register", function (done) {
         this.timeout(5000);
-        prototype.register( { email: testAccount.email, pass: testAccount.password}, (err: Error, result: any) => {
+        prototype.register({ email: testAccount.email, pass: testAccount.password }, (err: Error, result: any) => {
             if (err) done(err);
             if (result) {
                 if (result.error) done(new Error(result.error))
@@ -80,7 +80,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("account", done => {
         prototype.account((err: Error, account: any) => {
@@ -94,7 +94,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("version", done => {
         prototype.version((err: Error, version: any) => {
@@ -106,7 +106,7 @@ describe("PROTOTYPE", () => {
     })
 
 
-    
+
 
     it("signin", done => {
         // fresh instance
@@ -118,7 +118,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("account", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); }
@@ -134,7 +134,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     var packet = {
         id: "test_httppost",
@@ -153,7 +153,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("device HTTP VIEW", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); }
@@ -171,7 +171,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("device HTTP PACKETS", done => {
         new Prototype(testAccount).packets(packet.id, (err: Error, response: any) => {
@@ -186,7 +186,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("device HTTP STATE", done => {
         new Prototype(testAccount).state(packet.id, (err: Error, response: any) => {
@@ -202,13 +202,13 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("device HTTP STATES", done => {
         new Prototype(testAccount).states((err: Error, response: any) => {
             if (err) done(err);
             if (response) {
-                if (response.error) { done(new Error(response.error)); return;}
+                if (response.error) { done(new Error(response.error)); return; }
                 if (response[0].id != packet.id) { done(new Error("id mismatch")); return; }
                 if (response[0].data.random != packet.data.random) { done(new Error("data mismatch")); return; }
                 done();
@@ -216,7 +216,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
 
     it("device HTTP DELETE", done => {
@@ -228,8 +228,8 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
-/*
+
+
 
     it("HTTP -> SOCKET", done => {
         var id = "protTestHttpSocket"
@@ -237,19 +237,18 @@ describe("PROTOTYPE", () => {
 
         // SOCKET
         var account = _.clone(testAccount);
-        account.protocol = "websocket";
+        account.protocol = "socketio";
         account.id = id;
         var protSocket = new Prototype(account);
 
         protSocket.on("connect", () => {
             // HTTP POST
-            console.log("connect")
-            setTimeout(() => {
-                new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => {
-                    if (e) done(e);
-                    console.log(r);
-                })
-            }, 100)
+            //setTimeout(() => {
+            new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => {
+                if (e) done(e);
+                //console.log(r);
+            })
+            //}, 100)
 
         })
         protSocket.on("data", (data: any) => {
@@ -261,7 +260,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+
 
     it("HTTP -> MQTT", done => {
         var id = "protTestHttpMqtt"
@@ -285,7 +284,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+    /*
 
     it("MQTT -> SOCKET", function (done) {
         this.timeout(5000);
