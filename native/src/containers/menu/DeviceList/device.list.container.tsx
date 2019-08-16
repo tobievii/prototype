@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { any } from 'prop-types';
-import { Text } from 'react-native';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, ScrollView, StyleSheet } from 'react-native';
+import { ListItem } from 'react-native-elements'
 
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
   state = {
-    data: any,
+    data: [],
   };
 
   getDeviceList = async () => {
@@ -26,7 +26,6 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
       this.setState({ data: data });
 
       // tslint:disable-next-line: no-console
-      console.log(data);
     } catch (err) {
       return console.error(err.toString());
     }
@@ -40,7 +39,20 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
 
   private navigationKey: string = 'DeviceListContainer';
 
-  render = () => <Text>
-    {JSON.stringify(this.state.data)};
-  </Text>
+  render() {
+    console.log(this.state.data);
+    return (
+      <ScrollView>
+        {
+          this.state.data.map((l, i) => (
+            <ListItem
+              key={i}
+              leftAvatar={{ source: { uri: l.avatar_url } }}
+              title={l.id}
+            />
+          ))
+        }
+      </ScrollView>
+    )
+  }
 }
