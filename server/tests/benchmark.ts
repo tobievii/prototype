@@ -5,6 +5,9 @@ import { Prototype } from "../utils/api"
 import * as _ from "lodash"
 import { start } from "repl";
 
+var count = 1;
+var last: any = new Date();
+
 /*
   prototype test suite
   env server=https://prototype.dev.iotnxt.io port=443 https=true npm run test
@@ -62,20 +65,32 @@ class TestBot {
 
         this.protocon = new Prototype({ host: "localhost", port: 8080 })
         this.protocon.register({ email: this.email, pass: this.pass }, (err, result) => {
-            console.log(err);
-            console.log(result);
+            //console.log(err);
+            //console.log(result);
+            this.sendData();
+            this.sendData();
+            this.sendData();
+            this.sendData();
             this.sendData();
         })
     }
 
     sendData() {
-        this.count++;
-        var now: any = new Date();
+
         var packet = { id: "test_httppost", data: { random: generateDifficult(32) } }
+        count++;
+
+
+
         this.protocon.post(packet, (err, result) => {
             if (result) {
-                var later: any = new Date();
-                console.log(later - now)
+                //console.log(count);
+                if (count % 1000 == 0) {
+                    var now: any = new Date();
+                    var delta = now - last;
+                    last = now;
+                    console.log(new Date().toISOString() + " " + delta + " " + count);
+                }
                 this.sendData();
             }
         })
