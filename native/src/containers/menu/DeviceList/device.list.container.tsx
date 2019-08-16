@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { any } from 'prop-types';
-import { AsyncStorage, ScrollView, StyleSheet } from 'react-native';
-import { ListItem } from 'react-native-elements'
+import { AsyncStorage, ScrollView, StyleSheet, Text, View, FlatList } from 'react-native';
+import { CheckBox } from 'react-native-elements'
 
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
@@ -38,20 +38,24 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
   }
 
   private navigationKey: string = 'DeviceListContainer';
-
+  renderItem = ({ item }) => {
+    return (
+      <View style={{ height: 50, width: '100%', borderColor: '#6c757d', borderBottomWidth: 1 }}>
+        <Text style={{ color: '#ffffff', marginTop: 15 }}>{item.id}</Text>
+      </View>
+    );
+  }
   render() {
     console.log(this.state.data);
     return (
-      <ScrollView>
-        {
-          this.state.data.map((l, i) => (
-            <ListItem
-              key={i}
-              leftAvatar={{ source: { uri: l.avatar_url } }}
-              title={l.id}
-            />
-          ))
-        }
+      <ScrollView style={{ flex: 1, backgroundColor: "#162438" }}>
+        <FlatList
+          style={{ flex: 1, backgroundColor: "#162438" }}
+          data={this.state.data}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={item => item.id}
+          renderItem={this.renderItem}
+        />
       </ScrollView>
     )
   }
