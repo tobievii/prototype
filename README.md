@@ -1,4 +1,4 @@
-# 8bo
+# PROTOTYPE 5.1 ALPHA
 next generation realtime data store and display system
 
 # todo
