@@ -28,3 +28,7 @@ export interface DBchange {
     ns: { db: string, coll: string }
     documentKey: any
 }
+
+export interface User {
+    email?: string;
+}

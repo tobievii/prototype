@@ -4,10 +4,10 @@ import { DocumentStore } from "./core/data"
 import { Core } from "./core/core"
 import * as cluster from "cluster"
 import { logger } from './core/log';
-import { Package, DBchange } from "./interfaces/interfaces"
+import { Package, DBchange } from "./core/interfaces"
 import * as repl from "repl";
 import { SocketServer } from './core/socketserver';
-import { MQTTServer } from "./components/mqttserver/mqtt"
+import { MQTTServer } from "./core/mqtt"
 
 
 var nodePackage: Package = JSON.parse(fs.readFileSync("../package.json").toString());

@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { LogEvent } from "../interfaces/interfaces"
+import { LogEvent } from "./interfaces"
 
 /*
 import { createLogger, format, transports } from 'winston';
