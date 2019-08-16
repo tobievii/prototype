@@ -101,7 +101,7 @@ export class Prototype extends EventEmitter {
         registers a new account
     */
 
-    register(options: { email: string, pass: string }, cb: Function) {
+    register(options: { email: string, pass: string }, cb: (err: any, result?: any) => void) {
         request.post(this.uri + "/api/v3/admin/register", { json: { email: options.email, pass: options.pass } }, (err: Error, res: any, body: any) => {
             if (err) cb(err);
             if (body) {
@@ -153,7 +153,7 @@ export class Prototype extends EventEmitter {
         })
     }
 
-    post(packet: Packet, cb?: Function) {
+    post(packet: Packet, cb?: (err?: Error | null, result?: any) => void) {
 
         if ((this.protocol == "http") || (this.protocol == "https")) {
             request.post(this.uri + "/api/v3/data/post", { headers: this.headers, json: packet }, (err: Error, res: any, body: any) => {

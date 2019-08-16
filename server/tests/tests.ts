@@ -5,11 +5,8 @@ import { Prototype } from "../utils/api"
 import * as _ from "lodash"
 
 /*
-
   prototype test suite
-
   env server=https://prototype.dev.iotnxt.io port=443 https=true npm run test
-
 */
 
 // https://mochajs.org/#getting-started
@@ -63,6 +60,7 @@ if (toggle) {
 
 
 describe("PROTOTYPE", () => {
+
     // instance for new user
     var prototype = new Prototype(testAccount);
 
@@ -144,7 +142,7 @@ describe("PROTOTYPE", () => {
     it("device HTTP POST", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); }
 
-        new Prototype(testAccount).post(packet, (err: Error, response: any) => {
+        new Prototype(testAccount).post(packet, (err, response) => {
             if (err) done(err);
             if (response) {
                 if (response.result != "success") { done(new Error(response)); return; }
@@ -244,7 +242,7 @@ describe("PROTOTYPE", () => {
         protSocket.on("connect", () => {
             // HTTP POST
             //setTimeout(() => {
-            new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => {
+            new Prototype(testAccount).post({ id, data: { test } }, (e, r) => {
                 if (e) done(e);
                 //console.log(r);
             })
@@ -273,7 +271,7 @@ describe("PROTOTYPE", () => {
         var protMqtt = new Prototype(mqttaccount);
         protMqtt.on("connect", () => {
             // HTTP POST
-            new Prototype(testAccount).post({ id, data: { test } }, (e: Error, r: any) => { })
+            new Prototype(testAccount).post({ id, data: { test } }, (e, r) => { })
         })
         protMqtt.on("data", (data: any) => {
             if (data.id != id) { done(new Error("id missing from socket packet")); return; }
@@ -328,7 +326,7 @@ describe("PROTOTYPE", () => {
 
         var protMqtt = new Prototype(mqttaccount);
 
-        protMqtt.post({ id, data: { test } }, (e: Error, result: any) => {
+        protMqtt.post({ id, data: { test } }, (e, result) => {
 
             new Prototype(testAccount).view(id, (e: Error, data: any) => {
                 if (data.id != id) { done(new Error("id missing from packet")); return; }
@@ -355,7 +353,7 @@ describe("PROTOTYPE", () => {
         var protSocket = new Prototype(socketAccount)
 
         protSocket.on("connect", () => {
-            protSocket.post({ id, data: { test } }, (e: Error, result: any) => {
+            protSocket.post({ id, data: { test } }, (e, result) => {
                 new Prototype(testAccount).view(id, (e: Error, data: any) => {
                     if (data.id != id) { done(new Error("id missing from packet")); return; }
                     if (!data.data) { done(new Error("data missing from packet")); return; }

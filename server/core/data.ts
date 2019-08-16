@@ -7,6 +7,7 @@
 import * as mongoose from "mongoose"
 import { logger } from "./log";
 import { EventEmitter } from "events";
+import { threadId } from "worker_threads";
 
 //var mongojs = require('mongojs')
 
@@ -64,6 +65,29 @@ export class DocumentStore extends EventEmitter {
                 this.emit("ready");
             }
         });
+
+        this.createIndexes();
     }
 
+    createIndexes() {
+        logger.log({ message: "mongo indexes", data: {}, level: "verbose" })
+
+        this.db.states.createIndex({ apikey: 1 })
+        this.db.states.createIndex({ apikey: 1, devid: 1 })
+        this.db.states.createIndex({ "_last_seen": 1 })
+        this.db.states.createIndex({ key: 1 })
+        this.db.states.createIndex({ "plugins_iotnxt_gateway.GatewayId": 1, "plugins_iotnxt_gateway.HostAddress": 1 }, { background: 1 })
+
+        this.db.packets.createIndex({ "_created_on": 1 })
+        this.db.packets.createIndex({ apikey: 1 })
+        this.db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
+        this.db.packets.createIndex({ key: 1 }, { background: 1 })
+
+        this.db.users.createIndex({ uuid: 1 })
+        this.db.users.createIndex({ apikey: 1 })
+        this.db.users.createIndex({ "_last_seen": 1 })
+        this.db.users.createIndex({ username: 1 }, { background: 1 })
+        this.db.users.createIndex({ email: 1 }, { background: 1 }) // gert's fix
+        this.db.users.createIndex({ email: "text", username: "text" }, { background: 1 })
+    }
 }
