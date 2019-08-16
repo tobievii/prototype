@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import { iotnxt, Gateway } from "./api_prototype_iotnxt"
 //import { teltonika } from "./teltonika"
 
-import {PrototypeWS} from "./api_ws"
+import { PrototypeWS } from "./api_ws"
 
 export interface Packet {
     id: string;
@@ -25,6 +25,8 @@ export class Prototype extends EventEmitter {
     headers: any = {};
     id = undefined;
     socketclient: any = undefined;
+    socketiojoined: boolean = false;
+
     mqttclient: any = undefined;
     protocol = "http";
     plugins: any = {};
@@ -90,7 +92,7 @@ export class Prototype extends EventEmitter {
         }
 
 
-        this.plugins.iotnxt = new iotnxt(this);
+        //this.plugins.iotnxt = new iotnxt(this);
         //this.plugins.teltonika = new teltonika(this);
 
     }
@@ -99,21 +101,16 @@ export class Prototype extends EventEmitter {
         registers a new account
     */
 
-    register( options: {email: string, pass: string},  cb: Function) {
-
-        //console.log(this.uri+"/api/v3/admin/register")
-        //this.uri = "https://prototype.dev.iotnxt.io"
-        request.post(this.uri + "/api/v3/admin/register", { json: { email: options.email, pass: options.pass } }, (err, res, body) => {
+    register(options: { email: string, pass: string }, cb: Function) {
+        request.post(this.uri + "/api/v3/admin/register", { json: { email: options.email, pass: options.pass } }, (err: Error, res: any, body: any) => {
             if (err) cb(err);
             if (body) {
-                //console.log(body);
                 if (body.error) { cb(new Error(body.error)); return; }
                 if (body.account.apikey) {
                     this.apikey = body.account.apikey
                     this.rebuildHeader();
                     cb(null, body);
                 }
-
             }
         });
     }
@@ -157,6 +154,7 @@ export class Prototype extends EventEmitter {
     }
 
     post(packet: Packet, cb?: Function) {
+
         if ((this.protocol == "http") || (this.protocol == "https")) {
             request.post(this.uri + "/api/v3/data/post", { headers: this.headers, json: packet }, (err: Error, res: any, body: any) => {
                 if (err) if (cb) cb(err);
@@ -172,19 +170,24 @@ export class Prototype extends EventEmitter {
 
         if (this.protocol == "mqtt") {
             if (this.mqttclient) {
-                this.mqttclient.publish(this.apikey, JSON.stringify(packet), cb)
+                this.mqttclient.publish(this.apikey, JSON.stringify(packet), { qos: 1 }, cb)
             }
         }
 
         if (this.protocol == "socketio") {
             if (this.socketclient) {
-                this.socketclient.emit("post", packet)
-
-                //workaround as emit post callback does not fire
-                setTimeout(() => {
-                    if (cb) cb()
-                }, 50)
-
+                //immediate or wait for join if queued function
+                if (this.socketiojoined) {
+                    this.socketclient.emit("post", packet, () => {
+                        if (cb) cb();
+                    })
+                } else {
+                    this.on("connect", () => {
+                        this.socketclient.emit("post", packet, () => {
+                            if (cb) cb();
+                        })
+                    })
+                }
             }
         }
 
@@ -265,16 +268,22 @@ export class Prototype extends EventEmitter {
     }
 
     protocolSocketio() {
+
         var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
         this.socketclient = socketclient;
         socketclient.on("connect", () => {
             if (this.apikey == "") { console.error("apikey blank") }
             if (this.id) {
-                socketclient.emit("join", this.apikey + "|" + this.id);
-                this.emit("connect");
+                socketclient.emit("join", this.apikey + "|" + this.id, () => {
+                    this.socketiojoined = true;
+                    this.emit("connect");
+                });
+
             } else {
-                socketclient.emit("join", this.apikey);
-                this.emit("connect");
+                socketclient.emit("join", this.apikey, () => {
+                    this.socketiojoined = true;
+                    this.emit("connect");
+                });
             }
             socketclient.on("post", (data: any) => {
                 this.emit("data", data);
@@ -286,7 +295,6 @@ export class Prototype extends EventEmitter {
         var socketclient = new PrototypeWS(this.uri, { transports: ['websocket'] })
         this.socketclient = socketclient;
         socketclient.on("connect", () => {
-            console.log("...conn")
             if (this.apikey == "") { console.error("apikey blank") }
             if (this.id) {
                 socketclient.emit("join", this.apikey + "|" + this.id);

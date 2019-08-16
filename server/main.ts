@@ -75,7 +75,7 @@ if (cluster.isMaster) {
         // only allow webserver to recieve api calls once db is ready.
         core = new Core({ documentstore, config })
         webserver = new Webserver({ core });
-        socketserver = new SocketServer({ server: webserver.server });
+        socketserver = new SocketServer({ server: webserver.server, core });
         mqttserver = new MQTTServer({ core })
 
         documentstore.on("packets", (data: DBchange) => {

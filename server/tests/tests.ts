@@ -284,7 +284,6 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    /*
 
     it("MQTT -> SOCKET", function (done) {
         this.timeout(5000);
@@ -318,7 +317,7 @@ describe("PROTOTYPE", () => {
 
     })
 
-    
+
 
     it("MQTT -> HTTP", done => {
         var id = "protTestMqtt"
@@ -331,22 +330,19 @@ describe("PROTOTYPE", () => {
 
         protMqtt.post({ id, data: { test } }, (e: Error, result: any) => {
 
-            // Delay a bit
-            setTimeout(() => {
-                new Prototype(testAccount).view(id, (e: Error, data: any) => {
-                    if (data.id != id) { done(new Error("id missing from packet")); return; }
-                    if (!data.data) { done(new Error("data missing from packet")); return; }
-                    if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
-                    done();
-                })
-            }, 100)
+            new Prototype(testAccount).view(id, (e: Error, data: any) => {
+                if (data.id != id) { done(new Error("id missing from packet")); return; }
+                if (!data.data) { done(new Error("data missing from packet")); return; }
+                if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
+                done();
+            })
 
             protMqtt.disconnect();
         })
 
     })
 
-    
+
 
     it("SOCKET -> HTTP", done => {
         var id = "protTestSocketHttp"
@@ -359,26 +355,19 @@ describe("PROTOTYPE", () => {
         var protSocket = new Prototype(socketAccount)
 
         protSocket.on("connect", () => {
-
-            setTimeout(() => {
-                protSocket.post({ id, data: { test } }, (e: Error, result: any) => {
-                    //
-                    new Prototype(testAccount).view(id, (e: Error, data: any) => {
-                        if (data.id != id) { done(new Error("id missing from packet")); return; }
-                        if (!data.data) { done(new Error("data missing from packet")); return; }
-                        if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
-                        done();
-                    })
-                    protSocket.disconnect();
-                    //
+            protSocket.post({ id, data: { test } }, (e: Error, result: any) => {
+                new Prototype(testAccount).view(id, (e: Error, data: any) => {
+                    if (data.id != id) { done(new Error("id missing from packet")); return; }
+                    if (!data.data) { done(new Error("data missing from packet")); return; }
+                    if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
+                    done();
                 })
-            }, 100)
-
+                protSocket.disconnect();
+            })
         })
-
     })
 
-    
+
 
     it("SOCKET -> MQTT", done => {
         var id = "protTestSocketMqtt"
@@ -393,7 +382,9 @@ describe("PROTOTYPE", () => {
         protMqtt.on("connect", () => {
             var socketaccount = _.clone(testAccount);
             socketaccount.protocol = "socketio"
-            new Prototype(socketaccount).post({ id, data: { test } })
+            new Prototype(socketaccount).post({ id, data: { test, asdf: "zzz" } }, () => {
+
+            })
         })
 
         protMqtt.on("data", (data) => {
@@ -405,7 +396,7 @@ describe("PROTOTYPE", () => {
         })
     })
 
-    
+    /*
 })
 
 describe("PLUGINS", () => {

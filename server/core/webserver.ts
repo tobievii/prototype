@@ -21,7 +21,7 @@ import { webapiv3 } from "./webapi_v3"
 export class Webserver extends EventEmitter {
     app: express.Application;
     ssl: any;
-    server: any;
+    server: http.Server;
 
     port: number = 8080;
     core: Core;
@@ -122,7 +122,7 @@ export class Webserver extends EventEmitter {
         return (req: express.Request | any, res: express.Response, next: express.NextFunction) => {
             if (req.headers.authorization) {
 
-                this.core.user({ authorization: req.headers.authorization }, (err: Error, user: any) => {
+                this.core.user({ authorization: req.headers.authorization }, (err, user) => {
                     if (err) { next(); }
                     if (user) {
                         req.user = user;

@@ -1,31 +1,53 @@
 import { EventEmitter } from "events";
 var socketio = require('socket.io');
+
+import { Server } from "socket.io"
+
 import * as WebSocket from "ws";
 import { logger } from "./log"
+import { Core } from "./core"
+
+import { Express } from "express"
+import { Http2SecureServer } from "http2";
+
+import * as http from "http";
+import * as https from "https";
 
 export class SocketServer extends EventEmitter {
-    server;
-    io: any;
-    wss: WebSocket.Server;
+    server: http.Server | https.Server;
+    io: Server;
 
-    constructor(options?: any) {
+    constructor(options: { server: http.Server | https.Server, core: Core }) {
         super();
-        if (options.server) this.server = options.server;
-
-        // socketio:
-
+        this.server = options.server;
 
         this.io = socketio(this.server);
 
         this.io.on("connection", (socket: any) => {
-            socket.on("join", (path) => {
-                logger.log({ message: "socket join", data: { path }, level: "verbose" })
-                socket.join(path);
+            socket.on("join", (path: string, cb?: Function) => {
+                var key = path.split("|")
+                options.core.user({ apikey: key[0] }, (err, user) => {
+                    if (err) {
+                        logger.log({ message: "socket join error", data: { path }, level: "error" })
+                    }
+                    if (user) {
+                        socket.user = user;
+                        logger.log({ message: "socket join", data: { path }, level: "verbose" })
+                        socket.join(path);
+                        if (cb) cb();
+                    }
+                })
             })
 
-            socket.on("post", (data) => {
-                console.log("socket.io post:")
+            socket.on("post", (packet: any, cb?: Function) => {
+                logger.log({ message: "socket post", data: { packet }, level: "verbose" })
+                options.core.datapost({ user: socket.user, packet }, (err, result) => {
+                    if (result) {
+                        if (cb) cb({ result });
+                    }
+                })
             })
+
         })
 
         this.on("packets", (packets) => {

@@ -21,42 +21,44 @@ export class MQTTServer extends EventEmitter {
     ev: any;
     clustersubs: string[] = [];
 
-    constructor(options?: any) {
+    constructor(options: { core: Core }) {
         super();
-
-        logger.log({ message: "mqtt loading", level: "verbose" })
 
         var server = net.createServer((socket: any) => {
             var client = new mqttConnection({ socket, core: options.core })
 
-            client.on("connect", (data) => { this.mqttConnections.push(client); })
+            client.on("connect", (data) => {
+                logger.log({ message: "mqtt client conn", data: { data }, level: "verbose" })
+                this.mqttConnections.push(client);
+            })
 
             client.on("subscribe", (packet) => {
                 if (client.subscriptions.includes(packet.subscribe) == false) {
+                    logger.log({ message: "mqtt subscr", data: { sub: packet.subscribe }, level: "verbose" })
                     client.subscriptions.push(packet.subscribe)
                 }
             })
 
-            client.on("publish", (publish) => {
-                var requestClean: any = {}
+            // client.on("publish", (publish) => {
+            //     var requestClean: any = {}
 
-                // error catching..
+            //     // error catching..
 
-                try {
-                    requestClean = JSON.parse(publish.payload)
-                    if (requestClean.data == undefined || requestClean.id == undefined) {
-                        logger.log({ message: "mqtt data/id parameter missing", data: {}, level: "warn" })
-                    } else {
-                        logger.log({ message: "mqtt publish recv", data: {}, level: "info" })
-                        requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
+            //     try {
+            //         requestClean = JSON.parse(publish.payload)
+            //         if (requestClean.data == undefined || requestClean.id == undefined) {
+            //             logger.log({ message: "mqtt data/id parameter missing", data: {}, level: "warn" })
+            //         } else {
+            //             logger.log({ message: "mqtt publish recv", data: {}, level: "info" })
+            //             requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
+            //             //this.emit("device", { apikey: publish.topic, packet: requestClean }) // this now needs to be processed and saved to db.
+            //             options.core.datapost({ user: client.user, packet: requestClean })
 
-                        this.emit("device", { apikey: publish.topic, packet: requestClean }) // this now needs to be processed and saved to db.
-
-                    }
-                } catch (err) {
-                    logger.log({ message: "mqtt error", data: { err }, level: "error" });
-                }
-            })
+            //         }
+            //     } catch (err) {
+            //         logger.log({ message: "mqtt error", data: { err }, level: "error" });
+            //     }
+            // })
 
             client.on("error", (err: any) => {
                 logger.log({ message: "mqtt error", data: { err }, level: "error" });
@@ -74,8 +76,7 @@ export class MQTTServer extends EventEmitter {
     }
 
     handlePacket(packet: DBchange) {
-        console.log(packet.fullDocument);
-        logger.log({ message: "mqtt handlePacket", data: {}, level: "verbose" });
+
 
         for (var mqttConnection of this.mqttConnections) {
             for (var sub of mqttConnection.subscriptions) {
@@ -102,9 +103,7 @@ export class MQTTServer extends EventEmitter {
                         // }
 
                         if (sendit) {
-
-                            console.log("----- SENDING ----")
-                            console.log(mqttConnection.uuid)
+                            logger.log({ message: "mqtt handlePacket", data: { apikey: packet.fullDocument.apikey, packet: packet.fullDocument }, level: "verbose" });
                             mqttConnection.publish(packet.fullDocument.apikey, JSON.stringify(packet.fullDocument))
                         }
                     }
@@ -133,6 +132,7 @@ export class mqttConnection extends EventEmitter {
     data: Buffer;
     packetCount: number = 0;
     parser: any;
+    user: any;
 
     constructor(options: { socket: net.Socket, core: Core }) {
         super()
@@ -149,7 +149,7 @@ export class mqttConnection extends EventEmitter {
         this.connected = true;
 
         this.parser.on("packet", (packet: any) => {
-            console.log(packet)
+
             if (packet.cmd == "connect") {
                 /*
                 0x00 Connection Accepted
@@ -191,6 +191,7 @@ export class mqttConnection extends EventEmitter {
                             }
 
                             if (result) {
+                                this.user = result;
                                 this.apikey = apikey[1];
                                 this.emit("connect", { apikey: this.apikey })
 
@@ -223,13 +224,48 @@ export class mqttConnection extends EventEmitter {
             }
 
             if (packet.cmd == "publish") {
-                if (packet.qos > 0) {
-                    this.socket.write(mqttpacket.generate({
-                        cmd: 'puback',
-                        messageId: packet.messageId
-                    }))
+                ///////////
+
+
+                //this.emit("publish", packet);
+
+
+
+
+
+                var requestClean: any = {}
+
+                // error catching..
+
+                try {
+                    requestClean = JSON.parse(packet.payload)
+                    if (requestClean.data == undefined || requestClean.id == undefined) {
+                        logger.log({ message: "mqtt data/id parameter missing", data: {}, level: "warn" })
+                    } else {
+                        logger.log({ message: "mqtt publish recv", data: {}, level: "info" })
+                        requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": "..." }
+                        //this.emit("device", { apikey: publish.topic, packet: requestClean }) // this now needs to be processed and saved to db.
+                        options.core.datapost({ user: this.user, packet: requestClean }, (err, result) => {
+                            if (packet.qos > 0) {
+                                this.socket.write(mqttpacket.generate({
+                                    cmd: 'puback',
+                                    messageId: packet.messageId
+                                }))
+                            }
+                        })
+
+                    }
+                } catch (err) {
+                    logger.log({ message: "mqtt error", data: { err }, level: "error" });
                 }
-                this.emit("publish", packet);
+
+
+
+
+
+
+
+                /////////////
             }
         })
 
@@ -238,37 +274,13 @@ export class mqttConnection extends EventEmitter {
             //this.emit("close", err);
         })
 
-        this.socket.on("connect", () => {
-            console.log("connect");
-        })
-
-        this.socket.on("data", (chunk) => {
-            //console.log("data");
-            //console.log(chunk.toString("hex"))
-            //this.data = Buffer.concat([this.data, chunk])
-            //this.handleData();
-            this.parser.parse(chunk);
-        })
-
-        this.socket.on("drain", () => {
-            console.log("drain");
-        })
-
-        this.socket.on("end", () => {
-            console.log("end");
-            //this.handleData();
-        });
-
-        this.socket.on("error", (err) => {
-            console.log("error");
-        })
-
-        this.socket.on("timeout", () => { console.log("timeout"); })
-
-        this.socket.on("lookup", (err, address, family, host) => {
-            console.log("lookup");
-        })
-
+        this.socket.on("connect", () => { })
+        this.socket.on("data", (chunk) => { this.parser.parse(chunk); })
+        this.socket.on("drain", () => { })
+        this.socket.on("end", () => { });
+        this.socket.on("error", (err) => { })
+        this.socket.on("timeout", () => { })
+        this.socket.on("lookup", (err, address, family, host) => { })
     }
 
     publish = (topic: string, data: any) => {
@@ -280,7 +292,7 @@ export class mqttConnection extends EventEmitter {
             this.socket.write(mqttpacket.generate({
                 cmd: 'publish',
                 topic,
-                payload: new Buffer(data)
+                payload: Buffer.from(data)
             }))
         } catch (err) {
             logger.log({ message: "mqtt publish", data: { err }, level: "error" });

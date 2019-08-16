@@ -22,8 +22,8 @@ export class Core extends EventEmitter {
         //logger.log({message:{msg:"Core constructor", options}, level:"info"})
     }
 
-    register(options: any, cb?: (err: Error | undefined, result?: any) => void) {
-        logger.log({ message: "core new user registration", data: { options }, level: "info" })
+    register(options: { email: string, pass: string, username?: string, ip?: string, userAgent?: string }, cb?: (err: Error | undefined, result?: any) => void) {
+        logger.log({ message: "core new user registration", data: { options }, level: "verbose" })
 
         //encrypt password
         crypto.scrypt(options.pass, this.salt, 64, (err, derivedKey) => {
@@ -75,7 +75,7 @@ export class Core extends EventEmitter {
     }
     // end account
 
-    user(options: any, cb: any) {
+    user(options: { apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
 
         // finds user from db by Basic Auth base64 key
         if (options.authorization) {
@@ -99,8 +99,8 @@ export class Core extends EventEmitter {
                 if (err) { logger.log({ message: "finding user by email failed.", data: { err }, level: "error" }); cb(err); return; }
                 if (user) {
                     // check password:
-                    crypto.scrypt(options.pass, this.salt, 64, (err, derivedKey) => {
-
+                    var passbuf: any = options.pass;
+                    crypto.scrypt(passbuf, this.salt, 64, (err, derivedKey) => {
                         if (err) { logger.log({ message: "core user signedin password match scrypt error", data: { err }, level: "error" }); }
                         if (derivedKey) {
                             if (derivedKey.toString("hex") == user.password) {
@@ -130,10 +130,12 @@ export class Core extends EventEmitter {
     }
     // end user
 
-    datapost(options: any, cb?: any) {
+    datapost(options: { user: any, packet: any }, cb: (err: any, result?: any) => void) {
         //device / user?
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
+
+            if (!cb) cb = () => { }
 
             // data format error checking
             if (!packet.id) { cb({ error: "id parameter missing" }); return; }
