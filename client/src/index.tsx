@@ -70,7 +70,7 @@ export default class App extends React.Component {
 
         <BrowserRouter>
           <div>
-            <NavBar ></NavBar>
+            <NavBar account={this.state.account} ></NavBar>
             <Route exact path="/" component={this.home} />
             <Route path="/login" component={this.login} />
             <Route path="/about" component={About} />
