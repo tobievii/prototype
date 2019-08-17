@@ -4,9 +4,7 @@ import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
 
 import "../prototype.scss"
 
-import { Component } from "./component"
-
-export class NavBar extends Component {
+export class NavBar extends React.Component {
 
   state = {
     mobileMenuActive: false

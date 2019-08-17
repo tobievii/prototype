@@ -6,9 +6,7 @@ import "../prototype.scss"
 
 import { Registration } from "../components/registration"
 
-import { Component } from "../components/component"
-
-export class Home extends Component {
+export class Home extends React.Component {
 
     state = {
 

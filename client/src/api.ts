@@ -27,6 +27,7 @@ export class API extends events.EventEmitter {
                     if (body.account.apikey) {
                         this.apikey = body.account.apikey
                         this.rebuildHeader();
+                        this.connectSocket();
                         cb(null, body);
                     }
                 }
@@ -42,18 +43,18 @@ export class API extends events.EventEmitter {
     }
 
     // gets our latest account details
-    account(cb: Function) {
+    account(cb?: Function) {
         request.get(this.uri + "/api/v3/account",
             { headers: this.headers, json: true },
             (err: Error, res: any, body: any) => {
-                if (err) cb(err);
+                if (err) if (cb) cb(err);
                 if (body) {
                     console.log(body);
                     if (body.apikey) {
                         this.apikey = body.apikey;
                         if (this.socket == undefined) this.connectSocket();
                     }
-                    cb(null, body);
+                    if (cb) cb(null, body);
                 }
             }
         )
@@ -84,7 +85,26 @@ export class API extends events.EventEmitter {
                 this.emit("account", data);
             });
         });
+    }
 
+    signin(email: string, pass: any, cb: Function) {
+        request.post(this.uri + "/signin", { json: { email, pass } }, (err: Error, res: any, body: any) => {
+            if (err) cb(err);
+            if (body) {
+                if (body.err) { cb(new Error(body.err)); return; }
+                if (body.error) { cb(new Error(body.error)); return; }
+                if (body.signedin == true) cb(null, body);
+            }
+        })
+    }
+
+    version(cb: Function) {
+        request.get(this.uri + "/api/v3/version", { json: true }, (err: Error, res: any, body: any) => {
+            if (err) cb(err);
+            if (body) {
+                cb(null, body);
+            }
+        })
     }
 
 }

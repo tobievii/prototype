@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Link, NavLink, Nav } from 'react-router-dom'
 import "./prototype.scss"
 
 import { NavBar } from "./components/navbar"
+import { Login } from "./components/login"
 
 import { Home } from "./pages/home"
 
@@ -17,24 +18,27 @@ export default class App extends React.Component {
   state = {
     count: 0,
     mobileMenuActive: false,
-    account: {}
+    account: undefined
   };
 
   constructor(props) {
     super(props);
 
-    api.account((err, account) => {
-      if (err) { console.log(err); }
-      if (account) { this.setState({ account }) }
-    })
+    this.getaccount();
 
     api.on("account", (account) => {
       this.setState({ account });
     })
   }
 
+  getaccount = () => {
+    api.account((err, account) => {
+      if (err) { console.log(err); }
+      if (account) { this.setState({ account }) }
+    })
+  }
 
-  componentDidMount() { }
+
 
   increment = () => {
     this.setState({
@@ -68,6 +72,7 @@ export default class App extends React.Component {
           <div>
             <NavBar ></NavBar>
             <Route exact path="/" component={this.home} />
+            <Route path="/login" component={this.login} />
             <Route path="/about" component={About} />
             <Route path="/topics" component={Topics} />
           </div>
@@ -80,10 +85,18 @@ export default class App extends React.Component {
     );
   }
 
-  home() {
-    return (
-      <Home />
-    )
+  home = () => {
+    if (this.state.account) {
+      return (<div>loggedin</div>)
+    } else {
+      return (
+        <Home />
+      )
+    }
+  }
+
+  login = () => {
+    return (<Login getaccount={this.getaccount} />)
   }
 }
 

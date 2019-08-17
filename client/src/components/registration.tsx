@@ -4,11 +4,9 @@ import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
 
 import "../prototype.scss"
 
-import { Component } from "./component"
-
 import { api } from "../api"
 
-export class Registration extends Component {
+export class Registration extends React.Component {
 
     state = {
         email: "",

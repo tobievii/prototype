@@ -4,6 +4,7 @@ import express = require("express")
 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+var compression = require('compression')
 
 import { EventEmitter } from 'events';
 
@@ -32,9 +33,11 @@ export class Webserver extends EventEmitter {
 
         this.app = express();
 
-        this.app.disable('x-powered-by'); //security
 
+        this.app.disable('x-powered-by'); //security
+        this.app.use(compression());
         this.app.use(cookieParser());
+
         // this.app.use(session({
         //     secret: "ajnsjdknasjkdnjkasd",
         //     resave: false,

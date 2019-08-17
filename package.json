@@ -21,6 +21,7 @@
     "@types/socket.io": "^2.1.2",
     "@types/winston": "^2.4.4",
     "@types/ws": "^6.0.2",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
