@@ -2,25 +2,26 @@ import * as events from "events"
 import * as request from "browser-request";
 
 export class PrototypeClient extends events.EventEmitter {
-    ws = new WebSocket('ws://'+location.host);
+
+    //ws = new WebSocket('ws://'+location.host);
     apikey: string = "";
     headers: any = {};
 
     constructor() {
         super();
-        console.log(this.constructor.name+"\t Initialized.")
+        console.log(this.constructor.name + "\t Initialized.")
 
-        this.ws.onopen = () => {
-            console.log(this.constructor.name+"\t WebSocket connected.")
-            this.ws.send("proto connect")
-        }
-          
-        this.ws.onmessage = (evt) => {
-            //console.log(evt.data);
-            this.emit("data", evt.data);
-        }
+        // this.ws.onopen = () => {
+        //     console.log(this.constructor.name+"\t WebSocket connected.")
+        //     this.ws.send("proto connect")
+        // }
 
-        this.account((err,account)=>{
+        // this.ws.onmessage = (evt) => {
+        //     //console.log(evt.data);
+        //     this.emit("data", evt.data);
+        // }
+
+        this.account((err, account) => {
             if (err) this.emit("err", err);
             if (account) this.account = account;
         })

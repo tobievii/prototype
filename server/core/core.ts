@@ -23,7 +23,9 @@ export class Core extends EventEmitter {
     }
 
     register(options: { email: string, pass: string, username?: string, ip?: string, userAgent?: string }, cb?: (err: Error | undefined, result?: any) => void) {
-        logger.log({ message: "core new user registration", data: { options }, level: "verbose" })
+
+        //lowercase email
+        if (options.email) { options.email = options.email.toLowerCase() }
 
         //encrypt password
         crypto.scrypt(options.pass, this.salt, 64, (err, derivedKey) => {
@@ -39,7 +41,7 @@ export class Core extends EventEmitter {
                     ip: options.ip,
                     userAgent: options.userAgent,
                     password: derivedKey.toString("hex"),
-                    email: options.email,
+                    email: options.email.toLowerCase(),
                     level: 1,
                     apikey: utils.generate(32),
                     publickey: utils.generate(32).toLowerCase()
@@ -54,15 +56,29 @@ export class Core extends EventEmitter {
                 var ipLoc = geoip.lookup(options.ip);
                 if (ipLoc) { user.ipLoc = ipLoc }
 
-                this.db.users.save(user, (err: any, result: any) => {
-                    if (err) if (cb) cb(err);
-                    if (result) {
-                        var response = {
-                            account: result
+                //check if user exists...
+                this.user({ email: user.email }, (err, checkuser) => {
+                    if (err) { if (cb) cb(err); }
+                    if (checkuser == null) {
+                        //email is not taken.
+                        logger.log({ message: "core new user registration", data: { options }, level: "verbose" })
+                        this.db.users.save(user, (err: any, usersaved: any) => {
+                            if (err) if (cb) cb(err);
+                            if (usersaved) {
+                                console.log({ account: usersaved });
+                                if (cb) cb(undefined, { account: usersaved });
+                            }
+                        });
+                    } else {
+                        //user email is taken!
+                        logger.log({ message: "registration failed", data: { reason: "user email already taken", options }, level: "error" })
+                        if (cb) {
+                            cb(new Error("user email already taken"));
+                            return;
                         }
-                        if (cb) cb(undefined, response);
                     }
-                });
+
+                })
 
                 //////////////
             }
@@ -75,7 +91,10 @@ export class Core extends EventEmitter {
     }
     // end account
 
-    user(options: { apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
+    user(options: { uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
+
+        // force lowercase on users
+        if (options.email) { options.email = options.email.toLowerCase() }
 
         // finds user from db by Basic Auth base64 key
         if (options.authorization) {
@@ -91,6 +110,7 @@ export class Core extends EventEmitter {
                 }
                 if (user) { cb(undefined, user); }
             })
+
         }
         // or
         if ((options.email) && (options.pass)) {
@@ -113,7 +133,13 @@ export class Core extends EventEmitter {
                         }
                     });
                 }
+
+                if (user == null) {
+                    cb(new Error("user account not found"))
+                }
+
             })
+
         }
 
         // or apikey
@@ -124,6 +150,22 @@ export class Core extends EventEmitter {
                     cb(undefined, user);
                 }
 
+            })
+        }
+
+        // or only email
+        if ((options.email) && (options.pass == undefined)) {
+            this.db.users.findOne({ email: options.email }, (err: Error | undefined, user?: any) => {
+                if (err) { cb(err); return; }
+                cb(undefined, user);
+            })
+        }
+
+        // or uuid
+        if (options.uuid) {
+            this.db.users.findOne({ uuid: options.uuid }, (err: Error | undefined, user?: any) => {
+                if (err) { cb(err); return; }
+                if (user) { cb(undefined, user); } else { cb(new Error("user not found by uuid")); }
             })
         }
 
@@ -147,7 +189,7 @@ export class Core extends EventEmitter {
             // todo, run through plugins...
             // todo, run through VM
 
-            this.state({ id: packet.id, user }, (err: any, statedb: any) => {
+            this.state({ user, id: packet.id }, (err: any, statedb: any) => {
                 if (err) { cb({ error: "db error" }) }
 
                 var state: any = {}
@@ -195,7 +237,7 @@ export class Core extends EventEmitter {
 
         // one device
         if ((options.id) && (options.user)) {
-            this.db.states.findOne({ id: options.id, apikey: options.user.apikey }, (err: Error, result: any) => {
+            this.db.states.findOne({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }) }
                 if (result) {
                     if (result) cb(undefined, result); return;

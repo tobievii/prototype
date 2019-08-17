@@ -138,6 +138,7 @@ export class Prototype extends EventEmitter {
         request.post(this.uri + "/signin", { json: { email, pass } }, (err: Error, res: any, body: any) => {
             if (err) cb(err);
             if (body) {
+                if (body.err) { cb(new Error(body.err)); return; }
                 if (body.error) { cb(new Error(body.error)); return; }
                 if (body.signedin == true) cb(null, body);
             }

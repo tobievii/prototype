@@ -1,7 +1,7 @@
 // DEFINE COLOURS HERE:
 $spotA: rgb(242, 53, 58); //main colour
-$spotB: #0a203b;  //gradientBot
-$spotC: #09111a;  //gradientTop
+$spotB: #0a203b; //gradientBot
+$spotC: #09111a; //gradientTop
 $spotD: #0d243d; //background
 $spotE: #fff;
 $spotF: #17232b;
@@ -16,7 +16,7 @@ $spotF: #17232b;
 }
 
 * {
-  box-sizing: border-box;
+  font-family: "Share Tech Mono", Arial, Helvetica, sans-serif;
 }
 
 body {
@@ -31,13 +31,10 @@ body {
   ref: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_topnav
 */
 
-
 .topnav {
   overflow: hidden;
   background-color: $spotC;
 }
-
-
 
 .topnav a {
   float: left;
@@ -66,7 +63,9 @@ body {
 }
 
 @media screen and (max-width: 600px) {
-  .topnav a:not(:first-child) {display: none;}
+  .topnav a:not(:first-child) {
+    display: none;
+  }
   .topnav a.icon {
     float: right;
     display: block;
@@ -74,10 +73,9 @@ body {
 }
 
 @media screen and (max-width: 600px) {
-
-
-
-  .topnav.responsive {position: relative;}
+  .topnav.responsive {
+    position: relative;
+  }
   .topnav.responsive .icon {
     position: absolute;
     right: 0;
@@ -112,7 +110,6 @@ body {
   float: left;
 }
 
-
 .banner.banner--shape.banner--homepage {
   margin-bottom: -550px;
 }
@@ -128,16 +125,55 @@ body {
   padding: 0 0 120px;
 }
 
-article, aside, details, figcaption, figure, footer, header, main, menu, nav, section, summary {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+main,
+menu,
+nav,
+section,
+summary {
   display: block;
 }
 
 .svg-banner-shape {
-  fill: $spotD
+  fill: $spotD;
 }
 
 /* TEXT STYLE */
 
-h1, h2 {
+h1 {
+  font-size: 2.5em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h1,
+h2 {
   font-weight: 400;
+}
+
+/* INPUT */
+
+input {
+  border-radius: 2px;
+  padding: 0.5em;
+  border: none;
+  background: $spotE;
+  margin: 0.5em;
+}
+
+button {
+  border-radius: 2px;
+  background: $spotA;
+  color: $spotE;
+  border: none;
+  padding: 0.5em;
+  margin: 0.5em;
 }

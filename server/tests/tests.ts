@@ -78,8 +78,6 @@ describe("PROTOTYPE", () => {
         })
     })
 
-
-
     it("account", done => {
         prototype.account((err: Error, account: any) => {
             if (err) done(err);
@@ -92,8 +90,6 @@ describe("PROTOTYPE", () => {
         })
     })
 
-
-
     it("version", done => {
         prototype.version((err: Error, version: any) => {
             if (err) done(err);
@@ -102,9 +98,6 @@ describe("PROTOTYPE", () => {
             }
         })
     })
-
-
-
 
     it("signin", done => {
         // fresh instance
@@ -115,8 +108,6 @@ describe("PROTOTYPE", () => {
             }
         })
     })
-
-
 
     it("account", done => {
         if (testAccount.apikey == "") { done("no apikey yet!"); }

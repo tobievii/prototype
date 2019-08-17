@@ -15,6 +15,7 @@ import { logger } from "./log"
 import { Core } from "./core"
 
 import { webapiv3 } from "./webapi_v3"
+import { threadId } from 'worker_threads';
 
 
 
@@ -34,11 +35,11 @@ export class Webserver extends EventEmitter {
         this.app.disable('x-powered-by'); //security
 
         this.app.use(cookieParser());
-        this.app.use(session({
-            secret: "ajnsjdknasjkdnjkasd",
-            resave: false,
-            saveUninitialized: false
-        }))
+        // this.app.use(session({
+        //     secret: "ajnsjdknasjkdnjkasd",
+        //     resave: false,
+        //     saveUninitialized: false
+        // }))
 
         this.core = options.core;
 
@@ -52,12 +53,19 @@ export class Webserver extends EventEmitter {
 
         var reactHtml = "";
 
-        fs.readFile('../public/index.html', (err, data: any) => {
+        fs.readFile('../public/react.html', (err, data: any) => {
             reactHtml = data.toString();
-
         })
 
-        this.app.get("/", (req, res) => { res.end(reactHtml); })
+
+        this.app.get("/", (req: any, res) => {
+            if (req.user) {
+                res.end("loggedin");
+            } else {
+                res.end(reactHtml);
+            }
+        })
+
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })
         this.app.get("/features", (req, res) => { res.end(reactHtml); })
         this.app.get("/products", (req, res) => { res.end(reactHtml); })
@@ -67,8 +75,16 @@ export class Webserver extends EventEmitter {
 
         this.app.post("/signin", (req, res) => {
             this.core.user({ email: req.body.email, pass: req.body.pass }, (err: Error | undefined, user: any) => {
-                if (err) { res.json({ err }); return; }
+                if (err) {
+                    logger.log({ message: "web api signin error", data: { err }, level: "error" })
+                    res.json({ err: err.toString() }); return;
+                }
                 if (user) {
+                    //signin user
+                    var expiryDate = new Date(Number(new Date()) + 315360000000);  //10 years
+                    res.cookie('uuid', user.uuid, { expires: expiryDate, httpOnly: true });
+
+                    logger.log({ message: "web api signin", data: { email: user.email }, level: "info" })
                     var auth = 'Basic ' + Buffer.from("api:key-" + user.apikey).toString('base64')
                     res.json({ signedin: true, auth })
                 }
@@ -120,8 +136,8 @@ export class Webserver extends EventEmitter {
 
     parseHeaderAuth(core: Core) {
         return (req: express.Request | any, res: express.Response, next: express.NextFunction) => {
-            if (req.headers.authorization) {
 
+            if (req.headers.authorization) {
                 this.core.user({ authorization: req.headers.authorization }, (err, user) => {
                     if (err) { next(); }
                     if (user) {
@@ -129,7 +145,16 @@ export class Webserver extends EventEmitter {
                         next();
                     }
                 })
-
+            } else if (req.cookies.uuid) {
+                this.core.user({ uuid: req.cookies.uuid }, (err, user) => {
+                    if (err) { next(); }
+                    if (user) {
+                        req.user = user;
+                        next();
+                    } else {
+                        next();
+                    }
+                })
             } else {
                 next();
             }

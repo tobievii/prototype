@@ -27,7 +27,7 @@ export class DocumentStore extends EventEmitter {
 
         this.db.on("connect", () => {
             // only triggers on first activity it seems.
-            logger.log({ message: "mongojs db connected", level: "debug" })
+            //logger.log({ message: "mongojs db connected", level: "verbose" })
         })
 
         this.db.on("error", (err: Error) => {
@@ -41,21 +41,21 @@ export class DocumentStore extends EventEmitter {
                     this.connect(options); //retry every second
                 }, 10000)
             } else {
-                logger.log({ message: "mongoose db open", level: "debug" })
+                //logger.log({ message: "mongoose db open", level: "verbose" })
 
                 // add listeners
                 mongoose.connection.collection("users").watch().on("change", (change) => {
-                    logger.log({ message: "db change", data: { change }, level: "debug" });
+                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("users", change)
                 })
 
                 mongoose.connection.collection("states").watch().on("change", (change) => {
-                    logger.log({ message: "db change", data: { change }, level: "debug" });
+                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("states", change)
                 })
 
                 mongoose.connection.collection("packets").watch().on("change", (change) => {
-                    logger.log({ message: "db change", data: { change }, level: "debug" });
+                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("packets", change)
                 })
 
@@ -70,7 +70,7 @@ export class DocumentStore extends EventEmitter {
     }
 
     createIndexes() {
-        logger.log({ message: "mongo indexes", data: {}, level: "verbose" })
+        //logger.log({ message: "mongo indexes", data: {}, level: "verbose" })
 
         //this.db.states.createIndex({ apikey: 1 })
         this.db.states.createIndex({ apikey: 1, id: 1 })
@@ -79,12 +79,13 @@ export class DocumentStore extends EventEmitter {
         // this.db.states.createIndex({ "plugins_iotnxt_gateway.GatewayId": 1, "plugins_iotnxt_gateway.HostAddress": 1 }, { background: 1 })
 
         // this.db.packets.createIndex({ "_created_on": 1 })
-        // this.db.packets.createIndex({ apikey: 1 })
+        this.db.packets.createIndex({ apikey: 1, id: 1 })
         // this.db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
         // this.db.packets.createIndex({ key: 1 }, { background: 1 })
 
         //this.db.users.createIndex({ uuid: 1 })
         this.db.users.createIndex({ apikey: 1 })
+        this.db.users.createIndex({ email: 1 })
         // this.db.users.createIndex({ "_last_seen": 1 })
         // this.db.users.createIndex({ username: 1 }, { background: 1 })
         // this.db.users.createIndex({ email: 1 }, { background: 1 }) // gert's fix

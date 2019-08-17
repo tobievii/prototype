@@ -4,7 +4,11 @@ import { BrowserRouter, Route, Link } from 'react-router-dom'
 
 import "../prototype.scss"
 
-export class Home extends React.Component {
+import { Registration } from "../components/registration"
+
+import { Component } from "../components/component"
+
+export class Home extends Component {
 
     state = {
 
@@ -12,15 +16,17 @@ export class Home extends React.Component {
 
     render() {
         return (
-            <div style={{paddingTop: "5em", textAlign:"center"}}>
-                
-                    <h1>
-                        Internet of Things for everyone.
-                    </h1>
-                    <h2>
-                        Easily monitor and automate your world!
-                    </h2>
-                
+            <div style={{ paddingTop: "2em", textAlign: "center" }}>
+                <section>
+                    <h1>Internet of Things for everyone.</h1>
+                    <h2>Easily monitor and automate your world!</h2>
+                </section>
+
+                <section>
+                    <Registration />
+                </section>
+
+
             </div>
         );
     }

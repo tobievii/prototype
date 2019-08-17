@@ -9,6 +9,12 @@ import { PrototypeClient } from "./prototype"
 
 import { Home } from "./pages/home"
 
+import * as request from "browser-request";
+
+
+import "./api"
+
+
 export default class App extends React.Component {
 
   proto = new PrototypeClient();
@@ -17,6 +23,12 @@ export default class App extends React.Component {
     count: 0,
     mobileMenuActive: false
   };
+
+  constructor(props) {
+    super(props);
+    //global.api = new API({ request });
+  }
+
 
   componentDidMount() {
     this.proto.on("data", (data) => {
@@ -38,7 +50,7 @@ export default class App extends React.Component {
 
   mobileMenuPress = () => {
     this.setState({ mobileMenuActive: !this.state.mobileMenuActive })
-}
+  }
 
   render() {
     return (
@@ -54,9 +66,9 @@ export default class App extends React.Component {
 
         <BrowserRouter>
           <div>
-            <NavBar />
+            <NavBar ></NavBar>
 
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" component={this.home} />
             <Route path="/about" component={About} />
             <Route path="/topics" component={Topics} />
           </div>
@@ -64,7 +76,15 @@ export default class App extends React.Component {
       </div>
     );
   }
+
+  home() {
+    return (
+      <Home />
+    )
+  }
 }
+
+
 
 function About() {
   return (

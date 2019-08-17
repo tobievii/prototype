@@ -27,12 +27,14 @@ interface State {
     isMaster: boolean;
     pid: any;
     numCPUs: any;
+    workers: cluster.Worker[];
 }
 
 var state: State = {
     isMaster: cluster.isMaster,
     pid: process.pid,
-    numCPUs: require('os').cpus().length
+    numCPUs: require('os').cpus().length,
+    workers: []
 }
 
 //console.log(state)
@@ -47,17 +49,38 @@ if (cluster.isMaster) {
     for (let i = 0; i < numCPUs; i++) {
         logger.log({ message: "cluster forking", data: { workernum: i }, level: "info" })
 
-        cluster.fork();
+        var worker = cluster.fork();
+        state.workers.push(worker);
     }
+
+
+    cluster.on('message', (worker, message, handle) => {
+        logger.log({ message: "cluster message", data: { worker, message, handle }, level: "verbose" })
+    });
 
     cluster.on('exit', (worker, code, signal) => {
         logger.log({ message: "cluster fork died", data: { workerpid: worker.process.pid, signal, code }, level: "warn" })
     });
 
+    process.on('message', (msg) => {
+        //process.send(msg);
+        logger.log({ message: "master process recv", data: { msg }, level: "verbose" });
+    });
+
     setTimeout(() => {
-        var replserver = repl.start("");
+
         // expose state to repl context
-        replserver.context.state = state;
+        var core;
+        var documentstore = new DocumentStore({ mongoConnection: config.mongoConnection });
+        documentstore.on("ready", () => {
+
+            core = new Core({ documentstore, config })
+
+            var replserver = repl.start(">");
+            replserver.context.state = state;
+            replserver.context.core = core;
+        });
+
     }, 2000)
 
 
@@ -70,6 +93,11 @@ if (cluster.isMaster) {
     var mqttserver: MQTTServer;
 
     var documentstore = new DocumentStore({ mongoConnection: config.mongoConnection });
+
+    process.on('message', (msg) => {
+        logger.log({ message: "worker process recv", data: { msg }, level: "verbose" });
+        if (process) if (process.send) if (msg) process.send(msg);
+    });
 
     documentstore.on("ready", () => {
         // only allow webserver to recieve api calls once db is ready.
