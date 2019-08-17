@@ -22,7 +22,7 @@ export interface CorePacket {
 }
 
 export interface DBchange {
-    operationType: "insert" | "update" | "remove";
+    operationType: "insert" | "replace";
     clusterTime: any;
     fullDocument: CorePacket;
     ns: { db: string, coll: string }

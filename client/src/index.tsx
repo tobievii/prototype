@@ -5,36 +5,36 @@ import { BrowserRouter, Route, Link, NavLink, Nav } from 'react-router-dom'
 import "./prototype.scss"
 
 import { NavBar } from "./components/navbar"
-import { PrototypeClient } from "./prototype"
 
 import { Home } from "./pages/home"
 
-import * as request from "browser-request";
-
-
 import "./api"
+import { api } from "./api";
 
 
 export default class App extends React.Component {
 
-  proto = new PrototypeClient();
-
   state = {
     count: 0,
-    mobileMenuActive: false
+    mobileMenuActive: false,
+    account: {}
   };
 
   constructor(props) {
     super(props);
-    //global.api = new API({ request });
-  }
 
+    api.account((err, account) => {
+      if (err) { console.log(err); }
+      if (account) { this.setState({ account }) }
+    })
 
-  componentDidMount() {
-    this.proto.on("data", (data) => {
-      console.log(this.constructor.name + "\tproto data: " + data);
+    api.on("account", (account) => {
+      this.setState({ account });
     })
   }
+
+
+  componentDidMount() { }
 
   increment = () => {
     this.setState({
@@ -67,12 +67,15 @@ export default class App extends React.Component {
         <BrowserRouter>
           <div>
             <NavBar ></NavBar>
-
             <Route exact path="/" component={this.home} />
             <Route path="/about" component={About} />
             <Route path="/topics" component={Topics} />
           </div>
         </BrowserRouter>
+
+        <div id="debug">
+          <div>{JSON.stringify(this.state.account)}</div>
+        </div>
       </div>
     );
   }

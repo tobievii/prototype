@@ -8,7 +8,7 @@ import * as _ from "lodash"
 import { logger } from "./log"
 import { generateDifficult } from "../utils/utils"
 import { Core } from "./core"
-import { DBchange } from "./interfaces";
+import { DBchange, CorePacket } from "./interfaces";
 
 export class MQTTServer extends EventEmitter {
     serversMem: any[] = [];
@@ -75,14 +75,15 @@ export class MQTTServer extends EventEmitter {
 
     }
 
-    handlePacket(packet: DBchange) {
-
+    handlePacket(packet: CorePacket) {
+        if (!packet.id) { return; }
+        if (!packet.apikey) { return; }
 
         for (var mqttConnection of this.mqttConnections) {
             for (var sub of mqttConnection.subscriptions) {
-                if ((sub == packet.fullDocument.apikey) || (sub == packet.fullDocument.apikey + "|" + packet.fullDocument.id)) {
+                if ((sub == packet.apikey) || (sub == packet.apikey + "|" + packet.id)) {
 
-                    //var temp = _.clone(packet.fullDocument);
+                    //var temp = _.clone(packet);
 
                     // delete temp["meta"]
                     // delete temp.timestamp
@@ -103,8 +104,8 @@ export class MQTTServer extends EventEmitter {
                         // }
 
                         if (sendit) {
-                            logger.log({ message: "mqtt handlePacket", data: { apikey: packet.fullDocument.apikey, packet: packet.fullDocument }, level: "verbose" });
-                            mqttConnection.publish(packet.fullDocument.apikey, JSON.stringify(packet.fullDocument))
+                            logger.log({ message: "mqtt handlePacket", data: { apikey: packet.apikey, packet: packet }, level: "verbose" });
+                            mqttConnection.publish(packet.apikey, JSON.stringify(packet))
                         }
                     }
                 }

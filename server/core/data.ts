@@ -45,17 +45,17 @@ export class DocumentStore extends EventEmitter {
 
                 // add listeners
                 mongoose.connection.collection("users").watch().on("change", (change) => {
-                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
+                    logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("users", change)
                 })
 
                 mongoose.connection.collection("states").watch().on("change", (change) => {
-                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
+                    logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("states", change)
                 })
 
                 mongoose.connection.collection("packets").watch().on("change", (change) => {
-                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
+                    logger.log({ message: "db change", data: { change }, level: "verbose" });
                     this.emit("packets", change)
                 })
 

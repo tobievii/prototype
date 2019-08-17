@@ -4,7 +4,7 @@ import { DocumentStore } from "./core/data"
 import { Core } from "./core/core"
 import * as cluster from "cluster"
 import { logger } from './core/log';
-import { Package, DBchange } from "./core/interfaces"
+import { Package, DBchange, User } from "./core/interfaces"
 import * as repl from "repl";
 import { SocketServer } from './core/socketserver';
 import { MQTTServer } from "./core/mqtt"
@@ -106,9 +106,28 @@ if (cluster.isMaster) {
         socketserver = new SocketServer({ server: webserver.server, core });
         mqttserver = new MQTTServer({ core })
 
+        // update client that packets has changed
         documentstore.on("packets", (data: DBchange) => {
-            socketserver.emit("packets", data);
-            mqttserver.emit("packets", data);
+            if (data.fullDocument) {
+                socketserver.emit("packets", data.fullDocument);
+                mqttserver.emit("packets", data.fullDocument);
+            }
+        })
+
+        // update client that packets has changed
+        documentstore.on("states", (data: DBchange) => {
+            if (data.fullDocument) {
+                socketserver.emit("states", data.fullDocument);
+                mqttserver.emit("states", data.fullDocument);
+            }
+        })
+
+        // update client that account has changed
+        documentstore.on("users", (data: DBchange) => {
+            if (data.fullDocument) {
+                socketserver.emit("users", data.fullDocument);
+                mqttserver.emit("users", data.fullDocument);
+            }
         })
 
         webserver.listen();

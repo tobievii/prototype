@@ -12,6 +12,7 @@ import { Http2SecureServer } from "http2";
 
 import * as http from "http";
 import * as https from "https";
+import { CorePacket } from "./interfaces";
 
 export class SocketServer extends EventEmitter {
     server: http.Server | https.Server;
@@ -50,15 +51,24 @@ export class SocketServer extends EventEmitter {
 
         })
 
-        this.on("packets", (packets) => {
-            if (packets.operationType == "insert") {
-                // new packet
-                if (packets.fullDocument) {
-                    if (packets.fullDocument.apikey) {
-                        this.io.to(packets.fullDocument.apikey).emit("post", packets.fullDocument)
-                        this.io.to(packets.fullDocument.apikey + "|" + packets.fullDocument.id).emit("post", packets.fullDocument)
-                    }
-                }
+        this.on("packets", (packet: CorePacket) => {
+            if ((packet.apikey) && (packet.id)) {
+                this.io.to(packet.apikey).emit("post", packet)
+                this.io.to(packet.apikey + "|" + packet.id).emit("post", packet)
+            }
+        })
+
+        this.on("states", (states: CorePacket) => {
+            if ((states.apikey) && (states.id)) {
+                this.io.to(states.apikey).emit("states", states)
+                this.io.to(states.apikey + "|" + states.id).emit("states", states)
+            }
+        })
+
+        this.on("users", (user: CorePacket) => {
+            if (user.apikey) {
+                this.io.to(user.apikey).emit("users", user)
+                this.io.to(user.apikey + "|" + user.id).emit("users", user)
             }
         })
 

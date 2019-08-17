@@ -28,7 +28,7 @@ class Logger extends EventEmitter {
   log(event: LogEvent) {
     if (event.message) {
 
-      if (event.level != "debug") { return; }
+      // if (event.level != "debug") { return; }
       // if (event.level == "info") { return; }
 
       //console.log(new Date().toISOString()+" "+process.pid+" "+JSON.stringify(event.message))

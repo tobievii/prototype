@@ -57,13 +57,8 @@ export class Webserver extends EventEmitter {
             reactHtml = data.toString();
         })
 
-
         this.app.get("/", (req: any, res) => {
-            if (req.user) {
-                res.end("loggedin");
-            } else {
-                res.end(reactHtml);
-            }
+            res.end(reactHtml);
         })
 
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })
@@ -147,7 +142,11 @@ export class Webserver extends EventEmitter {
                 })
             } else if (req.cookies.uuid) {
                 this.core.user({ uuid: req.cookies.uuid }, (err, user) => {
-                    if (err) { next(); }
+                    if (err) {
+                        res.clearCookie("uuid");
+                        next();
+                        return;
+                    }
                     if (user) {
                         req.user = user;
                         next();
