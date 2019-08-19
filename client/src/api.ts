@@ -1,6 +1,6 @@
 import * as events from "events"
 import { request } from "./utils/requestweb"
-import { User } from "../../server/core/interfaces"
+import { User, CorePacket } from "../../server/core/interfaces"
 import { logger } from "../../server/core/log"
 
 import * as io from "socket.io-client"
@@ -11,6 +11,12 @@ export class API extends events.EventEmitter {
     apikey: string;
     accountData: User | undefined;
     socket: any;
+
+    data: any = {
+        account: {},
+        states: [],
+        packets: []
+    }
 
     constructor() {
         super();
@@ -43,14 +49,15 @@ export class API extends events.EventEmitter {
     }
 
     // gets our latest account details
-    account(cb?: Function) {
+    account = (cb?: Function) => {
         request.get(this.uri + "/api/v3/account",
             { headers: this.headers, json: true },
             (err: Error, res: any, body: any) => {
                 if (err) if (cb) cb(err);
                 if (body) {
-                    console.log(body);
                     if (body.apikey) {
+                        this.data.account = body;
+                        //this.data.account = body;
                         this.apikey = body.apikey;
                         if (this.socket == undefined) this.connectSocket();
                     }
@@ -76,6 +83,7 @@ export class API extends events.EventEmitter {
 
             // Receive data:
             this.socket.on("packets", data => {
+                console.log("packet event:")
                 console.log(data);
             });
 
@@ -84,6 +92,26 @@ export class API extends events.EventEmitter {
             this.socket.on("users", data => {
                 this.emit("account", data);
             });
+
+            this.socket.on("states", data => {
+                // console.log("states event:");
+
+                let found: boolean = false;
+                for (var s in this.data.states) {
+                    if (this.data.states[s].key == data.key) {
+                        logger.log({ message: "recieved new device state", data: data, level: "verbose" })
+                        this.data.states[s] = data; //new data
+                        found = true;
+                    }
+                }
+
+                if (found == false) {
+                    this.data.states.push(data);
+                }
+
+                // let the app know:
+                this.emit("states", this.data.states);
+            })
         });
     }
 
@@ -107,9 +135,101 @@ export class API extends events.EventEmitter {
         })
     }
 
+    post(packet: CorePacket, cb?: (err: Error, result?: any) => void) {
+        request.post(this.uri + "/api/v3/data/post", { headers: this.headers, json: packet }, (err: Error, res: any, body: any) => {
+            if (err) if (cb) cb(err);
+            if (body) {
+                if (body.result == "success") {
+                    if (cb) cb(null, body);
+                    return;
+                }
+                if (cb) cb(body);
+            }
+        })
+    }
+
+    // view state of a device by id
+    view(id: string, cb: Function) {
+        request.post(this.uri + "/api/v3/view",
+            { headers: this.headers, json: { id } },
+            (err: Error, res: any, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    cb(null, body);
+                }
+            })
+    }
+
+    /*
+        retrieve device packet history
+    */
+    packets(id: string, cb: Function) {
+        request.post(this.uri + "/api/v3/packets",
+            { headers: this.headers, json: { id } },
+            (err: Error, res: any, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    cb(null, body);
+                }
+            })
+    }
+
+    /*  
+        retrieve a single device state in detail.
+    */
+
+    state(id: string, cb: Function) {
+        request.post(this.uri + "/api/v3/state",
+            { headers: this.headers, json: { id } },
+            (err: Error, res: any, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    cb(null, body);
+                }
+            })
+    }
+
+    /*
+        provides all device states in an array
+    */
+
+    states = (cb: (err: Error, states?: object) => void) => {
+        request.get(this.uri + "/api/v3/states",
+            { json: true },
+            (err: Error, res: any, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    this.data.states = body;
+                    cb(null, body);
+                }
+            })
+    }
+
+    /*
+        deletes a device/state. Device history is not deleted.
+    */
+    delete(id: string, cb: Function) {
+        request.post(this.uri + "/api/v3/state/delete",
+            { json: { id } },
+            (err: Error, res: any, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    if (body.ok == 1) {
+                        cb(null, body);
+                    } else {
+                        cb(body);
+                    }
+                }
+            })
+    }
+
 }
 
+var apiinstance = new API()
+
+const globalAny: any = global;
+globalAny.api = apiinstance
 
 
-
-export var api = new API()
+export var api = apiinstance
+//window.api = api;

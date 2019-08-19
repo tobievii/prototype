@@ -1,5 +1,6 @@
 "use strict";
 
+var webpack = require("webpack");
 const path = require("path");
 
 module.exports = {
@@ -26,15 +27,19 @@ module.exports = {
         "sass-loader" // compiles Sass to CSS, using Node Sass by default
       ]
     },
-      {
-        test: /\.tsx?$/,
-        loader: "ts-loader"
-      }
+    {
+      test: /\.tsx?$/,
+      loader: "ts-loader"
+    }
     ]
   },
 
   // File extensions to support resolving
   resolve: {
-    extensions: [".ts", ".tsx", ".js"]
-  }
+    extensions: [".ts", ".tsx", ".js"],
+    alias: { 'api': path.resolve(__dirname, './src/api') }
+  },
+  plugins: [new webpack.ProvidePlugin({
+    'api': 'api'
+  })]
 };

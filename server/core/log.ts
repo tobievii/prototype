@@ -41,7 +41,14 @@ class Logger extends EventEmitter {
       if (event.level.length <= 5) {
         leveltabs = "\t\t"
       }
-      console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
+
+      if (process.pid) {
+        console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
+      } else {
+        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
+      }
+
+
       //+JSON.stringify(event.message.msg))
     } else {
       console.log("ERROR invalid log format...")

@@ -50,7 +50,7 @@ export class Webserver extends EventEmitter {
         this.app.use(this.safeParser);
         this.app.use(this.parseHeaderAuth(this.core));
 
-        
+
 
         this.app.use(express.static('../public'))
         this.app.use(express.static('../client/dist'))
@@ -64,6 +64,11 @@ export class Webserver extends EventEmitter {
         })
 
         this.app.get("/", (req: any, res) => {
+
+            fs.readFile('../public/react.html', (err, data: any) => {
+                reactHtml = data.toString();
+            })
+
             res.end(reactHtml);
         })
 
@@ -167,11 +172,11 @@ export class Webserver extends EventEmitter {
     }
 
 
-    nocache(req:Express.Request, res:any, next:any) {
-            res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
-            res.header('Expires', '-1');
-            res.header('Pragma', 'no-cache');
-            next();
-          }
-    
+    nocache(req: Express.Request, res: any, next: any) {
+        res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+        res.header('Expires', '-1');
+        res.header('Pragma', 'no-cache');
+        next();
+    }
+
 }

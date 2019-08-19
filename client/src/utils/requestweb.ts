@@ -20,12 +20,12 @@ export class RequestWeb {
                 }
                 cb(undefined, true, resp);
             }).catch((err) => {
-                console.error(err.toString());
+                console.log(err.toString());
                 cb(err);
             });
     }
 
-    post(uri: string, data: { json: object }, cb: (err: Error, res?: any, body?: object) => void) {
+    post(uri: string, data: { headers?: object, json: object }, cb: (err: Error, res?: any, body?: object) => void) {
         fetch(uri, {
             method: "POST",
             headers: {
@@ -41,7 +41,7 @@ export class RequestWeb {
                 }
                 cb(undefined, true, resp);
             }).catch((err) => {
-                console.error(err.toString());
+                console.log(err.toString());
                 cb(err);
             });
     }

@@ -207,7 +207,7 @@ export class Core extends EventEmitter {
 
                 // timestamp it.
                 state["_last_seen"] = new Date();
-
+                packet.key = state.key;
                 packet.apikey = user.apikey;
 
                 packet.meta = {};
