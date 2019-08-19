@@ -2,8 +2,7 @@ import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { any } from 'prop-types';
 import { AsyncStorage, ScrollView, StyleSheet, Text, View, FlatList } from 'react-native';
-import { CheckBox } from 'react-native-elements'
-
+import { CheckBox } from 'react-native-elements';
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
   state = {
@@ -37,26 +36,26 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     this.getDeviceList();
   }
 
-  private navigationKey: string = 'DeviceListContainer';
-  renderItem = ({ item }) => {
-    return (
-      <View style={{ height: 50, width: '100%', borderColor: '#6c757d', borderBottomWidth: 1 }}>
-        <Text style={{ color: '#ffffff', marginTop: 15 }}>{item.id}</Text>
-      </View>
-    );
+  onCheckChanged(id) {
+    const data = this.state.data;
+    const index = data.findIndex(x => x.id === id);
+    data[index].checked = !data[index].checked;
+    this.setState(data);
   }
+
   render() {
-    console.log(this.state.data);
-    return (
-      <ScrollView style={{ flex: 1, backgroundColor: "#162438" }}>
-        <FlatList
-          style={{ flex: 1, backgroundColor: "#162438" }}
-          data={this.state.data}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item.id}
-          renderItem={this.renderItem}
-        />
-      </ScrollView>
-    )
+
+    return (<ScrollView style={{ backgroundColor: "#162438" }}>
+      {
+        this.state.data.map((item, key) =>
+          <View style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key}>
+            <View style={{ width: "100%", marginLeft: 10, flexDirection: 'row' }} >
+              <CheckBox checked={item.checked} onPress={() => this.onCheckChanged(item.id)} />
+              <Text style={{ width: "70%", color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
+            </View>
+          </View>
+        )
+      }
+    </ScrollView>)
   }
 }
