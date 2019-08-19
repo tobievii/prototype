@@ -10,6 +10,7 @@ import { api } from "../api"
 
 interface MyProps {
     getaccount: Function;
+    history: any;
 }
 
 interface MyState {
@@ -36,6 +37,7 @@ export class Login extends React.Component<MyProps, MyState> {
                 console.log("result")
                 console.log(result);
                 if (result.signedin) {
+                    this.props.history.push("/");
                     this.props.getaccount();
                 }
             }

@@ -18,8 +18,8 @@ import { rgba } from "polished"
 import { Notification, FormClose } from 'grommet-icons';
 
 import { DeviceList } from "./components/devicelist"
-
 import { theme } from "./theme"
+import { SideBar } from "./components/sidebar"
 
 const AppBar = (props) => (
   <Box
@@ -56,11 +56,9 @@ const BGgrad = (props) => (
 export default class App extends React.Component {
   state = {
     count: 0,
-    mobileMenuActive: false,
+    showSidebar: false,
     account: undefined,
-    states: undefined,
-    showSidebar: false //new grommet
-
+    states: undefined
   };
 
   constructor(props) {
@@ -106,17 +104,17 @@ export default class App extends React.Component {
   };
 
   mobileMenuPress = () => {
-    this.setState({ mobileMenuActive: !this.state.mobileMenuActive });
+    console.log("----")
+    this.setState({ showSidebar: !this.state.showSidebar });
   };
 
   render() {
     const { showSidebar } = this.state;
     return (
       <Grommet theme={theme} full>
-
         <ResponsiveContext.Consumer>
           {size => (
-            <Box fill>
+            <div>
               <AppBar>
                 <Heading level='3' margin='none'>My App</Heading>
 
@@ -124,72 +122,21 @@ export default class App extends React.Component {
                   label="hello world"
                   primary
                   icon={<Notification />}
-
                   onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
                 />
               </AppBar>
-
-              {/* <BGgrad /> */}
 
               <BrowserRouter>
                 <div>
                   <NavBar account={this.state.account} />
                   <Route exact path="/" component={this.home} />
                   <Route path="/login" component={this.login} />
-                  <Route path="/about" component={About} />
-                  <Route path="/topics" component={Topics} />
                 </div>
               </BrowserRouter>
 
+              <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
 
-              <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
-
-
-                {(!showSidebar || size !== 'small') ? (
-                  <Collapsible direction="horizontal" open={showSidebar}>
-                    <Box
-                      flex
-                      width='medium'
-                      background='light-2'
-                      elevation='small'
-                      align='center'
-                      justify='center'
-                    >
-                      sidebar
-                    </Box>
-                  </Collapsible>
-                ) : (
-                    <Layer>
-                      <Box
-                        background='light-2'
-                        tag='header'
-                        justify='end'
-                        align='center'
-                        direction='row'
-                      >
-
-                        <Button
-                          label=""
-                          primary
-                          icon={<FormClose />}
-                          onClick={() => this.setState({ showSidebar: false })}
-                        />
-
-
-                      </Box>
-                      <Box
-                        fill
-                        background='light-2'
-                        align='center'
-                        justify='center'
-                      >
-                        sidebar
-                         </Box>
-                    </Layer>
-                  )}
-
-              </Box>
-            </Box>
+            </div>
           )}
         </ResponsiveContext.Consumer>
       </Grommet >
@@ -208,51 +155,10 @@ export default class App extends React.Component {
     }
   };
 
-  login = () => {
-    return <Login getaccount={this.getaccount} />;
+  login = (props) => {
+    return <Login history={props.history} getaccount={this.getaccount} />;
   };
 }
 
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-    </div>
-  );
-}
-
-function Topics({ match }) {
-  return (
-    <div>
-      <h2>Topics</h2>
-      <ul>
-        <li>
-          <Link to={`${match.url}/rendering`}>Rendering with React</Link>
-        </li>
-        <li>
-          <Link to={`${match.url}/components`}>Components</Link>
-        </li>
-        <li>
-          <Link to={`${match.url}/props-v-state`}>Props v. State</Link>
-        </li>
-      </ul>
-
-      <Route path={`${match.path}/:topicId`} component={Topic} />
-      <Route
-        exact
-        path={match.path}
-        render={() => <h3>Please select a topic.</h3>}
-      />
-    </div>
-  );
-}
-
-function Topic({ match }) {
-  return (
-    <div>
-      <h3>{match.params.topicId}</h3>
-    </div>
-  );
-}
 
 ReactDOM.render(<App />, document.getElementById("app"));
