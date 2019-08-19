@@ -83,6 +83,11 @@ export class Device extends React.Component<DeviceProps, MyState> {
 
 
 export class DeviceList extends React.Component<MyProps, MyState> {
+
+    state = {
+        height: window.innerHeight - 300
+    }
+
     constructor(props) {
         super(props);
     }
@@ -90,7 +95,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     render() {
         const states = this.props.states;
         return (
-            <div style={{ width: "100%" }} >
+            <div style={{ width: "100%", height: "100%", overflow: "hidden" }} >
                 <button onClick={() => alert('hello, world')} >+ ADD DEVICE</button>
 
                 <Menu
@@ -103,7 +108,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                     ]}
                 />
 
-                <div style={{ overflowX: "hidden", width: "100%" }}>
+                <div style={{ overflowX: "hidden", width: "100%", height: this.state.height, overflowY: "scroll" }}>
                     {(this.props.states) ? (<div>
 
                         {this.props.states.map(
@@ -116,6 +121,8 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
                     </div>) : (<div>loading</div>)}
                 </div>
+
+                <div style={{ clear: "both" }}></div>
 
 
             </div>

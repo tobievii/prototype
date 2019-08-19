@@ -58,7 +58,8 @@ export default class App extends React.Component {
     count: 0,
     showSidebar: false,
     account: undefined,
-    states: undefined
+    states: undefined,
+    height: window.innerHeight
   };
 
   constructor(props) {
@@ -72,6 +73,10 @@ export default class App extends React.Component {
 
     api.on("states", states => {
       this.setState({ states });
+    })
+
+    window.addEventListener("resize", () => {
+      this.setState({ height: window.innerHeight })
     })
   }
 
@@ -110,45 +115,38 @@ export default class App extends React.Component {
 
   render() {
     const { showSidebar } = this.state;
-    return (
-      <Grommet theme={theme} full>
-        <ResponsiveContext.Consumer>
-          {size => (
-            <div>
-              <AppBar>
-                <Heading level='3' margin='none'>My App</Heading>
 
-                <Button
-                  label="hello world"
-                  primary
-                  icon={<Notification />}
-                  onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
-                />
-              </AppBar>
+    var size = "large";
+    if (window.innerWidth < 700) { size = "small" }
 
-              <BrowserRouter>
-                <div>
-                  <NavBar account={this.state.account} />
-                  <Route exact path="/" component={this.home} />
-                  <Route path="/login" component={this.login} />
-                </div>
-              </BrowserRouter>
+    return (<div style={{ height: this.state.height, overflow: "hidden" }}>
+      <AppBar>
 
-              <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
+        <Button
+          label="hello world"
+          primary
+          icon={<Notification />}
+          onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
+        />
+      </AppBar>
 
-            </div>
-          )}
-        </ResponsiveContext.Consumer>
-      </Grommet >
+      <BrowserRouter>
+
+        <NavBar account={this.state.account} />
+        <Route exact path="/" component={this.home} />
+        <Route path="/login" component={this.login} />
+
+      </BrowserRouter>
+
+      <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
+    </div>
     );
   }
 
   home = () => {
     if (this.state.account) {
       return (
-        <Box align="center" background="panelbg">
-          <DeviceList account={this.state.account} states={this.state.states} />
-        </Box>
+        <DeviceList account={this.state.account} states={this.state.states} />
       )
     } else {
       return (<Home />);
