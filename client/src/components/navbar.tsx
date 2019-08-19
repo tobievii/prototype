@@ -1,37 +1,38 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
+import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 
-import "../prototype.scss"
+import "../prototype.scss";
 
-import { User } from "../../../server/core/interfaces"
+import { User } from "../../../server/core/interfaces";
 
 interface MyProps {
   account: User;
 }
 
 interface MyState {
-  [index: string]: any
+  [index: string]: any;
 }
 
 export class NavBar extends React.Component<MyProps, MyState> {
-
   state = {
     mobileMenuActive: false
-  }
-
+  };
 
   mobileMenuPress = () => {
-    this.setState({ mobileMenuActive: !this.state.mobileMenuActive })
-  }
+    this.setState({ mobileMenuActive: !this.state.mobileMenuActive });
+  };
 
   render() {
     if (this.props.account) {
       return (
-
-        <div id="myTopnav" className={"topnav " + (this.state.mobileMenuActive ? "responsive" : "")}>
-          <NavLink id="topnavhome" exact activeClassName="active" to="/" >
-
+        <div
+          id="myTopnav"
+          className={
+            "topnav " + (this.state.mobileMenuActive ? "responsive" : "")
+          }
+        >
+          <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left" }}>
               <img
                 src="/icon.png"
@@ -41,30 +42,40 @@ export class NavBar extends React.Component<MyProps, MyState> {
                 style={{ float: "left" }}
               />
 
-              <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }} >
+              <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }}>
                 <span className="navHeading">PR0T0TYP3</span>
               </div>
             </div>
-
           </NavLink>
 
-          <NavLink activeClassName="active" to="/register">Register</NavLink>
+          <NavLink activeClassName="active" to="/resources">
+            Resources
+          </NavLink>
           <a href="/signout">Signout</a>
-          <NavLink activeClassName="active" to="/resources">Resources</NavLink>
-          <NavLink activeClassName="active" to="/features">Features</NavLink>
-          <NavLink activeClassName="active" to="/products">Products</NavLink>
+          <NavLink activeClassName="active" to="/account">
+            Account
+          </NavLink>
+          <NavLink activeClassName="active" to="/settings">
+            Settings
+          </NavLink>
+          <NavLink activeClassName="active" to="/notifications">
+            Notifications
+          </NavLink>
 
           <a className="icon" onClick={this.mobileMenuPress}>
-            <i className="fa fa-bars"></i>
+            <i className="fa fa-bars" />
           </a>
         </div>
-
-      )
+      );
     } else {
       return (
-        <div id="myTopnav" className={"topnav " + (this.state.mobileMenuActive ? "responsive" : "")}>
-          <NavLink id="topnavhome" exact activeClassName="active" to="/" >
-
+        <div
+          id="myTopnav"
+          className={
+            "topnav " + (this.state.mobileMenuActive ? "responsive" : "")
+          }
+        >
+          <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left" }}>
               <img
                 src="/icon.png"
@@ -74,25 +85,33 @@ export class NavBar extends React.Component<MyProps, MyState> {
                 style={{ float: "left" }}
               />
 
-              <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }} >
+              <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }}>
                 <span className="navHeading">PR0T0TYP3</span>
               </div>
             </div>
-
           </NavLink>
 
-          <NavLink activeClassName="active" to="/register">Register</NavLink>
-          <NavLink activeClassName="active" to="/login">Login</NavLink>
-          <NavLink activeClassName="active" to="/resources">Resources</NavLink>
-          <NavLink activeClassName="active" to="/features">Features</NavLink>
-          <NavLink activeClassName="active" to="/products">Products</NavLink>
+          <NavLink activeClassName="active" to="/register">
+            Register
+          </NavLink>
+          <NavLink activeClassName="active" to="/login">
+            Login
+          </NavLink>
+          <NavLink activeClassName="active" to="/resources">
+            Resources
+          </NavLink>
+          <NavLink activeClassName="active" to="/features">
+            Features
+          </NavLink>
+          <NavLink activeClassName="active" to="/products">
+            Products
+          </NavLink>
 
           <a className="icon" onClick={this.mobileMenuPress}>
-            <i className="fa fa-bars"></i>
+            <i className="fa fa-bars" />
           </a>
         </div>
       );
     }
   }
 }
-

@@ -1,20 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Link, NavLink, Nav } from 'react-router-dom'
+import { BrowserRouter, Route, Link, NavLink, Nav } from "react-router-dom";
 
-import "./prototype.scss"
+import "./prototype.scss";
 
-import { NavBar } from "./components/navbar"
-import { Login } from "./components/login"
+import { NavBar } from "./components/navbar";
+import { Login } from "./components/login";
 
-import { Home } from "./pages/home"
+import { Home } from "./pages/home";
 
-import "./api"
+import "./api";
 import { api } from "./api";
 
-
 export default class App extends React.Component {
-
   state = {
     count: 0,
     mobileMenuActive: false,
@@ -26,51 +24,60 @@ export default class App extends React.Component {
 
     this.getaccount();
 
-    api.on("account", (account) => {
+    api.on("account", account => {
       this.setState({ account });
-    })
+    });
   }
 
   getaccount = () => {
     api.account((err, account) => {
-      if (err) { console.log(err); }
-      if (account) { this.setState({ account }) }
-    })
-  }
-
-
+      if (err) {
+        console.log(err);
+      }
+      if (account) {
+        this.setState({ account });
+      }
+    });
+  };
 
   increment = () => {
     this.setState({
-      count: (this.state.count + 1)
+      count: this.state.count + 1
     });
   };
 
   decrement = () => {
     this.setState({
-      count: (this.state.count - 1)
+      count: this.state.count - 1
     });
   };
 
   mobileMenuPress = () => {
-    this.setState({ mobileMenuActive: !this.state.mobileMenuActive })
-  }
+    this.setState({ mobileMenuActive: !this.state.mobileMenuActive });
+  };
 
   render() {
     return (
       <div>
-
         <header className="site-banner banner banner--shape banner--homepage">
-          <div className="banner__background" >
-            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1903 556">
-              <path className="svg-banner-shape" d="M753.1,434.2c110.6,63.7,277.7,70.6,373.4,15.4L1905,0v555.9H0V0.2L753.1,434.2z"></path>
+          <div className="banner__background">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              x="0px"
+              y="0px"
+              viewBox="0 0 1903 556"
+            >
+              <path
+                className="svg-banner-shape"
+                d="M753.1,434.2c110.6,63.7,277.7,70.6,373.4,15.4L1905,0v555.9H0V0.2L753.1,434.2z"
+              />
             </svg>
           </div>
         </header>
 
         <BrowserRouter>
           <div>
-            <NavBar account={this.state.account} ></NavBar>
+            <NavBar account={this.state.account} />
             <Route exact path="/" component={this.home} />
             <Route path="/login" component={this.login} />
             <Route path="/about" component={About} />
@@ -79,6 +86,7 @@ export default class App extends React.Component {
         </BrowserRouter>
 
         <div id="debug">
+          <hr />
           <div>{JSON.stringify(this.state.account)}</div>
         </div>
       </div>
@@ -87,20 +95,16 @@ export default class App extends React.Component {
 
   home = () => {
     if (this.state.account) {
-      return (<div>loggedin</div>)
+      return <div>loggedin</div>;
     } else {
-      return (
-        <Home />
-      )
+      return <Home />;
     }
-  }
+  };
 
   login = () => {
-    return (<Login getaccount={this.getaccount} />)
-  }
+    return <Login getaccount={this.getaccount} />;
+  };
 }
-
-
 
 function About() {
   return (
