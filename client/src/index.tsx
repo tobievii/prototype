@@ -124,6 +124,7 @@ export default class App extends React.Component {
                   label="hello world"
                   primary
                   icon={<Notification />}
+
                   onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
                 />
               </AppBar>
@@ -142,9 +143,7 @@ export default class App extends React.Component {
 
 
               <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
-                <Box flex align='center' justify='center'>
-                  {size}
-                </Box>
+
 
                 {(!showSidebar || size !== 'small') ? (
                   <Collapsible direction="horizontal" open={showSidebar}>

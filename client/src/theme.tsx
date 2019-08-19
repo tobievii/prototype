@@ -1,3 +1,8 @@
+
+export const prototypeTheme = {
+    padding: "10px"
+}
+
 export const theme = {
     global: {
         colors: {
@@ -22,16 +27,6 @@ export const theme = {
             size: '14px',
             height: '20px',
         },
-    },
-    button: {
-        border: {
-            width: '1px',
-            radius: '4px',
-        },
-        padding: {
-            vertical: '8px',
-            horizontal: '16px',
-        }
     }
 };
 

@@ -41,7 +41,7 @@ export class Registration extends React.Component {
         return (
             <div>
                 <div>
-                    <input placeholder="Email Address" type="text" style={{ width: 250 }} onChange={this.onChange("email")} value={this.state.email} />
+                    <input placeholder="Email Address" type="text" style={{ width: 250 }} onChange={this.onChange("email")} value={this.state.email.toLowerCase()} />
                     <input placeholder="Password" type="password" style={{ width: 250 }} onChange={this.onChange("pass")} value={this.state.pass} />
                     <button onClick={this.onClick}>Create Account</button>
                 </div>

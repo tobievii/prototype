@@ -17,6 +17,7 @@ import { Core } from "./core"
 
 import { webapiv3 } from "./webapi_v3"
 import { threadId } from 'worker_threads';
+import { LogEvent } from './interfaces';
 
 
 
@@ -50,7 +51,12 @@ export class Webserver extends EventEmitter {
         this.app.use(this.safeParser);
         this.app.use(this.parseHeaderAuth(this.core));
 
+        this.app.use((req, res, next) => {
+            var logmsg: LogEvent = { message: "visit", data: { url: req.url, method: req.method, ip: req.socket.remoteAddress, uuid: req.cookies.uuid }, level: "verbose" }
 
+            logger.log(logmsg)
+            next();
+        })
 
         this.app.use(express.static('../public'))
         this.app.use(express.static('../client/dist'))

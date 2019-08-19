@@ -5,6 +5,7 @@ import { logger } from "../../server/core/log"
 
 import * as io from "socket.io-client"
 
+
 export class API extends events.EventEmitter {
     uri: string = ""
     headers: any = {};
@@ -34,6 +35,7 @@ export class API extends events.EventEmitter {
                         this.apikey = body.account.apikey
                         this.rebuildHeader();
                         this.connectSocket();
+
                         cb(null, body);
                     }
                 }
@@ -78,7 +80,7 @@ export class API extends events.EventEmitter {
 
             // Receive data:
             this.socket.on("post", data => {
-                console.log(data);
+                //console.log(data);
             });
 
             // Receive data:
@@ -121,7 +123,9 @@ export class API extends events.EventEmitter {
             if (body) {
                 if (body.err) { cb(new Error(body.err)); return; }
                 if (body.error) { cb(new Error(body.error)); return; }
-                if (body.signedin == true) cb(null, body);
+                if (body.signedin == true) {
+                    cb(null, body);
+                }
             }
         })
     }

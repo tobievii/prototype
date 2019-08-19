@@ -26,6 +26,23 @@ export function getGUID() {
 
 /* ------------------------------------------------------------------------- */
 
+export function blendrgba(x, y, ratio) {
+
+    if (ratio <= 0) {
+        return "rgba(" + Math.round(x.r) + "," + Math.round(x.g) + "," + Math.round(x.b) + "," + x.a + ")"
+    } else if (ratio >= 1) {
+        return "rgba(" + Math.round(y.r) + "," + Math.round(y.g) + "," + Math.round(y.b) + "," + y.a + ")"
+    } else {
+        var blended = {
+            r: (x.r * (1 - ratio)) + (y.r * ratio),
+            g: (x.g * (1 - ratio)) + (y.g * ratio),
+            b: (x.b * (1 - ratio)) + (y.b * ratio),
+            a: (x.a * (1 - ratio)) + (y.a * ratio),
+        }
+        return "rgba(" + Math.round(blended.r) + "," + Math.round(blended.g) + "," + Math.round(blended.b) + "," + blended.a + ")"
+    }
+
+}
 
 
 /**
@@ -160,7 +177,7 @@ export function generateDifficult(count: number) {
 export function createDBIndexes(db: any) {
     // creates optimized indexes
     // meant to be run on first start or when upgrading from an older version
-    logger.log({message: "creating db indexes", data: {}, level: "info"})
+    logger.log({ message: "creating db indexes", data: {}, level: "info" })
 
     db.states.createIndex({ apikey: 1 })
     db.states.createIndex({ apikey: 1, devid: 1 })
@@ -178,6 +195,6 @@ export function createDBIndexes(db: any) {
     db.users.createIndex({ "_last_seen": 1 })
     db.users.createIndex({ username: 1 }, { background: 1 })
     db.users.createIndex({ email: 1 }, { background: 1 }) // gert's fix
-    db.users.createIndex({email: "text", username: "text"}, {background: 1})
+    db.users.createIndex({ email: "text", username: "text" }, { background: 1 })
 }
 
