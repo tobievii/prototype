@@ -50,7 +50,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
         this.state.data.map((item, key) =>
           <View style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key}>
             <View style={{ width: "100%", marginLeft: 10, flexDirection: 'row' }} >
-              <CheckBox checked={item.checked} onPress={() => this.onCheckChanged(item.id)} />
+              <CheckBox checked={item.checked} checkedColor='limegreen' onPress={() => this.onCheckChanged(item.id)} />
               <Text style={{ width: "70%", color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
             </View>
           </View>
