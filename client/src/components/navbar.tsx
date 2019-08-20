@@ -5,14 +5,20 @@ import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import "../prototype.scss";
 
 import { User } from "../../../server/core/interfaces";
+import { theme } from "../theme"
+
 
 interface MyProps {
   account: User;
+  size: string;
 }
 
 interface MyState {
   [index: string]: any;
 }
+
+
+
 
 export class NavBar extends React.Component<MyProps, MyState> {
   state = {
@@ -24,16 +30,19 @@ export class NavBar extends React.Component<MyProps, MyState> {
   };
 
   render() {
+    // LOGGED IN USERS:
     if (this.props.account) {
+
+      const menuitemsLogged = [
+        { small: "N", large: "Notifications", path: "/notifications", icon: "bell" },
+        { small: "S", large: "Settings", path: "/settings", icon: "cog" },
+        { small: "A", large: "Account", path: "/account", icon: "user-circle" }
+      ]
+
       return (
-        <div
-          id="myTopnav"
-          className={
-            "topnav " + (this.state.mobileMenuActive ? "responsive" : "")
-          }
-        >
+        <div style={theme.global.navbar}>
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
-            <div style={{ float: "left" }}>
+            <div style={{ float: "left", padding: theme.paddings.default }}>
               <img
                 src="/icon.png"
                 alt=""
@@ -48,26 +57,36 @@ export class NavBar extends React.Component<MyProps, MyState> {
             </div>
           </NavLink>
 
-          <NavLink activeClassName="active" to="/resources">
-            Resources
-          </NavLink>
-          <a href="/signout">Signout</a>
-          <NavLink activeClassName="active" to="/account">
-            Account
-          </NavLink>
-          <NavLink activeClassName="active" to="/settings">
-            Settings
-          </NavLink>
-          <NavLink activeClassName="active" to="/notifications">
-            Notifications
-          </NavLink>
+          {menuitemsLogged.map((menuitem, i, arr) => {
+            if (this.props.size == "small") {
+              return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinksmall}>
+                <i className={"fa fa-" + menuitem.icon} ></i>
+              </NavLink>)
+            } else {
+              return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinklarge}>
+                <i className={"fa fa-" + menuitem.icon} ></i> {menuitem.large}
+              </NavLink>)
+            }
+          })}
 
-          <a className="icon" onClick={this.mobileMenuPress}>
-            <i className="fa fa-bars" />
-          </a>
+          <div style={{ clear: "both" }}></div>
         </div>
       );
-    } else {
+    }
+
+    //////////////////////////////////////////////////////////////////
+
+    //VISTORS:
+    if (this.props.account == undefined) {
+
+      const menuitemsVisitor = [
+        { small: "R", large: "Register", path: "/register", icon: "" },
+        { small: "L", large: "Login", path: "/login", icon: "" },
+        { small: "R", large: "Resources", path: "/resources", icon: "" },
+        { small: "F", large: "Features", path: "/features", icon: "" },
+        { small: "P", large: "Products", path: "/products", icon: "" }
+      ]
+
       return (
         <div
           id="myTopnav"
@@ -91,21 +110,18 @@ export class NavBar extends React.Component<MyProps, MyState> {
             </div>
           </NavLink>
 
-          <NavLink activeClassName="active" to="/register">
-            Register
-          </NavLink>
-          <NavLink activeClassName="active" to="/login">
-            Login
-          </NavLink>
-          <NavLink activeClassName="active" to="/resources">
-            Resources
-          </NavLink>
-          <NavLink activeClassName="active" to="/features">
-            Features
-          </NavLink>
-          <NavLink activeClassName="active" to="/products">
-            Products
-          </NavLink>
+          {menuitemsVisitor.map((menuitem, i, arr) => {
+            if (this.props.size == "small") {
+              return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
+                <i className={"fa fa-" + menuitem.icon} ></i>
+              </NavLink>)
+            } else {
+              return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
+                <i className={"fa fa-" + menuitem.icon} ></i>
+                {menuitem.large}
+              </NavLink>)
+            }
+          })}
 
           <a className="icon" onClick={this.mobileMenuPress}>
             <i className="fa fa-bars" />

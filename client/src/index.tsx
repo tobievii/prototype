@@ -75,6 +75,10 @@ export default class App extends React.Component {
       this.setState({ states });
     })
 
+    api.on("location", location => {
+      window.location = location
+    })
+
     window.addEventListener("resize", () => {
       this.setState({ height: window.innerHeight })
     })
@@ -109,7 +113,6 @@ export default class App extends React.Component {
   };
 
   mobileMenuPress = () => {
-    console.log("----")
     this.setState({ showSidebar: !this.state.showSidebar });
   };
 
@@ -117,10 +120,10 @@ export default class App extends React.Component {
     const { showSidebar } = this.state;
 
     var size = "large";
-    if (window.innerWidth < 700) { size = "small" }
+    if (window.innerWidth < 800) { size = "small" }
 
     return (<div style={{ height: this.state.height, overflow: "hidden" }}>
-      <AppBar>
+      {/* <AppBar>
 
         <Button
           label="hello world"
@@ -128,14 +131,13 @@ export default class App extends React.Component {
           icon={<Notification />}
           onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
         />
-      </AppBar>
+      </AppBar> */}
 
       <BrowserRouter>
-
-        <NavBar account={this.state.account} />
+        <NavBar account={this.state.account} size={size} />
         <Route exact path="/" component={this.home} />
         <Route path="/login" component={this.login} />
-
+        <Route path="/signout" component={this.signout} />
       </BrowserRouter>
 
       <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
@@ -149,13 +151,22 @@ export default class App extends React.Component {
         <DeviceList account={this.state.account} states={this.state.states} />
       )
     } else {
-      return (<Home history={props.history} getaccount={this.getaccount} />);
+      return (
+        <div>
+          <BGgrad />
+          <Home history={props.history} getaccount={this.getaccount} />
+        </div>);
     }
   };
 
   login = (props) => {
     return <Login history={props.history} getaccount={this.getaccount} />;
   };
+
+  signout = (props) => {
+    api.location("/signout");
+    return <div>signing out</div>;
+  }
 }
 
 

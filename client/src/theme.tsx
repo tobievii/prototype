@@ -3,6 +3,22 @@ export const prototypeTheme = {
     padding: "10px"
 }
 
+const colors = {
+    spotA: "rgb(242, 53, 58)", // main colour
+    spotB: "#0a203b", //gradientBot
+    spotC: "#09111a", //gradientTop
+    spotD: "#0d243d", //background
+    spotE: "#fff",
+    spotF: "#17232b", //panelbg
+    panels: "#131E27"
+}
+
+// DEFINE COLOURS HERE:
+
+const paddings = {
+    default: 10
+}
+
 export const theme = {
     global: {
         colors: {
@@ -13,7 +29,7 @@ export const theme = {
             },
             'primary': '#0f0',
             'neutral-2': "#f00",
-            "panelbg": "#131E27"
+            "panelbg": colors.panels
         },
         edgeSize: {
             small: '14px',
@@ -27,13 +43,36 @@ export const theme = {
             size: '14px',
             height: '20px',
         },
+        // NAVBAR
+        navbar: {
+            background: colors.panels
+        },
+        navbarlogo: {
+            padding: paddings.default,
+            float: "right"
+        },
+        navlinksmall: {
+            float: "right",
+            padding: paddings.default
+        },
+        navlinklarge: {
+            float: "right",
+            padding: paddings.default
+        },
+        /////
         sidebar: {
             width: 400,
-            background: "#131E27"
+            background: colors.panels
         }
-    }
+
+    },
+    paddings,
+    colors
 };
 
+
+
+export var icons = [];
 
 
 /*

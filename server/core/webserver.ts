@@ -71,9 +71,9 @@ export class Webserver extends EventEmitter {
 
         this.app.get("/", (req: any, res) => {
 
-            fs.readFile('../public/react.html', (err, data: any) => {
-                reactHtml = data.toString();
-            })
+            // fs.readFile('../public/react.html', (err, data: any) => {
+            //     reactHtml = data.toString();
+            // })
 
             res.end(reactHtml);
         })
@@ -104,12 +104,14 @@ export class Webserver extends EventEmitter {
         })
 
         this.app.get('/signout', (req, res) => {
+            console.log("SIGNOUT");
             res.clearCookie("uuid");
             res.redirect('/');
         });
 
         this.app.get("*", (req, res) => {
-            res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
+            res.status(404).end(reactHtml);
+
         })
 
         this.app.post("*", (req, res) => {
@@ -185,4 +187,4 @@ export class Webserver extends EventEmitter {
         next();
     }
 
-}
+}  

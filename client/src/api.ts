@@ -227,6 +227,14 @@ export class API extends events.EventEmitter {
             })
     }
 
+
+
+    ////////////////////// WEB API
+
+    location = (location) => {
+        this.emit("location", location);
+    }
+
 }
 
 var apiinstance = new API()

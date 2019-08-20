@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
 import "../prototype.scss"
 
 import { api } from "../api"
+import { emit } from "cluster";
 
 interface MyProps {
     getaccount: Function;
@@ -28,12 +29,29 @@ export class Registration extends React.Component<MyProps, MyState> {
             if (err) {
                 this.setState({ message: err.err })
                 setTimeout(() => {
-                    this.setState({ message: "" })
-                }, 2000)
+                    this.setState({ message: "attempting login..." })
+                    this.signin();
+                }, 1000)
             }
             if (result) {
-                this.props.getaccount();
-                this.props.history.push("/");
+                api.location("/")
+            }
+        })
+    }
+
+    signin = () => {
+        api.signin(this.state.email, this.state.pass, (err, result) => {
+            if (err) {
+                this.setState({ message: err.err })
+                setTimeout(() => {
+                    this.setState({ message: "" })
+                }, 1000)
+            }
+            if (result) {
+                if (result.signedin) {
+                    this.props.getaccount();
+                    this.props.history.push("/");
+                }
             }
         })
     }
@@ -52,7 +70,7 @@ export class Registration extends React.Component<MyProps, MyState> {
                 <div>
                     <input placeholder="Email Address" type="text" style={{ width: 250 }} onChange={this.onChange("email")} value={this.state.email.toLowerCase()} />
                     <input placeholder="Password" type="password" style={{ width: 250 }} onChange={this.onChange("pass")} value={this.state.pass} />
-                    <button onClick={this.onClick}>Create Account</button>
+                    <button onClick={this.onClick}>OK</button>
                 </div>
 
                 <span>{this.state.message}</span>

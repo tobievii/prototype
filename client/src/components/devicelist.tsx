@@ -28,10 +28,15 @@ export class Device extends React.Component<DeviceProps, MyState> {
 
     constructor(props) {
         super(props);
-        setInterval(() => {
+        this.intervalupdater = setInterval(() => {
             this.forceUpdate();
         }, 200)
     }
+
+    componentWillUnmount = () => {
+        if (this.intervalupdater) clearInterval(this.intervalupdater);
+    }
+
 
     /* returns a ratio of how long ago something occurred between 0 and 1. Intended to be used as a time fade. */
     timeratio(timestamp, duration, options?: ({ clamp: boolean })): number {
