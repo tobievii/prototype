@@ -78,7 +78,7 @@ if (cluster.isMaster) {
 
             var replserver = repl.start(">");
             replserver.context.state = state;
-            replserver.context.core = core;
+            replserver.context.api = core;
         });
 
     }, 2000)
