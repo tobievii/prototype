@@ -16,7 +16,7 @@ const colors = {
 // DEFINE COLOURS HERE:
 
 const paddings = {
-    default: 10
+    default: 20
 }
 
 export const theme = {

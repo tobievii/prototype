@@ -73,8 +73,16 @@ export class Device extends React.Component<DeviceProps, MyState> {
     }
 
     render() {
-        return (<div style={this.calcStyle()}>
-            {this.props.device.id}</div>
+        return (<div className="device" style={this.calcStyle()}>
+            {this.props.device.id}
+
+            <i className="fas fa-bullhorn" />
+            <i className="fas fa-exclamation-triangle" />
+            <i className="fas fa-share-alt" />
+            <i className="fas fa-globe-africa" />
+
+
+        </div>
         )
     }
 

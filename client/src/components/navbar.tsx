@@ -7,6 +7,7 @@ import "../prototype.scss";
 import { User } from "../../../server/core/interfaces";
 import { theme } from "../theme"
 
+import { api } from "../api"
 
 interface MyProps {
   account: User;

@@ -162,3 +162,44 @@ a {
 a:hover {
   color: $spotE;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: $spotD;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: darken($spotE, 20%);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5555;
+}
+
+// DEVICE LIST
+
+.device {
+  color: #e1e1e1;
+  box-sizing: border-box;
+  background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
+  border-left: 2px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-right: 2px solid rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  opacity: 0.9;
+  display: flex;
+}
+
+.device:hover {
+  opacity: 1;
+  filter: drop-shadow(0px 0px 0px rgba(255, 255, 255, 0.35));
+}
