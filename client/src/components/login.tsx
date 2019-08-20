@@ -34,11 +34,9 @@ export class Login extends React.Component<MyProps, MyState> {
                 }, 2000)
             }
             if (result) {
-                console.log("result")
-                console.log(result);
                 if (result.signedin) {
-                    this.props.history.push("/");
                     this.props.getaccount();
+                    this.props.history.push("/");
                 }
             }
         })

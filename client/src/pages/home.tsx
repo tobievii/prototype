@@ -6,7 +6,16 @@ import "../prototype.scss"
 
 import { Registration } from "../components/registration"
 
-export class Home extends React.Component {
+interface MyProps {
+    getaccount: Function;
+    history: any;
+}
+
+interface MyState {
+    [index: string]: any
+}
+
+export class Home extends React.Component<MyProps, MyState> {
 
     state = {
 
@@ -21,7 +30,7 @@ export class Home extends React.Component {
                 </section>
 
                 <section>
-                    <Registration />
+                    <Registration history={this.props.history} getaccount={this.props.getaccount} />
                 </section>
 
 

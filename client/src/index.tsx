@@ -143,13 +143,13 @@ export default class App extends React.Component {
     );
   }
 
-  home = () => {
+  home = (props) => {
     if (this.state.account) {
       return (
         <DeviceList account={this.state.account} states={this.state.states} />
       )
     } else {
-      return (<Home />);
+      return (<Home history={props.history} getaccount={this.getaccount} />);
     }
   };
 

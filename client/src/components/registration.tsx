@@ -6,7 +6,16 @@ import "../prototype.scss"
 
 import { api } from "../api"
 
-export class Registration extends React.Component {
+interface MyProps {
+    getaccount: Function;
+    history: any;
+}
+
+interface MyState {
+    [index: string]: any
+}
+
+export class Registration extends React.Component<MyProps, MyState> {
 
     state = {
         email: "",
@@ -23,8 +32,8 @@ export class Registration extends React.Component {
                 }, 2000)
             }
             if (result) {
-                console.log("result")
-                console.log(result);
+                this.props.getaccount();
+                this.props.history.push("/");
             }
         })
     }
