@@ -31,9 +31,12 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
     render() {
         const states = this.props.states;
-        return (
-            <div style={{ width: "100%", height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }} >
 
+        return (
+            <div style={{
+                width: "100%",
+                height: "100%", overflow: "hidden", display: "flex", flexDirection: "column"
+            }} >
                 <div style={{ background: theme.global.titlebars.background }}>
                     <button style={theme.global.devicelist.addevice} onClick={() => alert('hello, world')} >+ ADD DEVICE</button>
                 </div>
@@ -56,7 +59,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                     </div>) : (<div>loading</div>)}
                 </div>
 
-                <div style={{ clear: "both" }}></div>
 
 
             </div>

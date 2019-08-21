@@ -75,23 +75,26 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
                     <button><i className="fas fa-trash"></i> REMOVE</button>
                 </div>
-                <div style={{ boxSizing: "border-box", background: theme.global.menubars.background, width: "100%", borderRight: "11px solid " + theme.global.menubars.background }} >
+                <div style={{
+                    boxSizing: "border-box", background: theme.global.menubars.background, width: "100%", borderRight: "11px solid " + theme.global.menubars.background,
+                    paddingBottom: "5px"
+                }} >
                     <div style={{ display: "flex", width: "100%" }}>
-
                         <div style={theme.global.devicelist.columns}>
                             <SortButton onChangeSort={this.changeSort("selected")} value={this.state.sort.selected} />
                         </div>
 
-                        <div style={{ flex: 1 }}>
+
+                        <div style={{ width: theme.global.devicelist.columns.width }}>
                             <div style={{ float: "left", paddingLeft: 10, width: theme.global.devicelist.columns.width }}><SortButton onChangeSort={this.changeSort("id")} value={this.state.sort.id} type="verticalalpha" /></div>
+                        </div>
 
-                            <div style={{ float: "left", paddingLeft: 50 }}>
-                                <i className="fas fa-search" style={{ opacity: 0.25, padding: theme.paddings.default }} ></i>
-                                <input placeholder="search" />
-                            </div>
+                        <div style={{ width: "80px", textAlign: "right", paddingTop: "7px", paddingRight: "7px" }}>
+                            <i className="fas fa-search" style={{ opacity: 0.5 }} ></i>
+                        </div>
 
-
-
+                        <div style={{ flex: "1" }}>
+                            <input placeholder="search" style={{ width: "100%" }} />
                         </div>
 
                         <div style={theme.global.devicelist.timecolumn}><SortButton onChangeSort={this.changeSort("lastseen")} value={this.state.sort.lastseen} /></div>

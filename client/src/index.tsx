@@ -122,8 +122,9 @@ export default class App extends React.Component {
     var size = "large";
     if (window.innerWidth < 800) { size = "small" }
 
-    return (<div style={{ height: this.state.height, overflow: "hidden" }}>
-      {/* <AppBar>
+    return (
+      <div style={{}}>
+        {/* <AppBar>
 
         <Button
           label="hello world"
@@ -133,22 +134,44 @@ export default class App extends React.Component {
         />
       </AppBar> */}
 
-      <BrowserRouter>
-        <NavBar account={this.state.account} size={size} />
-        <Route exact path="/" component={this.home} />
-        <Route path="/login" component={this.login} />
-        <Route path="/signout" component={this.signout} />
-      </BrowserRouter>
 
-      <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
-    </div>
+        <BrowserRouter>
+
+          <Route exact path="/" component={this.home} />
+          <Route path="/login" component={this.login} />
+          <Route path="/signout" component={this.signout} />
+        </BrowserRouter>
+
+        <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
+      </div>
     );
   }
 
   home = (props) => {
     if (this.state.account) {
       return (
-        <DeviceList account={this.state.account} states={this.state.states} />
+        <div style={{
+          height: this.state.height,
+          display: "flex",
+          flexDirection: "column",
+          //border: "2px solid #0f9",
+          //boxSizing: "border-box",
+          //overflow: "hidden"
+        }}>
+          <div style={{ flex: "0 1 auto" }}><NavBar account={this.state.account} size="small" /></div>
+
+          <div style={{
+            flex: "1 1 auto",
+            flexFlow: "column",
+            overflowY: "auto",
+            //border: "2px solid #f00",
+            boxSizing: "border-box"
+          }}>
+            <DeviceList account={this.state.account} states={this.state.states} />
+          </div>
+
+          <div style={{ flex: "0 1 40px" }}>footer</div>
+        </div>
       )
     } else {
       return (
