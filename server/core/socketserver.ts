@@ -49,6 +49,11 @@ export class SocketServer extends EventEmitter {
                 })
             })
 
+            socket.on("publickey", (path: string, cb?: Function) => {
+                console.log("socket join publickey " + path)
+                socket.join(path);
+            })
+
         })
 
         this.on("packets", (packet: CorePacket) => {
@@ -62,6 +67,12 @@ export class SocketServer extends EventEmitter {
             if ((states.apikey) && (states.id)) {
                 this.io.to(states.apikey).emit("states", states)
                 this.io.to(states.apikey + "|" + states.id).emit("states", states)
+
+                //public?
+                if (states.public) {
+                    this.io.to(states.publickey).emit("publickey", states);
+                    this.io.to(states.publickey + "|" + states.id).emit("publickey", states)
+                }
             }
         })
 

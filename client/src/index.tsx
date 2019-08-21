@@ -91,11 +91,13 @@ export default class App extends React.Component {
       }
       if (account) {
         this.setState({ account });
+
         api.states((err, states) => {
           if (states) {
             this.setState({ states })
           }
         })
+
       }
     });
   };
@@ -134,10 +136,10 @@ export default class App extends React.Component {
         />
       </AppBar> */}
 
-
         <BrowserRouter>
-
           <Route exact path="/" component={this.home} />
+          <Route exact path="/u/:username" component={this.userView} />
+          <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
           <Route path="/login" component={this.login} />
           <Route path="/signout" component={this.signout} />
         </BrowserRouter>
@@ -167,7 +169,7 @@ export default class App extends React.Component {
             //border: "2px solid #f00",
             boxSizing: "border-box"
           }}>
-            <DeviceList account={this.state.account} states={this.state.states} />
+            <DeviceList />
           </div>
 
           <div style={{ flex: "0 1 40px" }}>footer</div>
@@ -181,6 +183,19 @@ export default class App extends React.Component {
         </div>);
     }
   };
+
+  userView = (props) => {
+    return <div>
+      <NavBar account={this.state.account} size="small" />
+      <DeviceList username={props.match.params.username} />
+      {JSON.stringify(props.match)}
+
+    </div>
+  }
+
+  deviceView = (props) => {
+    return <div>{JSON.stringify(props.match)}</div>
+  }
 
   login = (props) => {
     return <Login history={props.history} getaccount={this.getaccount} />;

@@ -1,20 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { api } from "../api"
-
 import { Menu, Button, Box } from "grommet"
-import { User, CorePacket, } from "../../../server/core/interfaces";
+import { User, CorePacket } from "../../../server/core/interfaces";
 import { blendrgba } from "../../../server/utils/utils"
-
 import { prototypeTheme, theme } from "../theme"
-
 import { SortButton } from "./sortbutton"
-
 import { DeviceListItem } from "./devicelistitem"
-import { DeviceListMenu } from "./devicelistmenu"
+import { DeviceListMenu, MenuSort } from "./devicelistmenu"
+import * as _ from "lodash"
+
 interface MyProps {
-    account: User;
-    states: [];
+    username?: string;
 }
 
 interface MyState {
@@ -23,15 +20,80 @@ interface MyState {
 
 export class DeviceList extends React.Component<MyProps, MyState> {
 
-    state = { sort: "name_up" }
+    state = {
+        sort: undefined,
+        filter: "",
+        states: [],
+        statesraw: [],
+    }
+
+
 
     constructor(props) {
         super(props);
     }
 
-    render() {
-        const states = this.props.states;
+    // listener callback
+    stateUpdater = (states: CorePacket[]) => {
+        this.applySortFilter(states);
+    }
 
+    componentDidMount = () => {
+        console.log("did mount")
+
+        // initial load
+        if (this.props.username) {
+            api.states({ username: this.props.username }, (err, states: CorePacket[]) => {
+                if (err) console.log("devicelist 40 " + err);
+                if (states) {
+                    if (states.length > 0) api.subscribe({ publickey: states[0].publickey });
+                    this.applySortFilter(states);
+                }
+            })
+        } else {
+            // own account
+            api.states((err, states: CorePacket[]) => {
+                if (states) {
+                    this.applySortFilter(states);
+                }
+            })
+        }
+
+        //dynamic updates:
+        api.on("states", this.stateUpdater)
+    }
+
+    componentWillUnmount = () => {
+        api.removeListener("states", this.stateUpdater);
+    }
+
+    applySortFilter(states: CorePacket[]) {
+        // todo finish
+        // this applies the sorts and the search filter to states
+        // get clean copy
+
+        var tempstates = _.clone(states);
+        if (this.props.username) {
+            tempstates = _.filter(tempstates, (dev) => {
+                if (dev.username == undefined) return false;
+                return (dev.username == this.props.username)
+            })
+        }
+
+        // var states: CorePacket[] = _.filter(_.clone(api.data.states), (dev: CorePacket) => {
+        //     if (dev.id.indexOf("") >= 0) { return true } else return false
+        // })
+        this.setState({ states: tempstates });
+    }
+
+    onMenu = (data) => {
+        console.log(data);
+        if (data.sort) {
+            this.applySortFilter(data.sort)
+        }
+    }
+
+    render() {
         return (
             <div style={{
                 width: "100%",
@@ -42,13 +104,13 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 </div>
 
                 <div style={theme.global.menubars}>
-                    <DeviceListMenu />
+                    <DeviceListMenu onMenu={this.onMenu} />
                 </div>
 
                 <div style={{ overflowX: "hidden", width: "100%", flex: 1, overflowY: "scroll" }}>
-                    {(this.props.states) ? (<div>
+                    {(this.state.states) ? (<div>
 
-                        {this.props.states.map(
+                        {this.state.states.map(
                             (value: CorePacket, index, array) => {
                                 return (
                                     <DeviceListItem device={value} key={index} />
@@ -58,9 +120,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
                     </div>) : (<div>loading</div>)}
                 </div>
-
-
-
             </div>
         )
     }

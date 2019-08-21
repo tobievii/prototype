@@ -9,6 +9,7 @@ import * as crypto from "crypto"
 import { DocumentStore } from "./data";
 
 import * as lodash from "lodash"
+import { UserInfo } from "os";
 
 export class Core extends EventEmitter {
     db: any;
@@ -48,10 +49,12 @@ export class Core extends EventEmitter {
                 }
 
                 // handle case where no username is provided.
-                var username;
-                if (options.username) { username = options.username; } else {
-                    username = options.email.split("@")[0] + Math.round(Math.random() * 10000)
+                if (options.username) {
+                    user.username = options.username;
+                } else {
+                    user.username = options.email.split("@")[0] + Math.round(Math.random() * 10000)
                 }
+
 
                 var ipLoc = geoip.lookup(options.ip);
                 if (ipLoc) { user.ipLoc = ipLoc }
@@ -91,7 +94,8 @@ export class Core extends EventEmitter {
     }
     // end account
 
-    user(options: { uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
+    // everything to do with finding a user
+    user(options: { username?: string, uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
 
         // force lowercase on users
         if (options.email) { options.email = options.email.toLowerCase() }
@@ -137,7 +141,6 @@ export class Core extends EventEmitter {
                 if (user == null) {
                     cb(new Error("user account not found"))
                 }
-
             })
 
         }
@@ -169,6 +172,14 @@ export class Core extends EventEmitter {
             })
         }
 
+        // or username
+        if (options.username) {
+            console.log("finding by username:" + options.username)
+            this.db.users.findOne({ username: options.username }, (err: Error | undefined, user?: any) => {
+                if (err) { cb(err); return; }
+                cb(undefined, user);
+            })
+        }
     }
     // end user
 
@@ -209,7 +220,8 @@ export class Core extends EventEmitter {
                 state["_last_seen"] = new Date();
                 packet.key = state.key;
                 packet.apikey = user.apikey;
-
+                packet.publickey = user.publickey
+                packet.username = user.username
                 packet.meta = {};
                 var stateMerged = lodash.merge(state, packet)
 
@@ -247,12 +259,28 @@ export class Core extends EventEmitter {
             })
         }
 
-        // all devices
-        if ((options.user) && (options.id == undefined)) {
+        // all own devices 
+        if ((options.user) && (options.id == undefined) && (options.username == undefined)) {
             this.db.states.find({ apikey: options.user.apikey }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }); return; }
                 cb(undefined, result);
             })
+        }
+
+        // all visible devices from a username
+        if ((options.username) && (options.user)) {
+            let username = options.username;
+            this.user({ username }, (err, user) => {
+                if (err) cb({ error: "db error" });
+                if (user) {
+                    console.log("ANDSJKL")
+                    this.db.states.find({ apikey: user.apikey, public: true }, (err: Error, result: any) => {
+                        if (err) { cb({ error: "db error" }); return; }
+                        cb(undefined, result);
+                    })
+                }
+            })
+
         }
     }
 

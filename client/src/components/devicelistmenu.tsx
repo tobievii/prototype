@@ -13,12 +13,22 @@ import { SortButton } from "./sortbutton"
 import * as _ from "lodash"
 
 interface MenuProps {
-    [index: string]: any;
+    onMenu: Function;
 }
 
-interface MenuState {
-}
+interface MenuState { }
 
+export type SortVal = 'none' | 'up' | 'down';
+
+export interface MenuSort {
+    selected: SortVal
+    id: SortVal
+    lastseen: SortVal
+    alarm: SortVal
+    warning: SortVal
+    shared: SortVal
+    public: SortVal
+}
 
 export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
@@ -53,7 +63,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
             //set this one
             sort[prop] = direction;
             console.log("sort " + prop + " by " + direction)
-            this.setState({ sort })
+            this.setState({ sort }, () => { this.props.onMenu({ sort }) })
         }
     }
 
@@ -108,25 +118,3 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
         )
     }
 }
-
-/*
-  <div style={theme.global.menuoptions}>
-
-                        <div style={{ width: 100 }}>
-                            <i className="fas fa-sort" style={{ opacity: 0.5, position: "absolute" }}></i>
-                            {this.state.sort == "select_up" && <i className="fas fa-sort-up" style={{ position: "absolute" }}></i>}
-                            {this.state.sort == "select_down" && <i className="fas fa-sort-down" style={{ position: "absolute" }}></i>}
-                        </div>
-
-                    </div>
-
-                    <div style={theme.global.menuoptions}>
-                        <div style={{ width: 100 }}>
-                            <i className="fas fa-sort" style={{ opacity: 0.5, position: "absolute" }}></i>
-                            {this.state.sort == "name_up" && (<span><i className="fas fa-sort-up" style={{ position: "absolute" }}></i>A-Z</span>)}
-                            {this.state.sort == "name_down" && (<span><i className="fas fa-sort-down" style={{ position: "absolute" }}></i> Z-A</span>)}
-                        </div>
-                    </div>
-
-                    <div style={theme.global.menuoptions}> test </div>
-                    */

@@ -1,6 +1,8 @@
 import { Core } from "./core";
 import { Application } from "express"
-import lodash = require('lodash');
+import * as _ from 'lodash'
+
+
 
 export function webapiv3(app: Application, core: Core) {
 
@@ -28,7 +30,7 @@ export function webapiv3(app: Application, core: Core) {
 
     app.get("/api/v3/account", (req: any, res) => {
         if (!req.user) { res.json({ err: "user not authenticated" }); return; }
-        var cleanUser = lodash.clone(req.user);
+        var cleanUser = _.clone(req.user);
         delete cleanUser.password;
         res.json(cleanUser);
     })
@@ -60,7 +62,7 @@ export function webapiv3(app: Application, core: Core) {
             if (result) {
                 //compatibility fix for v3..
                 result.devid = result.id;
-                result.payload = lodash.clone(result);
+                result.payload = _.clone(result);
                 res.json(result);
             }
         })
@@ -68,6 +70,17 @@ export function webapiv3(app: Application, core: Core) {
 
     app.get("/api/v3/states", (req: any, res) => {
         core.view({ user: req.user }, (err, result) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    app.post("/api/v3/states", (req: any, res) => {
+
+        var options = _.clone(req.body)
+        options.user = req.user;
+        console.log(options);
+        core.view(options, (err, result) => {
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
         })

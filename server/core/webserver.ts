@@ -36,7 +36,7 @@ export class Webserver extends EventEmitter {
 
 
         this.app.disable('x-powered-by'); //security
-        this.app.use(compression());
+        this.app.use(compression(1));
         this.app.use(cookieParser());
 
         // this.app.use(session({
@@ -103,6 +103,15 @@ export class Webserver extends EventEmitter {
             })
         })
 
+        ///////////////////////////////////////////////////////
+
+        // this.app.use('/view', express.static('../client/dist'))
+        // this.app.use('/u/:username/view', express.static('../client/dist'))
+
+        this.app.use('/view', (req, res) => { res.end(reactHtml); })
+        this.app.use('/u/:username', (req, res) => { res.end(reactHtml); })
+        this.app.use('/u/:username/view', (req, res) => { res.end(reactHtml); })
+
         this.app.get('/signout', (req, res) => {
             console.log("SIGNOUT");
             res.clearCookie("uuid");
@@ -110,8 +119,8 @@ export class Webserver extends EventEmitter {
         });
 
         this.app.get("*", (req, res) => {
-            res.status(404).end(reactHtml);
-
+            //res.status(404).end(reactHtml);
+            res.status(404).json({ err: 404 })
         })
 
         this.app.post("*", (req, res) => {

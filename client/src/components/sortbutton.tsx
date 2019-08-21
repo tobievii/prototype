@@ -14,6 +14,7 @@ interface SortProps {
     value: string;
 }
 
+
 interface SortState {
 
 }
@@ -26,7 +27,7 @@ export class SortButton extends React.Component<SortProps, SortState> {
         value: "none"
     }
 
-    componentWillReceiveProps = () => {
+    componentDidMount = () => {
         if (this.props.value) { this.setState({ value: this.props.value }) }
 
         if (this.props.type) {
