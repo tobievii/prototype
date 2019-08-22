@@ -12,7 +12,7 @@ import { Home } from "./pages/home";
 import "./api";
 import { api } from "./api";
 
-import { Grommet, Box, Button, Heading, Collapsible, ResponsiveContext, Layer } from 'grommet';
+import { Grommet, Box, } from 'grommet';
 import { normalizeColor } from "grommet/utils"
 import { rgba } from "polished"
 import { Notification, FormClose } from 'grommet-icons';
@@ -144,8 +144,8 @@ export default class App extends React.Component {
           <Route path="/signout" component={this.signout} />
         </BrowserRouter>
 
-        <SideBar size={size} open={showSidebar} toggle={this.mobileMenuPress} >sidebarA</SideBar>
-      </div>
+        <SideBar open={false} toggle={this.mobileMenuPress} >sidebarA</SideBar>
+      </div >
     );
   }
 

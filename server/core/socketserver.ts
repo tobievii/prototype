@@ -50,7 +50,7 @@ export class SocketServer extends EventEmitter {
             })
 
             socket.on("publickey", (path: string, cb?: Function) => {
-                console.log("socket join publickey " + path)
+                logger.log({ message: "socket join publickey", data: { publickey: path }, level: "verbose" })
                 socket.join(path);
             })
 

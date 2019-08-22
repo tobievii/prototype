@@ -1,14 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { api } from "../api"
 
-import { Menu, Button, Box } from "grommet"
 import { User, CorePacket, } from "../../../server/core/interfaces";
 import { blendrgba } from "../../../server/utils/utils"
 
-import { prototypeTheme, theme, colors } from "../theme"
+import { theme, colors } from "../theme"
 
-import { SortButton } from "./sortbutton"
 import * as moment from "moment"
 
 interface MyProps {
@@ -34,7 +31,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
         super(props);
         this.intervalupdater = setInterval(() => {
             this.forceUpdate();
-        }, 200)
+        }, 1000)
     }
 
     componentWillUnmount = () => {
@@ -64,7 +61,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
     }
 
     calcStyle = () => {
-        var quickfade = this.timeratio(this.props.device["_last_seen"], 5000, { clamp: true });
+        var quickfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60, { clamp: true });
         var slowfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60, { clamp: true });
 
         return {

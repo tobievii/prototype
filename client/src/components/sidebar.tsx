@@ -7,12 +7,11 @@ import { Notification, FormClose } from 'grommet-icons';
 import "../prototype.scss"
 
 import { api } from "../api"
-import { theme } from "../theme";
+import { theme, colors } from "../theme";
 import { position } from "polished";
 
 interface SideBarProps {
     open: boolean;
-    size: string;
     toggle: Function;
 }
 
@@ -25,47 +24,40 @@ export class SideBar extends React.Component<SideBarProps, SideBarState> {
 
     contents() {
         return (<div style={{ height: "100%", boxSizing: "border-box", overflow: "hidden" }}>
-            <Box
-                background='panelbg'
-                tag='header'
-                justify='end'
-                align='center'
-                direction='row'
-            >
-                <Button
-                    label=""
-                    primary
-                    icon={<FormClose />}
-                    onClick={() => { this.props.toggle(); }}
-                />
-            </Box>
-            <Box
-                fill
-                background='panelbg'
-                align='center'
-                justify='center'
-            >
-                sidebarB
-            </Box>
+            <div style={{ background: colors.spotA }}><button onClick={() => { this.props.toggle(); }}>X</button></div>
+            <div style={{ background: colors.panels }}>sidebarB</div>
         </div>)
     }
 
     render() {
+
+
+        var size = "large";
+        if (window.innerWidth < 800) { size = "small" }
+
         if (this.props.open == false) {
             return (<div></div>)
         }
 
-        if (this.props.size == "small") {
+        if (size == "small") {
             return (
-                <Layer>
+                <div style={{
+                    width: "100%",
+                    height: "100%",
+                    background: colors.spotB,
+                    zIndex: 1000,
+                    position: "absolute",
+                    top: 0,
+                    right: 0
+                }}>
                     {this.contents()}
-                </Layer>);
+                </div>);
         } else {
             return (
                 <div style={{
                     float: "right",
-                    width: theme.global.sidebar.width,
-                    background: theme.global.sidebar.background,
+                    width: "500px",
+                    background: colors.panels,
                     position: "absolute",
                     top: 0,
                     right: 0,

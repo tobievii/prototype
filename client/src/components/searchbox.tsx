@@ -25,19 +25,27 @@ export class SearchBox extends React.Component<MyProps, MyState> {
     }
 
     onChange = (e) => {
-        console.log(e.target.value)
         var searchtext = e.target.value
         this.setState({ searchtext }, () => { })
     }
 
     onKeyPress = (event) => {
         if (event.key === "Enter") {
-            console.log("searching...")
+
+            if (this.state.searchtext.trim() == "") {
+                this.clear();
+                return;
+            }
+
             api.search({ searchtext: this.state.searchtext }, (err, result) => {
                 if (err) console.log(err);
                 if (result) { console.log(result); this.setState({ result }) }
             })
         }
+    }
+
+    clear = () => {
+        this.setState({ searchtext: "", result: [] })
     }
 
     render() {
@@ -79,7 +87,7 @@ export class SearchBox extends React.Component<MyProps, MyState> {
                         background: "none",
                         position: "fixed",
                         top: 0, left: 0
-                    }} onClick={() => { this.setState({ searchtext: "", result: [] }) }} />
+                    }} onClick={() => { this.clear() }} />
 
                 </div> : <div></div>}
 

@@ -51,8 +51,21 @@ export class Webserver extends EventEmitter {
         this.app.use(this.safeParser);
         this.app.use(this.parseHeaderAuth(this.core));
 
-        this.app.use((req, res, next) => {
-            var logmsg: LogEvent = { message: "visit", data: { url: req.url, method: req.method, ip: req.socket.remoteAddress, uuid: req.cookies.uuid }, level: "verbose" }
+        this.app.use((req: any, res, next) => {
+
+
+
+            var logmsg: LogEvent = {
+                message: "http",
+                data: {
+                    url: req.url,
+                    method: req.method,
+                    ip: req.socket.remoteAddress
+                }, level: "verbose"
+            }
+
+            // log current user if logged in (req.user);
+            if (req.user) { logmsg.data.user = { username: req.user.username, email: req.user.email } }
 
             logger.log(logmsg)
             next();

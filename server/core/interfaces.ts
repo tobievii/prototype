@@ -9,7 +9,7 @@ export interface Package {
 
 export interface LogEvent {
     message: string;
-    data?: object;
+    data?: any;
     level: "error" | "warn" | "info" | "verbose" | "debug" | "silly";
 }
 
@@ -18,6 +18,11 @@ export interface CorePacket {
     id: string;
     data: any;
     apikey?: string;
+    alarm?: boolean;
+    warning?: boolean;
+    shared?: boolean;
+    public?: boolean;
+    workflowCode?: string;
     [index: string]: any;
 }
 

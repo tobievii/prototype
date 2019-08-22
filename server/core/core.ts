@@ -8,8 +8,11 @@ var geoip = require("geoip-lite");
 import * as crypto from "crypto"
 import { DocumentStore } from "./data";
 
-import * as lodash from "lodash"
-import { UserInfo } from "os";
+import * as _ from "lodash"
+
+import * as vm2 from "vm2"
+
+import { User, CorePacket } from "./interfaces"
 
 export class Core extends EventEmitter {
     db: any;
@@ -68,7 +71,6 @@ export class Core extends EventEmitter {
                         this.db.users.save(user, (err: any, usersaved: any) => {
                             if (err) if (cb) cb(err);
                             if (usersaved) {
-                                console.log({ account: usersaved });
                                 if (cb) cb(undefined, { account: usersaved });
                             }
                         });
@@ -89,12 +91,12 @@ export class Core extends EventEmitter {
     }
     // end register
 
-    account(options: any, cb?: (err: Error, result?: any) => void) {
+    account(options: any, cb?: (err: Error | undefined, result?: any) => void) {
         console.log("account change")
         console.log(options);
         if ((options.user) && (options.change)) {
             this.db.users.update({ apikey: options.user.apikey },
-                { "$set": options.change }, (err, result) => {
+                { "$set": options.change }, (err: any, result: any) => {
                     if (err) { if (cb) cb(err); }
                     if (result) { if (cb) cb(undefined, result); }
                 })
@@ -196,64 +198,85 @@ export class Core extends EventEmitter {
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
 
-            if (!cb) cb = () => { }
+            //if (!cb) cb = () => { }
 
-            // data format error checking
-            if (!packet.id) { cb({ error: "id parameter missing" }); return; }
-            if (typeof packet.id != "string") { cb({ error: "id must be a string" }); return; }
-            if (packet.id == "") { cb({ error: "id may not be empty" }); return; }
-            if (packet.id.indexOf(" ") != -1) { cb({ "error": "id may not contain spaces" }); return; }
-            if (packet.id.match(/^[a-z0-9_]+$/i) == null) { cb({ "error": "id may only contain a-z A-Z 0-9 and _" }); return; }
+            // ERROR CHECK
+            if (!packet.id) { if (cb) cb({ error: "id parameter missing" }); return; }
+            if (typeof packet.id != "string") { if (cb) cb({ error: "id must be a string" }); return; }
+            if (packet.id == "") { if (cb) cb({ error: "id may not be empty" }); return; }
+            if (packet.id.indexOf(" ") != -1) { if (cb) cb({ "error": "id may not contain spaces" }); return; }
+            if (packet.id.match(/^[a-z0-9_]+$/i) == null) { if (cb) cb({ "error": "id may only contain a-z A-Z 0-9 and _" }); return; }
 
-            // todo, run through plugins...
-            // todo, run through VM
-
+            // gets this device's state from the db. 
+            // todo: get all subscribed instances and perform workflows on the chain, then update db.
             this.state({ user, id: packet.id }, (err: any, statedb: any) => {
-                if (err) { cb({ error: "db error" }) }
+                if (err) { if (cb) cb({ error: "db error" }); return; }
 
-                var state: any = {}
+                console.log("----------")
+                console.log(statedb);
 
-                // no state yet, create new entry.
-                if (statedb == null) {
-                    state = {
-                        "_created_on": new Date(),
-                        key: utils.generateDifficult(128)
-                    }
-                }
+
+
+
+                var state: CorePacket | any = {};
                 if (statedb) {
-                    state = statedb;
+                    state = statedb; //existed!
+                } else {
+                    state = { "_created_on": new Date(), key: utils.generateDifficult(128) }
                 }
+
+                delete state["_id"]; //sanitize db data
 
                 // timestamp it.
                 state["_last_seen"] = new Date();
 
-                packet.id = packet.id.toLowerCase();
+                //add data from state
                 packet.key = state.key;
+
+                //add data from user
                 packet.apikey = user.apikey;
                 packet.publickey = user.publickey
                 packet.username = user.username
-                packet.meta = {};
-                if (packet.public != undefined) packet.public = (packet.public == true);
-                var stateMerged = lodash.merge(state, packet)
 
-                this.db.packets.save(packet, (err: any, result: any) => {
-                    this.db.states.save(stateMerged, (err1: any, result1: any) => {
-                        if (err1) { }
-                        if (result1) {
-                            cb(undefined, { result: "success" });
-                        }
+                packet.id = packet.id.toLowerCase();
+
+                //todo: meta
+                packet.meta = {};
+
+                //flags force boolean
+                if (packet.public != undefined) packet.public = (packet.public == true);
+
+                //merge state from packet into state. this keeps state most of the latest data
+
+
+                // workflow just before saving to db.
+                this.workflow({ packet, state }, (err, processedPacket) => {
+                    console.log(processedPacket);
+                    this.db.packets.save(processedPacket, (err: any, result: any) => {
+                        var stateMerged = _.merge(state, processedPacket)
+                        console.log("saving to db:")
+                        var stateSave = _.clone(stateMerged);
+                        console.log(stateSave);
+                        delete stateSave["_id"]
+                        this.db.states.update({ key: stateSave.key }, stateSave, { upsert: true }, (err1: any, result1: any) => {
+                            if (err1) { console.log(err1) }
+                            if (result1) {
+                                console.log(result1);
+                                if (cb) cb(undefined, { result: "success" });
+                            }
+                        })
                     })
                 })
+                // done!
 
-                // update device state db.
-                //
-            })
+
+
+
+            });
         }
     }
 
     view(options: any, cb: (error: { error: string } | undefined, result?: any) => void) {
-
-        console.log(options);
 
         // secure
         if (options.user) {
@@ -301,7 +324,7 @@ export class Core extends EventEmitter {
         if ((options.id) && (options.user)) {
             this.db.packets.find({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }) }
-                if (result) { cb(undefined, result); }
+                if (result) { cb(undefined, result) }
             })
         }
     }
@@ -330,23 +353,21 @@ export class Core extends EventEmitter {
 
     // --------------------------------- 
 
-    search(options: any, cb: (err: any, result?: any) => void) {
-        console.log(options)
-
+    search(options: any, cb: (err: any, result?: User | User[]) => void) {
         var securityfilter = { username: 1, publickey: 1 }
-
         if (options.request.searchtext) {
+            if (options.request.searchtext.trim() == "") { cb(undefined, []); return; }
             this.db.users.find({
                 $or: [{ 'username': { '$regex': options.request.searchtext } },
                 { 'email': options.request.searchtext }]
-            }, securityfilter, (err, result) => {
+            }, securityfilter, (err: Error, result: User[]) => {
                 if (err) { cb({ error: "db error" }); return; }
                 if (result) { cb(undefined, result) }
             })
         }
 
         if (options.request.username) {
-            this.db.users.findOne({ username: options.request.username }, securityfilter, (err, result) => {
+            this.db.users.findOne({ username: options.request.username }, securityfilter, (err: Error, result: User) => {
                 if (err) { cb({ error: "db error" }); return; }
                 if (result) { cb(undefined, result) }
             })
@@ -354,6 +375,32 @@ export class Core extends EventEmitter {
     }
 
     // --------------------------------- 
+
+    workflow(options: { packet: CorePacket, state: CorePacket }, cb: (err: Error | undefined, result?: CorePacket) => void) {
+
+        var packet = options.packet;
+        var state = options.state;
+
+        console.log(options);
+
+        if (packet.workflowCode == undefined) { cb(undefined, packet); return; }
+
+        let sandbox: any = { packet, state }
+        sandbox.callback = (packetProcessed: CorePacket) => {
+            cb(undefined, packetProcessed)
+        }
+
+        const vm = new vm2.VM({ timeout: 100, sandbox })
+
+        try {
+            vm.run(packet.workflowCode)
+        } catch (err) {
+            packet.workflowerror = err.toString();
+            logger.log({ message: "workflow error", data: { packet, state, err }, level: "warn" })
+            cb(undefined, packet);
+        }
+    }
+    // -------------------------------
 }
 
 

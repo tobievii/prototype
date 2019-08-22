@@ -221,13 +221,14 @@ describe("PROTOTYPE", () => {
 
 
     it("HTTP -> SOCKET", done => {
-        var id = "protTestHttpSocket"
+        var id = "prottesthttpsocket"
         var test = Math.random()
 
         // SOCKET
         var account = _.clone(testAccount);
         account.protocol = "socketio";
         account.id = id;
+
         var protSocket = new Prototype(account);
 
         protSocket.on("connect", () => {
@@ -236,6 +237,7 @@ describe("PROTOTYPE", () => {
             new Prototype(testAccount).post({ id, data: { test } }, (e, r) => {
                 if (e) done(e);
                 //console.log(r);
+                if (r.result != "success") { done(new Error("http post did not result success")) }
             })
             //}, 100)
 
@@ -252,7 +254,7 @@ describe("PROTOTYPE", () => {
 
 
     it("HTTP -> MQTT", done => {
-        var id = "protTestHttpMqtt"
+        var id = "prottesthttpmqtt"
         var test = Math.random()
 
         // MQTT
@@ -262,7 +264,10 @@ describe("PROTOTYPE", () => {
         var protMqtt = new Prototype(mqttaccount);
         protMqtt.on("connect", () => {
             // HTTP POST
+
             new Prototype(testAccount).post({ id, data: { test } }, (e, r) => { })
+
+
         })
         protMqtt.on("data", (data: any) => {
             if (data.id != id) { done(new Error("id missing from socket packet")); return; }
@@ -276,7 +281,7 @@ describe("PROTOTYPE", () => {
 
     it("MQTT -> SOCKET", function (done) {
         this.timeout(5000);
-        var id = "protTestMqttSocket"
+        var id = "prottestmqttsocket"
         var test = Math.random()
 
         // SOCKET LISTEN
@@ -309,7 +314,7 @@ describe("PROTOTYPE", () => {
 
 
     it("MQTT -> HTTP", done => {
-        var id = "protTestMqtt"
+        var id = "prottestmqtt"
         var test = Math.random()
 
         var mqttaccount = _.clone(testAccount);
@@ -334,7 +339,7 @@ describe("PROTOTYPE", () => {
 
 
     it("SOCKET -> HTTP", done => {
-        var id = "protTestSocketHttp"
+        var id = "prottestsockethttp"
         var test = Math.random()
 
 
@@ -359,7 +364,7 @@ describe("PROTOTYPE", () => {
 
 
     it("SOCKET -> MQTT", done => {
-        var id = "protTestSocketMqtt"
+        var id = "prottestsocketmqtt"
         var test = Math.random()
 
         var mqttaccount = _.clone(testAccount);
@@ -371,9 +376,7 @@ describe("PROTOTYPE", () => {
         protMqtt.on("connect", () => {
             var socketaccount = _.clone(testAccount);
             socketaccount.protocol = "socketio"
-            new Prototype(socketaccount).post({ id, data: { test, asdf: "zzz" } }, () => {
-
-            })
+            new Prototype(socketaccount).post({ id, data: { test, asdf: "zzz" } }, () => { })
         })
 
         protMqtt.on("data", (data) => {
