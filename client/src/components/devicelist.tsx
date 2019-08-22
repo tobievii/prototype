@@ -19,7 +19,6 @@ interface MyState {
 }
 
 export class DeviceList extends React.Component<MyProps, MyState> {
-
     state = {
         sort: undefined,
         search: undefined,
@@ -28,30 +27,19 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         statesraw: [],
     }
 
-
-
     constructor(props) {
         super(props);
     }
 
-
-
     componentDidMount = () => {
-        // initial load
-        console.log(this.props.username);
         if (this.props.username) {
-
             api.subscribe({ username: this.props.username });
 
             api.states({ username: this.props.username }, (err, states: CorePacket[]) => {
-                if (err) console.log("devicelist 40 " + err);
-                if (states) {
-                    console.log("======")
-                    console.log(states)
-                    //if (states.length > 0) api.subscribe({ publickey: states[0].publickey });
-                    this.applySortFilter(states);
-                }
+                if (err) console.error(err);
+                if (states) { this.applySortFilter(states); }
             })
+
         } else {
             // own account
             api.states((err, states: CorePacket[]) => {
@@ -75,10 +63,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     applySortFilter = (states: CorePacket[]) => {
-        // todo finish
-        // this applies the sorts and the search filter to states
-        // get clean copy
-
         // transfer select state
         for (var dev of this.state.states) {
             for (var dev2 of states) {
