@@ -26,7 +26,14 @@ export function getGUID() {
 
 /* ------------------------------------------------------------------------- */
 
-export function blendrgba(x, y, ratio) {
+interface color {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
+
+export function blendrgba(x: color, y: color, ratio: number) {
 
     if (ratio <= 0) {
         return "rgba(" + Math.round(x.r) + "," + Math.round(x.g) + "," + Math.round(x.b) + "," + x.a + ")"
