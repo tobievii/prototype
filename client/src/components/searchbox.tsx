@@ -1,9 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
-
 import "../prototype.scss"
-
 import { api } from "../api"
 import { emit } from "cluster";
 import { theme, colors } from "../theme";
@@ -75,7 +73,7 @@ export class SearchBox extends React.Component<MyProps, MyState> {
                         return <div
                             key={i}
                             style={{ padding: "5px", borderBottom: "1px solid #333" }}>
-                            <a href={"/u/" + user.username} >{user.username}</a>
+                            <Link to={"/u/" + user.username} >{user.username}</Link>
                         </div>
                     })}
                 </div>

@@ -235,35 +235,25 @@ export class Core extends EventEmitter {
                 //flags force boolean
                 if (packet.public != undefined) packet.public = (packet.public == true);
 
-                //merge state from packet into state. this keeps state most of the latest data
-
-
                 // workflow just before saving to db.
                 this.workflow({ packet, state }, (err, processedPacket) => {
-                    console.log(processedPacket);
+                    var stateMerged = _.merge(state, processedPacket);
                     this.db.packets.save(processedPacket, (err: any, result: any) => {
-                        var stateMerged = _.merge(state, processedPacket)
-                        console.log("saving to db:")
-                        var stateSave = _.clone(stateMerged);
-                        console.log(stateSave);
-                        delete stateSave["_id"]
-                        this.db.states.update({ key: stateSave.key }, stateSave, { upsert: true }, (err1: any, result1: any) => {
+                        delete stateMerged["_id"]
+                        this.db.states.update({ key: stateMerged.key }, stateMerged, { upsert: true }, (err1: any, result1: any) => {
                             if (err1) { console.log(err1) }
                             if (result1) {
-                                console.log(result1);
                                 if (cb) cb(undefined, { result: "success" });
                             }
                         })
                     })
                 })
                 // done!
-
-
-
-
             });
         }
     }
+
+    // ---------------------------------------
 
     view(options: any, cb: (error: { error: string } | undefined, result?: any) => void) {
 
@@ -370,8 +360,6 @@ export class Core extends EventEmitter {
         var packet = options.packet;
         var state = options.state;
 
-        console.log(options);
-
         if (packet.workflowCode == undefined) { cb(undefined, packet); return; }
 
         let sandbox: any = { packet, state }
@@ -392,11 +380,6 @@ export class Core extends EventEmitter {
     // -------------------------------
 
     checkValidCorePacket(packet: any): { passed: boolean, error?: string } {
-        // if (!packet.id) { if (cb) cb({ error: "id parameter missing" }); return; }
-        // if (typeof packet.id != "string") { if (cb) cb({ error: "id must be a string" }); return; }
-        // if (packet.id == "") { if (cb) cb({ error: "id may not be empty" }); return; }
-        // if (packet.id.indexOf(" ") != -1) { if (cb) cb({ "error": "id may not contain spaces" }); return; }
-        // if (packet.id.match(/^[a-z0-9_]+$/i) == null) { if (cb) cb({ "error": "id may only contain a-z A-Z 0-9 and _" }); return; }
 
         if (!packet.id) {
             return { passed: false, error: "id parameter missing" }

@@ -2,38 +2,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Link, NavLink, Nav } from "react-router-dom";
 
-//import "./prototype.scss";
-
 import { NavBar } from "./components/navbar";
 import { Login } from "./components/login";
-
 import { Home } from "./pages/home";
 
-import "./api";
 import { api } from "./api";
-
-import { Grommet, Box, } from 'grommet';
-import { normalizeColor } from "grommet/utils"
-import { rgba } from "polished"
-import { Notification, FormClose } from 'grommet-icons';
 
 import { DeviceList } from "./components/devicelist"
 import { theme } from "./theme"
 import { SideBar } from "./components/sidebar"
-
-const AppBar = (props) => (
-  <Box
-    tag='header'
-    direction='row'
-    align='center'
-    justify='between'
-    background='panelbg'
-    pad={{ left: 'medium', right: 'small', vertical: 'small' }}
-    elevation='medium'
-    style={{ zIndex: '1' }}
-    {...props}
-  />
-);
 
 const BGgrad = (props) => (
   <header className="site-banner banner banner--shape banner--homepage">
@@ -126,20 +103,10 @@ export default class App extends React.Component {
 
     return (
       <div style={{}}>
-        {/* <AppBar>
-
-        <Button
-          label="hello world"
-          primary
-          icon={<Notification />}
-          onClick={() => this.setState((prevState: any) => ({ showSidebar: !prevState.showSidebar }))}
-        />
-      </AppBar> */}
-
         <BrowserRouter>
           <Route exact path="/" component={this.home} />
           <Route exact path="/u/:username" component={this.userView} />
-          <Route exact path="/u/:username/view/:devid" component={this.deviceView} />
+          <Route exact path="/u/:username/view/:id" component={this.deviceView} />
           <Route path="/login" component={this.login} />
           <Route path="/signout" component={this.signout} />
         </BrowserRouter>
@@ -189,13 +156,15 @@ export default class App extends React.Component {
     return <div>
       <NavBar account={this.state.account} />
       <DeviceList username={props.match.params.username} />
-      {JSON.stringify(props.match)}
-
     </div>
   }
 
   deviceView = (props) => {
-    return <div>{JSON.stringify(props.match)}</div>
+    return <div>
+      <NavBar account={this.state.account} />
+
+      {JSON.stringify(props.match)}
+    </div>
   }
 
   login = (props) => {

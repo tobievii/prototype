@@ -1,18 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
 import { User, CorePacket, } from "../../../server/core/interfaces";
 import { blendrgba } from "../../../server/utils/utils"
-
 import { theme, colors } from "../theme"
-
 import * as moment from "moment"
-
-interface MyProps {
-    account: User;
-    states: [];
-}
-
+import { Link } from "react-router-dom";
 interface MyState {
     [index: string]: any;
 }
@@ -21,7 +13,6 @@ interface DeviceProps {
     device: CorePacket,
     action: Function
 }
-
 
 export class DeviceListItem extends React.Component<DeviceProps, MyState> {
 
@@ -83,7 +74,9 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                             onClick={(e) => this.props.action({ select: true })}
                             style={{ opacity: colors.transparent }} className="fas fa-square" />}
                 </div>
-                <div style={{ flex: 1 }}>{this.props.device.id}</div>
+                <div style={{ flex: 1 }}>
+                    <Link to={"/u/" + this.props.device.username + "/view/" + this.props.device.id} >{this.props.device.id}</Link>
+                </div>
 
                 <div style={theme.global.devicelist.timecolumn}>
                     {moment(this.props.device["_last_seen"]).fromNow()}
