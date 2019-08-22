@@ -64,13 +64,35 @@ export class Registration extends React.Component<MyProps, MyState> {
         }
     }
 
+    onKeyPress = (event) => {
+        if (event.key === "Enter") {
+            console.log("enter!")
+            this.onClick();
+        }
+    }
+
     render() {
         return (
             <div>
                 <div>
-                    <input placeholder="Email Address" type="text" style={{ width: 250 }} onChange={this.onChange("email")} value={this.state.email.toLowerCase()} />
-                    <input placeholder="Password" type="password" style={{ width: 250 }} onChange={this.onChange("pass")} value={this.state.pass} />
-                    <button onClick={this.onClick}>OK</button>
+                    <input
+                        placeholder="Email Address"
+                        type="text"
+                        style={{ width: 250 }}
+                        onChange={this.onChange("email")}
+                        value={this.state.email.toLowerCase()} />
+
+                    <input
+                        placeholder="Password"
+                        type="password"
+                        style={{ width: 250 }}
+                        onChange={this.onChange("pass")}
+                        value={this.state.pass}
+                        onKeyPress={this.onKeyPress} />
+
+                    <button
+                        onClick={this.onClick}>
+                        OK</button>
                 </div>
 
                 <span>{this.state.message}</span>

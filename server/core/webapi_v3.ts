@@ -35,6 +35,15 @@ export function webapiv3(app: Application, core: Core) {
         res.json(cleanUser);
     })
 
+    app.post("/api/v3/account", (req: any, res) => {
+        // change account settings
+        var query = { change: req.body, user: req.user }
+        core.account(query, (err, result) => {
+            if (err) { res.json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
 
     app.get("/api/v3/version", (req: any, res) => {
         res.json(core.config.version)

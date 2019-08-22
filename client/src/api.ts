@@ -51,22 +51,50 @@ export class API extends events.EventEmitter {
     }
 
     // gets our latest account details
-    account = (cb?: Function) => {
-        request.get(this.uri + "/api/v3/account",
-            { headers: this.headers, json: true },
-            (err, res, body: any) => {
-                if (err) if (cb) cb(err);
-                if (body) {
-                    if (body.apikey) {
-                        this.data.account = body;
-                        //this.data.account = body;
-                        this.apikey = body.apikey;
-                        if (this.socket == undefined) this.connectSocket();
+    account = (options?: any | Function, cb?: Function) => {
+        var opt;
+        var callback;
+        if (typeof options == "function") {
+            callback = options;
+        } else {
+            opt = options;
+            if (cb) callback = cb;
+        }
+
+        if (opt) {
+            request.post(this.uri + "/api/v3/account",
+                { json: opt },
+                (err, res, body: any) => {
+                    if (err) if (callback) callback(err);
+                    if (body) {
+                        if (body.apikey) {
+                            this.data.account = body;
+                            //this.data.account = body;
+                            this.apikey = body.apikey;
+                            if (this.socket == undefined) this.connectSocket();
+                        }
+                        if (callback) callback(null, body);
                     }
-                    if (cb) cb(null, body);
                 }
-            }
-        )
+            )
+        } else {
+            request.get(this.uri + "/api/v3/account",
+                { headers: this.headers, json: true },
+                (err, res, body: any) => {
+                    if (err) if (callback) callback(err);
+                    if (body) {
+                        if (body.apikey) {
+                            this.data.account = body;
+                            //this.data.account = body;
+                            this.apikey = body.apikey;
+                            if (this.socket == undefined) this.connectSocket();
+                        }
+                        if (callback) callback(null, body);
+                    }
+                }
+            )
+        }
+
     }
 
     connectSocket() {

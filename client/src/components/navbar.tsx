@@ -11,15 +11,11 @@ import { api } from "../api"
 
 interface MyProps {
   account: User;
-  size: string;
 }
 
 interface MyState {
   [index: string]: any;
 }
-
-
-
 
 export class NavBar extends React.Component<MyProps, MyState> {
   state = {
@@ -31,13 +27,17 @@ export class NavBar extends React.Component<MyProps, MyState> {
   };
 
   render() {
+
+    var size = "large";
+    if (window.innerWidth < 800) { size = "small" }
+
     // LOGGED IN USERS:
     if (this.props.account) {
 
       const menuitemsLogged = [
-        { small: "N", large: "Notifications", path: "/notifications", icon: "bell" },
-        { small: "S", large: "Settings", path: "/settings", icon: "cog" },
-        { small: "A", large: "Account", path: "/account", icon: "user-circle" }
+        { text: "Notifications", path: "/notifications", icon: "bell" },
+        { text: "Settings", path: "/settings", icon: "cog" },
+        { text: "Account", path: "/account", icon: "user-circle" }
       ]
 
       return (
@@ -59,13 +59,13 @@ export class NavBar extends React.Component<MyProps, MyState> {
           </NavLink>
 
           {menuitemsLogged.map((menuitem, i, arr) => {
-            if (this.props.size == "small") {
+            if (size == "small") {
               return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinksmall}>
                 <i className={"fa fa-" + menuitem.icon} ></i>
               </NavLink>)
             } else {
               return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinklarge}>
-                <i className={"fa fa-" + menuitem.icon} ></i> {menuitem.large}
+                <i className={"fa fa-" + menuitem.icon} ></i> {menuitem.text}
               </NavLink>)
             }
           })}
@@ -81,11 +81,11 @@ export class NavBar extends React.Component<MyProps, MyState> {
     if (this.props.account == undefined) {
 
       const menuitemsVisitor = [
-        { small: "R", large: "Register", path: "/register", icon: "" },
-        { small: "L", large: "Login", path: "/login", icon: "" },
-        { small: "R", large: "Resources", path: "/resources", icon: "" },
-        { small: "F", large: "Features", path: "/features", icon: "" },
-        { small: "P", large: "Products", path: "/products", icon: "" }
+        { text: "Register", path: "/register", icon: "" },
+        { text: "Login", path: "/login", icon: "" },
+        { text: "Resources", path: "/resources", icon: "" },
+        { text: "Features", path: "/features", icon: "" },
+        { text: "Products", path: "/products", icon: "" }
       ]
 
       return (
@@ -112,14 +112,14 @@ export class NavBar extends React.Component<MyProps, MyState> {
           </NavLink>
 
           {menuitemsVisitor.map((menuitem, i, arr) => {
-            if (this.props.size == "small") {
+            if (size == "small") {
               return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
                 <i className={"fa fa-" + menuitem.icon} ></i>
               </NavLink>)
             } else {
               return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
                 <i className={"fa fa-" + menuitem.icon} ></i>
-                {menuitem.large}
+                {menuitem.text}
               </NavLink>)
             }
           })}

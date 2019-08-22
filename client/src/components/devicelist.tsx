@@ -22,6 +22,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
     state = {
         sort: undefined,
+        search: undefined,
         filter: "",
         states: [],
         statesraw: [],
@@ -33,10 +34,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         super(props);
     }
 
-    // listener callback
-    stateUpdater = (states: CorePacket[]) => {
-        this.applySortFilter(states);
-    }
+
 
     componentDidMount = () => {
         console.log("did mount")
@@ -67,11 +65,26 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         api.removeListener("states", this.stateUpdater);
     }
 
-    applySortFilter(states: CorePacket[]) {
+    // listener callback
+    stateUpdater = (states: CorePacket[]) => {
+        this.applySortFilter(states);
+    }
+
+    applySortFilter = (states: CorePacket[]) => {
         // todo finish
         // this applies the sorts and the search filter to states
         // get clean copy
 
+        // transfer select state
+        for (var dev of this.state.states) {
+            for (var dev2 of states) {
+                if (dev2.key == dev.key) {
+                    if (dev.selected) { dev2.selected = dev.selected }
+                }
+            }
+        }
+
+        // show current username devices
         var tempstates = _.clone(states);
         if (this.props.username) {
             tempstates = _.filter(tempstates, (dev) => {
@@ -80,6 +93,77 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             })
         }
 
+        // apply sorts
+        if (this.state.sort) {
+            if (this.state.sort.selected == "up") {
+                tempstates = _.sortBy(tempstates, (d) => {
+                    if (d.selected == undefined) { return false } else { return d.selected }
+                }).reverse()
+            }
+
+            if (this.state.sort.selected == "down") {
+                tempstates = _.sortBy(tempstates, (d) => {
+                    if (d.selected == undefined) { return false } else { return d.selected }
+                })
+            }
+
+            if (this.state.sort.id == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.id })
+            }
+
+            if (this.state.sort.id == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.id }).reverse()
+            }
+
+            if (this.state.sort.lastseen == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d["_last_seen"] }).reverse()
+            }
+
+            if (this.state.sort.lastseen == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d["_last_seen"] })
+            }
+
+            if (this.state.sort.alarm == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.alarm })
+            }
+
+            if (this.state.sort.alarm == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.alarm }).reverse()
+            }
+
+            if (this.state.sort.warning == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.warning })
+            }
+
+            if (this.state.sort.warning == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.warning }).reverse()
+            }
+
+            if (this.state.sort.shared == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.shared })
+            }
+
+            if (this.state.sort.shared == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.shared }).reverse()
+            }
+
+            if (this.state.sort.public == "up") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.public })
+            }
+
+            if (this.state.sort.public == "down") {
+                tempstates = _.sortBy(tempstates, (d) => { return d.public }).reverse()
+            }
+        }
+
+        // apply search
+        if (this.state.search) {
+            if (this.state.search != "") {
+                tempstates = _.filter(tempstates, (dev) => {
+                    if (dev.id.toLowerCase().indexOf(this.state.search) >= 0) { return true } else return false;
+                })
+            }
+        }
         // var states: CorePacket[] = _.filter(_.clone(api.data.states), (dev: CorePacket) => {
         //     if (dev.id.indexOf("") >= 0) { return true } else return false
         // })
@@ -88,8 +172,36 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
     onMenu = (data) => {
         console.log(data);
+
         if (data.sort) {
-            this.applySortFilter(data.sort)
+            this.setState({ sort: data.sort }, () => {
+                this.applySortFilter(_.clone(api.data.states));
+            })
+        }
+
+        if (data.search != undefined) {
+            this.setState({ search: data.search.trim() }, () => {
+                this.applySortFilter(_.clone(api.data.states));
+            })
+        }
+    }
+
+    handleAction = (device) => {
+        return (action) => {
+            console.log("------")
+            console.log(device);
+            console.log(action);
+            if (action.select != undefined) {
+                var states = _.clone(this.state.states)
+                for (var dev in states) {
+                    if (states[dev].key == device.key) {
+                        console.log("setting")
+                        console.log(action.select)
+                        states[dev].selected = action.select;
+                    }
+                }
+                this.setState({ states })
+            }
         }
     }
 
@@ -113,7 +225,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                         {this.state.states.map(
                             (value: CorePacket, index, array) => {
                                 return (
-                                    <DeviceListItem device={value} key={index} />
+                                    <DeviceListItem device={value} key={index} action={this.handleAction(value)} />
                                 )
                             }
                         )}

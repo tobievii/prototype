@@ -6,9 +6,10 @@ import { Menu, Button, Box } from "grommet"
 import { User, CorePacket, } from "../../../server/core/interfaces";
 import { blendrgba } from "../../../server/utils/utils"
 
-import { prototypeTheme, theme } from "../theme"
+import { prototypeTheme, theme, colors } from "../theme"
 
 import { SortButton } from "./sortbutton"
+import * as moment from "moment"
 
 interface MyProps {
     account: User;
@@ -20,7 +21,8 @@ interface MyState {
 }
 
 interface DeviceProps {
-    device: CorePacket
+    device: CorePacket,
+    action: Function
 }
 
 
@@ -75,13 +77,47 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
     render() {
         return (
             <div className="device" style={this.calcStyle()}>
-                <div style={theme.global.devicelist.columns}>[]</div>
+                <div style={theme.global.devicelist.columns} >
+                    {(this.props.device.selected)
+                        ? <i
+                            onClick={(e) => this.props.action({ select: false })}
+                            style={{ color: colors.checkmark }} className="fas fa-check" />
+                        : <i
+                            onClick={(e) => this.props.action({ select: true })}
+                            style={{ opacity: colors.transparent }} className="fas fa-square" />}
+                </div>
                 <div style={{ flex: 1 }}>{this.props.device.id}</div>
-                <div style={theme.global.devicelist.timecolumn}>time</div>
-                <div style={theme.global.devicelist.columns}><i className="fas fa-bullhorn" /></div>
-                <div style={theme.global.devicelist.columns}><i className="fas fa-exclamation-triangle" /></div>
-                <div style={theme.global.devicelist.columns}><i className="fas fa-share-alt" /></div>
-                <div style={theme.global.devicelist.columns}><i className="fas fa-globe-africa" /></div>
+
+                <div style={theme.global.devicelist.timecolumn}>
+                    {moment(this.props.device["_last_seen"]).fromNow()}
+                </div>
+
+                <div style={theme.global.devicelist.columns}>
+                    {(this.props.device.alarm)
+                        ? <i style={{ color: colors.alarm }} className="fas fa-bullhorn" />
+                        : <i style={{ opacity: colors.transparent }} className="fas fa-bullhorn" />
+                    }
+
+                </div>
+
+                <div style={theme.global.devicelist.columns}>
+                    {(this.props.device.warning)
+                        ? <i style={{ color: colors.warning }} className="fas fa-exclamation-triangle" />
+                        : <i style={{ opacity: colors.transparent }} className="fas fa-exclamation-triangle" />}
+                </div>
+
+                <div style={theme.global.devicelist.columns}>
+                    {(this.props.device.shared)
+                        ? <i style={{ color: colors.share }} className="fas fa-share-alt" />
+                        : <i style={{ opacity: colors.transparent }} className="fas fa-share-alt" />}
+
+                </div>
+
+                <div style={theme.global.devicelist.columns}>
+                    {(this.props.device.public)
+                        ? <i style={{ color: colors.public }} className="fas fa-globe-africa" />
+                        : <i style={{ opacity: colors.transparent }} className="fas fa-globe-africa" />}
+                </div>
             </div>
         )
     }

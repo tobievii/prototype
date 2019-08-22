@@ -160,7 +160,7 @@ export default class App extends React.Component {
           //boxSizing: "border-box",
           //overflow: "hidden"
         }}>
-          <div style={{ flex: "0 1 auto" }}><NavBar account={this.state.account} size="small" /></div>
+          <div style={{ flex: "0 1 auto" }}><NavBar account={this.state.account} /></div>
 
           <div style={{
             flex: "1 1 auto",
@@ -179,6 +179,7 @@ export default class App extends React.Component {
       return (
         <div>
           <BGgrad />
+          <NavBar account={this.state.account} />
           <Home history={props.history} getaccount={this.getaccount} />
         </div>);
     }
@@ -186,7 +187,7 @@ export default class App extends React.Component {
 
   userView = (props) => {
     return <div>
-      <NavBar account={this.state.account} size="small" />
+      <NavBar account={this.state.account} />
       <DeviceList username={props.match.params.username} />
       {JSON.stringify(props.match)}
 

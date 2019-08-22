@@ -89,8 +89,16 @@ export class Core extends EventEmitter {
     }
     // end register
 
-    account(options: any, cb?: any) {
-
+    account(options: any, cb?: (err: Error, result?: any) => void) {
+        console.log("account change")
+        console.log(options);
+        if ((options.user) && (options.change)) {
+            this.db.users.update({ apikey: options.user.apikey },
+                { "$set": options.change }, (err, result) => {
+                    if (err) { if (cb) cb(err); }
+                    if (result) { if (cb) cb(undefined, result); }
+                })
+        }
     }
     // end account
 
@@ -218,6 +226,8 @@ export class Core extends EventEmitter {
 
                 // timestamp it.
                 state["_last_seen"] = new Date();
+
+                packet.id = packet.id.toLowerCase();
                 packet.key = state.key;
                 packet.apikey = user.apikey;
                 packet.publickey = user.publickey

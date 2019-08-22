@@ -4,7 +4,7 @@ export const prototypeTheme = {
     padding: "10px"
 }
 
-const colors = {
+export const colors = {
     spotA: "rgb(242, 53, 58)", // main colour
     spotB: "#0a203b", //gradientBot
     spotC: "#09111a", //gradientTop
@@ -12,7 +12,13 @@ const colors = {
     spotE: "#fff",
     spotF: "#17232b", //panelbg
     panels: "#131E27",
-    good: "#148344"
+    good: "#119752",    //green buttons
+    public: "#1fb6d1", //blue planet
+    share: "#18d66d", // green share
+    warning: "#ecb81f",
+    alarm: "#d9283a",
+    checkmark: "#16d271",   //green
+    transparent: 0.15
 }
 
 // DEFINE COLOURS HERE:
@@ -79,8 +85,9 @@ export const theme: any = {
                 textAlign: "center",
             },
             timecolumn: {
-                width: "100px",
-                textAlign: "center",
+                flex: 1,
+                textAlign: "right",
+                paddingRight: "20px"
             }
         },
         titlebars: {

@@ -41,7 +41,8 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
             warning: 'none',
             shared: 'none',
             public: 'none'
-        }
+        },
+        search: ""
     }
 
     constructor(props) {
@@ -65,6 +66,11 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
             console.log("sort " + prop + " by " + direction)
             this.setState({ sort }, () => { this.props.onMenu({ sort }) })
         }
+    }
+
+    onSearchBoxChange = (event) => {
+        var search = event.target.value.toLowerCase();
+        this.setState({ search }, () => { this.props.onMenu({ search }) })
     }
 
     render() {
@@ -103,11 +109,19 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                             <i className="fas fa-search" style={{ opacity: 0.5 }} ></i>
                         </div>
 
-                        <div style={{ flex: "1" }}>
-                            <input placeholder="search" style={{ width: "100%" }} />
+                        <div style={{ flex: "5" }}>
+                            <input
+                                type="text"
+                                placeholder="search"
+                                style={{ width: "100%" }}
+                                onChange={this.onSearchBoxChange}
+                                value={this.state.search}
+                            />
                         </div>
 
-                        <div style={theme.global.devicelist.timecolumn}><SortButton onChangeSort={this.changeSort("lastseen")} value={this.state.sort.lastseen} /></div>
+                        <div style={theme.global.devicelist.timecolumn}>
+                            <div style={{}}><SortButton onChangeSort={this.changeSort("lastseen")} value={this.state.sort.lastseen} /></div>
+                        </div>
                         <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("alarm")} value={this.state.sort.alarm} /></div>
                         <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("warning")} value={this.state.sort.warning} /></div>
                         <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("shared")} value={this.state.sort.shared} /></div>
