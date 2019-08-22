@@ -198,25 +198,14 @@ export class Core extends EventEmitter {
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
 
-            //if (!cb) cb = () => { }
-
             // ERROR CHECK
-            if (!packet.id) { if (cb) cb({ error: "id parameter missing" }); return; }
-            if (typeof packet.id != "string") { if (cb) cb({ error: "id must be a string" }); return; }
-            if (packet.id == "") { if (cb) cb({ error: "id may not be empty" }); return; }
-            if (packet.id.indexOf(" ") != -1) { if (cb) cb({ "error": "id may not contain spaces" }); return; }
-            if (packet.id.match(/^[a-z0-9_]+$/i) == null) { if (cb) cb({ "error": "id may only contain a-z A-Z 0-9 and _" }); return; }
+            var check = this.checkValidCorePacket(packet)
+            if (check.passed == false) { return check.error }
 
             // gets this device's state from the db. 
             // todo: get all subscribed instances and perform workflows on the chain, then update db.
             this.state({ user, id: packet.id }, (err: any, statedb: any) => {
                 if (err) { if (cb) cb({ error: "db error" }); return; }
-
-                console.log("----------")
-                console.log(statedb);
-
-
-
 
                 var state: CorePacket | any = {};
                 if (statedb) {
@@ -401,6 +390,32 @@ export class Core extends EventEmitter {
         }
     }
     // -------------------------------
+
+    checkValidCorePacket(packet: any): { passed: boolean, error?: string } {
+        // if (!packet.id) { if (cb) cb({ error: "id parameter missing" }); return; }
+        // if (typeof packet.id != "string") { if (cb) cb({ error: "id must be a string" }); return; }
+        // if (packet.id == "") { if (cb) cb({ error: "id may not be empty" }); return; }
+        // if (packet.id.indexOf(" ") != -1) { if (cb) cb({ "error": "id may not contain spaces" }); return; }
+        // if (packet.id.match(/^[a-z0-9_]+$/i) == null) { if (cb) cb({ "error": "id may only contain a-z A-Z 0-9 and _" }); return; }
+
+        if (!packet.id) {
+            return { passed: false, error: "id parameter missing" }
+        }
+        if (typeof packet.id != "string") {
+            return { passed: false, error: "id must be a string" }
+        }
+        if (packet.id == "") {
+            return { passed: false, error: "id may not be empty" }
+        }
+        if (packet.id.indexOf(" ") != -1) {
+            return { passed: false, error: "id may not contain spaces" }
+        }
+        if (packet.id.match(/^[a-z0-9_]+$/i) == null) {
+            return { passed: false, error: "id may only contain a-z A-Z 0-9 and _" }
+        }
+
+        return { passed: true };
+    }
 }
 
 
