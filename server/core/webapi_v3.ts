@@ -109,4 +109,12 @@ export function webapiv3(app: Application, core: Core) {
             if (result) { res.json(result); }
         })
     })
+
+    // general search api for finding users/devices across the system
+    app.post("/api/v3/search", (req: any, res) => {
+        core.search({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
 }

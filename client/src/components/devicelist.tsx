@@ -37,14 +37,18 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
 
     componentDidMount = () => {
-        console.log("did mount")
-
         // initial load
+        console.log(this.props.username);
         if (this.props.username) {
+
+            api.subscribe({ username: this.props.username });
+
             api.states({ username: this.props.username }, (err, states: CorePacket[]) => {
                 if (err) console.log("devicelist 40 " + err);
                 if (states) {
-                    if (states.length > 0) api.subscribe({ publickey: states[0].publickey });
+                    console.log("======")
+                    console.log(states)
+                    //if (states.length > 0) api.subscribe({ publickey: states[0].publickey });
                     this.applySortFilter(states);
                 }
             })
@@ -171,7 +175,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     onMenu = (data) => {
-        console.log(data);
 
         if (data.sort) {
             this.setState({ sort: data.sort }, () => {
@@ -186,17 +189,13 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         }
     }
 
+    // handles clicks on devices in the list.. like for selecting/deselecting
     handleAction = (device) => {
         return (action) => {
-            console.log("------")
-            console.log(device);
-            console.log(action);
             if (action.select != undefined) {
                 var states = _.clone(this.state.states)
                 for (var dev in states) {
                     if (states[dev].key == device.key) {
-                        console.log("setting")
-                        console.log(action.select)
                         states[dev].selected = action.select;
                     }
                 }

@@ -63,7 +63,6 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
             //set this one
             sort[prop] = direction;
-            console.log("sort " + prop + " by " + direction)
             this.setState({ sort }, () => { this.props.onMenu({ sort }) })
         }
     }
@@ -77,20 +76,26 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
         return (
             <div>
                 <div style={theme.global.menubars}>
-                    <i className="fas fa-check-double"></i> SELECT ALL
+                    <div>
+                        <button style={{ background: "none" }}>
+                            <i className="fas fa-check-double"></i> SELECT ALL
+                        </button>
 
-                    <Menu
-                        label="Modify"
-                        items={[
-                            { label: 'Dashboard Preset', onClick: () => { } },
-                            { label: 'Script Preset', onClick: () => { } },
-                            { label: 'Share', onClick: () => { } },
-                            { label: 'Delete', onClick: () => { } }
-                        ]}
-                    />
 
-                    <button><i className="fas fa-trash"></i> REMOVE</button>
+                        <Menu
+                            label="Modify"
+                            items={[
+                                { label: 'Dashboard Preset', onClick: () => { } },
+                                { label: 'Script Preset', onClick: () => { } },
+                                { label: 'Share', onClick: () => { } },
+                                { label: 'Delete', onClick: () => { } }
+                            ]}
+                        />
+
+                        <button style={{ background: "none" }}><i className="fas fa-trash"></i> REMOVE</button>
+                    </div>
                 </div>
+
                 <div style={{
                     boxSizing: "border-box", background: theme.global.menubars.background, width: "100%", borderRight: "11px solid " + theme.global.menubars.background,
                     paddingBottom: "5px"
@@ -106,13 +111,13 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                         </div>
 
                         <div style={{ width: "80px", textAlign: "right", paddingTop: "7px", paddingRight: "7px" }}>
-                            <i className="fas fa-search" style={{ opacity: 0.5 }} ></i>
+                            <i className="fas fa-filter" style={{ opacity: 0.5 }} ></i>
                         </div>
 
                         <div style={{ flex: "5" }}>
                             <input
                                 type="text"
-                                placeholder="search"
+                                placeholder="filter"
                                 style={{ width: "100%" }}
                                 onChange={this.onSearchBoxChange}
                                 value={this.state.search}

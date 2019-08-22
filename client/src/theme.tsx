@@ -18,7 +18,8 @@ export const colors = {
     warning: "#ecb81f",
     alarm: "#d9283a",
     checkmark: "#16d271",   //green
-    transparent: 0.15
+    transparent: 0.15,
+    borders: "1px solid #2b4255"
 }
 
 // DEFINE COLOURS HERE:
@@ -67,10 +68,9 @@ export const theme: any = {
             float: "right",
             padding: paddings.default
         },
-        /////
-        sidebar: {
-            width: 400,
-            background: colors.panels
+        searchresults: {
+            background: colors.panels,
+            border: "1px solid"
         },
         //////
         devicelist: {

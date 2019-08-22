@@ -9,6 +9,8 @@ import { theme } from "../theme"
 
 import { api } from "../api"
 
+import { SearchBox } from "./searchbox"
+
 interface MyProps {
   account: User;
 }
@@ -42,6 +44,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
       return (
         <div style={theme.global.navbar}>
+
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left", padding: theme.paddings.default }}>
               <img
@@ -57,6 +60,8 @@ export class NavBar extends React.Component<MyProps, MyState> {
               </div>
             </div>
           </NavLink>
+
+          <SearchBox />
 
           {menuitemsLogged.map((menuitem, i, arr) => {
             if (size == "small") {

@@ -311,11 +311,31 @@ export class API extends events.EventEmitter {
     subscribe = (options) => {
         console.log("subscribing to")
         console.log(options);
+
+        if (options.username) {
+            this.search({ username: options.username }, (e, r) => {
+                console.log("rrrr")
+                console.log(r);
+                if (r) { this.socket.emit("publickey", r.publickey); }
+            })
+        }
+
         if (options.publickey) {
             this.socket.emit("publickey", options.publickey); // your api key            
         }
     }
 
+    search = (options, cb?: (err: Error, result?: any) => void) => {
+        request.post(this.uri + "/api/v3/search",
+            { headers: this.headers, json: options },
+            (err, res, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    if (body.error) { cb(body); return; }
+                    cb(null, body);
+                }
+            })
+    }
 }
 
 var apiinstance = new API()

@@ -233,6 +233,7 @@ export class Core extends EventEmitter {
                 packet.publickey = user.publickey
                 packet.username = user.username
                 packet.meta = {};
+                if (packet.public != undefined) packet.public = (packet.public == true);
                 var stateMerged = lodash.merge(state, packet)
 
                 this.db.packets.save(packet, (err: any, result: any) => {
@@ -251,6 +252,8 @@ export class Core extends EventEmitter {
     }
 
     view(options: any, cb: (error: { error: string } | undefined, result?: any) => void) {
+
+        console.log(options);
 
         // secure
         if (options.user) {
@@ -283,7 +286,6 @@ export class Core extends EventEmitter {
             this.user({ username }, (err, user) => {
                 if (err) cb({ error: "db error" });
                 if (user) {
-                    console.log("ANDSJKL")
                     this.db.states.find({ apikey: user.apikey, public: true }, (err: Error, result: any) => {
                         if (err) { cb({ error: "db error" }); return; }
                         cb(undefined, result);
@@ -315,6 +317,8 @@ export class Core extends EventEmitter {
         }
     }
 
+    // --------------------------------- 
+
     delete(options: any, cb: any) {
         if ((options.id) && (options.user)) {
             this.db.states.remove({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
@@ -323,6 +327,33 @@ export class Core extends EventEmitter {
             })
         }
     }
+
+    // --------------------------------- 
+
+    search(options: any, cb: (err: any, result?: any) => void) {
+        console.log(options)
+
+        var securityfilter = { username: 1, publickey: 1 }
+
+        if (options.request.searchtext) {
+            this.db.users.find({
+                $or: [{ 'username': { '$regex': options.request.searchtext } },
+                { 'email': options.request.searchtext }]
+            }, securityfilter, (err, result) => {
+                if (err) { cb({ error: "db error" }); return; }
+                if (result) { cb(undefined, result) }
+            })
+        }
+
+        if (options.request.username) {
+            this.db.users.findOne({ username: options.request.username }, securityfilter, (err, result) => {
+                if (err) { cb({ error: "db error" }); return; }
+                if (result) { cb(undefined, result) }
+            })
+        }
+    }
+
+    // --------------------------------- 
 }
 
 
