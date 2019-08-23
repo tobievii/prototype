@@ -19,8 +19,8 @@ export class FavoritesContainer extends React.Component {
   constructor(props) {
     super(props);
     this.data = Object.keys(themes)
-                      .filter(this.shouldIncludeTheme)
-                      .map(this.toThemeObject);
+      .filter(this.shouldIncludeTheme)
+      .map(this.toThemeObject);
   }
 
   private shouldIncludeTheme = (themeKey: ThemeKey): boolean => {
