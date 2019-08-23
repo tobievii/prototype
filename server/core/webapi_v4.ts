@@ -1,10 +1,10 @@
 import { Core } from "./core";
-import { Application } from "express"
+import * as express from "express"
 import * as _ from 'lodash'
 
 
 
-export function webapiv4(app: Application, core: Core) {
+export function webapiv4(app: express.Application, core: Core) {
 
 
 
@@ -29,7 +29,7 @@ export function webapiv4(app: Application, core: Core) {
     })
 
     app.get("/api/v4/account", (req: any, res) => {
-        if (!req.user) { res.json({ err: "user not authenticated" }); return; }
+        if (!req.user) { res.json({ err: 'Error: user not authenticated' }); return; }
         var cleanUser = _.clone(req.user);
         delete cleanUser.password;
         res.json(cleanUser);
@@ -37,9 +37,9 @@ export function webapiv4(app: Application, core: Core) {
 
     app.post("/api/v4/account", (req: any, res) => {
         // change account settings
-        var query = { change: req.body, user: req.user }
+        var query = { change: req.body, user: req.user, ip: req.socket.remoteAddress };
         core.account(query, (err, result) => {
-            if (err) { res.json(err); }
+            if (err) { res.json({ err: err.toString() }); }
             if (result) { res.json(result); }
         })
     })

@@ -91,9 +91,14 @@ export class Core extends EventEmitter {
     }
     // end register
 
-    account(options: any, cb?: (err: Error | undefined, result?: any) => void) {
-        console.log("account change")
-        console.log(options);
+    account(options: { user: User, change: any, ip?: string }, cb?: (err: Error | undefined, result?: any) => void) {
+
+        if (options.user == undefined) {
+            logger.log({ message: "BLOCKED! account api use without authentication!", data: { ip: options.ip }, level: "warn" })
+            if (cb) { cb(new Error("user not authenticated")) }
+            return;
+        }
+
         if ((options.user) && (options.change)) {
             this.db.users.update({ apikey: options.user.apikey },
                 { "$set": options.change }, (err: any, result: any) => {

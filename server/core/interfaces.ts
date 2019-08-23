@@ -35,6 +35,7 @@ export interface DBchange {
 }
 
 export interface User {
-    email?: string;
+    email: string;
     username: string;
+    apikey: string;
 }
