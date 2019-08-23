@@ -181,11 +181,12 @@ describe("PROTOTYPE", () => {
         new Prototype(testAccount).state(packet.id, (err: Error, response: any) => {
             if (err) done(err);
             if (response) {
+                console.log(response);
                 if (!response.key) { done(new Error("key missing from state")); return; }
                 if (!response.apikey) { done(new Error("apikey missing")); return; }
-                if (!response.devid) { done(new Error("devid missing")); return; }
-                if (!response.payload) { done(new Error("payload missing")); return; }
-                if (packet.data.random != response.payload.data.random) { done(new Error("date mismatch")); return; }
+                if (!response.id) { done(new Error("id missing")); return; }
+                if (!response.data) { done(new Error("payload missing")); return; }
+                if (packet.data.random != response.data.random) { done(new Error("date mismatch")); return; }
                 done();
             }
         })

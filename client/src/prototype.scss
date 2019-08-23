@@ -6,6 +6,10 @@ $spotD: #0d243d; //background
 $spotE: #fff;
 $spotF: #17232b;
 $gray: #888888;
+$panelBg: rgba(3, 4, 5, 0.5);
+$spot: #f3353a;
+$borders: rgb(34, 39, 44);
+$backgroundPanels: rgba(3, 4, 5, 0.5);
 
 @font-face {
   font-family: "Share Tech Mono";
@@ -221,3 +225,45 @@ a:hover {
 }
 
 
+
+
+//// DATA VIEW
+
+.dataView {
+  background: $panelBg;
+  margin: 0;
+  font-size: 14px;
+  //padding: 7px 7px 7px 15px;
+  padding: 1px 1px 1px 10px;
+  cursor: grab;
+  min-height: 15px;
+  border: 1px transparent solid;
+  box-sizing: border-box;
+  //box-sizing: content-box;
+  width: 100%;
+  transition: all 0.1s;
+  //overflow: hidden;
+}
+
+
+.dataView:hover {
+  background: lighten($panelBg, 5%);
+  border: 1px lighten($borders, 10%) solid;
+}
+
+.dataViewName {
+  color: lighten($panelBg, 75%);
+  overflow: hidden;
+}
+
+.dataView:hover .dataViewName {
+  //background: lighten($panelBg, 20%)
+  color: lighten($panelBg, 95%);
+}
+
+.dataViewValue {
+
+  overflow: hidden;
+  padding: 5px;
+
+}

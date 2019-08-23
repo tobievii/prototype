@@ -10,6 +10,8 @@ import { DeviceListItem } from "./devicelistitem"
 import { DeviceListMenu, MenuSort } from "./devicelistmenu"
 import * as _ from "lodash"
 
+import { logger } from "../../../server/core/log"
+
 interface MyProps {
     username?: string;
 }
@@ -32,12 +34,18 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     componentDidMount = () => {
+        logger.log({ message: "loading devicelist", data: this.props, level: "verbose" })
         if (this.props.username) {
             api.subscribe({ username: this.props.username });
 
             api.states({ username: this.props.username }, (err, states: CorePacket[]) => {
+                console.log("=========")
+                console.log(states)
                 if (err) console.error(err);
-                if (states) { this.applySortFilter(states); }
+                if (states) {
+                    logger.log({ message: "states return", data: { states }, level: "verbose" })
+                    this.applySortFilter(states);
+                }
             })
 
         } else {

@@ -36,7 +36,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
       const menuitemsLogged = [
         { text: "Notifications", path: "/notifications", icon: "bell" },
         { text: "Settings", path: "/settings", icon: "cog" },
-        { text: "Account", path: "/account", icon: "user-circle" }
+        { text: this.props.account.username, path: "/account", icon: "user-circle" }
       ]
 
       return (

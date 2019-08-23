@@ -11,6 +11,7 @@ import { api } from "./api";
 import { DeviceList } from "./components/devicelist"
 import { theme } from "./theme"
 import { SideBar } from "./components/sidebar"
+import { DeviceView } from "./components/deviceview";
 
 const BGgrad = (props) => (
   <header className="site-banner banner banner--shape banner--homepage">
@@ -162,7 +163,7 @@ export default class App extends React.Component {
   deviceView = (props) => {
     return <div>
       <NavBar account={this.state.account} />
-
+      <DeviceView username={props.match.params.username} id={props.match.params.id} />
       {JSON.stringify(props.match)}
     </div>
   }

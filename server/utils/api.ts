@@ -102,7 +102,7 @@ export class Prototype extends EventEmitter {
     */
 
     register(options: { email: string, pass: string }, cb: (err: any, result?: any) => void) {
-        request.post(this.uri + "/api/v3/admin/register", { json: { email: options.email, pass: options.pass } }, (err: Error, res: any, body: any) => {
+        request.post(this.uri + "/api/v4/admin/register", { json: { email: options.email, pass: options.pass } }, (err: Error, res: any, body: any) => {
             if (err) cb(err);
             if (body) {
                 if (body.error) { cb(new Error(body.error)); return; }
@@ -125,7 +125,7 @@ export class Prototype extends EventEmitter {
 
     // gets our latest account details
     account(cb: Function) {
-        request.get(this.uri + "/api/v3/account",
+        request.get(this.uri + "/api/v4/account",
             { headers: this.headers, json: true },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -146,7 +146,7 @@ export class Prototype extends EventEmitter {
     }
 
     version(cb: Function) {
-        request.get(this.uri + "/api/v3/version", { json: true }, (err: Error, res: any, body: any) => {
+        request.get(this.uri + "/api/v4/version", { json: true }, (err: Error, res: any, body: any) => {
             if (err) cb(err);
             if (body) {
                 cb(null, body);
@@ -157,7 +157,7 @@ export class Prototype extends EventEmitter {
     post(packet: Packet, cb?: (err?: Error | null, result?: any) => void) {
 
         if ((this.protocol == "http") || (this.protocol == "https")) {
-            request.post(this.uri + "/api/v3/data/post", { headers: this.headers, json: packet }, (err: Error, res: any, body: any) => {
+            request.post(this.uri + "/api/v4/data/post", { headers: this.headers, json: packet }, (err: Error, res: any, body: any) => {
                 if (err) if (cb) cb(err);
                 if (body) {
                     if (body.result == "success") {
@@ -196,7 +196,7 @@ export class Prototype extends EventEmitter {
 
     // view state of a device by id
     view(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/view",
+        request.post(this.uri + "/api/v4/view",
             { headers: this.headers, json: { id } },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -210,7 +210,7 @@ export class Prototype extends EventEmitter {
         retrieve device packet history
     */
     packets(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/packets",
+        request.post(this.uri + "/api/v4/packets",
             { headers: this.headers, json: { id } },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -225,7 +225,7 @@ export class Prototype extends EventEmitter {
     */
 
     state(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/state",
+        request.post(this.uri + "/api/v4/state",
             { headers: this.headers, json: { id } },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -240,7 +240,7 @@ export class Prototype extends EventEmitter {
     */
 
     states(cb: Function) {
-        request.get(this.uri + "/api/v3/states",
+        request.get(this.uri + "/api/v4/states",
             { headers: this.headers, json: true },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -254,7 +254,7 @@ export class Prototype extends EventEmitter {
         deletes a device/state. Device history is not deleted.
     */
     delete(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/state/delete",
+        request.post(this.uri + "/api/v4/state/delete",
             { headers: this.headers, json: { id } },
             (err: Error, res: any, body: any) => {
                 if (err) cb(err);
@@ -405,7 +405,7 @@ Device sharing
  */
     shareDevice(id: any, cb: Function) {
         this.state(id, (err: any, device: any) => {
-            request.post(this.uri + "/api/v3/setprivateorpublic", { json: { public: true, devid: device.key } }, (err, res, body) => {
+            request.post(this.uri + "/api/v4/setprivateorpublic", { json: { public: true, devid: device.key } }, (err, res, body) => {
                 if (err) cb(err);
                 else if (body) {
                     if (body.nModified == 1) {
@@ -420,7 +420,7 @@ Device sharing
 
     unshareDevice(id: any, cb: Function) {
         this.state(id, (err: any, device: any) => {
-            request.post(this.uri + "/api/v3/setprivateorpublic", { json: { public: false, devid: device.key } }, (err, res, body) => {
+            request.post(this.uri + "/api/v4/setprivateorpublic", { json: { public: false, devid: device.key } }, (err, res, body) => {
                 if (err) cb(err);
                 else if (body) {
                     if (body.nModified == 1) {
@@ -438,7 +438,7 @@ Device sharing
 Device workflow code
 */
     assignDevWorkflow(code: any, id: any, cb: Function) {
-        request.post(this.uri + "/api/v3/workflow", { headers: this.headers, json: { code, id } }, (err, res, body) => {
+        request.post(this.uri + "/api/v4/workflow", { headers: this.headers, json: { code, id } }, (err, res, body) => {
             if (err) cb(err);
             else if (body) {
                 if (body.result == "success") {
@@ -457,7 +457,7 @@ Device Dashboard
 */
     assignDevDasboard(id: any, layout: any, cb: Function) {
         this.state(id, (err: any, device: any) => {
-            request.post(this.uri + "/api/v3/dashboard", { json: { key: device.key, layout } }, (err, res, body) => {
+            request.post(this.uri + "/api/v4/dashboard", { json: { key: device.key, layout } }, (err, res, body) => {
                 if (err) cb(err);
                 else if (body) {
                     if (body.nModified == 1) {
@@ -476,7 +476,7 @@ CLEAR DEVICE DATA & WORKFLOW
 */
     //CLEAR DEVICE DATA
     clearDeviceData(id: any, cb: Function) {
-        request.post(this.uri + "/api/v3/state/clear", { headers: this.headers, json: { id: id } }, (err, res, body) => {
+        request.post(this.uri + "/api/v4/state/clear", { headers: this.headers, json: { id: id } }, (err, res, body) => {
             if (err) cb(err);
             else if (body) {
                 if (body.nModified == 1) {
@@ -493,7 +493,7 @@ CLEAR DEVICE DATA & WORKFLOW
         this.state(id, (err: any, device: any) => {
             var devices = []
             devices.push(device)
-            request.post(this.uri + "/api/v3/state/clear", { headers: this.headers, json: { id: devices, type: "multi", clearhistory: true } }, (err, res, body) => {
+            request.post(this.uri + "/api/v4/state/clear", { headers: this.headers, json: { id: devices, type: "multi", clearhistory: true } }, (err, res, body) => {
                 if (err) cb(err);
                 else if (body) {
                     if (body.ok == 1) {

@@ -13,6 +13,7 @@ import { Http2SecureServer } from "http2";
 import * as http from "http";
 import * as https from "https";
 import { CorePacket } from "./interfaces";
+import * as _ from "lodash";
 
 export class SocketServer extends EventEmitter {
     server: http.Server | https.Server;
@@ -65,21 +66,25 @@ export class SocketServer extends EventEmitter {
 
         this.on("states", (states: CorePacket) => {
             if ((states.apikey) && (states.id)) {
-                this.io.to(states.apikey).emit("states", states)
-                this.io.to(states.apikey + "|" + states.id).emit("states", states)
+                let cleanStates = _.clone(states);
+                delete cleanStates["apikey"]
+                this.io.to(states.apikey).emit("states", cleanStates)
+                this.io.to(states.apikey + "|" + states.id).emit("states", cleanStates)
 
                 //public?
                 if (states.public) {
-                    this.io.to(states.publickey).emit("publickey", states);
-                    this.io.to(states.publickey + "|" + states.id).emit("publickey", states)
+                    this.io.to(states.publickey).emit("publickey", cleanStates);
+                    this.io.to(states.publickey + "|" + states.id).emit("publickey", cleanStates)
                 }
             }
         })
 
         this.on("users", (user: CorePacket) => {
             if (user.apikey) {
-                this.io.to(user.apikey).emit("users", user)
-                this.io.to(user.apikey + "|" + user.id).emit("users", user)
+                let cleanUser = _.clone(user);
+                delete cleanUser["password"]
+                this.io.to(user.apikey).emit("users", cleanUser)
+                this.io.to(user.apikey + "|" + user.id).emit("users", cleanUser)
             }
         })
 

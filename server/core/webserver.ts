@@ -16,6 +16,7 @@ import { logger } from "./log"
 import { Core } from "./core"
 
 import { webapiv3 } from "./webapi_v3"
+import { webapiv4 } from "./webapi_v4"
 import { threadId } from 'worker_threads';
 import { LogEvent } from './interfaces';
 
@@ -75,6 +76,7 @@ export class Webserver extends EventEmitter {
         this.app.use(express.static('../client/dist'))
 
         webapiv3(this.app, this.core);
+        webapiv4(this.app, this.core);
 
         var reactHtml = "";
 

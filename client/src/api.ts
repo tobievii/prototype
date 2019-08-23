@@ -25,7 +25,7 @@ export class API extends events.EventEmitter {
     }
 
     register(options: { email: string, pass: string }, cb: (err, result?) => void) {
-        request.post(this.uri + "/api/v3/admin/register",
+        request.post(this.uri + "/api/v4/admin/register",
             { json: { email: options.email, pass: options.pass } },
             (err, res, body: any) => {
                 if (err) cb(err);
@@ -62,7 +62,7 @@ export class API extends events.EventEmitter {
         }
 
         if (opt) {
-            request.post(this.uri + "/api/v3/account",
+            request.post(this.uri + "/api/v4/account",
                 { json: opt },
                 (err, res, body: any) => {
                     if (err) if (callback) callback(err);
@@ -78,7 +78,7 @@ export class API extends events.EventEmitter {
                 }
             )
         } else {
-            request.get(this.uri + "/api/v3/account",
+            request.get(this.uri + "/api/v4/account",
                 { headers: this.headers, json: true },
                 (err, res, body: any) => {
                     if (err) if (callback) callback(err);
@@ -180,7 +180,7 @@ export class API extends events.EventEmitter {
     }
 
     version(cb: Function) {
-        request.get(this.uri + "/api/v3/version", { json: true }, (err, res, body) => {
+        request.get(this.uri + "/api/v4/version", { json: true }, (err, res, body) => {
             if (err) cb(err);
             if (body) {
                 cb(null, body);
@@ -189,7 +189,7 @@ export class API extends events.EventEmitter {
     }
 
     post(packet: CorePacket, cb?: (err, result?) => void) {
-        request.post(this.uri + "/api/v3/data/post", { headers: this.headers, json: packet },
+        request.post(this.uri + "/api/v4/data/post", { headers: this.headers, json: packet },
             (err, res, body: any) => {
                 if (err) if (cb) cb(err);
                 if (body) {
@@ -204,7 +204,7 @@ export class API extends events.EventEmitter {
 
     // view state of a device by id
     view(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/view",
+        request.post(this.uri + "/api/v4/view",
             { headers: this.headers, json: { id } },
             (err, res, body) => {
                 if (err) cb(err);
@@ -218,7 +218,7 @@ export class API extends events.EventEmitter {
         retrieve device packet history
     */
     packets(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/packets",
+        request.post(this.uri + "/api/v4/packets",
             { headers: this.headers, json: { id } },
             (err, res, body) => {
                 if (err) cb(err);
@@ -232,15 +232,33 @@ export class API extends events.EventEmitter {
         retrieve a single device state in detail.
     */
 
-    state(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/state",
-            { headers: this.headers, json: { id } },
-            (err, res, body) => {
-                if (err) cb(err);
-                if (body) {
-                    cb(null, body);
-                }
-            })
+    state(a: string | object, cb: (err: Error, state?: CorePacket) => void) {
+
+        if (typeof a == "object") {
+            request.post(this.uri + "/api/v4/state",
+                { headers: this.headers, json: a },
+                (err, res, body: CorePacket) => {
+                    if (err) cb(err);
+                    if (body) {
+                        console.log(body);
+                        cb(null, body);
+                    }
+                })
+        }
+
+        if (typeof a == "string") {
+            let id = a;
+            request.post(this.uri + "/api/v4/state",
+                { headers: this.headers, json: { id } },
+                (err, res, body: CorePacket) => {
+                    if (err) cb(err);
+                    if (body) {
+                        cb(null, body);
+                    }
+                })
+        }
+
+
     }
 
     /*
@@ -248,14 +266,14 @@ export class API extends events.EventEmitter {
     */
 
     states = (options?, cb?: (err, states?: object) => void) => {
-
+        logger.log({ message: "api states", data: { options }, level: "verbose" })
         var callback;
         var opt;
         if (cb) {
             //options - POST
             callback = cb;
             console.log(options);
-            request.post(this.uri + "/api/v3/states", { json: options }, (err, res, body) => {
+            request.post(this.uri + "/api/v4/states", { json: options }, (err, res, body) => {
                 console.log(body);
                 if (err) callback(err);
                 if (body) {
@@ -268,7 +286,7 @@ export class API extends events.EventEmitter {
             // no options - GET
             callback = options;
 
-            request.get(this.uri + "/api/v3/states",
+            request.get(this.uri + "/api/v4/states",
                 { json: true },
                 (err, res, body: any) => {
                     if (err) callback(err);
@@ -286,7 +304,7 @@ export class API extends events.EventEmitter {
         deletes a device/state. Device history is not deleted.
     */
     delete(id: string, cb: Function) {
-        request.post(this.uri + "/api/v3/state/delete",
+        request.post(this.uri + "/api/v4/state/delete",
             { json: { id } },
             (err, res, body: any) => {
                 if (err) cb(err);
@@ -314,9 +332,11 @@ export class API extends events.EventEmitter {
 
         if (options.username) {
             this.search({ username: options.username }, (e, r) => {
-                console.log("rrrr")
-                console.log(r);
-                if (r) { this.socket.emit("publickey", r.publickey); }
+                if (r) {
+                    let publickey = r.publickey
+                    logger.log({ message: "joining publickey", data: { publickey }, level: "verbose" })
+                    this.socket.emit("publickey", r.publickey);
+                }
             })
         }
 
@@ -326,7 +346,7 @@ export class API extends events.EventEmitter {
     }
 
     search = (options, cb?: (err: Error, result?: any) => void) => {
-        request.post(this.uri + "/api/v3/search",
+        request.post(this.uri + "/api/v4/search",
             { headers: this.headers, json: options },
             (err, res, body: any) => {
                 if (err) cb(err);
