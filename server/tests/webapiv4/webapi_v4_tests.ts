@@ -43,7 +43,7 @@ export function webapi_v4() {
         })
 
         it("should not allow changing of account data maliciously", function (done) {
-            request.post(config.uri + "/api/v4/account", { json: { change: { a: 1 } } }, (err, res, body) => {
+            request.post(config.uri + "/api/v4/account", { json: { change: { testsuite: "ignore" } } }, (err, res, body) => {
                 if (err) done(err);
                 if (body) {
                     // should only respond with {err:'Error: user not authenticated'} 

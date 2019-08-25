@@ -23,6 +23,7 @@ export interface CorePacket {
     shared?: boolean;
     public?: boolean;
     workflowCode?: string;
+    key?: string; // todo: is this secret?
     [index: string]: any;
 }
 
@@ -38,4 +39,5 @@ export interface User {
     email: string;
     username: string;
     apikey: string;
+    publickey: string;
 }

@@ -27,6 +27,7 @@ export class Core extends EventEmitter {
     }
 
     register(options: { email: string, pass: string, username?: string, ip?: string, userAgent?: string }, cb?: (err: Error | undefined, result?: any) => void) {
+        logger.log({ message: "core.register", data: options, level: "verbose" });
 
         //lowercase email
         if (options.email) { options.email = options.email.toLowerCase() }
@@ -92,9 +93,10 @@ export class Core extends EventEmitter {
     // end register
 
     account(options: { user: User, change: any, ip?: string }, cb?: (err: Error | undefined, result?: any) => void) {
+        logger.log({ message: "core.account", data: options, level: "verbose" });
 
         if (options.user == undefined) {
-            logger.log({ message: "BLOCKED! account api use without authentication!", data: { ip: options.ip }, level: "warn" })
+            logger.log({ message: "BLOCKED! account api use without authentication!", data: { ip: options.ip, change: options.change }, level: "warn" })
             if (cb) { cb(new Error("user not authenticated")) }
             return;
         }
@@ -111,7 +113,7 @@ export class Core extends EventEmitter {
 
     // everything to do with finding a user
     user(options: { username?: string, uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
-
+        logger.log({ message: "core.user", data: options, level: "verbose" });
 
         // force lowercase on users
         if (options.email) { options.email = options.email.toLowerCase() }
@@ -198,7 +200,14 @@ export class Core extends EventEmitter {
     }
     // end user
 
-    datapost(options: { user: any, packet: any }, cb: (err: any, result?: any) => void) {
+    datapost(options: { user: User, packet: CorePacket }, cb: (err: any, result?: any) => void) {
+        logger.log({ message: "core.datapost", data: options, level: "verbose" });
+
+        if (options.packet == undefined) { cb(new Error("missing packet")) }
+        if (options.packet.id == undefined) { cb(new Error("missing id")) }
+
+        options.packet.id = options.packet.id.toLowerCase();
+
         //device / user?
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
@@ -261,6 +270,8 @@ export class Core extends EventEmitter {
     // ---------------------------------------
 
     view(options: any, cb: (error: { error: string } | undefined, result?: CorePacket | CorePacket[]) => void) {
+        logger.log({ message: "core.view", data: options, level: "verbose" });
+
         // var logopt = _.clone(options);
         // delete logopt.user;
         // logger.log({ message: "core view", data: logopt, level: "verbose" })
@@ -325,6 +336,8 @@ export class Core extends EventEmitter {
 
     // returns device packets (history);
     packets(options: any, cb: any) {
+        logger.log({ message: "core.packets", data: options, level: "verbose" });
+
         if ((options.id) && (options.user)) {
             this.db.packets.find({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }) }
@@ -336,6 +349,8 @@ export class Core extends EventEmitter {
 
     // returns device state    
     state(options: any, cb: any) {
+        logger.log({ message: "core.state", data: options, level: "verbose" });
+
         if ((options.id) && (options.user)) {
             this.db.states.findOne({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }) }
@@ -347,6 +362,8 @@ export class Core extends EventEmitter {
     // --------------------------------- 
 
     delete(options: any, cb: any) {
+        logger.log({ message: "core.delete", data: options, level: "verbose" });
+
         if ((options.id) && (options.user)) {
             this.db.states.remove({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }); }
@@ -358,6 +375,8 @@ export class Core extends EventEmitter {
     // --------------------------------- 
 
     search(options: any, cb: (err: any, result?: User | User[]) => void) {
+        logger.log({ message: "core.search", data: options, level: "verbose" });
+
         var securityfilter = { username: 1, publickey: 1 }
         if (options.request.searchtext) {
             if (options.request.searchtext.trim() == "") { cb(undefined, []); return; }
@@ -381,6 +400,7 @@ export class Core extends EventEmitter {
     // --------------------------------- 
 
     workflow(options: { packet: CorePacket, state: CorePacket }, cb: (err: Error | undefined, result?: CorePacket) => void) {
+        logger.log({ message: "core.workflow", data: options, level: "verbose" });
 
         var packet = options.packet;
         var state = options.state;
@@ -402,7 +422,39 @@ export class Core extends EventEmitter {
             cb(undefined, packet);
         }
     }
+
     // -------------------------------
+
+    // manage access to a single device
+
+    access(options: { remove?: boolean, devicekey: string, userkey: string, user: User }, cb?: (err: Error | undefined, result?: any) => void) {
+        logger.log({ message: "core.access", data: options, level: "verbose" });
+
+        if (!options.devicekey) { cb(new Error("missing devicekey")) }
+        if (!options.userkey) { cb(new Error("missing userkey")) }
+
+        var query: any = {};
+        if (!options.remove)
+            query["$addToSet"] = { access: options.userkey }
+        else
+            query["$pull"] = { access: options.userkey }
+
+        this.db.states.update(
+            { key: options.devicekey },
+            query,
+            (err: Error, result: any) => {
+                if (err) {
+                    if (cb) { cb(err); } else { console.error(err); }
+                }
+                if (result) {
+                    if (cb) { cb(undefined, result) } else { console.log(result) }
+                }
+            })
+    }
+
+    // add core functions here
+
+    // HELPER FUNCTIONS: -------------------------------
 
     checkValidCorePacket(packet: any): { passed: boolean, error?: string } {
 
@@ -424,6 +476,10 @@ export class Core extends EventEmitter {
 
         return { passed: true };
     }
+
+    // -------------------------------
+
+    // add helper functions here
 }
 
 

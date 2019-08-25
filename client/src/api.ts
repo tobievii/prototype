@@ -303,19 +303,31 @@ export class API extends events.EventEmitter {
     /*
         deletes a device/state. Device history is not deleted.
     */
-    delete(id: string, cb: Function) {
+    delete(options: { id?: string }, cb?: Function) {
+
+        if (typeof options != "object") {
+            let err = new Error("delete expects an object {id?,key?}");
+            if (cb) { cb(err); } else { console.error(err) }
+        }
+
         request.post(this.uri + "/api/v4/state/delete",
-            { json: { id } },
+            { json: options },
             (err, res, body: any) => {
-                if (err) cb(err);
+
+                if (err != undefined) {
+                    if (cb) { cb(err); } else { console.error(err); }
+                }
+
                 if (body) {
                     if (body.ok == 1) {
-                        cb(null, body);
+                        if (cb) { cb(null, body); } else { console.log(body); }
                     } else {
-                        cb(body);
+                        if (cb) { cb(body); } else { console.log(body); }
                     }
                 }
             })
+
+        return true;
     }
 
 
