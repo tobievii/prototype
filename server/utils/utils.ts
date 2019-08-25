@@ -3,11 +3,10 @@ import * as https from "https"
 import * as os from 'os';
 import * as dns from 'dns';
 import * as url from 'url';
-import * as _ from 'lodash';
 
 //import * as accounts from "./accounts"
 
-import { logger } from "../core/log"
+import { logger } from "../shared/log"
 
 /* ------------------------------------------------------------------------- */
 
@@ -58,18 +57,18 @@ export function blendrgba(x: color, y: color, ratio: number) {
  * @param  {Object} base   Object to compare with
  * @return {Object}        Return a new object who represent the diff
  */
-export function difference(object: any, base: any) {
+// export function difference(object: any, base: any) {
 
-    function changes(object: any, base: any) {
-        return _.transform(object, function (result: any, value: any, key: any) {
-            if (!_.isEqual(value, base[key])) {
-                result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
-            }
-        });
-    }
+//     function changes(object: any, base: any) {
+//         return _.transform(object, function (result: any, value: any, key: any) {
+//             if (!_.isEqual(value, base[key])) {
+//                 result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+//             }
+//         });
+//     }
 
-    return changes(object, base);
-}
+//     return changes(object, base);
+// }
 
 
 export function recursiveFlat(inObj: any) {

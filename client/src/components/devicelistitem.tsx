@@ -1,10 +1,10 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { User, CorePacket, } from "../../../server/core/interfaces";
-import { blendrgba } from "../../../server/utils/utils"
+import { CorePacket } from "../../../server/shared/interfaces";
+import { blendrgba } from "../utils/utils"
 import { theme, colors } from "../theme"
-import * as moment from "moment"
 import { Link } from "react-router-dom";
+
+
 interface MyState {
     [index: string]: any;
 }
@@ -79,7 +79,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                 </div>
 
                 <div style={theme.global.devicelist.timecolumn}>
-                    {moment(this.props.device["_last_seen"]).fromNow()}
+                    {this.props.device["_last_seen"]}
                 </div>
 
                 <div style={theme.global.devicelist.columns}>

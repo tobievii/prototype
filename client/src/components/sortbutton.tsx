@@ -1,11 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
-
-import "../prototype.scss"
-
-import { api } from "../api"
-import { emit } from "cluster";
 import { theme } from "../theme"
 
 interface SortProps {

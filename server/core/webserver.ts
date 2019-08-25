@@ -12,13 +12,13 @@ import * as http from "http";
 import * as https from "https";
 
 import * as fs from "fs";
-import { logger } from "./log"
+import { logger } from "../shared/log"
 import { Core } from "./core"
 
 import { webapiv3 } from "./webapi_v3"
 import { webapiv4 } from "./webapi_v4"
 import { threadId } from 'worker_threads';
-import { LogEvent } from './interfaces';
+import { LogEvent } from '../shared/interfaces';
 
 
 
@@ -37,7 +37,7 @@ export class Webserver extends EventEmitter {
 
 
         this.app.disable('x-powered-by'); //security
-        this.app.use(compression(1));
+        this.app.use(compression());
         this.app.use(cookieParser());
 
         // this.app.use(session({

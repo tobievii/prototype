@@ -1,14 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { api } from "../api"
-import { Menu, Button, Box } from "grommet"
-import { User, CorePacket } from "../../../server/core/interfaces";
-import { blendrgba } from "../../../server/utils/utils"
-import { prototypeTheme, theme } from "../theme"
-import { SortButton } from "./sortbutton"
-import { DeviceListItem } from "./devicelistitem"
-import { DeviceListMenu, MenuSort } from "./devicelistmenu"
-import * as _ from "lodash"
 
 interface MyProps {
     object: object;

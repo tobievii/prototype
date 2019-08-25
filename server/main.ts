@@ -3,8 +3,8 @@ import { Webserver } from "./core/webserver"
 import { DocumentStore } from "./core/data"
 import { Core } from "./core/core"
 import * as cluster from "cluster"
-import { logger } from './core/log';
-import { Package, DBchange, User } from "./core/interfaces"
+import { logger } from './shared/log';
+import { Package, DBchange, User } from "./shared/interfaces"
 import * as repl from "repl";
 import { SocketServer } from './core/socketserver';
 import { MQTTServer } from "./core/mqtt"
@@ -14,7 +14,8 @@ var nodePackage: Package = JSON.parse(fs.readFileSync("../package.json").toStrin
 
 logger.log({ message: "process start", data: { name: nodePackage.name, version: nodePackage.version }, level: "info" })
 
-const numCPUs = require('os').cpus().length;
+//const numCPUs = require('os').cpus().length;
+const numCPUs = 1;
 
 var config = {
     "ssl": false,
@@ -45,10 +46,11 @@ if (cluster.isMaster) {
 
     logger.log({ message: "cluster isMaster", data: { state }, level: "info" })
 
+
+
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {
         logger.log({ message: "cluster forking", data: { workernum: i }, level: "info" })
-
         var worker = cluster.fork();
         state.workers.push(worker);
     }

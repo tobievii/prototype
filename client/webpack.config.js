@@ -2,11 +2,12 @@
 
 var webpack = require("webpack");
 const path = require("path");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   // Set debugging source maps to be "inline" for
   // simplicity and ease of use
-  devtool: "inline-source-map",
+  // devtool: "inline-source-map",
 
   // The application entrypoint
   entry: "./src/index.tsx",
@@ -36,10 +37,12 @@ module.exports = {
 
   // File extensions to support resolving
   resolve: {
-    extensions: [".ts", ".tsx", ".js"],
-    alias: { 'api': path.resolve(__dirname, './src/api') }
+    extensions: [".ts", ".tsx", ".js"]
   },
-  plugins: [new webpack.ProvidePlugin({
-    'api': 'api'
-  })]
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ]
+  // plugins: [new webpack.ProvidePlugin({
+  //   'api': 'api'
+  // })]
 };

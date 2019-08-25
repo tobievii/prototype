@@ -1,16 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { api } from "../api"
-import { Menu, Button, Box } from "grommet"
-import { User, CorePacket } from "../../../server/core/interfaces";
-import { blendrgba } from "../../../server/utils/utils"
-import { prototypeTheme, theme } from "../theme"
-import { SortButton } from "./sortbutton"
-import { DeviceListItem } from "./devicelistitem"
-import { DeviceListMenu, MenuSort } from "./devicelistmenu"
-import * as _ from "lodash"
 
-import { logger } from "../../../server/core/log"
+import { api } from "../api"
+import { CorePacket } from "../../../server/shared/interfaces";
+import { theme } from "../theme"
+import { DeviceListItem } from "./devicelistitem"
+import { DeviceListMenu } from "./devicelistmenu"
+
+import { sortBy, clone, filter } from "../utils/lodash_alt"
+import { logger } from "../../../server/shared/log"
 
 interface MyProps {
     username?: string;
@@ -81,9 +78,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         }
 
         // show current username devices
-        var tempstates = _.clone(states);
+        var tempstates = clone(states);
         if (this.props.username) {
-            tempstates = _.filter(tempstates, (dev) => {
+            tempstates = filter(tempstates, (dev) => {
                 if (dev.username == undefined) return false;
                 return (dev.username == this.props.username)
             })
@@ -92,75 +89,75 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         // apply sorts
         if (this.state.sort) {
             if (this.state.sort.selected == "up") {
-                tempstates = _.sortBy(tempstates, (d) => {
+                tempstates = sortBy(tempstates, (d) => {
                     if (d.selected == undefined) { return false } else { return d.selected }
                 }).reverse()
             }
 
             if (this.state.sort.selected == "down") {
-                tempstates = _.sortBy(tempstates, (d) => {
+                tempstates = sortBy(tempstates, (d) => {
                     if (d.selected == undefined) { return false } else { return d.selected }
                 })
             }
 
             if (this.state.sort.id == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.id })
+                tempstates = sortBy(tempstates, (a, b) => { return a > b })
             }
 
             if (this.state.sort.id == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.id }).reverse()
+                tempstates = sortBy(tempstates, (a, b) => { return a > b }).reverse()
             }
 
             if (this.state.sort.lastseen == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d["_last_seen"] }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return d["_last_seen"] }).reverse()
             }
 
             if (this.state.sort.lastseen == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d["_last_seen"] })
+                tempstates = sortBy(tempstates, (d) => { return d["_last_seen"] })
             }
 
             if (this.state.sort.alarm == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.alarm })
+                tempstates = sortBy(tempstates, (d) => { return d.alarm })
             }
 
             if (this.state.sort.alarm == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.alarm }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return d.alarm }).reverse()
             }
 
             if (this.state.sort.warning == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.warning })
+                tempstates = sortBy(tempstates, (d) => { return d.warning })
             }
 
             if (this.state.sort.warning == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.warning }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return d.warning }).reverse()
             }
 
             if (this.state.sort.shared == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.shared })
+                tempstates = sortBy(tempstates, (d) => { return d.shared })
             }
 
             if (this.state.sort.shared == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.shared }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return d.shared }).reverse()
             }
 
             if (this.state.sort.public == "up") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.public })
+                tempstates = sortBy(tempstates, (d) => { return d.public })
             }
 
             if (this.state.sort.public == "down") {
-                tempstates = _.sortBy(tempstates, (d) => { return d.public }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return d.public }).reverse()
             }
         }
 
         // apply search
         if (this.state.search) {
             if (this.state.search != "") {
-                tempstates = _.filter(tempstates, (dev) => {
+                tempstates = filter(tempstates, (dev) => {
                     if (dev.id.toLowerCase().indexOf(this.state.search) >= 0) { return true } else return false;
                 })
             }
         }
-        // var states: CorePacket[] = _.filter(_.clone(api.data.states), (dev: CorePacket) => {
+        // var states: CorePacket[] = filter(clone(api.data.states), (dev: CorePacket) => {
         //     if (dev.id.indexOf("") >= 0) { return true } else return false
         // })
         this.setState({ states: tempstates });
@@ -170,13 +167,13 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
         if (data.sort) {
             this.setState({ sort: data.sort }, () => {
-                this.applySortFilter(_.clone(api.data.states));
+                this.applySortFilter(clone(api.data.states));
             })
         }
 
         if (data.search != undefined) {
             this.setState({ search: data.search.trim() }, () => {
-                this.applySortFilter(_.clone(api.data.states));
+                this.applySortFilter(clone(api.data.states));
             })
         }
     }
@@ -185,7 +182,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     handleAction = (device) => {
         return (action) => {
             if (action.select != undefined) {
-                var states = _.clone(this.state.states)
+                var states = clone(this.state.states)
                 for (var dev in states) {
                     if (states[dev].key == device.key) {
                         states[dev].selected = action.select;

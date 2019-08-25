@@ -1,16 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { api } from "../api"
-import { Menu, Button, Box } from "grommet"
-import { User, CorePacket } from "../../../server/core/interfaces";
-import { blendrgba } from "../../../server/utils/utils"
-import { prototypeTheme, theme } from "../theme"
-import { SortButton } from "./sortbutton"
-import { DeviceListItem } from "./devicelistitem"
-import { DeviceListMenu, MenuSort } from "./devicelistmenu"
-import * as _ from "lodash"
+import { CorePacket } from "../../../server/shared/interfaces";
 import { JSONviewer } from "./jsonviewer";
-import { logger } from "../../../server/core/log";
+import { logger } from "../../../server/shared/log";
 
 interface MyProps {
     username: string;

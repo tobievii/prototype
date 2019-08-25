@@ -5,10 +5,10 @@ import { EventEmitter } from "events"
 import * as net from "net";
 
 import * as _ from "lodash"
-import { logger } from "./log"
+import { logger } from "../shared/log"
 import { generateDifficult } from "../utils/utils"
 import { Core } from "./core"
-import { DBchange, CorePacket } from "./interfaces";
+import { DBchange, CorePacket } from "../shared/interfaces";
 
 export class MQTTServer extends EventEmitter {
     serversMem: any[] = [];

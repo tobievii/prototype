@@ -5,7 +5,7 @@
 */
 
 import * as mongoose from "mongoose"
-import { logger } from "./log";
+import { logger } from "../shared/log";
 import { EventEmitter } from "events";
 import { threadId } from "worker_threads";
 

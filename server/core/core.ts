@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { logger } from "./log"
+import { logger } from "../shared/log"
 
 import * as utils from "../utils/utils"
 
@@ -12,7 +12,7 @@ import * as _ from "lodash"
 
 import * as vm2 from "vm2"
 
-import { User, CorePacket } from "./interfaces"
+import { User, CorePacket } from "../shared/interfaces"
 
 export class Core extends EventEmitter {
     db: any;
@@ -430,8 +430,14 @@ export class Core extends EventEmitter {
     access(options: { remove?: boolean, devicekey: string, userkey: string, user: User }, cb?: (err: Error | undefined, result?: any) => void) {
         logger.log({ message: "core.access", data: options, level: "verbose" });
 
-        if (!options.devicekey) { cb(new Error("missing devicekey")) }
-        if (!options.userkey) { cb(new Error("missing userkey")) }
+        if (!options.devicekey) {
+            let err = new Error("missing devicekey")
+            if (cb) { cb(err) } else console.error(err);
+        }
+        if (!options.userkey) {
+            let err = new Error("missing userkey")
+            if (cb) { cb(err) } else console.error(err);
+        }
 
         var query: any = {};
         if (!options.remove)

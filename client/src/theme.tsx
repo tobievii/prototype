@@ -1,5 +1,3 @@
-import { padding } from "polished";
-
 export const prototypeTheme = {
     padding: "10px"
 }

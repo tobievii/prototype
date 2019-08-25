@@ -1,12 +1,13 @@
-import * as events from "events"
+import { EventEmitter } from "events"
 import { request } from "./utils/requestweb"
-import { User, CorePacket } from "../../server/core/interfaces"
-import { logger } from "../../server/core/log"
+import { User, CorePacket } from "../../server/shared/interfaces"
+import { logger } from "../../server/shared/log"
+//import { liteio } from "./utils/liteio"
 
-import * as io from "socket.io-client"
+import * as WebSocketWrapper from "ws-wrapper"
 
 
-export class API extends events.EventEmitter {
+export class API extends EventEmitter {
     uri: string = ""
     headers = {};
     apikey: string;
@@ -98,10 +99,29 @@ export class API extends events.EventEmitter {
     }
 
     connectSocket() {
-        this.socket = io(undefined, { transports: ['websocket'] });
+        console.log("... connect")
+        // Create WebSocket connection.
+        // const socket = new WebSocket('ws://localhost:8080');
+
+        // // Connection opened
+        // socket.addEventListener('open', function (event) {
+        //     socket.send('Hello Server!');
+        // });
+
+        // // Listen for messages
+        // socket.addEventListener('message', function (event) {
+        //     console.log('Message from server ', event.data);
+        // });
+
+
+        this.socket = new WebSocketWrapper(new WebSocket('ws://localhost:8080'));
+
 
         this.socket.on("connect", (sock) => {
             console.log("connected.");
+
+            this.listenSocketChannel(this.socket.of(this.apikey))
+
             this.socket.emit("join", this.apikey); // your api key
             // or subscribe to a specific device: 
             // socket.emit("join", "0aotj1uetsqfwdrui9fqqsj02kr7wsrw|yourdevice001");
@@ -130,8 +150,13 @@ export class API extends events.EventEmitter {
 
             this.socket.on("states", this.updateStates)
         });
+
     }
 
+    listenSocketChannel = (channel) => {
+        console.log("....!")
+        channel.on("states", this.updateStates);
+    }
 
     updateStates = (data) => {
 
@@ -346,8 +371,9 @@ export class API extends events.EventEmitter {
             this.search({ username: options.username }, (e, r) => {
                 if (r) {
                     let publickey = r.publickey
-                    logger.log({ message: "joining publickey", data: { publickey }, level: "verbose" })
-                    this.socket.emit("publickey", r.publickey);
+                    logger.log({ message: "joining publickey", data: { publickey }, level: "verbose", group: "ws" })
+                    //this.socket.emit("publickey", r.publickey);
+                    this.listenSocketChannel(this.socket.of(r.publickey))
                 }
             })
         }

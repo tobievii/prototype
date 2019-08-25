@@ -1,16 +1,7 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { api } from "../api"
-
-import { Menu, Button, Box } from "grommet"
-import { User, CorePacket, } from "../../../server/core/interfaces";
-import { blendrgba } from "../../../server/utils/utils"
-
-import { prototypeTheme, theme } from "../theme"
-
+import { theme } from "../theme"
 import { SortButton } from "./sortbutton"
-
-import * as _ from "lodash"
+import { clone } from "../utils/lodash_alt"
 
 interface MenuProps {
     onMenu: Function;
@@ -51,7 +42,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
     changeSort = (prop) => {
         return (direction) => {
-            var sort = _.clone(this.state.sort);
+            var sort = clone(this.state.sort);
             //default others
             sort.selected = 'none'
             sort.id = 'none'
@@ -82,7 +73,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                         </button>
 
 
-                        <Menu
+                        {/* <Menu
                             label="Modify"
                             items={[
                                 { label: 'Dashboard Preset', onClick: () => { } },
@@ -90,7 +81,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                                 { label: 'Share', onClick: () => { } },
                                 { label: 'Delete', onClick: () => { } }
                             ]}
-                        />
+                        /> */}
 
                         <button style={{ background: "none" }}><i className="fas fa-trash"></i> REMOVE</button>
                     </div>

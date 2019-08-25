@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { render } from "react-dom";
 import { BrowserRouter, Route, Link, NavLink, Nav } from "react-router-dom";
 
 import { NavBar } from "./components/navbar";
@@ -179,4 +179,4 @@ export default class App extends React.Component {
 }
 
 
-ReactDOM.render(<App />, document.getElementById("app"));
+render(<App />, document.getElementById("app"));

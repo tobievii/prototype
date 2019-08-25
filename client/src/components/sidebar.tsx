@@ -1,14 +1,7 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
-import { Grommet, Box, Button, Heading, Collapsible, ResponsiveContext, Layer } from 'grommet';
-import { Notification, FormClose } from 'grommet-icons';
-
-import "../prototype.scss"
 
 import { api } from "../api"
 import { theme, colors } from "../theme";
-import { position } from "polished";
 
 interface SideBarProps {
     open: boolean;

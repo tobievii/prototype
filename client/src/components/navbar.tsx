@@ -1,8 +1,7 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import "../prototype.scss";
-import { User } from "../../../server/core/interfaces";
+import { User } from "../../../server/shared/interfaces";
 import { theme } from "../theme"
 import { api } from "../api"
 import { SearchBox } from "./searchbox"

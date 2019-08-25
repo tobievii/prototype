@@ -1,5 +1,3 @@
-import { Core } from "../core/core";
-
 export interface Package {
     name: string;
     version: string;
@@ -11,6 +9,7 @@ export interface LogEvent {
     message: string;
     data?: any;
     level: "error" | "warn" | "info" | "verbose" | "debug" | "silly";
+    group?: string;
 }
 
 

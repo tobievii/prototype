@@ -1,4 +1,3 @@
-import { EventEmitter } from "events";
 import { LogEvent } from "./interfaces"
 
 /*
@@ -20,16 +19,17 @@ export const logger:any = createLogger({
 
 */
 
-class Logger extends EventEmitter {
-  constructor() {
-    super();
-  }
+class Logger {
 
   log(event: LogEvent) {
     if (event.message) {
 
       // if (event.level != "debug") { return; }
       // if (event.level == "info") { return; }
+
+      // groups are optional for now
+      if (!event.group) { return; }
+      if (event.group != "ws") { return; }
 
       //console.log(new Date().toISOString()+" "+process.pid+" "+JSON.stringify(event.message))
       var tabs = "\t"
