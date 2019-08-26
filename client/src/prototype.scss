@@ -1,15 +1,15 @@
 // DEFINE COLOURS HERE:
 $spotA: rgb(242, 53, 58); //main colour
-$spotB: #0a203b; //gradientBot
-$spotC: #09111a; //gradientTop
-$spotD: #0d243d; //background
+$spotB: #3b3b3b; // #0a203b; //gradientBot
+$spotC: #1a1a1a; // #09111a; //gradientTop
+$spotD: #202020; //background
 $spotE: #fff;
-$spotF: #17232b;
+$spotF: #2b2b2b; // #17232b;
 $gray: #888888;
-$panelBg: rgba(3, 4, 5, 0.5);
+$panelBg: #181818; // rgba(3, 4, 5, 0.5);
 $spot: #f3353a;
-$borders: rgb(34, 39, 44);
-$backgroundPanels: rgba(3, 4, 5, 0.5);
+$borders: #2b2b2b; // rgb(34, 39, 44);
+$backgroundPanels: #121212; // rgba(3, 4, 5, 0.5);
 
 @font-face {
   font-family: "Share Tech Mono";
@@ -207,9 +207,8 @@ a:hover {
 .device {
   color: #e1e1e1;
   box-sizing: border-box;
-  background: linear-gradient(rgba(3, 4, 5, 0.5), rgba(2, 3, 4, 0.5));
+  background: #1b1b1b;
   
-  border-left: 2px solid rgba(0, 0, 0, 0);
   border-top: 0;
   border-bottom: 0;
   border-right: 2px solid rgba(0, 0, 0, 0);
@@ -266,4 +265,13 @@ a:hover {
   overflow: hidden;
   padding: 5px;
 
+}
+
+.button {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.button:hover {
+  opacity: 1;
 }

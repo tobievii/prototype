@@ -91,18 +91,23 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                     boxSizing: "border-box", background: theme.global.menubars.background, width: "100%", borderRight: "11px solid " + theme.global.menubars.background,
                     paddingBottom: "5px"
                 }} >
-                    <div style={{ display: "flex", width: "100%" }}>
-                        <div style={theme.global.devicelist.columns}>
+                    <div style={{ display: "flex", width: "100%", marginRight: 35 }}>
+                        <div style={theme.global.devicelist.columnleftsortselect}>
                             <SortButton onChangeSort={this.changeSort("selected")} value={this.state.sort.selected} />
                         </div>
 
-
-                        <div style={{ width: theme.global.devicelist.columns.width }}>
-                            <div style={{ float: "left", paddingLeft: 10, width: theme.global.devicelist.columns.width }}><SortButton onChangeSort={this.changeSort("id")} value={this.state.sort.id} type="verticalalpha" /></div>
+                        <div style={theme.global.devicelist.menusortcollapse}>
+                            <i style={{ paddingLeft: 0, paddingTop: 7 }} className="button fas fa-caret-up"></i>
                         </div>
 
-                        <div style={{ width: "80px", textAlign: "right", paddingTop: "7px", paddingRight: "7px" }}>
-                            <i className="fas fa-filter" style={{ opacity: 0.5 }} ></i>
+                        <div style={theme.global.devicelist.columnleftsortselect}>
+                            <div style={{ float: "left", paddingLeft: 0, width: theme.global.devicelist.columns.width }}>
+                                <SortButton onChangeSort={this.changeSort("id")} value={this.state.sort.id} type="verticalalpha" />
+                            </div>
+                        </div>
+
+                        <div style={{}}>
+                            <i className="fas fa-filter" style={{ fontSize: "0.85em", opacity: 0.5, paddingLeft: 0, paddingTop: 14, paddingRight: 5 }} ></i>
                         </div>
 
                         <div style={{ flex: "5" }}>
@@ -115,13 +120,21 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                             />
                         </div>
 
-                        <div style={theme.global.devicelist.timecolumn}>
+                        <div style={theme.global.devicelist.menutimesort}>
                             <div style={{}}><SortButton onChangeSort={this.changeSort("lastseen")} value={this.state.sort.lastseen} /></div>
                         </div>
-                        <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("alarm")} value={this.state.sort.alarm} /></div>
-                        <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("warning")} value={this.state.sort.warning} /></div>
-                        <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("shared")} value={this.state.sort.shared} /></div>
-                        <div style={theme.global.devicelist.columns}><SortButton onChangeSort={this.changeSort("public")} value={this.state.sort.public} /></div>
+                        <div style={theme.global.devicelist.menucolumn}>
+                            <SortButton onChangeSort={this.changeSort("alarm")} value={this.state.sort.alarm} />
+                        </div>
+                        <div style={theme.global.devicelist.menucolumn}>
+                            <SortButton onChangeSort={this.changeSort("warning")} value={this.state.sort.warning} />
+                        </div>
+                        <div style={theme.global.devicelist.menucolumn}>
+                            <SortButton onChangeSort={this.changeSort("shared")} value={this.state.sort.shared} />
+                        </div>
+                        <div style={theme.global.devicelist.menuright}>
+                            <SortButton onChangeSort={this.changeSort("public")} value={this.state.sort.public} />
+                        </div>
                     </div>
                 </div>
             </div >

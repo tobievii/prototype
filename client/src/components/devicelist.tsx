@@ -127,35 +127,35 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             }
 
             if (this.state.sort.alarm == "up") {
-                tempstates = sortBy(tempstates, (d) => { return d.alarm })
+                tempstates = sortBy(tempstates, (d) => { return (d.alarm) ? 1 : -1 }).reverse()
             }
 
             if (this.state.sort.alarm == "down") {
-                tempstates = sortBy(tempstates, (d) => { return d.alarm }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return (d.alarm) ? 1 : -1 })
             }
 
             if (this.state.sort.warning == "up") {
-                tempstates = sortBy(tempstates, (d) => { return d.warning })
+                tempstates = sortBy(tempstates, (d) => { return (d.warning) ? 1 : -1 }).reverse()
             }
 
             if (this.state.sort.warning == "down") {
-                tempstates = sortBy(tempstates, (d) => { return d.warning }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return (d.warning) ? 1 : -1 })
             }
 
             if (this.state.sort.shared == "up") {
-                tempstates = sortBy(tempstates, (d) => { return d.shared })
+                tempstates = sortBy(tempstates, (d) => { return (d.shared) ? 1 : -1 }).reverse()
             }
 
             if (this.state.sort.shared == "down") {
-                tempstates = sortBy(tempstates, (d) => { return d.shared }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return (d.shared) ? 1 : -1 })
             }
 
             if (this.state.sort.public == "up") {
-                tempstates = sortBy(tempstates, (d) => { return d.public })
+                tempstates = sortBy(tempstates, (d) => { return (d.public) ? 1 : -1 }).reverse()
             }
 
             if (this.state.sort.public == "down") {
-                tempstates = sortBy(tempstates, (d) => { return d.public }).reverse()
+                tempstates = sortBy(tempstates, (d) => { return (d.public) ? 1 : -1 })
             }
         }
 
@@ -209,9 +209,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 width: "100%",
                 height: "100%", overflow: "hidden", display: "flex", flexDirection: "column"
             }} >
-                <div style={{ background: theme.global.titlebars.background }}>
+                {/* <div style={{ background: theme.global.titlebars.background }}>
                     <button style={theme.global.devicelist.addevice} onClick={() => alert('hello, world')} >+ ADD DEVICE</button>
-                </div>
+                </div> */}
 
                 <div style={theme.global.menubars}>
                     <DeviceListMenu onMenu={this.onMenu} />

@@ -68,6 +68,7 @@ export function webapiv4(app: express.Application, core: Core) {
     app.post("/api/v4/state", (req: any, res) => {
         var query = _.clone(req.body);
         query.user = req.user;
+
         core.view(query, (err, result: any) => {
             if (err) { res.status(400).json(err); }
             if (result) {

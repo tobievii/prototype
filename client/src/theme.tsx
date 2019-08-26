@@ -4,12 +4,12 @@ export const prototypeTheme = {
 
 export const colors = {
     spotA: "rgb(242, 53, 58)", // main colour
-    spotB: "#0a203b", //gradientBot
-    spotC: "#09111a", //gradientTop
-    spotD: "#0d243d", //background
+    spotB: "#3b3b3b", // "#0a203b", //gradientBot
+    spotC: "#1a1a1a", // "#09111a", //gradientTop
+    spotD: "#202020", // "#0d243d", //background
     spotE: "#fff",
-    spotF: "#17232b", //panelbg
-    panels: "#131E27",
+    spotF: "#2b2b2b", //"#17232b", //panelbg
+    panels: "#262626", // "#131E27",
     good: "#119752",    //green buttons
     public: "#1fb6d1", //blue planet
     share: "#18d66d", // green share
@@ -17,7 +17,7 @@ export const colors = {
     alarm: "#d9283a",
     checkmark: "#16d271",   //green
     transparent: 0.15,
-    borders: "1px solid #2b4255"
+    borders: "1px solid #545454" // #2b4255"
 }
 
 // DEFINE COLOURS HERE:
@@ -72,6 +72,15 @@ export const theme: any = {
         },
         //////
         devicelist: {
+            columnleftselect: {
+                marginLeft: 6,
+                padding: 5
+            },
+            columnleftsortselect: {
+                width: 26,
+                marginLeft: 6,
+                padding: 5
+            },
             addevice: {
                 borderRadius: 0,
                 margin: 0,
@@ -79,13 +88,34 @@ export const theme: any = {
                 background: colors.good
             },
             columns: {
-                width: "30px",
+                flex: "0 1",
+                padding: 5,
                 textAlign: "center",
+            },
+            columnFill: {
+                flex: "1",
+                padding: 5,
+                textAlign: "left",
             },
             timecolumn: {
                 flex: 1,
                 textAlign: "right",
-                paddingRight: "20px"
+                padding: 5
+            },
+            menusortcollapse: {
+                flex: "0 1",
+                padding: "5px 6px 0 1px",
+                textAlign: "center"
+            },
+            menutimesort: {
+                width: 50
+            },
+            menucolumn: {
+                width: 26
+            },
+            menuright: {
+                width: 26,
+                marginRight: 9
             }
         },
         titlebars: {

@@ -3,8 +3,8 @@ import { CorePacket } from "../../../server/shared/interfaces";
 import { blendrgba } from "../utils/utils"
 import { theme, colors } from "../theme"
 import { Link } from "react-router-dom";
-
 import { moment } from "../utils/momentalt"
+import { JSONviewer } from "./jsonviewer";
 
 interface MyState {
     [index: string]: any;
@@ -16,6 +16,10 @@ interface DeviceProps {
 }
 
 export class DeviceListItem extends React.Component<DeviceProps, MyState> {
+
+    state = {
+        collapsed: true
+    }
 
     intervalupdater;
 
@@ -57,58 +61,88 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
         var slowfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60 * 24, { clamp: true });
 
         return {
-            marginBottom: 2, padding: "5px 0 5px 0",
-            backgroundImage: "linear-gradient(to right, rgba(16, 26, 38, 0.5)," + blendrgba({ r: 3, g: 4, b: 5, a: 0.5 }, { r: 125, g: 255, b: 175, a: 0.75 }, (quickfade / 1.5) - 0.35) + ")",
-            borderRight: "5px solid " + blendrgba({ r: 60, g: 19, b: 25, a: 0 }, { r: 125, g: 255, b: 175, a: 1.0 }, slowfade)
+
+
+            backgroundImage: "linear-gradient(to right, #1b1b1b ," +
+                blendrgba({ r: 27, g: 27, b: 27, a: 1 }, { r: 125, g: 255, b: 175, a: 0.75 },
+                    (quickfade / 1.5) - 0.35) + ")",
+            borderRight: "5px solid " +
+                blendrgba({ r: 27, g: 27, b: 27, a: 1 }, { r: 125, g: 255, b: 175, a: 1.0 },
+                    slowfade)
         }
     }
 
     render() {
+
+        var cleanState = JSON.parse(JSON.stringify(this.props.device));
+
+        for (var a of Object.keys(cleanState)) {
+            if (a[0] == "_") {
+                delete cleanState[a]
+            }
+        }
+
         return (
-            <div className="device" style={this.calcStyle()}>
-                <div style={theme.global.devicelist.columns} >
-                    {(this.props.device.selected)
-                        ? <i
-                            onClick={(e) => this.props.action({ select: false })}
-                            style={{ color: colors.checkmark }} className="fas fa-check" />
-                        : <i
-                            onClick={(e) => this.props.action({ select: true })}
-                            style={{ opacity: colors.transparent }} className="fas fa-square" />}
-                </div>
-                <div style={{ flex: 1 }}>
-                    <Link to={"/u/" + this.props.device.username + "/view/" + this.props.device.id} >{this.props.device.id}</Link>
+            <div style={{ background: "#202020", padding: 3, margin: 5 }}>
+                <div className="device" style={this.calcStyle()}>
+                    <div style={theme.global.devicelist.columnleftselect} >
+                        {(this.props.device.selected)
+                            ? <i
+                                onClick={(e) => this.props.action({ select: false })}
+                                style={{ color: colors.checkmark }} className="fas fa-check" />
+                            : <i
+                                onClick={(e) => this.props.action({ select: true })}
+                                style={{ opacity: colors.transparent }} className="fas fa-square" />}
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        <i className="fas fa-caret-down button" onClick={() => { this.setState({ collapsed: !this.state.collapsed }) }}></i>
+                    </div>
+
+                    <div style={theme.global.devicelist.columnFill}>
+                        <Link to={"/u/" + this.props.device.username + "/view/" + this.props.device.id} >{this.props.device.id}</Link>
+                    </div>
+
+                    <div style={theme.global.devicelist.timecolumn}>
+                        {moment(this.props.device["_last_seen"]).timeDelta()}
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        {(this.props.device.alarm)
+                            ? <i style={{ color: colors.alarm }} className="fas fa-bullhorn" />
+                            : <i style={{ opacity: colors.transparent }} className="fas fa-bullhorn" />
+                        }
+
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        {(this.props.device.warning)
+                            ? <i style={{ color: colors.warning }} className="fas fa-exclamation-triangle" />
+                            : <i style={{ opacity: colors.transparent }} className="fas fa-exclamation-triangle" />}
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        {(this.props.device.shared)
+                            ? <i style={{ color: colors.share }} className="fas fa-share-alt" />
+                            : <i style={{ opacity: colors.transparent }} className="fas fa-share-alt" />}
+
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        {(this.props.device.public)
+                            ? <i style={{ color: colors.public }} className="fas fa-globe-africa" />
+                            : <i style={{ opacity: colors.transparent }} className="fas fa-globe-africa" />}
+                    </div>
                 </div>
 
-                <div style={theme.global.devicelist.timecolumn}>
-                    {moment(this.props.device["_last_seen"]).timeDelta()}
-                </div>
+                {
+                    (this.state.collapsed) ? (<div></div>) : (<div style={{ width: "100%" }}>
+                        <JSONviewer object={cleanState.data} />
+                    </div>)
 
-                <div style={theme.global.devicelist.columns}>
-                    {(this.props.device.alarm)
-                        ? <i style={{ color: colors.alarm }} className="fas fa-bullhorn" />
-                        : <i style={{ opacity: colors.transparent }} className="fas fa-bullhorn" />
-                    }
+                }
 
-                </div>
 
-                <div style={theme.global.devicelist.columns}>
-                    {(this.props.device.warning)
-                        ? <i style={{ color: colors.warning }} className="fas fa-exclamation-triangle" />
-                        : <i style={{ opacity: colors.transparent }} className="fas fa-exclamation-triangle" />}
-                </div>
-
-                <div style={theme.global.devicelist.columns}>
-                    {(this.props.device.shared)
-                        ? <i style={{ color: colors.share }} className="fas fa-share-alt" />
-                        : <i style={{ opacity: colors.transparent }} className="fas fa-share-alt" />}
-
-                </div>
-
-                <div style={theme.global.devicelist.columns}>
-                    {(this.props.device.public)
-                        ? <i style={{ color: colors.public }} className="fas fa-globe-africa" />
-                        : <i style={{ opacity: colors.transparent }} className="fas fa-globe-africa" />}
-                </div>
             </div>
         )
     }

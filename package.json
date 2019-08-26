@@ -4,7 +4,7 @@
   "description": "Typescript framework for general purpose remote monitoring/control. Built using react, mongodb, express and socketio.",
   "main": "index.js",
   "scripts": {
-    "server": "node --trace-sync-io ./build/main.js",
+    "server": "cd build && node --require source-map-support/register ./main.js",
     "test": "mocha --exit ./build/tests/tests.js",
     "bench": "node ./build/tests/benchmark.js",
     "build": "tsc --sourcemap --lib es2015 ./server/main.ts ./server/tests/tests.ts ./server/tests/benchmark.ts --outDir ./build",
@@ -37,6 +37,7 @@
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
+    "source-map-support": "^0.5.13",
     "typescript": "^3.5.3",
     "vm2": "^3.8.3",
     "winston": "^3.2.1",

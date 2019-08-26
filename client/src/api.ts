@@ -263,6 +263,7 @@ export class API extends EventEmitter {
             request.post(this.uri + "/api/v4/state",
                 { headers: this.headers, json: a },
                 (err, res, body: CorePacket) => {
+                    //console.log([err, res, body]);
                     if (err) cb(err);
                     if (body) {
                         console.log(body);
@@ -276,6 +277,7 @@ export class API extends EventEmitter {
             request.post(this.uri + "/api/v4/state",
                 { headers: this.headers, json: { id } },
                 (err, res, body: CorePacket) => {
+                    //console.log([err, res, body]);
                     if (err) cb(err);
                     if (body) {
                         cb(null, body);
@@ -372,8 +374,6 @@ export class API extends EventEmitter {
                 if (r) {
                     let publickey = r.publickey
                     logger.log({ message: "joining publickey", data: { publickey }, level: "verbose", group: "ws" })
-                    //this.socket.emit("publickey", r.publickey);
-                    //this.listenSocketChannel(this.socket.of(r.publickey))
                     this.prototypews.subscribe(r.publickey)
                 }
             })

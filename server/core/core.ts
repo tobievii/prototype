@@ -298,11 +298,18 @@ export class Core extends EventEmitter {
             this.user({ username: options.username }, (err, user) => {
                 if (err) cb({ error: "db error" });
                 if (user) {
-                    this.db.states.findOne({ apikey: user.apikey, public: true, id: options.id }, (err: Error, result: CorePacket) => {
+                    var query = { apikey: user.apikey, public: true, id: options.id }
+                    this.db.states.findOne(query, (err: Error, result: CorePacket | any) => {
                         if (err) { cb({ error: "db error" }); return; }
-                        delete result["_id"] //cleanup
-                        delete result["apikey"] //secure
-                        cb(undefined, result);
+                        if (result == null) {
+                            cb(undefined, { err: "no device found" }); // no device
+                            return;
+                        }
+                        if (result) {
+                            delete result["_id"] //cleanup
+                            delete result["apikey"] //secure
+                            cb(undefined, result);
+                        }
                     })
                 }
             })

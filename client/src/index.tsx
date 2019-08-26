@@ -37,7 +37,8 @@ export default class App extends React.Component {
     showSidebar: false,
     account: undefined,
     states: undefined,
-    height: window.innerHeight
+    height: window.innerHeight,
+    ready: false
   };
 
   constructor(props) {
@@ -64,6 +65,7 @@ export default class App extends React.Component {
 
   getaccount = () => {
     api.account((err, account) => {
+      this.setState({ ready: true })
       if (err) {
         console.log(err);
       }
@@ -118,6 +120,11 @@ export default class App extends React.Component {
   }
 
   home = (props) => {
+
+    if (!this.state.ready) {
+      return (<div></div>)
+    }
+
     if (this.state.account) {
       return (
         <div style={{
@@ -164,7 +171,6 @@ export default class App extends React.Component {
     return <div>
       <NavBar account={this.state.account} />
       <DeviceView username={props.match.params.username} id={props.match.params.id} />
-      {JSON.stringify(props.match)}
     </div>
   }
 

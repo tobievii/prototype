@@ -15,7 +15,8 @@ interface MyState {
 
 export class DeviceView extends React.Component<MyProps, MyState> {
     state = {
-        state: undefined
+        state: undefined,
+        message: undefined
     }
 
     componentDidMount = () => {
@@ -25,9 +26,12 @@ export class DeviceView extends React.Component<MyProps, MyState> {
             api.subscribe({ username: this.props.username });
 
             api.state({ username: this.props.username, id: this.props.id }, (err, state) => {
-                if (err) console.log(err)
+
+                if (err) {
+                    this.setState({ message: err })
+                }
+
                 if (state) {
-                    //console.log(state);
                     this.setState({ state })
                 }
             });
@@ -55,6 +59,10 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     render() {
 
+        if (this.state.message) {
+            return <div><JSONviewer object={this.state.message} /></div>
+        }
+
         if (this.state.state == undefined) {
             return (<div>...</div>)
         }
@@ -66,8 +74,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
                     width: "100%", height: "100%",
                     overflow: "hidden", display: "flex", flexDirection: "column"
                 }} >
-                    DEVICEVIEW
-                    {this.props.username} - {this.props.id}
+
+                    {this.props.id}
 
                     <JSONviewer object={this.state.state} />
 

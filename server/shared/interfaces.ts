@@ -14,8 +14,8 @@ export interface LogEvent {
 
 
 export interface CorePacket {
-    id: string;
-    data: any;
+    id?: string;
+    data?: any;
     apikey?: string;
     alarm?: boolean;
     warning?: boolean;
@@ -24,6 +24,7 @@ export interface CorePacket {
     workflowCode?: string;
     key?: string; // todo: is this secret?
     [index: string]: any;
+    err: string;
 }
 
 export interface DBchange {

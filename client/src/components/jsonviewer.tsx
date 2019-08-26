@@ -66,14 +66,14 @@ export class JSONviewer extends React.Component<MyProps, MyState> {
                     if (typeof data[name] == "object") {
                         return (
                             <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
-                                <div className="dataViewName" style={{ color: "" }}>{name}:</div>
+                                <div className="dataViewName" style={{ color: "" }}>{name}</div>
                                 <div className="dataViewValue" >{this.renderData(data[name], level, path + "." + name)}</div>
                                 <div style={{ clear: "both" }} />
                             </div>)
                     } else {
                         return (
                             <div key={i} className="dataView" draggable onDragStart={(e) => this.onDragStart(e, name, i, data[name], level, path + "." + name)}  >
-                                <div className="dataViewName" style={{ float: "left" }}>{name}:</div>
+                                <div className="dataViewName" style={{ float: "left" }}>{name}</div>
                                 <div className="dataViewValue" style={{ float: "right" }}>{this.renderData(data[name], level, path + "." + name)}</div>
                                 <div style={{ clear: "both" }} />
                             </div>)
@@ -106,7 +106,7 @@ export class JSONviewer extends React.Component<MyProps, MyState> {
     }
 
     render() {
-        if (this.props.object == undefined) { return (<div>...</div>) }
+        if (this.props.object == undefined) { return (<div></div>) }
         return (
             <div style={{
                 width: "100%", height: "100%",
