@@ -4,6 +4,7 @@ import { blendrgba } from "../utils/utils"
 import { theme, colors } from "../theme"
 import { Link } from "react-router-dom";
 
+import { moment } from "../utils/momentalt"
 
 interface MyState {
     [index: string]: any;
@@ -52,8 +53,8 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
     }
 
     calcStyle = () => {
-        var quickfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60, { clamp: true });
-        var slowfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60, { clamp: true });
+        var quickfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60, { clamp: true });
+        var slowfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60 * 24, { clamp: true });
 
         return {
             marginBottom: 2, padding: "5px 0 5px 0",
@@ -79,7 +80,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                 </div>
 
                 <div style={theme.global.devicelist.timecolumn}>
-                    {this.props.device["_last_seen"]}
+                    {moment(this.props.device["_last_seen"]).timeDelta()}
                 </div>
 
                 <div style={theme.global.devicelist.columns}>
