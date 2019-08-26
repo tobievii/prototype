@@ -27,7 +27,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
         sort: {
             selected: 'none',
             id: 'none',
-            lastseen: 'none',
+            lastseen: 'up',
             alarm: 'none',
             warning: 'none',
             shared: 'none',

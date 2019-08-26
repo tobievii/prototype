@@ -22,7 +22,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
         if ((this.props.username) && (this.props.id)) {
             logger.log({ message: "loading deviceview", data: this.props, level: "verbose" })
 
-            //api.subscribe({ username: this.props.username });
+            api.subscribe({ username: this.props.username });
 
             api.state({ username: this.props.username, id: this.props.id }, (err, state) => {
                 if (err) console.log(err)

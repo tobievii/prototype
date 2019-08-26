@@ -14,6 +14,10 @@ var nodePackage: Package = JSON.parse(fs.readFileSync("../package.json").toStrin
 
 logger.log({ message: "process start", data: { name: nodePackage.name, version: nodePackage.version }, level: "info" })
 
+// todo:
+// ssl certs
+
+// todo switch back to cpu length for production
 //const numCPUs = require('os').cpus().length;
 const numCPUs = 1;
 

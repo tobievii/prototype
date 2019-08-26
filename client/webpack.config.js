@@ -7,7 +7,8 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = {
   // Set debugging source maps to be "inline" for
   // simplicity and ease of use
-  // devtool: "inline-source-map",
+  // todo: disable for production
+  devtool: "inline-source-map",
 
   // The application entrypoint
   entry: "./src/index.tsx",

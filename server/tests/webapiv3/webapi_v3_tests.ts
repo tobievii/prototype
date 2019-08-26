@@ -230,7 +230,7 @@ export function webapi_v3() {
 
             // SOCKET
             var account = _.clone(testAccount);
-            account.protocol = "socketio";
+            account.protocol = "websocket";
             account.id = id;
 
             var protSocket = new Prototype(account);
@@ -243,10 +243,9 @@ export function webapi_v3() {
                     //console.log(r);
                     if (r.result != "success") { done(new Error("http post did not result success")) }
                 })
-                //}, 100)
-
             })
             protSocket.on("data", (data: any) => {
+                //console.log(data);
                 if (data.id != id) { done(new Error("id missing from socket packet")); return; }
                 if (!data.data) { done(new Error("data missing from socket packet")); return; }
                 if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
@@ -290,7 +289,7 @@ export function webapi_v3() {
 
             // SOCKET LISTEN
             var socketaccount = _.clone(testAccount);
-            socketaccount.protocol = "socketio";
+            socketaccount.protocol = "websocket";
             socketaccount.id = id;
             var protSocket = new Prototype(socketaccount)
 
@@ -348,7 +347,7 @@ export function webapi_v3() {
 
 
             var socketAccount = _.clone(testAccount);
-            socketAccount.protocol = "socketio";
+            socketAccount.protocol = "websocket";
 
             var protSocket = new Prototype(socketAccount)
 
@@ -379,7 +378,7 @@ export function webapi_v3() {
 
             protMqtt.on("connect", () => {
                 var socketaccount = _.clone(testAccount);
-                socketaccount.protocol = "socketio"
+                socketaccount.protocol = "websocket"
                 new Prototype(socketaccount).post({ id, data: { test, asdf: "zzz" } }, () => { })
             })
 

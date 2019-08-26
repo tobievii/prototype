@@ -26,6 +26,7 @@ export class Prototype extends EventEmitter {
     id = undefined;
     socketclient: any = undefined;
     socketiojoined: boolean = false;
+    websocketclient: any;
 
     mqttclient: any = undefined;
     protocol = "http";
@@ -192,6 +193,12 @@ export class Prototype extends EventEmitter {
             }
         }
 
+        if (this.protocol == "websocket") {
+            if (this.websocketclient) {
+                this.websocketclient.post(packet);
+            }
+        }
+
     }
 
     // view state of a device by id
@@ -269,43 +276,51 @@ export class Prototype extends EventEmitter {
     }
 
     protocolSocketio() {
+        console.log("===== SOCKETIO DISABLED!!")
+        // var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
+        // this.socketclient = socketclient;
+        // socketclient.on("connect", () => {
+        //     console.log("b.connect")
+        //     this.emit("connect");
 
-        var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
-        this.socketclient = socketclient;
-        socketclient.on("connect", () => {
-            if (this.apikey == "") { console.error("apikey blank") }
-            if (this.id) {
-                socketclient.emit("join", this.apikey + "|" + this.id, () => {
-                    this.socketiojoined = true;
-                    this.emit("connect");
-                });
+        //     // if (this.apikey == "") { console.error("apikey blank") }
+        //     // if (this.id) {
+        //     //     socketclient.emit("join", this.apikey + "|" + this.id, () => {
+        //     //         this.socketiojoined = true;
+        //     //         this.emit("connect");
+        //     //     });
 
-            } else {
-                socketclient.emit("join", this.apikey, () => {
-                    this.socketiojoined = true;
-                    this.emit("connect");
-                });
-            }
-            socketclient.on("post", (data: any) => {
-                this.emit("data", data);
-            })
-        })
+        //     // } else {
+        //     //     socketclient.emit("join", this.apikey, () => {
+        //     //         this.socketiojoined = true;
+        //     //         this.emit("connect");
+        //     //     });
+        //     // }
+        //     socketclient.on("post", (data: any) => {
+        //         this.emit("data", data);
+        //     })
+        // })
     }
 
     protocolWebSocket() {
-        var socketclient = new PrototypeWS(this.uri, { transports: ['websocket'] })
-        this.socketclient = socketclient;
-        socketclient.on("connect", () => {
+        var websocketclient = new PrototypeWS(this.uri, { apikey: this.apikey, id: this.id })
+        this.websocketclient = websocketclient;
+
+        websocketclient.on("connect", () => {
+            this.emit("connect");
+
             if (this.apikey == "") { console.error("apikey blank") }
-            if (this.id) {
-                socketclient.emit("join", this.apikey + "|" + this.id);
-                this.emit("connect");
-            } else {
-                socketclient.emit("join", this.apikey);
-                this.emit("connect");
-            }
-            socketclient.on("post", (data: any) => {
-                this.emit("data", data);
+
+            // if (this.id) {
+            //     websocketclient.emit("join", this.apikey + "|" + this.id);
+            //     this.emit("connect");
+            // } else {
+            //     websocketclient.emit("join", this.apikey);
+            //     this.emit("connect");
+            // }
+
+            websocketclient.on("states", (states: any) => {
+                this.emit("data", states);
             })
         })
     }
@@ -340,6 +355,9 @@ export class Prototype extends EventEmitter {
         }
         if (this.protocol == "socketio") {
             if (this.socketclient) this.socketclient.disconnect();
+        }
+        if (this.protocol == "websocket") {
+            if (this.websocketclient) this.websocketclient.disconnect();
         }
     }
 

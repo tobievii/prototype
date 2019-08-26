@@ -19,7 +19,15 @@ interface MyState {
 
 export class DeviceList extends React.Component<MyProps, MyState> {
     state = {
-        sort: undefined,
+        sort: {
+            selected: "none",
+            id: "none",
+            lastseen: "up",
+            alarm: "none",
+            warning: "none",
+            shared: "none",
+            public: "none"
+        },
         search: undefined,
         filter: "",
         states: [],
@@ -36,8 +44,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             api.subscribe({ username: this.props.username });
 
             api.states({ username: this.props.username }, (err, states: CorePacket[]) => {
-                console.log("=========")
-                console.log(states)
                 if (err) console.error(err);
                 if (states) {
                     logger.log({ message: "states return", data: { states }, level: "verbose" })
@@ -109,11 +115,15 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             }
 
             if (this.state.sort.lastseen == "up") {
-                tempstates = sortBy(tempstates, (d) => { return d["_last_seen"] }).reverse()
+                tempstates = sortBy(tempstates, (a, b) => {
+                    return new Date(b["_last_seen"]).getTime() - new Date(a["_last_seen"]).getTime();
+                })
             }
 
             if (this.state.sort.lastseen == "down") {
-                tempstates = sortBy(tempstates, (d) => { return d["_last_seen"] })
+                tempstates = sortBy(tempstates, (a, b) => {
+                    return new Date(b["_last_seen"]).getTime() - new Date(a["_last_seen"]).getTime();
+                }).reverse()
             }
 
             if (this.state.sort.alarm == "up") {
