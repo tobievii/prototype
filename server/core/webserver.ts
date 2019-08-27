@@ -101,6 +101,9 @@ export class Webserver extends EventEmitter {
 
         this.app.get("/account", (req, res) => { res.end(reactHtml); })
 
+        this.app.get("/settings", (req, res) => { res.end(reactHtml); })
+        this.app.get("/settings/account", (req, res) => { res.end(reactHtml); })
+
 
         this.app.post("/signin", (req, res) => {
             this.core.user({ email: req.body.email, pass: req.body.pass }, (err: Error | undefined, user: any) => {

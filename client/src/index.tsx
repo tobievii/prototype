@@ -15,6 +15,9 @@ import { DeviceView } from "./components/deviceview";
 import { BGgrad } from "./pages/bggrad"
 
 import { Account } from "./components/account"
+import { Settings } from "./components/settings"
+
+import { ProtoMap as Map } from "./components/map"
 
 export default class App extends React.Component {
   state = {
@@ -106,10 +109,11 @@ export default class App extends React.Component {
       return (
         <BrowserRouter>
           <Route exact path="/" component={this.home} />
-          <Route exact path="/account" component={this.account} />
           <Route exact path="/u/:username" component={this.userView} />
           <Route exact path="/u/:username/view/:id" component={this.deviceView} />
           <Route path="/signout" component={this.signout} />
+          <Route exact path="/settings" component={this.settings} />
+          <Route exact path="/settings/account" component={this.account} />
         </BrowserRouter>
       )
     }
@@ -134,6 +138,10 @@ export default class App extends React.Component {
     //);
   }
 
+  settings = (props) => {
+    return <div><NavBar /><Settings /></div>
+  }
+
   account = (props) => {
     return <div><NavBar /><Account /></div>
   }
@@ -148,25 +156,27 @@ export default class App extends React.Component {
   }
 
   home = (props) => {
+    var s1: any = { height: this.state.height, display: "flex", flexDirection: "column" }
+    var s2: any = { flex: "1 1 auto", flexFlow: "column", overflowY: "auto", boxSizing: "border-box" }
+    var size = (window.innerWidth < 800) ? "small" : "large"
     return (
-      <div style={{
-        height: this.state.height,
-        display: "flex",
-        flexDirection: "column",
-        //border: "2px solid #0f9",
-        //boxSizing: "border-box",
-        //overflow: "hidden"
-      }}>
-        <div style={{ flex: "0 1 auto" }}><NavBar /></div>
+      <div style={s1}>
 
-        <div style={{
-          flex: "1 1 auto",
-          flexFlow: "column",
-          overflowY: "auto",
-          //border: "2px solid #f00",
-          boxSizing: "border-box"
-        }}>
-          <DeviceList />
+        <div style={{ flex: "0 1 auto" }}>
+          <NavBar />
+        </div>
+
+        <div style={s2}>
+
+          {(size == "small")
+            ? (<DeviceList />)
+            : (<div style={{ overflow: "hidden", display: "flex", height: "100%" }}>
+
+              <div><DeviceList /></div>
+              <div style={{ flex: "1 0 auto" }}><Map /></div>
+
+            </div>)}
+
         </div>
 
         <div style={{ flex: "0 1 40px" }}>footer</div>
