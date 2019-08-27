@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { AsyncStorage, ScrollView, Text, View, TouchableHighlight } from 'react-native';
 import { CheckBox } from 'react-native-elements';
+var devices = require('../devices');
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
   state = {
@@ -22,7 +23,15 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
 
       const data = await response.json();
       this.setState({ data: data });
-
+      for (var i in data) {
+        if (data[i].data.gps) {
+          data[i].data.gps['latitude'] = data[i].data.gps.lat
+          data[i].data.gps['longitude'] = data[i].data.gps.lon;
+          delete data[i].data.gps.lat
+          delete data[i].data.gps.lon
+        }
+      }
+      devices.devices = data
     } catch (err) {
       return console.error(err.toString());
     }

@@ -1,16 +1,16 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import MapView from 'react-native-maps';
-import {Dimensions, Alert} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import { Dimensions, Alert, Text } from 'react-native';
 
-const {width, height} = Dimensions.get('window');
-
+const { width, height } = Dimensions.get('window');
+var devices = require('../devices');
+var temp = []
 const SCREEN_HIGHT = height;
 const SCREEN_WIDTH = width;
 const ASPECT_RATIO = width / height;
 const LATTITUDE_DELTA = 0.0922;
 const LONGTITUDE_DELTA = LATTITUDE_DELTA * ASPECT_RATIO;
-
 export class MapViewContainer extends React.Component<NavigationScreenProps> {
 
   constructor(props: any) {
@@ -33,36 +33,41 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
   watchID: number = null;
 
   componentDidMount() {
+    this.devicesLocations()
     navigator.geolocation.getCurrentPosition((position) => {
-      const lat = parseFloat(position.coords.latitude);
-      const lon = parseFloat(position.coords.longitude);
-      const initRegion = {
+      var lat = parseFloat(position.coords.latitude);
+      var lon = parseFloat(position.coords.longitude);
+      var initRegion = {
         latitude: lat,
         longitude: lon,
         latitudeDelta: LATTITUDE_DELTA,
         longitudeDelta: LONGTITUDE_DELTA,
       };
-      this.setState({initialPosition: initRegion});
-      this.setState({markedPosition: initRegion});
+      this.setState({ initialPosition: initRegion });
+      this.setState({ markedPosition: initRegion });
     },
 
-    (error) => alert(JSON.stringify(error)),
+      (error) => alert(JSON.stringify(error)),
 
-    {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
     );
     this.watchID = navigator.geolocation.watchPosition((position) => {
-      const lat = parseFloat(position.coords.latitude);
-      const lon = parseFloat(position.coords.longitude);
+      var lat = parseFloat(position.coords.latitude);
+      var lon = parseFloat(position.coords.longitude);
+      var lastRegion;
+      devices.deveices.map((data, i) => {
+        if (data.data.gps) {
+          lastRegion = {
+            latitude: data.data.gps.lat,
+            longitude: data.data.gps.lon,
+            latitudeDelta: LONGTITUDE_DELTA,
+            longitudeDelta: LATTITUDE_DELTA,
+          };
+        }
+      })
 
-      const lastRegion = {
-        latitude: lat,
-        longitude: lon,
-        latitudeDelta: LONGTITUDE_DELTA,
-        longitudeDelta: LATTITUDE_DELTA,
-      };
-
-      this.setState({initialPosition: lastRegion});
-      this.setState({markedPosition: lastRegion});
+      this.setState({ initialPosition: lastRegion });
+      this.setState({ markedPosition: lastRegion });
 
     });
   }
@@ -71,13 +76,28 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
-  public render(): React.ReactNode {
+  devicesLocations() {
+    {
+      for (var i in devices.devices) {
+        if (devices.devices[i].data.gps) {
+          temp.push(devices.devices[i])
+        }
+      }
+    }
+  }
+
+  render() {
     return (
       <MapView
-      style={{flex: 1}}
-      region={this.state.initialPosition}
-      showsUserLocation={true}
-      />
+        style={{ flex: 1 }}
+        region={this.state.initialPosition}
+        showsUserLocation={true}>
+        {temp.map((marker, i) => (
+          <Marker
+            coordinate={marker.data.gps}
+          />
+        ))}
+      </MapView>
     );
   }
 }

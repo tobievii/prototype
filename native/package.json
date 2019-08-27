@@ -25,6 +25,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/react-native-fontawesome": "^0.1.0",
     "@tradle/react-native-http": "^2.0.0",
+    "@types/node": "^12.7.2",
     "assert": "^1.1.1",
     "browserify-zlib": "^0.1.4",
     "console-browserify": "^1.1.0",
