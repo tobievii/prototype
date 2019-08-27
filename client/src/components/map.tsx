@@ -1,28 +1,18 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter, Route, Link, NavLink } from 'react-router-dom'
-import { api } from "../api"
-import { User } from "../../../server/shared/interfaces"
-import { colors } from "../theme";
-
 import Map from 'pigeon-maps'
 
-// import Marker from 'pigeon-marker/react'
+interface MapProps { }
+interface MapState { }
 
-import Overlay from 'pigeon-overlay'
-
-interface MyProps { }
-interface MyState { }
-
-export class ProtoMap extends React.Component<MyProps, MyState> {
-
-
+export class ProtoMap extends React.Component<MapProps, MapState> {
     state = {
         width: 800,
         height: 400,
         resizing: false,
-        zoom: 12
+        zoom: 5,
+        center: [-28.825355905602482, 24.968895574177196]
     }
+
     mapwrapper;
 
     constructor(props) {
@@ -41,14 +31,14 @@ export class ProtoMap extends React.Component<MyProps, MyState> {
 
     updateDimensions = () => {
 
-        console.log("updating..")
         if (this.mapwrapper) {
+            console.log("updating..")
 
             var vals = { resizing: true, width: this.mapwrapper.current.offsetWidth, height: this.mapwrapper.current.offsetHeight }
-
             if (vals.width < 100) { vals.width = 100 }
             if (vals.height < 100) { vals.width = 100 }
 
+            // workaround where pidgeon map wont size down:
             this.setState(vals, () => {
                 setTimeout(() => {
                     this.setState({ resizing: false })
@@ -57,42 +47,41 @@ export class ProtoMap extends React.Component<MyProps, MyState> {
         }
     }
 
-
-
     wheelHandler = (e) => {
-        console.log(e.deltaY)
-        if (e.deltaY < 0) {
-            this.setState({
-                zoom: Math.min(this.state.zoom + 1, 18)
-            })
-        } else {
-            this.setState({
-                zoom: Math.max(this.state.zoom - 1, 1)
-            })
-        }
+        console.log("mousewheel:" + e.deltaY)
+        var zoom = (e.deltaY < 0) ? Math.min(this.state.zoom + 1, 18) : Math.max(this.state.zoom - 1, 1)
+        this.setState({ zoom })
     }
 
-
-
+    onBoundsChanged = (e) => {
+        console.log(e);
+        this.setState({ center: e.center })
+    }
     render() {
-
-        return <div style={{ boxSizing: "border-box", background: "#fff", margin: 0, width: "100%", height: "100%", overflow: "hidden" }} ref={this.mapwrapper}>
+        return (<div
+            style={{
+                boxSizing: "border-box",
+                background: "#fff",
+                margin: 0,
+                width: "100%",
+                height: "100%",
+                overflow: "hidden"
+            }}
+            ref={this.mapwrapper}
+        >
             {(this.state.resizing)
                 ? (<div style={{ width: "100%", height: "100%" }}></div>)
                 : (<div style={{ width: "100%", height: "100%" }} onWheel={this.wheelHandler}>
                     <Map
+                        onBoundsChanged={this.onBoundsChanged}
                         attribution={false}
                         animate={true}
-                        center={[50.879, 4.6997]}
+                        center={this.state.center}
                         zoom={this.state.zoom}
                         width={this.state.width}
                         height={this.state.height}></Map>
                 </div>)}
-
-        </div>
-
-
-
-    }
+        </div>)
+    } //end render
 }
 
