@@ -1,6 +1,7 @@
 import React from "react";
 import Map from 'pigeon-maps'
-
+import Marker from './mapmarker'
+import { api } from "../api";
 interface MapProps { }
 interface MapState { }
 
@@ -9,8 +10,8 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
         width: 800,
         height: 400,
         resizing: false,
-        zoom: 5,
-        center: [-28.825355905602482, 24.968895574177196]
+        zoom: 2,
+        center: [0, 0]
     }
 
     mapwrapper;
@@ -48,15 +49,26 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     }
 
     wheelHandler = (e) => {
+        console.log(e);
         console.log("mousewheel:" + e.deltaY)
         var zoom = (e.deltaY < 0) ? Math.min(this.state.zoom + 1, 18) : Math.max(this.state.zoom - 1, 1)
         this.setState({ zoom })
     }
 
     onBoundsChanged = (e) => {
-        console.log(e);
+        //console.log(e);
         this.setState({ center: e.center })
     }
+
+    mouseMove = (e) => {
+        // todo improve zoom location, perhaps using tag locations
+        // console.log(e.clientX);
+    }
+
+    handleMarkerClick = ({ event, payload, anchor }) => {
+        console.log(`Marker #${payload} clicked at: `, anchor)
+    }
+
     render() {
         return (<div
             style={{
@@ -71,7 +83,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
         >
             {(this.state.resizing)
                 ? (<div style={{ width: "100%", height: "100%" }}></div>)
-                : (<div style={{ width: "100%", height: "100%" }} onWheel={this.wheelHandler}>
+                : (<div style={{ width: "100%", height: "100%" }} onMouseMove={this.mouseMove} onWheel={this.wheelHandler}>
                     <Map
                         onBoundsChanged={this.onBoundsChanged}
                         attribution={false}
@@ -79,7 +91,22 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
                         center={this.state.center}
                         zoom={this.state.zoom}
                         width={this.state.width}
-                        height={this.state.height}></Map>
+                        height={this.state.height}>
+
+                        {api.data.states.map((dev, i) => {
+
+                            if (!dev.data) { return; }
+                            if (!dev.data.gps) { return; }
+                            if (!dev.data.gps.lat) { return; }
+                            if (!dev.data.gps.lon) { return; }
+                            return <Marker
+                                key={i}
+                                anchor={[dev.data.gps.lat, dev.data.gps.lon]}
+                                payload={1}
+                                onClick={this.handleMarkerClick} />
+                        })}
+
+                    </Map>
                 </div>)}
         </div>)
     } //end render
