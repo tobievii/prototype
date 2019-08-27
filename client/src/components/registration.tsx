@@ -8,12 +8,12 @@ import { api } from "../api"
 import { emit } from "cluster";
 
 interface MyProps {
-    getaccount: Function;
-    history: any;
+    // getaccount: Function;
+    // history: any;
 }
 
 interface MyState {
-    [index: string]: any
+    // [index: string]: any
 }
 
 export class Registration extends React.Component<MyProps, MyState> {
@@ -49,8 +49,9 @@ export class Registration extends React.Component<MyProps, MyState> {
             }
             if (result) {
                 if (result.signedin) {
-                    this.props.getaccount();
-                    this.props.history.push("/");
+                    //this.props.getaccount();
+                    //this.props.history.push("/");
+                    api.location("/")
                 }
             }
         })

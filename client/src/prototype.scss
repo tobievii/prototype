@@ -164,12 +164,13 @@ button {
   border: none;
   padding: 10px;
   margin: 0;
-  opacity: 0.9;
+  opacity: 1.0;
+  
   cursor: pointer;
 }
 
 button:hover {
-  opacity: 1.0;
+  opacity: 0.9;
 }
 
 a {

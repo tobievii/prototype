@@ -74,7 +74,9 @@ export const theme: any = {
         devicelist: {
             columnleftselect: {
                 marginLeft: 6,
-                padding: 5
+                padding: 5,
+                width: 20,
+                textAlign: "center"
             },
             columnleftsortselect: {
                 width: 26,
@@ -90,7 +92,7 @@ export const theme: any = {
             columns: {
                 flex: "0 1",
                 padding: 5,
-                textAlign: "center",
+                textAlign: "center"
             },
             columnFill: {
                 flex: "1",

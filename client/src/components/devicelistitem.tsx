@@ -83,7 +83,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
         }
 
         return (
-            <div style={{ background: "#202020", padding: 3, margin: 5 }}>
+            <div style={{ background: "#202020", padding: 0, margin: 0 }}>
                 <div className="device" style={this.calcStyle()}>
                     <div style={theme.global.devicelist.columnleftselect} >
                         {(this.props.device.selected)
@@ -96,7 +96,9 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                     </div>
 
                     <div style={theme.global.devicelist.columns}>
-                        <i className="fas fa-caret-down button" onClick={() => { this.setState({ collapsed: !this.state.collapsed }) }}></i>
+                        {(this.state.collapsed)
+                            ? <i className={"fas fa-caret-down button"} onClick={() => { this.setState({ collapsed: !this.state.collapsed }) }}></i>
+                            : <i className={"fas fa-caret-up button"} onClick={() => { this.setState({ collapsed: !this.state.collapsed }) }}></i>}
                     </div>
 
                     <div style={theme.global.devicelist.columnFill}>

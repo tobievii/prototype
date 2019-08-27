@@ -16,7 +16,7 @@ export class API extends EventEmitter {
     prototypews;
 
     data = {
-        account: {},
+        account: undefined,
         states: [],
         packets: []
     }

@@ -8,7 +8,7 @@ import { SearchBox } from "./searchbox"
 
 
 interface MyProps {
-  account: User;
+  //account: User;
 }
 
 interface MyState {
@@ -30,12 +30,12 @@ export class NavBar extends React.Component<MyProps, MyState> {
     if (window.innerWidth < 800) { size = "small" }
 
     // LOGGED IN USERS:
-    if (this.props.account) {
+    if (api.data.account) {
 
       const menuitemsLogged = [
         { text: "Notifications", path: "/notifications", icon: "bell" },
         { text: "Settings", path: "/settings", icon: "cog" },
-        { text: this.props.account.username, path: "/account", icon: "user-circle" }
+        { text: api.data.account.username, path: "/account", icon: "user-circle" }
       ]
 
       return (
@@ -79,14 +79,12 @@ export class NavBar extends React.Component<MyProps, MyState> {
     //////////////////////////////////////////////////////////////////
 
     //VISTORS:
-    if (this.props.account == undefined) {
+    if (api.data.account == undefined) {
 
       const menuitemsVisitor = [
-        { text: "Register", path: "/register", icon: "" },
-        { text: "Login", path: "/login", icon: "" },
-        { text: "Resources", path: "/resources", icon: "" },
-        { text: "Features", path: "/features", icon: "" },
-        { text: "Products", path: "/products", icon: "" }
+        //{ text: "Resources", path: "/resources", icon: "" },
+        //{ text: "Features", path: "/features", icon: "" },
+        //{ text: "Products", path: "/products", icon: "" }
       ]
 
       return (

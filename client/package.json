@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "serve",
-    "watch": "webpack -w --mode development",
-    "build": "webpack --display-modules",
+    "watch": "webpack --env dev -w --mode development",
+    "build": "webpack --env prod --display-modules",
     "prod": "webpack -w --mode production"
   },
   "author": "",

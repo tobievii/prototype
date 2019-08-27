@@ -1,20 +1,18 @@
 import React from "react";
 import { Registration } from "../components/registration"
+import { colors, theme } from "../theme"
 
-interface MyProps {
-    getaccount: Function;
-    history: any;
-}
+import { Cards } from "./cards"
+
+interface MyProps { }
 
 interface MyState {
-    [index: string]: any
+    //[index: string]: any
 }
 
-export class Home extends React.Component<MyProps, MyState> {
+export class Landing extends React.Component<MyProps, MyState> {
 
-    state = {
-
-    }
+    state = {}
 
     render() {
         return (
@@ -24,11 +22,8 @@ export class Home extends React.Component<MyProps, MyState> {
                     <h2>Easily monitor and automate your world!</h2>
                 </section>
 
-                <section>
-                    <Registration history={this.props.history} getaccount={this.props.getaccount} />
-                </section>
-
-
+                <Registration />
+                <Cards />
             </div>
         );
     }
