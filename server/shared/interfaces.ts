@@ -40,4 +40,5 @@ export interface User {
     username: string;
     apikey: string;
     publickey: string;
+    level: number;
 }

@@ -12,8 +12,9 @@ import { DeviceList } from "./components/devicelist"
 import { theme } from "./theme"
 import { SideBar } from "./components/sidebar"
 import { DeviceView } from "./components/deviceview";
-
 import { BGgrad } from "./pages/bggrad"
+
+import { Account } from "./components/account"
 
 export default class App extends React.Component {
   state = {
@@ -105,6 +106,7 @@ export default class App extends React.Component {
       return (
         <BrowserRouter>
           <Route exact path="/" component={this.home} />
+          <Route exact path="/account" component={this.account} />
           <Route exact path="/u/:username" component={this.userView} />
           <Route exact path="/u/:username/view/:id" component={this.deviceView} />
           <Route path="/signout" component={this.signout} />
@@ -132,6 +134,9 @@ export default class App extends React.Component {
     //);
   }
 
+  account = (props) => {
+    return <div><NavBar /><Account /></div>
+  }
 
   // new vistors home/landing page.. 
   landing = (props) => {
