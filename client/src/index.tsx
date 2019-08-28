@@ -8,16 +8,18 @@ import { Landing } from "./pages/landing";
 
 import { api } from "./api";
 
-import { DeviceList } from "./components/devicelist"
-import { theme } from "./theme"
-import { SideBar } from "./components/sidebar"
+import { DeviceList } from "./components/devicelist";
+import { theme } from "./theme";
+import { SideBar } from "./components/sidebar";
 import { DeviceView } from "./components/deviceview";
-import { BGgrad } from "./pages/bggrad"
+import { BGgrad } from "./pages/bggrad";
 
-import { Account } from "./components/account"
-import { Settings } from "./components/settings"
+import { Account } from "./components/account";
+import { Settings } from "./components/settings";
 
-import { ProtoMap as Map } from "./components/map"
+import { ProtoMap as Map } from "./components/map";
+
+import { clone } from "./utils/lodash_alt";
 
 export default class App extends React.Component {
   state = {
@@ -40,33 +42,36 @@ export default class App extends React.Component {
 
     api.on("states", states => {
       this.setState({ states });
-    })
+    });
 
     api.on("location", location => {
-      window.location = location
-    })
+      window.location = location;
+    });
 
     window.addEventListener("resize", () => {
-      this.setState({ height: window.innerHeight })
-    })
+      this.setState({ height: window.innerHeight });
+    });
 
     this.getlocation();
   }
 
   getlocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((gps) => {
+      navigator.geolocation.getCurrentPosition(gps => {
         console.log(gps);
-        api.post({ id: "you", data: { gps: { lat: gps.coords.latitude, lon: gps.coords.longitude } } })
+        api.post({
+          id: "you",
+          data: { gps: { lat: gps.coords.latitude, lon: gps.coords.longitude } }
+        });
       });
     } else {
-      console.log("Geolocation is not supported by this browser.")
+      console.log("Geolocation is not supported by this browser.");
     }
-  }
+  };
 
   getaccount = () => {
     api.account((err, account) => {
-      this.setState({ ready: true })
+      this.setState({ ready: true });
       if (err) {
         console.log(err);
       }
@@ -75,10 +80,9 @@ export default class App extends React.Component {
 
         api.states((err, states) => {
           if (states) {
-            this.setState({ states })
+            this.setState({ states });
           }
-        })
-
+        });
       }
     });
   };
@@ -100,9 +104,8 @@ export default class App extends React.Component {
   };
 
   render() {
-
     if (!this.state.ready) {
-      return (<div></div>)
+      return <div></div>;
     }
 
     // NEW/RETURNING VISTORS
@@ -111,10 +114,14 @@ export default class App extends React.Component {
         <BrowserRouter>
           <Route exact path="/" component={this.landing} />
           <Route exact path="/u/:username" component={this.userView} />
-          <Route exact path="/u/:username/view/:id" component={this.deviceView} />
+          <Route
+            exact
+            path="/u/:username/view/:id"
+            component={this.deviceView}
+          />
           <Route path="/login" component={this.login} />
         </BrowserRouter>
-      )
+      );
     }
 
     // LOGGED IN USERS
@@ -123,12 +130,16 @@ export default class App extends React.Component {
         <BrowserRouter>
           <Route exact path="/" component={this.home} />
           <Route exact path="/u/:username" component={this.userView} />
-          <Route exact path="/u/:username/view/:id" component={this.deviceView} />
+          <Route
+            exact
+            path="/u/:username/view/:id"
+            component={this.deviceView}
+          />
           <Route path="/signout" component={this.signout} />
           <Route exact path="/settings" component={this.settings} />
           <Route exact path="/settings/account" component={this.account} />
         </BrowserRouter>
-      )
+      );
     }
 
     // const { showSidebar } = this.state;
@@ -151,75 +162,193 @@ export default class App extends React.Component {
     //);
   }
 
-  settings = (props) => {
-    return <div><NavBar /><Settings /></div>
-  }
-
-  account = (props) => {
-    return <div><NavBar /><Account /></div>
-  }
-
-  // new vistors home/landing page.. 
-  landing = (props) => {
-    return <div>
-      <BGgrad />
-      <NavBar />
-      <Landing />
-    </div>
-  }
-
-  home = (props) => {
-    var s1: any = { height: this.state.height, display: "flex", flexDirection: "column" }
-    var s2: any = { flex: "1 1 auto", flexFlow: "column", overflowY: "auto", boxSizing: "border-box" }
-    var size = (window.innerWidth < 800) ? "small" : "large"
+  settings = props => {
     return (
-      <div style={s1}>
+      <div>
+        <NavBar />
+        <Settings />
+      </div>
+    );
+  };
 
-        <div style={{ flex: "0 1 auto" }}>
+  account = props => {
+    return (
+      <div>
+        <NavBar />
+        <Account />
+      </div>
+    );
+  };
+
+  // new vistors home/landing page..
+  landing = props => {
+    return (
+      <div>
+        <BGgrad />
+        <NavBar />
+        <Landing />
+      </div>
+    );
+  };
+
+  home = props => {
+    var size = window.innerWidth < 800 ? "small" : "large";
+
+    var wrapper = clone(theme.global.responsive.wrapper);
+    wrapper.height = this.state.height;
+
+    return (
+      <div style={wrapper}>
+        <div style={theme.global.responsive.navbar}>
           <NavBar />
         </div>
 
-        <div style={s2}>
-
-          {(size == "small")
-            ? (<DeviceList />)
-            : (<div style={{ overflow: "hidden", display: "flex", height: "100%" }}>
-
-              <div><DeviceList /></div>
-              <div style={{ flex: "1 0 auto" }}><Map /></div>
-
-            </div>)}
-
+        <div style={theme.global.responsive.content}>
+          {size == "small" ? (
+            <DeviceList />
+          ) : (
+            <div style={theme.global.responsive.contenthorizontal}>
+              <div>
+                <DeviceList />
+              </div>
+              <div style={theme.global.responsive.contentright}>
+                <Map />
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={{ flex: "0 1 40px" }}>footer</div>
       </div>
-    )
+    );
   };
 
-  userView = (props) => {
-    return <div>
-      <NavBar />
-      <DeviceList username={props.match.params.username} />
-    </div>
-  }
+  /*
+  userView = props => {
+    var size = window.innerWidth < 800 ? "small" : "large";
 
-  deviceView = (props) => {
-    return <div>
-      <NavBar />
-      <DeviceView username={props.match.params.username} id={props.match.params.id} />
-    </div>
-  }
+    var wrapper = clone(theme.global.responsive.wrapper);
+    wrapper.height = this.state.height;
 
-  login = (props) => {
+    return (
+      <div style={wrapper}>
+        <div style={theme.global.responsive.navbar}>
+          <NavBar />
+        </div>
+
+        <div style={theme.global.responsive.content}>
+          {size == "small" ? (
+            <DeviceList username={props.match.params.username} />
+          ) : (
+            <div style={theme.global.responsive.contenthorizontal}>
+              <div>
+                <DeviceList username={props.match.params.username} />
+              </div>
+              <div style={theme.global.responsive.contentright}>
+                <Map />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ flex: "0 1 40px" }}>footer</div>
+      </div>
+    );
+  };*/
+
+  userView = props => {
+    var size = window.innerWidth < 800 ? "small" : "large";
+
+    var wrapper = clone(theme.global.responsive.wrapper);
+    wrapper.height = this.state.height;
+
+    var content = clone(theme.global.responsive.content);
+    content.width = window.innerWidth;
+
+    var contentSplit = clone(theme.global.responsive.content);
+    contentSplit.width = window.innerWidth - 300;
+
+    return (
+      <div style={wrapper}>
+        <div style={theme.global.responsive.navbar}>
+          <NavBar />
+        </div>
+
+        <div style={content}>
+          {size == "small" ? (
+            <DeviceView
+              username={props.match.params.username}
+              id={props.match.params.id}
+            />
+          ) : (
+            <div style={theme.global.responsive.contenthorizontal}>
+              <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                <DeviceList username={props.match.params.username} />
+              </div>
+              <div style={contentSplit}>
+                <Map />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ flex: "0 1 40px" }}>footer</div>
+      </div>
+    );
+  };
+
+  deviceView = props => {
+    var size = window.innerWidth < 800 ? "small" : "large";
+
+    var wrapper = clone(theme.global.responsive.wrapper);
+    wrapper.height = this.state.height;
+
+    var content = clone(theme.global.responsive.content);
+    content.width = window.innerWidth;
+
+    var contentSplit = clone(theme.global.responsive.content);
+    contentSplit.width = window.innerWidth - 300;
+
+    return (
+      <div style={wrapper}>
+        <div style={theme.global.responsive.navbar}>
+          <NavBar />
+        </div>
+
+        <div style={content}>
+          {size == "small" ? (
+            <DeviceView
+              username={props.match.params.username}
+              id={props.match.params.id}
+            />
+          ) : (
+            <div style={theme.global.responsive.contenthorizontal}>
+              <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                <DeviceList username={props.match.params.username} />
+              </div>
+              <div style={contentSplit}>
+                <DeviceView
+                  username={props.match.params.username}
+                  id={props.match.params.id}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ flex: "0 1 40px" }}>footer</div>
+      </div>
+    );
+  };
+
+  login = props => {
     return <Login history={props.history} getaccount={this.getaccount} />;
   };
 
-  signout = (props) => {
+  signout = props => {
     api.location("/signout");
     return <div>signing out</div>;
-  }
+  };
 }
-
 
 render(<App />, document.getElementById("app"));

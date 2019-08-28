@@ -13,6 +13,7 @@ import * as _ from "lodash"
 import * as vm2 from "vm2"
 
 import { User, CorePacket } from "../shared/interfaces"
+import { cleanString } from "../shared/shared";
 
 export class Core extends EventEmitter {
     db: any;
@@ -54,11 +55,12 @@ export class Core extends EventEmitter {
 
                 // handle case where no username is provided.
                 if (options.username) {
-                    user.username = options.username;
+                    user.username = cleanString(options.username);
                 } else {
-                    user.username = options.email.split("@")[0] + Math.round(Math.random() * 10000)
+                    user.username = cleanString(options.email.split("@")[0] + Math.round(Math.random() * 10000));
                 }
 
+                
 
                 var ipLoc = geoip.lookup(options.ip);
                 if (ipLoc) { user.ipLoc = ipLoc }

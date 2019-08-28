@@ -24,7 +24,7 @@ export interface CorePacket {
     workflowCode?: string;
     key?: string; // todo: is this secret?
     [index: string]: any;
-    err: string;
+    err?: string;
 }
 
 export interface DBchange {
@@ -41,4 +41,5 @@ export interface User {
     apikey: string;
     publickey: string;
     level: number;
+
 }

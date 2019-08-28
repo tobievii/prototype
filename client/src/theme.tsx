@@ -1,169 +1,193 @@
 export const prototypeTheme = {
-    padding: "10px"
-}
+  padding: "10px"
+};
 
 export const colors = {
-    spotA: "rgb(242, 53, 58)", // main colour
-    spotB: "#3b3b3b", // "#0a203b", //gradientBot
-    spotC: "#1a1a1a", // "#09111a", //gradientTop
-    spotD: "#202020", // "#0d243d", //background
-    spotE: "#fff",
-    spotF: "#2b2b2b", //"#17232b", //panelbg
-    panels: "#262626", // "#131E27",
-    good: "#119752",    //green buttons
-    public: "#1fb6d1", //blue planet
-    share: "#18d66d", // green share
-    warning: "#ecb81f",
-    alarm: "#d9283a",
-    checkmark: "#16d271",   //green
-    transparent: 0.15,
-    borders: "1px solid #545454" // #2b4255"
-}
+  spotA: "rgb(242, 53, 58)", // main colour
+  spotB: "#3b3b3b", // "#0a203b", //gradientBot
+  spotC: "#1a1a1a", // "#09111a", //gradientTop
+  spotD: "#202020", // "#0d243d", //background
+  spotE: "#fff",
+  spotF: "#2b2b2b", //"#17232b", //panelbg
+  panels: "#262626", // "#131E27",
+  good: "#119752", //green buttons
+  public: "#1fb6d1", //blue planet
+  share: "#18d66d", // green share
+  warning: "#ecb81f",
+  alarm: "#d9283a",
+  checkmark: "#16d271", //green
+  transparent: 0.15,
+  borders: "1px solid #545454" // #2b4255"
+};
 
 // DEFINE COLOURS HERE:
 
 const paddings = {
-    default: 10
-}
+  default: 10
+};
 
 export const theme: any = {
-    global: {
-        colors: {
-            "brand": '#f00',
-            'light-2': '#0f0',
-            'text': {
-                'light': 'rgba(0, 0, 0, 0.87)',
-            },
-            'primary': '#0f0',
-            'neutral-2': "#f00",
-            "panelbg": colors.panels
-        },
-        edgeSize: {
-            small: '14px',
-        },
-        elevation: {
-            light: {
-                medium: '0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)',
-            },
-        },
-        font: {
-            size: '14px',
-            height: '20px',
-        },
-        // NAVBAR
-        navbar: {
-            background: colors.panels
-        },
-        navbarlogo: {
-            padding: paddings.default,
-            float: "right"
-        },
-        navlinksmall: {
-            float: "right",
-            padding: paddings.default
-        },
-        navlinklarge: {
-            float: "right",
-            padding: paddings.default
-        },
-        searchresults: {
-            background: colors.panels,
-            border: "1px solid"
-        },
-        //////
-        devicelist: {
-            columnleftselect: {
-                marginLeft: 6,
-                padding: 5,
-                width: 20,
-                textAlign: "center"
-            },
-            columnleftsortselect: {
-                width: 26,
-                marginLeft: 6,
-                padding: 5
-            },
-            addevice: {
-                borderRadius: 0,
-                margin: 0,
-                padding: paddings.default,
-                background: colors.good
-            },
-            columns: {
-                flex: "0 1",
-                padding: 5,
-                textAlign: "center"
-            },
-            columnFill: {
-                flex: "1",
-                padding: 5,
-                textAlign: "left",
-            },
-            timecolumn: {
-                flex: 1,
-                textAlign: "right",
-                padding: 5
-            },
-            menusortcollapse: {
-                flex: "0 1",
-                padding: "5px 6px 0 1px",
-                textAlign: "center"
-            },
-            menutimesort: {
-                width: 50
-            },
-            menucolumn: {
-                width: 26
-            },
-            menuright: {
-                width: 26,
-                marginRight: 9
-            }
-        },
-        titlebars: {
-            background: colors.panels
-        },
-        menubars: {
-            background: shadeColor(colors.panels, 15)
-        },
-        menuoptions: {
-            padding: paddings.default,
-            float: "left"
-        },
-        sortbuttons: {
-            textAlign: "center",
-            float: "left"
-        }
+  global: {
+    colors: {
+      brand: "#f00",
+      "light-2": "#0f0",
+      text: {
+        light: "rgba(0, 0, 0, 0.87)"
+      },
+      primary: "#0f0",
+      "neutral-2": "#f00",
+      panelbg: colors.panels
     },
-    paddings,
-    colors
+    edgeSize: {
+      small: "14px"
+    },
+    elevation: {
+      light: {
+        medium:
+          "0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12)"
+      }
+    },
+    font: {
+      size: "14px",
+      height: "20px"
+    },
+    // NAVBAR
+    navbar: {
+      background: colors.panels
+    },
+    navbarlogo: {
+      padding: paddings.default,
+      float: "right"
+    },
+    navlinksmall: {
+      float: "right",
+      padding: paddings.default
+    },
+    navlinklarge: {
+      float: "right",
+      padding: paddings.default
+    },
+    searchresults: {
+      background: colors.panels,
+      border: "1px solid"
+    },
+    //////
+    devicelist: {
+      columnleftselect: {
+        marginLeft: 6,
+        padding: 5,
+        width: 20,
+        textAlign: "center"
+      },
+      columnleftsortselect: {
+        width: 26,
+        marginLeft: 6,
+        padding: 5
+      },
+      addevice: {
+        borderRadius: 0,
+        margin: 0,
+        padding: paddings.default,
+        background: colors.good
+      },
+      columns: {
+        flex: "0 1",
+        padding: 5,
+        textAlign: "center"
+      },
+      columnFill: {
+        flex: "1",
+        padding: 5,
+        textAlign: "left"
+      },
+      timecolumn: {
+        flex: 1,
+        textAlign: "right",
+        padding: 5
+      },
+      menusortcollapse: {
+        flex: "0 1",
+        padding: "5px 6px 0 1px",
+        textAlign: "center"
+      },
+      menutimesort: {
+        width: 50
+      },
+      menucolumn: {
+        width: 26
+      },
+      menuright: {
+        width: 26,
+        marginRight: 9
+      }
+    },
+    titlebars: {
+      background: colors.panels
+    },
+    menubars: {
+      background: shadeColor(colors.panels, 15)
+    },
+    menuoptions: {
+      padding: paddings.default,
+      float: "left"
+    },
+    sortbuttons: {
+      textAlign: "center",
+      float: "left"
+    },
+    responsive: {
+      wrapper: {
+        display: "flex",
+        flexDirection: "column"
+      },
+      navbar: { flex: "0 1 auto" },
+      content: {
+        flex: "1 1 auto",
+        flexFlow: "column",
+        //overflowY: "auto",
+        boxSizing: "border-box",
+        width: "100%"
+      },
+      contenthorizontal: {
+        boxSizing: "border-box",
+        //overflow: "hidden",
+        display: "flex",
+        flexFlow: "row",
+        height: "100%",
+        width: "100%"
+      },
+      contentright: {
+        flex: "1 0 auto"
+      }
+    }
+  },
+  paddings,
+  colors
 };
 
 // https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
 
 export function shadeColor(color, percent) {
+  var R = parseInt(color.substring(1, 3), 16);
+  var G = parseInt(color.substring(3, 5), 16);
+  var B = parseInt(color.substring(5, 7), 16);
 
-    var R = parseInt(color.substring(1, 3), 16);
-    var G = parseInt(color.substring(3, 5), 16);
-    var B = parseInt(color.substring(5, 7), 16);
+  R = Math.round((R * (100 + percent)) / 100);
+  G = Math.round((G * (100 + percent)) / 100);
+  B = Math.round((B * (100 + percent)) / 100);
 
-    R = Math.round(R * (100 + percent) / 100);
-    G = Math.round(G * (100 + percent) / 100);
-    B = Math.round(B * (100 + percent) / 100);
+  R = R < 255 ? R : 255;
+  G = G < 255 ? G : 255;
+  B = B < 255 ? B : 255;
 
-    R = (R < 255) ? R : 255;
-    G = (G < 255) ? G : 255;
-    B = (B < 255) ? B : 255;
+  var RR = R.toString(16).length == 1 ? "0" + R.toString(16) : R.toString(16);
+  var GG = G.toString(16).length == 1 ? "0" + G.toString(16) : G.toString(16);
+  var BB = B.toString(16).length == 1 ? "0" + B.toString(16) : B.toString(16);
 
-    var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-    var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-    var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
-    return "#" + RR + GG + BB;
+  return "#" + RR + GG + BB;
 }
 
 export var icons = [];
-
 
 /*
  ,
