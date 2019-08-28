@@ -55,18 +55,6 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
       var lat = parseFloat(position.coords.latitude);
       var lon = parseFloat(position.coords.longitude);
       var lastRegion;
-      devices.deveices.map((data, i) => {
-        if (data.data.gps) {
-          lastRegion = {
-            latitude: data.data.gps.lat,
-            longitude: data.data.gps.lon,
-            latitudeDelta: LONGTITUDE_DELTA,
-            longitudeDelta: LATTITUDE_DELTA,
-          };
-        }
-      })
-
-      this.setState({ initialPosition: lastRegion });
       this.setState({ markedPosition: lastRegion });
 
     });
@@ -78,9 +66,11 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
 
   devicesLocations() {
     {
-      for (var i in devices.devices) {
-        if (devices.devices[i].data.gps) {
-          temp.push(devices.devices[i])
+      if (devices.devices) {
+        for (var i in devices.devices) {
+          if (devices.devices[i].data.gps) {
+            temp.push(devices.devices[i])
+          }
         }
       }
     }
@@ -93,9 +83,10 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
         region={this.state.initialPosition}
         showsUserLocation={true}>
         {temp.map((marker, i) => (
-          <Marker
+          <Marker key={i}
+            title={marker.id}
             coordinate={marker.data.gps}
-          />
+          >{marker.Id}</Marker>
         ))}
       </MapView>
     );

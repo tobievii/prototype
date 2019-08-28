@@ -1,5 +1,6 @@
 export { MenuContainer } from './menu.container';
 export { DeviceListContainer } from './DeviceList/device.list.container';
+export { DeviceViewContainer } from './DeviceView/deviceview.container';
 export { MapViewContainer } from './MapView/map.container';
 export { FavoritesContainer } from '../../components/common/themes/favorites.container';
 export { SupportContainer } from './Support/support';

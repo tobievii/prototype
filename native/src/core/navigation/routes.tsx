@@ -16,6 +16,7 @@ import {
   MenuContainer,
   // DocsContainer,
   SupportContainer,
+  DeviceViewContainer,
 } from '../../../src/containers/menu';
 
 import {
@@ -28,7 +29,7 @@ import { MenuNavigationOptions } from './options';
 
 // import { AsyncStorage } from 'react-native'
 // var auth;
-
+console.disableYellowBox = true; //set to false to view warnings
 const DeviceListNavigator: NavigationContainer = createStackNavigator(
   {
     ['Device List']: DeviceListContainer,
@@ -94,6 +95,9 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   },
   {
     tabBarComponent: MenuContainer,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
   },
 );
 
@@ -102,6 +106,7 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
   ['Sign Up']: SignUpContainer,
   ['Forgot Password']: ForgotPasswordContainer,
   ['logged']: MenuNavigator,
+  ['DeviceView']: DeviceViewContainer,
 };
 
 const AppNavigator: NavigationContainer = createStackNavigator(
@@ -123,9 +128,5 @@ const createAppRouter = (
   useScreens();
   return createAppContainer(container);
 };
-// var user = async () => {
-//   var view = await AsyncStorage.getItem('user')
-//   console.log(view)//view user stored in device serilzed dictionary
-// }
 
 export let Router: NavigationContainer = createAppRouter(AppNavigator);
