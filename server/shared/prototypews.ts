@@ -1,8 +1,5 @@
 import { EventEmitter } from "events";
 
-import * as temptest from "./temp_clienttester"
-
-
 const WebSocket = require('isomorphic-ws')
 
 export class PrototypeWS extends EventEmitter {
@@ -13,14 +10,11 @@ export class PrototypeWS extends EventEmitter {
     constructor(options: { uri: string, apikey: string }) {
         super();
         this.apikey = options.apikey;
-
-        console.log("PrototypeWS init 2")
+        console.log("PrototypeWS init")
         this.socket = new WebSocket(options.uri);
-
 
         this.socket.onopen = () => {
             console.log('connect');
-            //this.emit("connect");
             this.sendJSON({ apikey: options.apikey });
         };
 
@@ -48,14 +42,10 @@ export class PrototypeWS extends EventEmitter {
                 }
 
             }
-            // setTimeout(() => {
-            //     this.sendJSON(Date.now());
-            // }, 500);
+
         };
 
-        this.on("join", (apikey) => {
-
-        })
+        this.on("join", (apikey) => { })
     }
 
 

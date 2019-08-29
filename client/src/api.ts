@@ -100,21 +100,7 @@ export class API extends EventEmitter {
     }
 
     connectSocket() {
-        console.log("... connect")
-        // Create WebSocket connection.
-        // const socket = new WebSocket('ws://localhost:8080');
-
-        // // Connection opened
-        // socket.addEventListener('open', function (event) {
-        //     socket.send('Hello Server!');
-        // });
-
-        // // Listen for messages
-        // socket.addEventListener('message', function (event) {
-        //     console.log('Message from server ', event.data);
-        // });
-
-
+        console.log("Connect websocket")
         this.prototypews = new PrototypeWS({ uri: 'ws://localhost:8080', apikey: this.apikey });
 
         this.prototypews.on("connect", () => {
@@ -124,33 +110,6 @@ export class API extends EventEmitter {
         this.prototypews.on("states", (states) => {
             this.updateStates(states)
         })
-
-        //this.socket.emit("join", this.apikey);
-        //this.listenSocketChannel(this.socket.of(this.apikey))
-        // your api key
-        // or subscribe to a specific device: 
-        // socket.emit("join", "0aotj1uetsqfwdrui9fqqsj02kr7wsrw|yourdevice001");
-        // // Receive data:
-        // this.socket.on("post", data => {
-        //     //console.log(data);
-        // });
-        // // Receive data:
-        // this.socket.on("packets", data => {
-        //     console.log("packet event:")
-        //     console.log(data);
-        // });
-        // this.socket.on("publickey", data => {
-        //     this.updateStates(data);
-        //     this.emit("publickey", data);
-        // });
-        // // Receive data on our users data that changes.. essentially our account details.
-        // // each user only has one entry into "users" db
-        // this.socket.on("users", data => {
-        //     this.emit("account", data);
-        // });
-        // this.socket.on("states", this.updateStates)
-
-
     }
 
     listenSocketChannel = (channel) => {
