@@ -7,7 +7,8 @@
     "start": "serve",
     "watch": "webpack --env dev -w --mode development",
     "build": "webpack --env prod --display-modules",
-    "prod": "webpack -w --mode production"
+    "prod": "webpack -w --mode production",
+    "buildsw": "tsc -w --lib es6,webworker ./src/serviceworker/serviceworker.ts --outDir ../public"
   },
   "author": "",
   "license": "ISC",

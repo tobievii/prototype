@@ -1,25 +1,20 @@
 import React from "react";
 import { render } from "react-dom";
 import { BrowserRouter, Route, Link, NavLink, Nav } from "react-router-dom";
-
 import { NavBar } from "./components/navbar";
 import { Login } from "./components/login";
 import { Landing } from "./pages/landing";
-
 import { api } from "./api";
-
 import { DeviceList } from "./components/devicelist";
 import { theme } from "./theme";
 import { SideBar } from "./components/sidebar";
 import { DeviceView } from "./components/deviceview";
 import { BGgrad } from "./pages/bggrad";
-
 import { Account } from "./components/account";
 import { Settings } from "./components/settings";
-
 import { ProtoMap as Map } from "./components/map";
-
 import { clone } from "./utils/lodash_alt";
+import { registerServiceWorker } from "./serviceworker/serviceworker_register"
 
 export default class App extends React.Component {
   state = {
@@ -51,6 +46,8 @@ export default class App extends React.Component {
     window.addEventListener("resize", () => {
       this.setState({ height: window.innerHeight });
     });
+
+    registerServiceWorker();
 
     this.getlocation();
   }
@@ -207,15 +204,15 @@ export default class App extends React.Component {
           {size == "small" ? (
             <DeviceList />
           ) : (
-            <div style={theme.global.responsive.contenthorizontal}>
-              <div>
-                <DeviceList />
+              <div style={theme.global.responsive.contenthorizontal}>
+                <div>
+                  <DeviceList />
+                </div>
+                <div style={theme.global.responsive.contentright}>
+                  <Map />
+                </div>
               </div>
-              <div style={theme.global.responsive.contentright}>
-                <Map />
-              </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div style={{ flex: "0 1 40px" }}>footer</div>
@@ -281,15 +278,15 @@ export default class App extends React.Component {
               id={props.match.params.id}
             />
           ) : (
-            <div style={theme.global.responsive.contenthorizontal}>
-              <div style={{ flex: "0 auto", maxWidth: "300px" }}>
-                <DeviceList username={props.match.params.username} />
+              <div style={theme.global.responsive.contenthorizontal}>
+                <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                  <DeviceList username={props.match.params.username} />
+                </div>
+                <div style={contentSplit}>
+                  <Map />
+                </div>
               </div>
-              <div style={contentSplit}>
-                <Map />
-              </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div style={{ flex: "0 1 40px" }}>footer</div>
@@ -322,18 +319,18 @@ export default class App extends React.Component {
               id={props.match.params.id}
             />
           ) : (
-            <div style={theme.global.responsive.contenthorizontal}>
-              <div style={{ flex: "0 auto", maxWidth: "300px" }}>
-                <DeviceList username={props.match.params.username} />
+              <div style={theme.global.responsive.contenthorizontal}>
+                <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                  <DeviceList username={props.match.params.username} />
+                </div>
+                <div style={contentSplit}>
+                  <DeviceView
+                    username={props.match.params.username}
+                    id={props.match.params.id}
+                  />
+                </div>
               </div>
-              <div style={contentSplit}>
-                <DeviceView
-                  username={props.match.params.username}
-                  id={props.match.params.id}
-                />
-              </div>
-            </div>
-          )}
+            )}
         </div>
 
         <div style={{ flex: "0 1 40px" }}>footer</div>

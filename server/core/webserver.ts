@@ -25,7 +25,7 @@ import { LogEvent, ConfigFile } from '../shared/interfaces';
 export class Webserver extends EventEmitter {
     app: express.Application;
     ssl: any;
-    server: http.Server;
+    server: http.Server | undefined;
 
     port: number = 8080;
     core: Core;
@@ -147,17 +147,18 @@ export class Webserver extends EventEmitter {
             res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
         })
 
-        // todo ssl
-        // this.server = https.createServer(this.sslOptions, this.app);
         if (options.config.ssl) {
+            if (!options.config.sslOptions) { console.error("missing sslOptions from config"); return; }
             this.server = https.createServer(options.config.sslOptions, this.app);
+            if (!options.config.httpsPort) { console.error("missing httpsPort setting from config"); return; }
             this.port = options.config.httpsPort
         } else {
             this.server = http.createServer(this.app);
-        }  
+        }
     }
 
     listen() {
+        if (!this.server) { console.error("http/s server not initialized"); return; }
         this.server.listen(this.port, () => {
             logger.log({ message: "webserver started", data: { port: this.port }, level: "info" })
         });

@@ -25,3 +25,12 @@ migration notes:
 db.packets
 
 
+BUILDING
+==========
+
+service worker:
+
+```
+cd client
+npm run buildsw
+```

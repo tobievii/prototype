@@ -6,22 +6,24 @@ import { Package, DBchange, User, ConfigFile } from "../shared/interfaces"
 
 
 export class Config extends EventEmitter {
-    filepath:string =  '../../../iotconfig.json';
-    config : ConfigFile = {
+    filepath: string = '../../../iotconfig.json';
+    config: ConfigFile = {
         ssl: false,
         httpPort: 8080,
-        mongoConnection : "prototype"
+        mongoConnection: "mongodb://localhost:27017/prototype" //default
     };
-    package: any|Package = {}
+    package: any | Package = {}
 
-    constructor(options?:any) {
+    constructor(options?: any) {
         super();
         if (options) { this.filepath = options.filepath }
         this.loadnodepkg();
         this.loadconfig();
-        this.config.version = { name: this.package.name, 
-            version: this.package.version, 
-            description: this.package.description }
+        this.config.version = {
+            name: this.package.name,
+            version: this.package.version,
+            description: this.package.description
+        }
 
         this.loadsslkeys();
     }
@@ -32,7 +34,8 @@ export class Config extends EventEmitter {
             this.config = mainconfig;
         }
         catch (err) {
-            logger.log({message:"config "+err.toString(), level:"error"})
+            logger.log({ message: "config " + err.toString(), level: "error" })
+            console.log("USING DEFAULT CONFIG")
         }
     }
 
@@ -42,16 +45,19 @@ export class Config extends EventEmitter {
             this.package = nodePackage;
 
         } catch (err) {
-            logger.log({message:"config "+err.toString(), level:"error"})
+            logger.log({ message: "config " + err.toString(), level: "error" })
         }
     }
 
     loadsslkeys() {
         if (this.config.ssl == true) {
-            this.config.sslOptions.cert = fs.readFileSync(this.config.sslOptions.certPath)
-            this.config.sslOptions.key = fs.readFileSync(this.config.sslOptions.keyPath)
-            if (this.config.sslOptions.caPath) {
-                this.config.sslOptions.ca = fs.readFileSync(this.config.sslOptions.caPath)
+            if (!this.config.sslOptions) { console.log("SSL CERT ERROR"); return; }
+            try {
+                if (this.config.sslOptions.certPath) this.config.sslOptions.cert = fs.readFileSync(this.config.sslOptions.certPath);
+                if (this.config.sslOptions.keyPath) this.config.sslOptions.key = fs.readFileSync(this.config.sslOptions.keyPath);
+                if (this.config.sslOptions.caPath) this.config.sslOptions.ca = fs.readFileSync(this.config.sslOptions.caPath);
+            } catch (err) {
+                console.log(err);
             }
         }
     }
