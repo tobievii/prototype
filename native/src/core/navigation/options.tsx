@@ -24,7 +24,7 @@ export interface BottomNavigationParams extends NavigationParams {
   bottomNavigation: (props: NavigationScreenProps) => BottomNavigationElement | null;
 }
 
-const MenuTopNavigationParams: TopNavigationParams = {
+export const MenuTopNavigationParams: TopNavigationParams = {
   header: (props: NavigationScreenProps): TopNavigationElement => {
     // @ts-ignore (private API)
     const { routeName } = getCurrentRouteState(props.navigation);

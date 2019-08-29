@@ -14,6 +14,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
 
     try {
       const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/states', {
+        //https://8bo.org/api/v4/states
         method: 'GET',
         headers: {
           'Authorization': user.auth,
@@ -21,7 +22,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
         },
       });
 
-      const data = await response.json();
+      var data = await response.json();
       this.setState({ data: data });
       for (var i in data) {
         if (data[i].data.gps) {
@@ -54,20 +55,33 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     this.props.navigation.navigate('DeviceView', { 'user': item })
   }
 
-  render() {
+  devices() {
+    if (this.state.data.length > 0) {
+      return (
+        <ScrollView style={{ backgroundColor: '#162438' }}>
+          {
+            this.state.data.map((item, key) =>
+              <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key}
+                onPress={() => this.deviceData(item)}>
+                <View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} >
+                  <CheckBox checked={item.checked} checkedColor='limegreen' onPress={() => this.onCheckChanged(item.id)} />
+                  <Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
+                </View>
+              </TouchableHighlight >,
+            )
+          }
+        </ScrollView>
+      )
+    }
+    else {
+      return (
+        <ScrollView style={{ backgroundColor: '#162438' }}>
+        </ScrollView>
+      )
+    }
+  }
 
-    return (<ScrollView style={{ backgroundColor: '#162438' }}>
-      {
-        this.state.data.map((item, key) =>
-          <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key}
-            onPress={() => this.deviceData(item)}>
-            <View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} >
-              <CheckBox checked={item.checked} checkedColor='limegreen' onPress={() => this.onCheckChanged(item.id)} />
-              <Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
-            </View>
-          </TouchableHighlight >,
-        )
-      }
-    </ScrollView>);
+  render() {
+    return (this.devices());
   }
 }

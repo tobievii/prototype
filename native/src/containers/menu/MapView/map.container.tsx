@@ -66,11 +66,9 @@ export class MapViewContainer extends React.Component<NavigationScreenProps> {
 
   devicesLocations() {
     {
-      if (devices.devices) {
-        for (var i in devices.devices) {
-          if (devices.devices[i].data.gps) {
-            temp.push(devices.devices[i])
-          }
+      for (var i in devices.devices) {
+        if (devices.devices[i].data.gps) {
+          temp.push(devices.devices[i])
         }
       }
     }

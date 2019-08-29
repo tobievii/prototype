@@ -84,6 +84,12 @@ const SettingsNavigator: NavigationContainer = createStackNavigator(
   },
 );
 
+const DeviceView: NavigationContainer = createStackNavigator(
+  {
+    ['DeviceView']: DeviceViewContainer,
+  },
+);
+
 const MenuNavigator: NavigationContainer = createBottomTabNavigator(
   {
     ['Device List']: DeviceListNavigator,
@@ -92,6 +98,7 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
     // ['Docs']: DocsNavigator,
     ['Support']: SupportNavigator,
     ['Settings']: SettingsNavigator,
+    ['Device']: DeviceView,
   },
   {
     tabBarComponent: MenuContainer,
@@ -106,7 +113,6 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
   ['Sign Up']: SignUpContainer,
   ['Forgot Password']: ForgotPasswordContainer,
   ['logged']: MenuNavigator,
-  ['DeviceView']: DeviceViewContainer,
 };
 
 const AppNavigator: NavigationContainer = createStackNavigator(

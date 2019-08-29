@@ -33,41 +33,50 @@ class MenuComponent extends React.Component<Props> {
     this.props.onTabSelect(index);
   };
 
+  bottomNav() {
+    if (this.props.selectedIndex !== 5) {
+      return (<BottomNavigation
+        appearance='noIndicator'
+        selectedIndex={this.props.selectedIndex}
+        onSelect={this.onTabSelect}>
+        <BottomNavigationTab
+          title='Device List'
+          icon={DeviceList}
+        />
+        <BottomNavigationTab
+          title='Map View'
+          icon={MapView}
+        />
+        <BottomNavigationTab
+          title='Favorites'
+          icon={Favorites}
+        />
+        <BottomNavigationTab
+          title='Support'
+          icon={Support}
+        />
+        {/* <BottomNavigationTab
+          title='Docs'
+          icon={Documentation}
+        /> */}
+        <BottomNavigationTab
+          title='Settings'
+          icon={Settings}
+        />
+      </BottomNavigation>)
+
+    }
+    else null
+  }
+
   public render(): React.ReactNode {
     const { selectedIndex, themedStyle } = this.props;
+
 
     return (
       <SafeAreaView style={themedStyle.safeAreaContainer}>
         <ThemeProvider theme={{ ...this.props.theme, ...themes['App Theme'] }}>
-          <BottomNavigation
-            appearance='noIndicator'
-            selectedIndex={selectedIndex}
-            onSelect={this.onTabSelect}>
-            <BottomNavigationTab
-              title='Device List'
-              icon={DeviceList}
-            />
-            <BottomNavigationTab
-              title='Map View'
-              icon={MapView}
-            />
-            <BottomNavigationTab
-              title='Favorites'
-              icon={Favorites}
-            />
-            <BottomNavigationTab
-              title='Support'
-              icon={Support}
-            />
-            {/* <BottomNavigationTab
-              title='Docs'
-              icon={Documentation}
-            /> */}
-            <BottomNavigationTab
-              title='Settings'
-              icon={Settings}
-            />
-          </BottomNavigation>
+          {this.bottomNav()}
         </ThemeProvider>
       </SafeAreaView>
     );

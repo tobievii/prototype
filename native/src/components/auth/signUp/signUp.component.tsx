@@ -79,6 +79,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
 
   private register = () => {
     fetch("https://prototype.dev.iotnxt.io/api/v3/admin/register", {
+      //https://8bo.org/api/v4/admin/register
       method: "POST",
       headers: {
         Accept: "application/json",
