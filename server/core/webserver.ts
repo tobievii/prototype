@@ -18,7 +18,7 @@ import { Core } from "./core"
 import { webapiv3 } from "./webapi_v3"
 import { webapiv4 } from "./webapi_v4"
 import { threadId } from 'worker_threads';
-import { LogEvent } from '../shared/interfaces';
+import { LogEvent, ConfigFile } from '../shared/interfaces';
 
 
 
@@ -30,7 +30,7 @@ export class Webserver extends EventEmitter {
     port: number = 8080;
     core: Core;
 
-    constructor(options: { core: Core }) {
+    constructor(options: { core: Core, config: ConfigFile }) {
         super();
 
         this.app = express();
@@ -149,9 +149,12 @@ export class Webserver extends EventEmitter {
 
         // todo ssl
         // this.server = https.createServer(this.sslOptions, this.app);
-        this.server = http.createServer(this.app);
-
-
+        if (options.config.ssl) {
+            this.server = https.createServer(options.config.sslOptions, this.app);
+            this.port = options.config.httpsPort
+        } else {
+            this.server = http.createServer(this.app);
+        }  
     }
 
     listen() {

@@ -43,3 +43,20 @@ export interface User {
     level: number;
 
 }
+
+export interface ConfigFile {
+    ssl: boolean
+    sslOptions?: {
+      certPath?: string
+      keyPath?: string
+      caPath?: string
+      ca?: any      
+      key? : any
+      cert? : any
+    }
+    env?: string
+    httpPort: number
+    httpsPort?: number
+    mongoConnection: string
+    version? : any;
+}

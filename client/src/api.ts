@@ -100,8 +100,14 @@ export class API extends EventEmitter {
     }
 
     connectSocket() {
+        var uri = "ws://localhost:8080"
+        if (location) {
+            uri = location.origin.replace("http","ws")
+        }
         console.log("Connect websocket")
-        this.prototypews = new PrototypeWS({ uri: 'ws://localhost:8080', apikey: this.apikey });
+
+        //this.prototypews = new PrototypeWS({ uri: 'ws://localhost:8080', apikey: this.apikey });
+        this.prototypews = new PrototypeWS({ uri, apikey: this.apikey });
 
         this.prototypews.on("connect", () => {
             console.log("connected with authentication.");
@@ -110,6 +116,10 @@ export class API extends EventEmitter {
         this.prototypews.on("states", (states) => {
             this.updateStates(states)
         })
+    }
+
+    originToWSuri() {
+        location.origin
     }
 
     listenSocketChannel = (channel) => {

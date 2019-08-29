@@ -28,8 +28,8 @@ class Logger {
       // if (event.level == "info") { return; }
 
       // groups are optional for now
-      if (!event.group) { return; }
-      if (event.group != "ws") { return; }
+      // if (!event.group) { return; }
+      // if (event.group != "ws") { return; }
 
       //console.log(new Date().toISOString()+" "+process.pid+" "+JSON.stringify(event.message))
       var tabs = "\t"
