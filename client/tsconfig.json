@@ -3,7 +3,7 @@
     // Allow importing like `import React from 'react'`
     "allowSyntheticDefaultImports": true,
     // Use ES2015 module system
-    "module": "es2015",
+    "module": "esNext",
     // Set React as the JSX factory
     "jsx": "react",
     // Resolve modules using Node-resolution algorithm
@@ -12,7 +12,7 @@
     "target": "es6",
     // Include typings from built-in lib declarations
     "lib": [
-      "es2015",
+      "esnext",
       "dom",
       "dom.iterable",
       "webworker"

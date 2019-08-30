@@ -75,6 +75,9 @@ export class Webserver extends EventEmitter {
         this.app.use(express.static('../public'))
         this.app.use(express.static('../client/dist'))
 
+        this.app.use('/view', express.static('../client/dist'))
+        this.app.use('/u/:username/view', express.static('../client/dist'))
+
         webapiv3(this.app, this.core);
         webapiv4(this.app, this.core);
 

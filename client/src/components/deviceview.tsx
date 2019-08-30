@@ -4,6 +4,8 @@ import { CorePacket } from "../../../server/shared/interfaces";
 import { JSONviewer } from "./jsonviewer";
 import { logger } from "../../../server/shared/log";
 
+import { ProtoEditor } from "./editor"
+
 interface MyProps {
   username: string;
   id: string;
@@ -57,8 +59,13 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   };
 
   stateUpdater = (states: CorePacket[]) => {
-    // if this device updated let's update state
+    console.log("--- stateUpdated!")
     console.log(states);
+
+    // if this device updated let's update state
+    if (!this.state.state) { return; }
+    if (!this.state.state.key) { return; }
+
     for (var s in states) {
       if (states[s].key == this.state.state.key) {
         if (states[s]["_last_seen"] != this.state.state["_last_seen"]) {
@@ -67,17 +74,10 @@ export class DeviceView extends React.Component<MyProps, MyState> {
         }
       }
     }
+
   };
 
   render() {
-    if (this.state.message) {
-      return (
-        <div>
-          <JSONviewer object={this.state.message} />
-        </div>
-      );
-    }
-
     if (this.state.state == undefined) {
       return <div>...</div>;
     }
@@ -95,6 +95,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
         >
           <div>
             {this.props.id}
+
+            <ProtoEditor state={this.state.state} />
             <JSONviewer object={this.state.state} />
           </div>
         </div>

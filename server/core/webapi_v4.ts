@@ -117,4 +117,12 @@ export function webapiv4(app: express.Application, core: Core) {
             if (result) { res.json(result); }
         })
     })
+
+    // app.post("/api/v4/workflow", (req: any, res) => {
+    //     core.changestate({ request: req.body, user: req.user }, (err: any, result: any) => {
+    //         console.log([err, result])
+    //         if (err) { res.status(400).json(err); }
+    //         if (result) { res.json(result); }
+    //     })
+    // })
 }

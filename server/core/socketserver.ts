@@ -77,6 +77,7 @@ export class SocketServer extends EventEmitter {
 
 
         this.on("states", (states: CorePacket) => {
+            console.log("-------")
             if ((states.apikey) && (states.id)) {
 
                 let cleanStates = _.clone(states);

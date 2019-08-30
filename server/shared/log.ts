@@ -24,8 +24,9 @@ class Logger {
   log(event: LogEvent) {
     if (event.message) {
 
-      // if (event.level != "debug") { return; }
-      // if (event.level == "info") { return; }
+      //if (event.level != "debug") { return; }
+      if (event.level != "debug") { return; }
+      //if (event.level == "info") { return; }
 
       // groups are optional for now
       // if (!event.group) { return; }

@@ -75,8 +75,9 @@ if (cluster.isMaster) {
 
         // expose state to repl context
         var core;
-        var documentstore = new DocumentStore({ 
-            mongoConnection: cfg.config.mongoConnection });
+        var documentstore = new DocumentStore({
+            mongoConnection: cfg.config.mongoConnection
+        });
 
         documentstore.on("ready", () => {
 
@@ -122,7 +123,9 @@ if (cluster.isMaster) {
 
         // update client that packets has changed
         documentstore.on("states", (data: DBchange) => {
+            console.log("....")
             if (data.fullDocument) {
+                console.log("!!!! emitting")
                 socketserver.emit("states", data.fullDocument);
                 mqttserver.emit("states", data.fullDocument);
             }
@@ -131,6 +134,7 @@ if (cluster.isMaster) {
         // update client that account has changed
         documentstore.on("users", (data: DBchange) => {
             if (data.fullDocument) {
+
                 socketserver.emit("users", data.fullDocument);
                 mqttserver.emit("users", data.fullDocument);
             }

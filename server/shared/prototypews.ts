@@ -10,16 +10,14 @@ export class PrototypeWS extends EventEmitter {
     constructor(options: { uri: string, apikey: string }) {
         super();
         this.apikey = options.apikey;
-        console.log("PrototypeWS init")
         this.socket = new WebSocket(options.uri);
 
         this.socket.onopen = () => {
-            console.log('connect');
             this.sendJSON({ apikey: options.apikey });
         };
 
         this.socket.onclose = function close() {
-            console.log('disconnected');
+            // todo handle reconnections
         };
 
         this.socket.onmessage = (message: any) => {
@@ -27,7 +25,6 @@ export class PrototypeWS extends EventEmitter {
             if (message.data) {
                 try {
                     var msg = JSON.parse(message.data);
-                    console.log(msg);
 
                     if (msg.auth == "success") {
                         this.emit("connect");
@@ -59,6 +56,7 @@ export class PrototypeWS extends EventEmitter {
             this.socket.send(JSON.stringify({ key }))
         } else {
             this.on("connect", () => {
+                console.log("subscribing to " + key)
                 this.socket.send(JSON.stringify({ key }))
             })
         }

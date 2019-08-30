@@ -60,7 +60,7 @@ export class Core extends EventEmitter {
                     user.username = cleanString(options.email.split("@")[0] + Math.round(Math.random() * 10000));
                 }
 
-                
+
 
                 var ipLoc = geoip.lookup(options.ip);
                 if (ipLoc) { user.ipLoc = ipLoc }
@@ -414,20 +414,29 @@ export class Core extends EventEmitter {
         var packet = options.packet;
         var state = options.state;
 
-        if (packet.workflowCode == undefined) { cb(undefined, packet); return; }
+        var code = undefined;
+
+        // use new workflowcode if exists on packet, else use from state if exists.
+        if (packet.workflowCode) { code = packet.workflowCode; } else {
+            if (state.workflowCode) { code = state.workflowCode }
+        }
+
+        // if still no workflowCode found, skip workflow.
+        if (code == undefined) { cb(undefined, packet); return; }
 
         let sandbox: any = { packet, state }
         sandbox.callback = (packetProcessed: CorePacket) => {
+            packetProcessed.workflowerror = ""
             cb(undefined, packetProcessed)
         }
 
         const vm = new vm2.VM({ timeout: 100, sandbox })
 
         try {
-            vm.run(packet.workflowCode)
+            vm.run(code)
         } catch (err) {
             packet.workflowerror = err.toString();
-            logger.log({ message: "workflow error", data: { packet, state, err }, level: "warn" })
+            logger.log({ message: "workflow error", data: { packet, state, err }, level: "debug" })
             cb(undefined, packet);
         }
     }
@@ -467,7 +476,7 @@ export class Core extends EventEmitter {
             })
     }
 
-    // add core functions here
+
 
     // HELPER FUNCTIONS: -------------------------------
 

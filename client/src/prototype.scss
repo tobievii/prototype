@@ -159,13 +159,12 @@ input:focus {
 }
 
 button {
-  background: $spotA;
+  background: lighten($spotF, 10%);
   color: $spotE;
   border: none;
-  padding: 10px;
+  padding: 10px 15px;
   margin: 0;
   opacity: 1.0;
-  
   cursor: pointer;
 }
 

@@ -23,7 +23,7 @@ export class DocumentStore extends EventEmitter {
     }
 
     connect(options: any) {
-        this.db = mongojs("8bo", ["users", "packets", "states"]);
+        this.db = mongojs(options.mongoConnection, ["users", "packets", "states"]);
 
         this.db.on("connect", () => {
             // only triggers on first activity it seems.
@@ -36,6 +36,7 @@ export class DocumentStore extends EventEmitter {
 
         mongoose.connect(options.mongoConnection, { useNewUrlParser: true }, (err) => {
             if (err) {
+                console.log(err);
                 logger.log({ message: "mongoose db connect error", data: { err }, level: "error" });
                 setTimeout(() => {
                     this.connect(options); //retry every second

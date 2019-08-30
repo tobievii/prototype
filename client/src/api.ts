@@ -102,15 +102,13 @@ export class API extends EventEmitter {
     connectSocket() {
         var uri = "ws://localhost:8080"
         if (location) {
-            uri = location.origin.replace("http","ws")
+            uri = location.origin.replace("http", "ws")
         }
-        console.log("Connect websocket")
 
-        //this.prototypews = new PrototypeWS({ uri: 'ws://localhost:8080', apikey: this.apikey });
         this.prototypews = new PrototypeWS({ uri, apikey: this.apikey });
 
         this.prototypews.on("connect", () => {
-            console.log("connected with authentication.");
+            logger.log({ message: "Websocket auth success", level: "verbose" })
         });
 
         this.prototypews.on("states", (states) => {
@@ -123,7 +121,6 @@ export class API extends EventEmitter {
     }
 
     listenSocketChannel = (channel) => {
-        console.log("....!")
         channel.on("states", this.updateStates);
     }
 
@@ -232,10 +229,8 @@ export class API extends EventEmitter {
             request.post(this.uri + "/api/v4/state",
                 { headers: this.headers, json: a },
                 (err, res, body: CorePacket) => {
-                    //console.log([err, res, body]);
                     if (err) cb(err);
                     if (body) {
-                        console.log(body);
                         cb(null, body);
                     }
                 })
@@ -246,7 +241,6 @@ export class API extends EventEmitter {
             request.post(this.uri + "/api/v4/state",
                 { headers: this.headers, json: { id } },
                 (err, res, body: CorePacket) => {
-                    //console.log([err, res, body]);
                     if (err) cb(err);
                     if (body) {
                         cb(null, body);
@@ -268,9 +262,7 @@ export class API extends EventEmitter {
         if (cb) {
             //options - POST
             callback = cb;
-            console.log(options);
             request.post(this.uri + "/api/v4/states", { json: options }, (err, res, body) => {
-                console.log(body);
                 if (err) callback(err);
                 if (body) {
                     this.updateStates(body)
@@ -311,14 +303,14 @@ export class API extends EventEmitter {
             (err, res, body: any) => {
 
                 if (err != undefined) {
-                    if (cb) { cb(err); } else { console.error(err); }
+                    if (cb) { cb(err); }
                 }
 
                 if (body) {
                     if (body.ok == 1) {
-                        if (cb) { cb(null, body); } else { console.log(body); }
+                        if (cb) { cb(null, body); }
                     } else {
-                        if (cb) { cb(body); } else { console.log(body); }
+                        if (cb) { cb(body); }
                     }
                 }
             })
@@ -335,8 +327,6 @@ export class API extends EventEmitter {
     }
 
     subscribe = (options) => {
-        console.log("subscribing to")
-        console.log(options);
 
         if (options.username) {
             this.search({ username: options.username }, (e, r) => {
@@ -364,6 +354,15 @@ export class API extends EventEmitter {
                 }
             })
     }
+
+    // workflow = (options, cb?) => {
+    //     request.post(this.uri + "/api/v4/workflow", { json: options }, (err, res, body: any) => {
+    //         if (err) if (cb) cb(err);
+    //         if (body) {
+    //             if (cb) cb(undefined, body);
+    //         }
+    //     })
+    // }
 }
 
 var apiinstance = new API()
