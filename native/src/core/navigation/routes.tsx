@@ -98,7 +98,6 @@ const MenuNavigator: NavigationContainer = createBottomTabNavigator(
     // ['Docs']: DocsNavigator,
     ['Support']: SupportNavigator,
     ['Settings']: SettingsNavigator,
-    ['Device']: DeviceView,
   },
   {
     tabBarComponent: MenuContainer,
@@ -113,6 +112,7 @@ const AuthNavigationMap: NavigationRouteConfigMap = {
   ['Sign Up']: SignUpContainer,
   ['Forgot Password']: ForgotPasswordContainer,
   ['logged']: MenuNavigator,
+  ['Device']: DeviceView,
 };
 
 const AppNavigator: NavigationContainer = createStackNavigator(

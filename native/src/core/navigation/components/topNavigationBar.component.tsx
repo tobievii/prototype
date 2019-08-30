@@ -4,7 +4,7 @@ import {
   ThemeType,
   withStyles,
 } from '@kitten/theme';
-import { ImageProps } from 'react-native';
+import { ImageProps, View, TouchableOpacity, } from 'react-native';
 import {
   TopNavigation,
   TopNavigationAction,
@@ -13,6 +13,7 @@ import {
 } from '@kitten/ui';
 import { textStyle } from '@src/components/common';
 import { SafeAreaView } from './safeAreaView.component';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export interface ComponentProps {
   backIcon?: BackIconProp;
@@ -41,19 +42,43 @@ class TopNavigationBarComponent extends React.Component<TopNavigationBarProps> {
     );
   };
 
+  Control = (control) => {
+    if (control == "left") {
+      return (<View style={{ flexDirection: 'row' }}>
+        <TouchableOpacity style={{ marginRight: 20, opacity: 0.7 }} >
+          <MaterialIcons name="add" size={32} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ opacity: 0.7 }}>
+          <MaterialIcons name="search" size={32} color="white" />
+        </TouchableOpacity>
+      </View>)
+    }
+
+    else if (control == "right") {
+      return (<View style={{ flexDirection: 'row' }}>
+        <TouchableOpacity style={{ marginLeft: 5, opacity: 0.7 }}>
+          <MaterialIcons name="person" size={32} color="white" />
+        </TouchableOpacity >
+        <TouchableOpacity style={{ marginLeft: 5, opacity: 0.7 }} >
+          <MaterialIcons name="settings" size={32} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ marginLeft: 5, opacity: 0.7 }}>
+          <MaterialIcons name="notifications" size={32} color="white" />
+        </TouchableOpacity>
+      </View>)
+    }
+  }
+
   public render(): React.ReactNode {
     const { themedStyle, title, backIcon } = this.props;
-
-    const leftControlElement: BackButtonElement | null = backIcon ? this.renderBackButton(backIcon) : null;
 
     return (
       <SafeAreaView style={themedStyle.safeArea}>
         <TopNavigation
           alignment='center'
-          title={title}
-          titleStyle={textStyle.subtitle}
           subtitleStyle={textStyle.caption1}
-          leftControl={leftControlElement}
+          leftControl={this.Control("left")}
+          rightControls={this.Control("right")}
         />
       </SafeAreaView>
     );

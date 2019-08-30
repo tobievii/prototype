@@ -1,17 +1,22 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { Text, View } from 'react-native';
+import { Text, View, TouchableOpacity, } from 'react-native';
+import { NavigationBar } from 'navigationbar-react-native';
 import { MenuTopNavigationParams } from '../../../core/navigation/options';
 import { MenuContainer } from '../menu.container';
-var currentDevice;
+import {
+    TopNavigation,
+} from '@kitten/ui';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { textStyle } from '@src/components/common'
 
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
         device: {};
     }
-
-    static navigationOptions = MenuTopNavigationParams;
-
+    static navigationOptions = {
+        header: null,
+    };
     private navigationKey: string = 'DeviceViewContainer';
 
     componentWillMount() {
@@ -19,16 +24,33 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
         this.setState({ device: navigation.getParam('user') })
     }
 
-    deviceData() {
-        this.props.navigation.navigate({
-            key: this.navigationKey,
-            routeName: 'Device List',
-        });
+    Controls = (control) => {
+        if (control == "left") {
+            return (<View>
+                <TouchableOpacity style={{ opacity: 0.7 }} onPress={() => this.props.navigation.goBack(null)}>
+                    <Feather name="chevron-left" size={32} color="white" />
+                </TouchableOpacity>
+            </View>)
+        }
+        else if (control == "right") {
+            return (<View>
+                <TouchableOpacity style={{ opacity: 0.7 }} >
+                    <MaterialIcons name="save" size={32} color="white" />
+                </TouchableOpacity>
+            </View>)
+        }
     }
 
     render() {
         return (<View >
-            <Text onPress={() => this.deviceData()}>{JSON.stringify(this.state.device)}</Text></View >
+            <TopNavigation
+                alignment='center'
+                title={this.state.device['id'].toString()}
+                leftControl={this.Controls("left")}
+                titleStyle={textStyle.subtitle}
+                rightControls={this.Controls("right")}
+            ></TopNavigation>
+            <Text>{JSON.stringify(this.state.device)}</Text></View >
         );
     }
 }
