@@ -1,7 +1,9 @@
-import React from "react";
-import MonacoEditor from 'react-monaco-editor';
+import React, { lazy, Suspense } from "react";
 
-import * as monaco from "monaco-editor"
+//import MonacoEditor from 'react-monaco-editor';
+const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
+//import * as monaco from "monaco-editor"
+
 import { colors, theme } from "../theme";
 import { api } from "../api";
 import { CorePacket } from "../../../server/shared/interfaces";
@@ -69,8 +71,8 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
         }
     };
 
-
-    editorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monaco: any) => {
+    //editorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monaco: any) => {
+    editorDidMount = (editor: any, monaco: any) => {
         console.log('editorDidMount', editor);
         editor.focus();
 
@@ -91,6 +93,7 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
 
         if (this.props.state) {
             definitions.push("declare var packet = " + JSON.stringify(this.props.state))
+            definitions.push("declare var state = " + JSON.stringify(this.props.state))
         }
 
         //definitions = definitions.concat(resp.pluginDefinitions.definitions);
@@ -146,7 +149,7 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
                     {this.message()}
                 </div>
 
-                <div style={{ flex: "1 auto" textAlign: "right" }}>
+                <div style={{ flex: "1 auto", textAlign: "right" }}>
                     {(this.state.unsaved)
                         ? <button onClick={this.saveWorkflow} style={{ background: colors.spotA }}><i className="fas fa-hdd"></i> Save</button>
                         : <button onClick={this.saveWorkflow}><i className="fas fa-hdd"></i> Save</button>
@@ -159,17 +162,19 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
 
 
             <div>
-                <MonacoEditor
-                    width="100%"
-                    height="300"
-                    language="typescript"
-                    theme="vs-dark"
-                    //value={JSON.stringify(this.props.state, null, 2)}
-                    value={this.state.code}
-                    options={options}
-                    onChange={this.onChange}
-                    editorDidMount={this.editorDidMount}
-                />
+                <Suspense fallback={<div>loading...</div>}>
+                    <MonacoEditor
+                        width="100%"
+                        height="300"
+                        language="typescript"
+                        theme="vs-dark"
+                        //value={JSON.stringify(this.props.state, null, 2)}
+                        value={this.state.code}
+                        options={options}
+                        onChange={this.onChange}
+                        editorDidMount={this.editorDidMount}
+                    />
+                </Suspense>
             </div>
 
 

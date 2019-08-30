@@ -1,26 +1,10 @@
 "use strict";
-
-// var webpack = require("webpack");
-// const path = require("path");
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
-    // Set debugging source maps to be "inline" for
-    // simplicity and ease of use
-    // todo: disable for production
-
-    // devtool: "inline-source-map",
-
-    // The application entrypoint
+    //devtool: "inline-source-map",
     entry: "./src/index.tsx",
-
-    // Where to compile the bundle
-    // By default the output directory is `dist`
-    output: {
-        filename: "bundle.js"
-    },
-
-    // Supported file loaders
+    output: { filename: "bundle.js" },
     module: {
         rules: [{
             test: /\.scss$/,
@@ -33,6 +17,16 @@ module.exports = {
         {
             test: /\.tsx?$/,
             loader: "ts-loader"
+        },
+        {
+            test: /\.css$/,
+            use: [{
+                loader: "style-loader"
+            },
+            {
+                loader: "css-loader"
+            }
+            ]
         }
         ]
     },
@@ -41,9 +35,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
     },
-    plugins: [
-        //new BundleAnalyzerPlugin()
-    ]
+    plugins: [new MonacoWebpackPlugin()]
     // plugins: [new webpack.ProvidePlugin({
     //   'api': 'api'
     // })]
