@@ -8,6 +8,9 @@ import { CorePacket } from "../../../server/shared/interfaces";
 import { logger } from "../../../server/shared/log";
 
 interface EditorProps {
+    /**
+     * Description test
+     */
     state?: CorePacket
 }
 
