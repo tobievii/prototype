@@ -3,41 +3,45 @@
 
 const initialize = (self: ServiceWorkerGlobalScope): void => {
 
-    var CACHE_NAME = 'Prototyp3';
-
-    var urlsToCache = [];
-
-    self.addEventListener('install', function (event) {
-        // Perform install steps
-        event.waitUntil(
-            caches.open(CACHE_NAME)
-                .then(function (cache) {
-                    console.log('Opened cache');
-                    return cache.addAll(urlsToCache);
-                })
-        );
+    self.addEventListener('install', () => {
+        self.skipWaiting();
     });
 
-    ///////////////
+    // var CACHE_NAME = 'Prototyp3';
 
-    self.addEventListener('activate', function (event) {
+    // var urlsToCache = [];
 
-        var cacheWhitelist = [];
+    // self.addEventListener('install', function (event) {
+    //     // Perform install steps
+    //     event.waitUntil(
+    //         caches.open(CACHE_NAME)
+    //             .then(function (cache) {
+    //                 console.log('Opened cache');
+    //                 return cache.addAll(urlsToCache);
+    //             })
+    //     );
+    // });
 
-        event.waitUntil(
-            caches.keys().then(function (cacheNames) {
-                return Promise.all(
-                    cacheNames.map(function (cacheName) {
-                        if (cacheWhitelist.indexOf(cacheName) === -1) {
-                            return caches.delete(cacheName);
-                        }
-                    })
-                );
-            })
-        );
+    // ///////////////
 
-        self.clients.claim();
-    });
+    // self.addEventListener('activate', function (event) {
+
+    //     var cacheWhitelist = [];
+
+    //     event.waitUntil(
+    //         caches.keys().then(function (cacheNames) {
+    //             return Promise.all(
+    //                 cacheNames.map(function (cacheName) {
+    //                     if (cacheWhitelist.indexOf(cacheName) === -1) {
+    //                         return caches.delete(cacheName);
+    //                     }
+    //                 })
+    //             );
+    //         })
+    //     );
+
+    //     self.clients.claim();
+    // });
 
 }
 
