@@ -155,6 +155,17 @@ export class Webserver extends EventEmitter {
             this.server = https.createServer(options.config.sslOptions, this.app);
             if (!options.config.httpsPort) { console.error("missing httpsPort setting from config"); return; }
             this.port = options.config.httpsPort
+
+
+            //REDIR TO HTTPS
+            /*
+             * Forward port 80 to https 
+             */
+            http.createServer(function (req: any, res: any) {
+                res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+                res.end();
+            }).listen(80);
+
         } else {
             this.server = http.createServer(this.app);
         }
