@@ -288,10 +288,11 @@ export class API extends EventEmitter {
 
     }
 
-    /*
-        deletes a device/state. Device history is not deleted.
+    /** 
+     *   deletes a device/state. Device history is not deleted.
+     * 
     */
-    delete(options: { id?: string }, cb?: Function) {
+    delete(options: { id?: string }, cb?: (err: Error, result?: any)) {
 
         if (typeof options != "object") {
             let err = new Error("delete expects an object {id?,key?}");
@@ -308,6 +309,7 @@ export class API extends EventEmitter {
 
                 if (body) {
                     if (body.ok == 1) {
+                        this.data.states = this.data.states.filter((dev) => { (dev.id != options.id) })
                         if (cb) { cb(null, body); }
                     } else {
                         if (cb) { cb(body); }

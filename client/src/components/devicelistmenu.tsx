@@ -5,6 +5,7 @@ import { clone } from "../utils/lodash_alt"
 
 interface MenuProps {
     onMenu: Function;
+    action: Function;
 }
 
 interface MenuState { }
@@ -33,7 +34,8 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
             shared: 'none',
             public: 'none'
         },
-        search: ""
+        search: "",
+        selectall: true
     }
 
     constructor(props) {
@@ -68,8 +70,11 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
             <div>
                 <div style={theme.global.menubars}>
                     <div>
-                        <button style={{ background: "none" }}>
-                            <i className="fas fa-check-double"></i> SELECT ALL
+                        <button style={{ background: "none" }} onClick={() => {
+                            this.props.action({ selectall: this.state.selectall })
+                            this.setState({ selectall: !this.state.selectall }); //toggle
+                        }}>
+                            <i className="fas fa-check-double"></i> {(this.state.selectall) ? "SELECT ALL" : "SELECT NONE"}
                         </button>
 
 
@@ -83,7 +88,10 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                             ]}
                         /> */}
 
-                        <button style={{ background: "none" }}><i className="fas fa-trash"></i> REMOVE</button>
+                        <button style={{ background: "none" }} onClick={() => { this.props.action({ removeselected: true }) }}>
+                            <i className="fas fa-trash"></i> REMOVE
+                        </button>
+
                     </div>
                 </div>
 

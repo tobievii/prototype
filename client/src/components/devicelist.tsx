@@ -39,6 +39,13 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     componentDidMount = () => {
+
+        this.getData();
+        //dynamic updates:
+        api.on("states", this.stateUpdater)
+    }
+
+    getData = () => {
         logger.log({ message: "loading devicelist", data: this.props, level: "verbose" })
         if (this.props.username) {
             api.subscribe({ username: this.props.username });
@@ -59,9 +66,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 }
             })
         }
-
-        //dynamic updates:
-        api.on("states", this.stateUpdater)
     }
 
     componentWillUnmount = () => {
@@ -189,7 +193,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     // handles clicks on devices in the list.. like for selecting/deselecting
-    handleAction = (device) => {
+    handleAction_deviceListItems = (device) => {
         return (action) => {
             if (action.select != undefined) {
                 var states = clone(this.state.states)
@@ -203,6 +207,49 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         }
     }
 
+    /**
+     * Handles actions coming from the menu.
+     * @param action Possible values: 
+     * { selectall: true|false }
+     * { removeselected: true}
+     */
+    handleAction_deviceListMenu = (action) => {
+        if (action.selectall != undefined) {
+            console.log("selectall")
+            var states = clone(this.state.states)
+            for (var device of states) {
+                device.selected = action.selectall;
+            }
+            this.setState({ states })
+        }
+
+        if (action.removeselected) {
+            console.log("remove selected:")
+            var states = clone(this.state.states)
+            for (var device of states) {
+                if (device.selected) {
+                    this.deleteItem(device)
+                }
+            }
+        }
+    }
+
+    deleteItem = (device) => {
+        console.log("removing id:" + device.id);
+        api.delete(device, (err, result) => {
+            if (err) { console.log(err); }
+            if (result) {
+                console.log(result);
+                if (result.n == 1) {
+                    console.log("success")
+                    var states = clone(this.state.states);
+                    states = states.filter((dev) => (dev.id != device.id))
+                    this.setState({ states })
+                }
+            }
+        })
+    }
+
     render() {
         return (
             <div style={{
@@ -214,7 +261,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 </div> */}
 
                 <div style={theme.global.menubars}>
-                    <DeviceListMenu onMenu={this.onMenu} />
+                    <DeviceListMenu onMenu={this.onMenu} action={this.handleAction_deviceListMenu} />
                 </div>
 
                 <div style={{ overflowX: "hidden", width: "100%", flex: 1, overflowY: "scroll" }}>
@@ -223,7 +270,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                         {this.state.states.map(
                             (value: CorePacket, index, array) => {
                                 return (
-                                    <DeviceListItem device={value} key={index} action={this.handleAction(value)} />
+                                    <DeviceListItem device={value} key={index} action={this.handleAction_deviceListItems(value)} />
                                 )
                             }
                         )}
