@@ -11,7 +11,8 @@ export class RequestWeb {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
-            }
+            },
+            credentials: "same-origin"
         }).then(response => response.json())
             .then(resp => {
                 if (resp.err) {
@@ -32,6 +33,7 @@ export class RequestWeb {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             },
+            credentials: "same-origin",
             body: JSON.stringify(data.json)
         }).then(response => response.json())
             .then(resp => {

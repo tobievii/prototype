@@ -27,7 +27,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
         super(props);
         this.intervalupdater = setInterval(() => {
             this.forceUpdate();
-        }, 1000)
+        }, 10000)
     }
 
     componentWillUnmount = () => {
