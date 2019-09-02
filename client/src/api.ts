@@ -292,7 +292,7 @@ export class API extends EventEmitter {
      *   deletes a device/state. Device history is not deleted.
      * 
     */
-    delete(options: { id?: string }, cb?: (err: Error, result?: any)) {
+    delete(options: { id?: string }, cb?: (err: Error, result?: any) => void) {
 
         if (typeof options != "object") {
             let err = new Error("delete expects an object {id?,key?}");
