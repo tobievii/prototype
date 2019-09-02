@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { AsyncStorage, ScrollView, Text, View, TouchableHighlight } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-var devices = require('../devices');
+const devices = require('../devices');
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
   state = {
@@ -14,7 +14,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
 
     try {
       const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/states', {
-        //https://8bo.org/api/v4/states
+        // https://8bo.org/api/v4/states
         method: 'GET',
         headers: {
           'Authorization': user.auth,
@@ -22,17 +22,17 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
         },
       });
 
-      var data = await response.json();
+      const data = await response.json();
       this.setState({ data: data });
-      for (var i in data) {
+      for (const i in data) {
         if (data[i].data.gps) {
-          data[i].data.gps['latitude'] = data[i].data.gps.lat
-          data[i].data.gps['longitude'] = data[i].data.gps.lon;
-          delete data[i].data.gps.lat
-          delete data[i].data.gps.lon
+          data[i].data.gps.latitude = data[i].data.gps.lat;
+          data[i].data.gps.longitude = data[i].data.gps.lon;
+          delete data[i].data.gps.lat;
+          delete data[i].data.gps.lon;
         }
       }
-      devices.devices = data
+      devices.devices = data;
     } catch (err) {
       return console.error(err.toString());
     }
@@ -51,8 +51,8 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     this.setState(data);
   }
 
-  deviceData(item) {
-    this.props.navigation.navigate('DeviceView', { 'user': item })
+  deviceData(item: any) {
+    this.props.navigation.navigate('DeviceView', { 'user': item });
   }
 
   devices() {
@@ -64,20 +64,21 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
               <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key}
                 onPress={() => this.deviceData(item)}>
                 <View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} >
-                  <CheckBox checked={item.checked} checkedColor='limegreen' onPress={() => this.onCheckChanged(item.id)} />
+                  <CheckBox
+                    checked={item.checked} checkedColor='limegreen' onPress={() => this.onCheckChanged(item.id)}
+                  />
                   <Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
                 </View>
               </TouchableHighlight >,
             )
           }
         </ScrollView>
-      )
-    }
-    else {
+      );
+    } else {
       return (
         <ScrollView style={{ backgroundColor: '#162438' }}>
         </ScrollView>
-      )
+      );
     }
   }
 
