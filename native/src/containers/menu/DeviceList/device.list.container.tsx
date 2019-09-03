@@ -77,6 +77,10 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     } else {
       return (
         <ScrollView style={{ backgroundColor: '#162438' }}>
+          <TouchableHighlight style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2, height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} onPress={() => { this.getDeviceList() }}>
+            <Text style={{ width: '70%', color: '#ffffff', marginLeft: 100, marginTop: 15, opacity: 0.5 }} >
+              No devices to display.</Text>
+          </TouchableHighlight>
         </ScrollView>
       );
     }

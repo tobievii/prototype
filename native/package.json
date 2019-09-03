@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@eva-design/eva": "^1.0.1",
+    "@expo/vector-icons": "^10.0.5",
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/react-native-fontawesome": "^0.1.0",
