@@ -108,17 +108,21 @@ export const theme: any = {
       menusortcollapse: {
         flex: "0 1",
         padding: "5px 6px 0 1px",
-        textAlign: "center"
+        textAlign: "center",
+        cursor: "pointer"
       },
       menutimesort: {
-        width: 50
+        width: 50,
+        cursor: "pointer"
       },
       menucolumn: {
-        width: 26
+        width: 26,
+        cursor: "pointer"
       },
       menuright: {
         width: 26,
-        marginRight: 9
+        marginRight: 9,
+        cursor: "pointer"
       }
     },
     titlebars: {

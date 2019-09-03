@@ -263,7 +263,7 @@ export default class App extends React.Component {
     content.width = window.innerWidth;
 
     var contentSplit = clone(theme.global.responsive.content);
-    contentSplit.width = window.innerWidth - 300;
+    contentSplit.width = window.innerWidth - 500;
 
     return (
       <div style={wrapper}>
@@ -279,7 +279,7 @@ export default class App extends React.Component {
             />
           ) : (
               <div style={theme.global.responsive.contenthorizontal}>
-                <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                <div style={{ flex: "0 auto", width: "500px" }}>
                   <DeviceList username={props.match.params.username} />
                 </div>
                 <div style={contentSplit}>
@@ -304,7 +304,7 @@ export default class App extends React.Component {
     content.width = window.innerWidth;
 
     var contentSplit = clone(theme.global.responsive.content);
-    contentSplit.width = window.innerWidth - 300;
+    contentSplit.width = window.innerWidth - 500;
 
     return (
       <div style={wrapper}>
@@ -320,7 +320,7 @@ export default class App extends React.Component {
             />
           ) : (
               <div style={theme.global.responsive.contenthorizontal}>
-                <div style={{ flex: "0 auto", maxWidth: "300px" }}>
+                <div style={{ flex: "0 auto", width: "500px" }}>
                   <DeviceList username={props.match.params.username} />
                 </div>
                 <div style={contentSplit}>

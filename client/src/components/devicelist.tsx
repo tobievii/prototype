@@ -2,7 +2,7 @@ import React from "react";
 
 import { api } from "../api"
 import { CorePacket } from "../../../server/shared/interfaces";
-import { theme } from "../theme"
+import { theme, colors } from "../theme"
 import { DeviceListItem } from "./devicelistitem"
 import { DeviceListMenu } from "./devicelistmenu"
 
@@ -177,20 +177,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         this.setState({ states: tempstates });
     }
 
-    onMenu = (data) => {
 
-        if (data.sort) {
-            this.setState({ sort: data.sort }, () => {
-                this.applySortFilter(clone(api.data.states));
-            })
-        }
-
-        if (data.search != undefined) {
-            this.setState({ search: data.search.trim() }, () => {
-                this.applySortFilter(clone(api.data.states));
-            })
-        }
-    }
 
     // handles clicks on devices in the list.. like for selecting/deselecting
     handleAction_deviceListItems = (device) => {
@@ -212,6 +199,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
      * @param action Possible values: 
      * { selectall: true|false }
      * { removeselected: true}
+     * { sort }
+     * { search }
+     * 
      */
     handleAction_deviceListMenu = (action) => {
         if (action.selectall != undefined) {
@@ -231,6 +221,18 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                     this.deleteItem(device)
                 }
             }
+        }
+
+        if (action.sort) {
+            this.setState({ sort: action.sort }, () => {
+                this.applySortFilter(clone(api.data.states));
+            })
+        }
+
+        if (action.search != undefined) {
+            this.setState({ search: action.search.trim() }, () => {
+                this.applySortFilter(clone(api.data.states));
+            })
         }
     }
 
@@ -256,12 +258,16 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 width: "100%",
                 height: "100%", overflow: "hidden", display: "flex", flexDirection: "column"
             }} >
-                {/* <div style={{ background: theme.global.titlebars.background }}>
-                    <button style={theme.global.devicelist.addevice} onClick={() => alert('hello, world')} >+ ADD DEVICE</button>
-                </div> */}
+                <div style={{ background: colors.spotC, display: "flex", flexDirection: "row" }}>
+
+                    <div style={{ flex: "1 auto", textAlign: "center" }}>
+                        <div style={{ padding: 8 }}><span>DEVICE LIST</span></div>
+                    </div>
+
+                </div>
 
                 <div style={theme.global.menubars}>
-                    <DeviceListMenu onMenu={this.onMenu} action={this.handleAction_deviceListMenu} />
+                    <DeviceListMenu action={this.handleAction_deviceListMenu} />
                 </div>
 
                 <div style={{ overflowX: "hidden", width: "100%", flex: 1, overflowY: "scroll" }}>

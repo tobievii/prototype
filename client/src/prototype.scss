@@ -140,8 +140,6 @@ h2 {
   font-weight: 400;
 }
 
-
-
 /* INPUT */
 
 input {
@@ -159,17 +157,21 @@ input:focus {
 }
 
 button {
-  background: lighten($spotF, 10%);
+  background: $spotF;
   color: $spotE;
-  border: none;
+  border: 1px solid darken($spotF, 1%);
   padding: 10px 15px;
   margin: 0;
-  opacity: 1.0;
+  opacity: 1;
   cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  text-align: left;
 }
 
 button:hover {
   opacity: 0.9;
+  background: lighten($spotF, 5%);
 }
 
 a {
@@ -208,23 +210,20 @@ a:hover {
   color: #e1e1e1;
   box-sizing: border-box;
   background: #1b1b1b;
-  
+
   border-top: 0;
   border-bottom: 0;
   border-right: 2px solid rgba(0, 0, 0, 0);
 
   opacity: 0.9;
   display: flex;
-  width:100%;
+  width: 100%;
 }
 
 .device:hover {
   opacity: 1;
   filter: drop-shadow(0px 0px 0px rgba(255, 255, 255, 0.35));
 }
-
-
-
 
 //// DATA VIEW
 
@@ -243,7 +242,6 @@ a:hover {
   transition: all 0.1s;
   //overflow: hidden;
 }
-
 
 .dataView:hover {
   background: lighten($panelBg, 5%);
@@ -276,14 +274,14 @@ a:hover {
 
 .cards {
   position: "relative";
-  top: 0px;  
-  box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.27);
+  top: 0px;
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.27);
   transition: all 0.5s ease;
 }
 
-.cards:hover{
+.cards:hover {
   position: "relative";
-  top: -10px;  
-  box-shadow: 0px 10px 4px 0px rgba(0,0,0,0.41);
+  top: -10px;
+  box-shadow: 0px 10px 4px 0px rgba(0, 0, 0, 0.41);
   transition: all 0.1s linear;
 }

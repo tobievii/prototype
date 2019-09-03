@@ -3,8 +3,9 @@ import { theme } from "../theme"
 import { SortButton } from "./sortbutton"
 import { clone } from "../utils/lodash_alt"
 
+import { Dropdown } from "./dropdown"
+
 interface MenuProps {
-    onMenu: Function;
     action: Function;
 }
 
@@ -56,41 +57,56 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
             //set this one
             sort[prop] = direction;
-            this.setState({ sort }, () => { this.props.onMenu({ sort }) })
+            this.setState({ sort }, () => { this.props.action({ sort }) })
         }
     }
 
     onSearchBoxChange = (event) => {
         var search = event.target.value.toLowerCase();
-        this.setState({ search }, () => { this.props.onMenu({ search }) })
+        this.setState({ search }, () => { this.props.action({ search }) })
     }
 
     render() {
         return (
             <div>
                 <div style={theme.global.menubars}>
-                    <div>
-                        <button style={{ background: "none" }} onClick={() => {
-                            this.props.action({ selectall: this.state.selectall })
-                            this.setState({ selectall: !this.state.selectall }); //toggle
-                        }}>
-                            <i className="fas fa-check-double"></i> {(this.state.selectall) ? "SELECT ALL" : "SELECT NONE"}
-                        </button>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
 
+                        <div style={{ flex: "0 auto" }}>
+                            <button onClick={() => { this.props.action({ add: true }) }}>
+                                <i className="fas fa-plus" /> ADD
+                            </button>
+                        </div>
 
-                        {/* <Menu
-                            label="Modify"
-                            items={[
-                                { label: 'Dashboard Preset', onClick: () => { } },
-                                { label: 'Script Preset', onClick: () => { } },
-                                { label: 'Share', onClick: () => { } },
-                                { label: 'Delete', onClick: () => { } }
-                            ]}
-                        /> */}
+                        <div style={{ flex: "" }}>
+                            <button style={{ width: "135px" }} onClick={() => {
+                                this.props.action({ selectall: this.state.selectall })
+                                this.setState({ selectall: !this.state.selectall }); //toggle
+                            }}>
+                                {(this.state.selectall)
+                                    ? <span><i className="fas fa-check-double" /> SELECT ALL</span>
+                                    : <span><i className="fas fa-square" /> SELECT NONE</span>
+                                }
+                            </button>
+                        </div>
 
-                        <button style={{ background: "none" }} onClick={() => { this.props.action({ removeselected: true }) }}>
-                            <i className="fas fa-trash"></i> REMOVE
-                        </button>
+                        <div style={{ flex: "0 auto" }}>
+                            <Dropdown
+                                label='Modify'
+                                items={[
+                                    { icon: "th", label: 'Dashboard Preset', onClick: () => { this.props.action({ dashboardset: true }); } },
+                                    { icon: "code", label: 'Code', onClick: () => { this.props.action({ scriptset: true }) } },
+                                    { icon: "share-alt", label: 'Share', onClick: () => { this.props.action({ shareset: true }) } },
+                                    { icon: "trash", label: 'Delete', onClick: () => { this.props.action({ removeselected: true }) } }
+                                ]}
+                            />
+                        </div>
+
+                        <div style={{ flex: "0 auto" }}>
+                            <button onClick={() => { this.props.action({ removeselected: true }) }}>
+                                <i className="fas fa-trash" /> REMOVE
+                            </button>
+                        </div>
 
                     </div>
                 </div>
