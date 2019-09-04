@@ -11,7 +11,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     width: 800,
     height: 400,
     resizing: false,
-    zoom: 2,
+    zoom: 4,
     center: [0, 0]
   };
 

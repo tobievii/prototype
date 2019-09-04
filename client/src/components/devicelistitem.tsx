@@ -132,7 +132,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
 
                     <div style={theme.global.devicelist.columns}>
                         {(this.props.device.public)
-                            ? <i style={{ color: colors.public }} className="fas fa-globe-africa" />
+                            ? <Link to={"/v/" + this.props.device.publickey} ><i style={{ color: colors.public }} className="fas fa-globe-africa" /></Link>
                             : <i style={{ opacity: colors.transparent }} className="fas fa-globe-africa" />}
                     </div>
                 </div>

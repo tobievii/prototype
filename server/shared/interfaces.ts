@@ -72,3 +72,10 @@ export interface WidgetType {
     dataname: string;
     options?: any;
 }
+
+
+export interface WidgetComponentProps {
+    widget: WidgetType
+    state: CorePacket
+    value?: any
+}

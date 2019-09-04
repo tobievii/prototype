@@ -75,6 +75,7 @@ export default class App extends React.Component {
         this.setState({ ready: true })
       }
       if (account) {
+        console.log(account);
         this.setState({ account, ready: true });
 
         api.states((err, states) => {
@@ -107,8 +108,12 @@ export default class App extends React.Component {
       return <div></div>;
     }
 
-    // NEW/RETURNING VISTORS
     if (!this.state.account) {
+      return <div>loading</div>
+    }
+
+    // NEW/RETURNING VISTORS
+    if (this.state.account.level == 0) {
       return (
         <BrowserRouter>
           <Route exact path="/" component={this.landing} />

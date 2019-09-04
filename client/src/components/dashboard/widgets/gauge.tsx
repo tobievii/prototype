@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Vector } from "../../../../server/shared/vector"
-import { Widget } from "./widget.jsx"
+import { Vector } from "../../../../../server/shared/vector"
+import { Widget } from "../widget.jsx"
 
-export class WidgetGauge extends React.Component {
+export default class WidgetGauge extends React.Component {
+
+    name = "Gauge"
 
     state = {
         value: 50,
