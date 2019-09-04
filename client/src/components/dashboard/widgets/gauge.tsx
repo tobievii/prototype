@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Vector } from "../../../../../server/shared/vector"
-import { Widget } from "../widget.jsx"
+import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
 
-export default class WidgetGauge extends React.Component {
+interface State { }
+export default class WidgetGauge extends React.Component<WidgetComponentProps, State> {
 
     name = "Gauge"
 
@@ -14,6 +15,7 @@ export default class WidgetGauge extends React.Component {
         typeError: false,
         color: "#11cc88"
     }
+
 
 
 
@@ -56,7 +58,9 @@ export default class WidgetGauge extends React.Component {
 
     }
 
-
+    options() {
+        return "asdf"
+    }
 
     render() {
 
@@ -73,7 +77,7 @@ export default class WidgetGauge extends React.Component {
                         fontWeight="normal"
                         textAnchor="middle"
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{this.state.value.toFixed(2)}</text>
+                        dominantBaseline="central">{this.props.value.toFixed(2)}</text>
 
                     <text x="0" y="80"
                         fill="#aaa"
@@ -94,7 +98,7 @@ export default class WidgetGauge extends React.Component {
                         dominantBaseline="central">MAX:{Math.round(this.state.max)}</text>
 
                     <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
-                    {this.drawguageSvg(this.state.min, this.state.value, this.state.max)}
+                    {this.drawguageSvg(this.state.min, this.props.value, this.state.max)}
                 </svg>
             </div>
         );

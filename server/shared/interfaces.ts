@@ -70,12 +70,16 @@ export interface WidgetType {
     h?: number;
     datapath?: string;
     dataname: string;
+    /** If any options have been set on this widget */
     options?: any;
 }
 
 
 export interface WidgetComponentProps {
+    /** Settings relevant to this widget */
     widget: WidgetType
+    /** This device full state */
     state: CorePacket
+    /** Data value if drag and dropped from endpoint */
     value?: any
 }

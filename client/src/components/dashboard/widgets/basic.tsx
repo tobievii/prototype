@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import { ProgressPlugin } from 'webpack';
-import { CorePacket, WidgetComponentProps } from '../../../../../server/shared/interfaces';
+import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
 
-
-interface State {
-
-}
+interface State { }
 
 export default class WidgetBasic extends React.Component<WidgetComponentProps, State> {
     state = {}
+
+    options() {
+        return "asdf"
+    }
 
     render() {
         return (

@@ -1,5 +1,5 @@
-// removes any non standard characters
-export function cleanString(str: any) {
+/**  Removes any non standard characters. */
+export function cleanString(str: string) {
     return str.replace(/[^a-z0-9]/gim, "").toLowerCase();
 }
 

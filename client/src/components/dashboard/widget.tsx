@@ -31,6 +31,10 @@ export class Widget extends React.Component<MyProps, MyState> {
 
         var WidgetToDraw = widgets[this.props.widget.type.toLowerCase()]
 
+        // Obtain OPTIONS from widget class
+        var WidgetOptions = "none"
+        if (WidgetToDraw) WidgetOptions = new WidgetToDraw().options()
+
         // datapath={data.datapath.split("root.")[1]
         var value;
         if (this.props.widget.datapath) {
@@ -55,7 +59,7 @@ export class Widget extends React.Component<MyProps, MyState> {
             </div>
 
             <div style={{ padding: "40px 10px 10px" }}>
-
+                <span>{WidgetOptions}</span>
 
                 {(WidgetToDraw != undefined)
                     ? <div><WidgetToDraw
