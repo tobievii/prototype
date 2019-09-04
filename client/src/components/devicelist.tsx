@@ -100,13 +100,13 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         if (this.state.sort) {
             if (this.state.sort.selected == "up") {
                 tempstates = sortBy(tempstates, (d) => {
-                    if (d.selected == undefined) { return false } else { return d.selected }
+                    return d.selected
                 }).reverse()
             }
 
             if (this.state.sort.selected == "down") {
                 tempstates = sortBy(tempstates, (d) => {
-                    if (d.selected == undefined) { return false } else { return d.selected }
+                    return d.selected
                 })
             }
 

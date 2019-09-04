@@ -47,16 +47,28 @@ export interface User {
 export interface ConfigFile {
     ssl: boolean
     sslOptions?: {
-      certPath?: string
-      keyPath?: string
-      caPath?: string
-      ca?: any      
-      key? : any
-      cert? : any
+        certPath?: string
+        keyPath?: string
+        caPath?: string
+        ca?: any
+        key?: any
+        cert?: any
     }
     env?: string
     httpPort: number
     httpsPort?: number
     mongoConnection: string
-    version? : any;
+    version?: any;
+}
+
+export interface WidgetType {
+    type: string;
+    i?: number;
+    x?: number;
+    y?: number;
+    w?: number;
+    h?: number;
+    datapath?: string;
+    dataname: string;
+    options?: any;
 }

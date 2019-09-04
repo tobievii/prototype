@@ -276,7 +276,6 @@ export class Prototype extends EventEmitter {
     }
 
     protocolSocketio() {
-        console.log("===== SOCKETIO DISABLED!!")
         // var socketclient = require("socket.io-client")(this.uri, { transports: ['websocket'] })
         // this.socketclient = socketclient;
         // socketclient.on("connect", () => {

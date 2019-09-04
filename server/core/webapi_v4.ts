@@ -29,7 +29,13 @@ export function webapiv4(app: express.Application, core: Core) {
     })
 
     app.get("/api/v4/account", (req: any, res) => {
-        if (!req.user) { res.json({ err: 'Error: user not authenticated' }); return; }
+
+        if (!req.user) {
+            //res.json({ err: 'Error: user not authenticated' }); return; 
+            res.json({ level: 0, username: "visitor" })
+            return;
+        }
+
         var cleanUser = _.clone(req.user);
         delete cleanUser.password;
         res.json(cleanUser);
@@ -59,7 +65,9 @@ export function webapiv4(app: express.Application, core: Core) {
 
     // view state simple
     app.post("/api/v4/view", (req: any, res) => {
-        core.view({ id: req.body.id, user: req.user }, (err, result) => {
+        var query = _.clone(req.body);
+        query.user = req.user;
+        core.view(query, (err, result) => {
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
         })
@@ -71,9 +79,7 @@ export function webapiv4(app: express.Application, core: Core) {
 
         core.view(query, (err, result: any) => {
             if (err) { res.status(400).json(err); }
-            if (result) {
-                res.json(result);
-            }
+            if (result) { res.json(result); }
         })
     })
 

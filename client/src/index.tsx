@@ -16,6 +16,7 @@ import { ProtoMap as Map } from "./components/map";
 import { clone } from "./utils/lodash_alt";
 import { registerServiceWorker } from "./serviceworker/serviceworker_register"
 
+
 export default class App extends React.Component {
   state = {
     count: 0,
@@ -68,16 +69,17 @@ export default class App extends React.Component {
 
   getaccount = () => {
     api.account((err, account) => {
-      this.setState({ ready: true });
       if (err) {
+        // public not logged in
         console.log(err);
+        this.setState({ ready: true })
       }
       if (account) {
-        this.setState({ account });
+        this.setState({ account, ready: true });
 
         api.states((err, states) => {
           if (states) {
-            this.setState({ states });
+            //this.setState({ states });
           }
         });
       }
@@ -111,6 +113,7 @@ export default class App extends React.Component {
         <BrowserRouter>
           <Route exact path="/" component={this.landing} />
           <Route exact path="/u/:username" component={this.userView} />
+          <Route exact path="/v/:publickey" component={this.viewByPublickey} />
           <Route
             exact
             path="/u/:username/view/:id"
@@ -132,6 +135,7 @@ export default class App extends React.Component {
             path="/u/:username/view/:id"
             component={this.deviceView}
           />
+          <Route exact path="/v/:publickey" component={this.viewByPublickey} />
           <Route path="/signout" component={this.signout} />
           <Route exact path="/settings" component={this.settings} />
           <Route exact path="/settings/account" component={this.account} />
@@ -158,6 +162,8 @@ export default class App extends React.Component {
     //   </div >
     //);
   }
+
+
 
   settings = props => {
     return (
@@ -220,38 +226,7 @@ export default class App extends React.Component {
     );
   };
 
-  /*
-  userView = props => {
-    var size = window.innerWidth < 800 ? "small" : "large";
 
-    var wrapper = clone(theme.global.responsive.wrapper);
-    wrapper.height = this.state.height;
-
-    return (
-      <div style={wrapper}>
-        <div style={theme.global.responsive.navbar}>
-          <NavBar />
-        </div>
-
-        <div style={theme.global.responsive.content}>
-          {size == "small" ? (
-            <DeviceList username={props.match.params.username} />
-          ) : (
-            <div style={theme.global.responsive.contenthorizontal}>
-              <div>
-                <DeviceList username={props.match.params.username} />
-              </div>
-              <div style={theme.global.responsive.contentright}>
-                <Map />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div style={{ flex: "0 1 40px" }}>footer</div>
-      </div>
-    );
-  };*/
 
   userView = props => {
     var size = window.innerWidth < 800 ? "small" : "large";
@@ -294,7 +269,22 @@ export default class App extends React.Component {
     );
   };
 
+  viewByPublickey = props => {
+    return (<div><DeviceView publickey={props.match.params.publickey} /></div>)
+  }
+
   deviceView = props => {
+
+    return <div>
+      <NavBar />
+
+      {/* <DeviceList username={props.match.params.username} /> */}
+      <DeviceView
+        username={props.match.params.username}
+        id={props.match.params.id}
+      />
+    </div>
+
     var size = window.innerWidth < 800 ? "small" : "large";
 
     var wrapper = clone(theme.global.responsive.wrapper);

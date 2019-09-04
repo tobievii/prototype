@@ -39,7 +39,6 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
     // -----------------------------------------------
 
     componentDidUpdate = () => {
-        console.log("EDITOR UPDATE?")
         //if (this.props.state.workflowerror) { this.setState({ message: this.props.state.workflowerror }) }
     }
 
@@ -131,10 +130,7 @@ export class ProtoEditor extends React.Component<EditorProps, EditorState> {
     render() {
 
         if (!this.props.state) { return (<div>loading</div>) }
-
-
-
-        const code = this.state.code;
+        if (!this.state.code) { return (<div>loading..</div>) }
 
         const options = {
             selectOnLineNumbers: false,

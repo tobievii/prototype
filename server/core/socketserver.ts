@@ -18,6 +18,7 @@ import * as ws from "ws";
 //const WebSocketServer = require("ws").Server
 // const WebSocketServerWrapper = require("ws-server-wrapper");
 
+
 export class SocketServer extends EventEmitter {
     server: http.Server | https.Server;
     io: any;
@@ -32,26 +33,39 @@ export class SocketServer extends EventEmitter {
 
         //// DEBUG
 
-        this.wss.on('connection', (socket) => {
-            socket.on('message', (message) => {
+        this.wss.on('connection', (socket: any) => {
+            logger.log({ message: "socket new connection", level: "verbose", group: "ws" })
+            socket.send(JSON.stringify({ server: "welcome" }))
+
+            socket.on('message', (message: string) => {
+                logger.log({ message: "socket rx", level: "verbose", group: "ws" })
                 try {
-                    var msg = JSON.parse(message);
-                    console.log(msg);
-                    //////////////
+                    var msg: any = JSON.parse(message);
 
                     // login?
-                    if (msg.apikey) {
-                        options.core.user(msg, (err, user) => {
-                            if (err) {
-                                logger.log({ message: "socket join error", data: {}, level: "error", group: "ws" })
-                            }
-                            if (user) {
-                                socket.user = user;
-                                socket.subscriptions = [];
-                                this.connections.push(socket);
-                                socket.send(JSON.stringify({ auth: "success" }))
-                            }
-                        })
+
+                    if (msg.connect) {
+                        if (msg.apikey) {
+                            options.core.user(msg, (err, user) => {
+                                if (err) {
+                                    logger.log({ message: "socket join error", level: "error", group: "ws" })
+                                }
+                                if (user) {
+                                    socket.user = user;
+                                    socket.subscriptions = [];
+                                    this.connections.push(socket);
+                                    socket.send(JSON.stringify({ auth: "success" }))
+                                }
+                            })
+                        } else {
+                            // anonymous connections to public data streams:
+                            // no apikey
+                            logger.log({ message: "socket anon connected", level: "warn", group: "ws" })
+                            socket.user = {};
+                            socket.subscriptions = [];
+                            this.connections.push(socket);
+                            socket.send(JSON.stringify({ auth: "success" }))
+                        }
                     }
 
                     if (socket.user) {
@@ -67,17 +81,11 @@ export class SocketServer extends EventEmitter {
                 }
             });
 
-            logger.log({ message: "ws connection", data: {}, level: "verbose", group: "ws" })
-            socket.send(JSON.stringify({ server: "welcome" }))
+
+
         })
 
-        console.log("server up")
-        //// -----------------------
-
-
-
         this.on("states", (states: CorePacket) => {
-            console.log("-------")
             if ((states.apikey) && (states.id)) {
 
                 let cleanStates = _.clone(states);

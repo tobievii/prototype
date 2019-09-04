@@ -1,5 +1,5 @@
 module.exports = (env) => {
-  console.log("=========== " + env)
+  console.log("Webpack using " + env)
 
   if (env == undefined) {
     return require(`./webpack.dev.js`)

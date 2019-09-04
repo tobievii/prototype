@@ -285,3 +285,114 @@ a:hover {
   box-shadow: 0px 10px 4px 0px rgba(0, 0, 0, 0.41);
   transition: all 0.1s linear;
 }
+
+.dashboardBlock {
+  background: $backgroundPanels;
+}
+
+/* WIDGETS */
+
+.widgetTitleBar {
+  background-color: $panelBg;
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.widgetGrab {
+  background: $panelBg;
+  cursor: grab;
+  padding: 5px 5px 5px 8px;
+  width: 100%;
+  text-align: left;
+  transition: background-color 0.1s linear;
+}
+
+.widgetGrab:hover {
+  background-color: lighten($panelBg, 15%);
+}
+
+.widgetGrab:active {
+  cursor: grabbing;
+}
+
+.widgetOptionsButton {
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity 0.25s linear;
+}
+
+.widgetOptionsButton:hover {
+  opacity: 0.75;
+}
+
+.menuIcons {
+  display: none;
+}
+
+.widgetMenu {
+  background: rgb(20, 35, 45);
+  border: 1px solid rgb(37, 52, 66);
+  padding: 2px;
+  text-align: left;
+}
+
+.widgetMenu select {
+  width: 100%;
+}
+
+.widgetMenuItem {
+  padding: 5px 10px 5px 10px;
+  margin: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  text-align: left;
+}
+
+.widgetMenuItemButton {
+  cursor: pointer;
+}
+
+.widgetMenuItemButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.widgetContents {
+  padding: 5px;
+}
+
+////////////////////////////////////
+
+.widget_button {
+  cursor: pointer;
+  opacity: 0.9;
+  transition: all 0.1s;
+}
+
+.widget_button:hover {
+  opacity: 1;
+}
+
+.widget_button:active {
+  transition: all 0.1s;
+  opacity: 0.5;
+  color: rgb(122, 112, 106);
+}
+
+.linkPointer {
+  cursor: pointer;
+}
+
+.widget_toggleTrue {
+  color: rgb(0, 255, 255);
+  transition: all 0.75s;
+}
+
+.widget_toggleFalse {
+  color: rgb(122, 112, 106);
+  transition: all 0.75s;
+}

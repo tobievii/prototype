@@ -21,18 +21,11 @@ export const logger:any = createLogger({
 
 class Logger {
 
+  logverbosity: number;
+
   log(event: LogEvent) {
+    this.logverbosity = 1;
     if (event.message) {
-
-      //if (event.level != "debug") { return; }
-      if (event.level != "debug") { return; }
-      //if (event.level == "info") { return; }
-
-      // groups are optional for now
-      // if (!event.group) { return; }
-      // if (event.group != "ws") { return; }
-
-      //console.log(new Date().toISOString()+" "+process.pid+" "+JSON.stringify(event.message))
       var tabs = "\t"
       if (event.message.length < 10) { tabs = "\t\t" }
       var data = "";
@@ -43,11 +36,19 @@ class Logger {
         leveltabs = "\t\t"
       }
 
-      if (process.pid) {
-        console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
-      } else {
-        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
+      if (this.logverbosity == 1) {
+        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message);
       }
+
+      if (this.logverbosity == 2) {
+        if (process.pid) {
+          console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
+        } else {
+          console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
+        }
+      }
+
+
 
 
       //+JSON.stringify(event.message.msg))

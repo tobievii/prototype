@@ -2,8 +2,9 @@ import React from "react";
 import Map from "pigeon-maps";
 import Marker from "./mapmarker";
 import { api } from "../api";
-interface MapProps {}
-interface MapState {}
+import { colors } from "../theme";
+interface MapProps { }
+interface MapState { }
 
 export class ProtoMap extends React.Component<MapProps, MapState> {
   state = {
@@ -48,9 +49,10 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
       // workaround where pidgeon map wont size down:
       this.setState(vals, () => {
+
         setTimeout(() => {
           this.setState({ resizing: false });
-        }, 100);
+        }, 600);
       });
     }
   };
@@ -83,8 +85,8 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     return (
       <div
         style={{
+          background: colors.panels,
           boxSizing: "border-box",
-          background: "#fff",
           margin: 0,
           width: "100%",
           height: "100%",
@@ -95,45 +97,45 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
         {this.state.resizing ? (
           <div style={{ width: "100%", height: "100%" }}></div>
         ) : (
-          <div
-            style={{ width: "100%", height: "100%" }}
-            onMouseMove={this.mouseMove}
-            onWheel={this.wheelHandler}
-          >
-            <Map
-              onBoundsChanged={this.onBoundsChanged}
-              attribution={false}
-              animate={true}
-              center={this.state.center}
-              zoom={this.state.zoom}
-              width={this.state.width}
-              height={this.state.height}
+            <div
+              style={{ width: "100%", height: "100%" }}
+              onMouseMove={this.mouseMove}
+              onWheel={this.wheelHandler}
             >
-              {api.data.states.map((dev, i) => {
-                if (!dev.data) {
-                  return;
-                }
-                if (!dev.data.gps) {
-                  return;
-                }
-                if (!dev.data.gps.lat) {
-                  return;
-                }
-                if (!dev.data.gps.lon) {
-                  return;
-                }
-                return (
-                  <Marker
-                    key={i}
-                    anchor={[dev.data.gps.lat, dev.data.gps.lon]}
-                    payload={1}
-                    onClick={this.handleMarkerClick}
-                  />
-                );
-              })}
-            </Map>
-          </div>
-        )}
+              <Map
+                onBoundsChanged={this.onBoundsChanged}
+                attribution={false}
+                animate={true}
+                center={this.state.center}
+                zoom={this.state.zoom}
+                width={this.state.width}
+                height={this.state.height}
+              >
+                {api.data.states.map((dev, i) => {
+                  if (!dev.data) {
+                    return;
+                  }
+                  if (!dev.data.gps) {
+                    return;
+                  }
+                  if (!dev.data.gps.lat) {
+                    return;
+                  }
+                  if (!dev.data.gps.lon) {
+                    return;
+                  }
+                  return (
+                    <Marker
+                      key={i}
+                      anchor={[dev.data.gps.lat, dev.data.gps.lon]}
+                      payload={1}
+                      onClick={this.handleMarkerClick}
+                    />
+                  );
+                })}
+              </Map>
+            </div>
+          )}
       </div>
     );
   } //end render

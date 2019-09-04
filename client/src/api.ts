@@ -21,6 +21,8 @@ export class API extends EventEmitter {
         packets: []
     }
 
+    subscriptions: any = [];
+
     constructor() {
         super();
         logger.log({ message: "API initialized", level: "verbose" })
@@ -54,6 +56,8 @@ export class API extends EventEmitter {
 
     // gets our latest account details
     account = (options?: any | Function, cb?: Function) => {
+        logger.log({ message: "api account load", level: "verbose" })
+
         var opt;
         var callback;
         if (typeof options == "function") {
@@ -64,6 +68,7 @@ export class API extends EventEmitter {
         }
 
         if (opt) {
+            logger.log({ message: "api account load1", level: "verbose" })
             request.post(this.uri + "/api/v4/account",
                 { json: opt },
                 (err, res, body: any) => {
@@ -80,6 +85,7 @@ export class API extends EventEmitter {
                 }
             )
         } else {
+
             request.get(this.uri + "/api/v4/account",
                 { headers: this.headers, json: true },
                 (err, res, body: any) => {
@@ -90,6 +96,11 @@ export class API extends EventEmitter {
                             //this.data.account = body;
                             this.apikey = body.apikey;
                             if (this.socket == undefined) this.connectSocket();
+                        } else {
+                            // connect anonymous visitors to public data streams
+                            if (body.level == 0) {
+                                if (this.socket == undefined) this.connectSocket();
+                            }
                         }
                         if (callback) callback(null, body);
                     }
@@ -105,6 +116,7 @@ export class API extends EventEmitter {
             uri = location.origin.replace("http", "ws")
         }
 
+        logger.log({ message: "api connect socket", level: "verbose" })
         this.prototypews = new PrototypeWS({ uri, apikey: this.apikey });
 
         this.prototypews.on("connect", () => {
@@ -136,9 +148,7 @@ export class API extends EventEmitter {
         }
 
         // let the app know:
-
         this.emit("states", this.data.states);
-
     }
 
     mergeState = (data) => {
@@ -153,6 +163,13 @@ export class API extends EventEmitter {
 
         if (found == false) {
             this.data.states.push(data);
+        }
+
+        //update subscriptions
+        for (var sub of this.subscriptions) {
+            if (data.publickey == sub.publickey) {
+                if (sub.cb) { sub.cb(data) }
+            }
         }
     }
 
@@ -194,9 +211,9 @@ export class API extends EventEmitter {
     }
 
     // view state of a device by id
-    view(id: string, cb: Function) {
+    view(query: object, cb: Function) {
         request.post(this.uri + "/api/v4/view",
-            { headers: this.headers, json: { id } },
+            { headers: this.headers, json: query },
             (err, res, body) => {
                 if (err) cb(err);
                 if (body) {
@@ -223,11 +240,11 @@ export class API extends EventEmitter {
         retrieve a single device state in detail.
     */
 
-    state(a: string | object, cb: (err: Error, state?: CorePacket) => void) {
+    state(query: object, cb: (err: Error, state?: CorePacket) => void) {
 
-        if (typeof a == "object") {
+        if (typeof query == "object") {
             request.post(this.uri + "/api/v4/state",
-                { headers: this.headers, json: a },
+                { headers: this.headers, json: query },
                 (err, res, body: CorePacket) => {
                     if (err) cb(err);
                     if (body) {
@@ -236,17 +253,17 @@ export class API extends EventEmitter {
                 })
         }
 
-        if (typeof a == "string") {
-            let id = a;
-            request.post(this.uri + "/api/v4/state",
-                { headers: this.headers, json: { id } },
-                (err, res, body: CorePacket) => {
-                    if (err) cb(err);
-                    if (body) {
-                        cb(null, body);
-                    }
-                })
-        }
+        // if (typeof a == "string") {
+        //     let id = a;
+        //     request.post(this.uri + "/api/v4/state",
+        //         { headers: this.headers, json: { id } },
+        //         (err, res, body: CorePacket) => {
+        //             if (err) cb(err);
+        //             if (body) {
+        //                 cb(null, body);
+        //             }
+        //         })
+        // }
 
 
     }
@@ -328,7 +345,7 @@ export class API extends EventEmitter {
         this.emit("location", location);
     }
 
-    subscribe = (options) => {
+    subscribe = (options, cb?: Function) => {
 
         if (options.username) {
             this.search({ username: options.username }, (e, r) => {
@@ -341,7 +358,12 @@ export class API extends EventEmitter {
         }
 
         if (options.publickey) {
-            this.socket.emit("publickey", options.publickey); // your api key            
+            logger.log({ message: "joining publickey", data: { publickey: options.publickey }, level: "verbose", group: "ws" })
+            this.prototypews.subscribe(options.publickey)
+
+            if (cb) {
+                this.subscriptions.push({ publickey: options.publickey, cb })
+            }
         }
     }
 

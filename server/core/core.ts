@@ -205,8 +205,9 @@ export class Core extends EventEmitter {
     datapost(options: { user: User, packet: CorePacket }, cb: (err: any, result?: any) => void) {
         logger.log({ message: "core.datapost", data: options, level: "verbose" });
 
-        if (options.packet == undefined) { cb(new Error("missing packet")) }
-        if (options.packet.id == undefined) { cb(new Error("missing id")) }
+        if (!options) { cb(new Error("options missing")); return; }
+        if (!options.packet) { cb(new Error("missing packet")); return; }
+        if (!options.packet.id) { cb(new Error("missing id")); return; }
 
         options.packet.id = options.packet.id.toLowerCase();
 
@@ -227,7 +228,11 @@ export class Core extends EventEmitter {
                 if (statedb) {
                     state = statedb; //existed!
                 } else {
-                    state = { "_created_on": new Date(), key: utils.generateDifficult(128) }
+                    state = {
+                        "_created_on": new Date(),
+                        publickey: utils.generate(32),
+                        key: utils.generateDifficult(128)
+                    }
                 }
 
                 delete state["_id"]; //sanitize db data
@@ -240,9 +245,12 @@ export class Core extends EventEmitter {
 
                 //add data from user
                 packet.apikey = user.apikey;
-                packet.publickey = user.publickey
+                packet.publickey = state.publickey
+
+                packet.userpublickey = user.publickey
                 packet.username = user.username
 
+                if (!packet.id) { return; }
                 packet.id = packet.id.toLowerCase();
 
                 //todo: meta
@@ -274,6 +282,7 @@ export class Core extends EventEmitter {
     view(options: any, cb: (error: { error: string } | undefined, result?: CorePacket | CorePacket[]) => void) {
         logger.log({ message: "core.view", data: options, level: "verbose" });
 
+
         // var logopt = _.clone(options);
         // delete logopt.user;
         // logger.log({ message: "core view", data: logopt, level: "verbose" })
@@ -282,6 +291,32 @@ export class Core extends EventEmitter {
                 delete options.username;
             }
         }
+
+        if (options.publickey) {
+
+            this.db.states.findOne({ publickey: options.publickey }, (err: Error, result: CorePacket) => {
+                if (err) { cb({ error: err.toString() }) }
+                if (result) {
+                    var send = false;
+                    if (result.public) send = true;
+
+                    if (options.user) {
+                        if (options.user.apikey == result.apikey) send = true;
+                    }
+
+                    // todo check if shared and so on..
+
+                    if (send) {
+                        cb(undefined, result);
+                    } else {
+                        cb({ error: "device not found" })
+                    }
+                }
+            })
+
+            return;
+        }
+
         // one device
         // own devices
         if ((options.id) && (options.user) && (options.username == undefined)) {

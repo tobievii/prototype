@@ -11,7 +11,6 @@ import { MQTTServer } from "./core/mqtt"
 import { cfg } from "./core/config"
 
 console.log(cfg.config)
-console.log("=========")
 
 logger.log({ message: "process start", level: "info" })
 
@@ -123,9 +122,7 @@ if (cluster.isMaster) {
 
         // update client that packets has changed
         documentstore.on("states", (data: DBchange) => {
-            console.log("....")
             if (data.fullDocument) {
-                console.log("!!!! emitting")
                 socketserver.emit("states", data.fullDocument);
                 mqttserver.emit("states", data.fullDocument);
             }

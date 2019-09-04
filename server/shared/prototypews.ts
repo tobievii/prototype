@@ -13,7 +13,7 @@ export class PrototypeWS extends EventEmitter {
         this.socket = new WebSocket(options.uri);
 
         this.socket.onopen = () => {
-            this.sendJSON({ apikey: options.apikey });
+            this.sendJSON({ apikey: options.apikey, connect: "true" });
         };
 
         this.socket.onclose = function close() {
