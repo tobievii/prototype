@@ -39,7 +39,7 @@ class DynamicStatusBarComponent extends React.Component<DynamicStatusBarProps> {
     return (
       <View style={themedStyle.container}>
         <StatusBar
-          backgroundColor={androidStatusBarBgColor}
+          backgroundColor={"#262626"}
           barStyle={barStyle}
         />
       </View>
@@ -49,7 +49,7 @@ class DynamicStatusBarComponent extends React.Component<DynamicStatusBarProps> {
 
 export const DynamicStatusBar = withStyles(DynamicStatusBarComponent, (theme: ThemeType) => ({
   container: {
-    backgroundColor: theme['background-basic-color-1'],
+    backgroundColor: "#262626",
     height: Platform.select({
       ios: Constants.statusBarHeight,
       android: 0,

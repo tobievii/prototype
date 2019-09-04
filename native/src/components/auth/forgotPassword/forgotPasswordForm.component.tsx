@@ -74,6 +74,7 @@ class ForgotPasswordFormComponent extends React.Component<ForgotPasswordFormProp
         style={[themedStyle.container, style]}
         {...restProps}>
         <ValidationInput
+          style={{ backgroundColor: "#262626" }}
           textStyle={textStyle.paragraph}
           placeholder='Email'
           icon={EmailIconFill}

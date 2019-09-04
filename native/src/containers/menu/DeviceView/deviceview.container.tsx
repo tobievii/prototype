@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { Text, View, TouchableOpacity, } from 'react-native';
+import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { NavigationBar } from 'navigationbar-react-native';
 import { MenuTopNavigationParams } from '../../../core/navigation/options';
 import { MenuContainer } from '../menu.container';
+import { DataView } from './dataView';
 import {
     TopNavigation,
 } from '@kitten/ui';
@@ -12,7 +13,8 @@ import { textStyle } from '@src/components/common'
 
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
-        device: {};
+        device: [];
+        dragging: false
     }
     static navigationOptions = {
         header: null,
@@ -42,15 +44,18 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
     }
 
     render() {
-        return (<View >
+        return (<View style={{ height: "100%", backgroundColor: '#202020' }}>
             <TopNavigation
                 alignment='center'
                 title={this.state.device['id'].toString()}
                 leftControl={this.Controls("left")}
                 titleStyle={textStyle.subtitle}
                 rightControls={this.Controls("right")}
+                style={{ position: "relative", backgroundColor: "#262626" }}
             ></TopNavigation>
-            <Text>{JSON.stringify(this.state.device)}</Text></View >
+            <ScrollView>
+                <DataView data={this.state.device} /></ScrollView >
+        </View >
         );
     }
 }

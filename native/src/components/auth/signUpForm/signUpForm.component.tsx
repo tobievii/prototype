@@ -149,12 +149,16 @@ export const SignUpForm = withStyles(SignUpFormComponent, (theme: ThemeType) => 
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
-  usernameInput: {},
+  usernameInput: {
+    backgroundColor: "#262626"
+  },
   emailInput: {
     marginTop: 16,
+    backgroundColor: "#262626"
   },
   passwordInput: {
     marginTop: 16,
+    backgroundColor: "#262626"
   },
   termsCheckBox: {
     marginTop: 24,

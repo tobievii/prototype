@@ -38,7 +38,8 @@ class MenuComponent extends React.Component<Props> {
       return (<BottomNavigation
         appearance='noIndicator'
         selectedIndex={this.props.selectedIndex}
-        onSelect={this.onTabSelect}>
+        onSelect={this.onTabSelect}
+        style={{ backgroundColor: "#262626" }}>
         <BottomNavigationTab
           title='Device List'
           icon={DeviceList}

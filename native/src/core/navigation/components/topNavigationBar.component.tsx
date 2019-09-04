@@ -111,7 +111,7 @@ export class TopNavigationBarComponent extends React.Component<TopNavigationBarP
     var { data } = this.state;
     if (this.state.search.length > 0) {
       return (
-        <FlatList data={data} renderItem={({ item }) => <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} onPress={() => this.deviceData(item)}><View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} ><Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }}>{item["id"]}</Text></View></TouchableHighlight>
+        <FlatList data={data} style={{ height: "100%" }} renderItem={({ item }) => <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1, backgroundColor: "#262626" }} onPress={() => this.deviceData(item)}><View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} ><Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }}>{item["id"]}</Text></View></TouchableHighlight>
         } keyExtractor={item => item["id"]} />
       )
     }
@@ -124,6 +124,7 @@ export class TopNavigationBarComponent extends React.Component<TopNavigationBarP
       return (<SafeAreaView style={themedStyle.safeArea}>
         <TopNavigation
           alignment='center'
+          style={{ backgroundColor: "#262626" }}
           subtitleStyle={textStyle.caption1}
           leftControl={this.Control("left")}
           rightControls={this.Control("right")}
@@ -139,7 +140,7 @@ export class TopNavigationBarComponent extends React.Component<TopNavigationBarP
             searchIcon={{ name: 'ios-search', color: "white", type: 'ionicon' }}
             cancelIcon={{ name: 'ios-arrow-back', color: "red", type: 'ionicon' }}
             clearIcon={{ name: "ios-close-circle", color: "red", type: 'ionicon' }}
-            containerStyle={themedStyle.safeArea}
+            containerStyle={{ backgroundColor: "#262626" }}
             inputStyle={{ backgroundColor: 'white' }}
             onChangeText={this.updateSearch}
             value={this.state.search}

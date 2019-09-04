@@ -77,6 +77,7 @@ class SignInForm2Component extends React.Component<SignInFormProps, State> {
         <View style={themedStyle.formContainer}>
           <ValidationInput
             textStyle={textStyle.paragraph}
+            style={{ backgroundColor: "#262626" }}
             placeholder='Username or Email'
             icon={PersonIconFill}
             validator={EmailValidator}
@@ -85,6 +86,7 @@ class SignInForm2Component extends React.Component<SignInFormProps, State> {
           <ValidationInput
             style={themedStyle.passwordInput}
             textStyle={textStyle.paragraph}
+            style={{ backgroundColor: "#262626" }}
             placeholder='Password'
             icon={EyeOffIconFill}
             secureTextEntry={true}

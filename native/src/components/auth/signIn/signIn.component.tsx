@@ -112,7 +112,7 @@ export const SignIn = withStyles(SignInComponent, (theme: ThemeType) => {
   return ({
     container: {
       flex: 1,
-      backgroundColor: theme['background-basic-color-1'],
+      backgroundColor: "#202020",
     },
     headerContainer: {
       justifyContent: 'center',

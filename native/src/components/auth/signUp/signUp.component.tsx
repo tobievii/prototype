@@ -161,7 +161,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
 export const SignUp2 = withStyles(SignUp2Component, (theme: ThemeType) => ({
   container: {
     flex: 1,
-    backgroundColor: ['background-basic-color-1'],
+    backgroundColor: '#202020',
   },
   headerContainer: {
     justifyContent: 'center',
