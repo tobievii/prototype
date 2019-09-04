@@ -4,7 +4,7 @@ import {
   ThemeType,
   withStyles,
 } from '@kitten/theme';
-import { ImageProps, View, Text, TouchableOpacity, Platform, TouchableHighlight } from 'react-native';
+import { ImageProps, View, Text, TouchableOpacity, Platform, TouchableHighlight, FlatList } from 'react-native';
 import {
   TopNavigation,
   TopNavigationAction,
@@ -16,12 +16,11 @@ import { SafeAreaView } from './safeAreaView.component';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SearchBar } from 'react-native-elements';
 var devices = require('../../../containers/menu/devices');
-import { NavigationScreenProps } from 'react-navigation';
 import { ScrollView } from 'react-native-gesture-handler';
-
 export interface ComponentProps {
   backIcon?: BackIconProp;
   onBackPress?: () => void;
+  navigation: any
 }
 
 export type TopNavigationBarProps = TopNavigationProps & ComponentProps;
@@ -31,10 +30,10 @@ type BackButtonElement = React.ReactElement<TopNavigationActionProps>;
 
 export class TopNavigationBarComponent extends React.Component<TopNavigationBarProps> {
   state: {
+    data: null;
     search: ""
     searchbar;
     platform;
-    newDeviceList: [];
   }
 
   componentWillMount() {
@@ -45,6 +44,13 @@ export class TopNavigationBarComponent extends React.Component<TopNavigationBarP
 
   updateSearch = search => {
     this.setState({ search });
+    const newData = devices.devices.filter(item => {
+      const itemData = `${item.id.toLowerCase()}   
+      ${item.data} `;
+      const textData = this.state.search;
+      return itemData.indexOf(textData.toLowerCase()) > -1;
+    });
+    this.setState({ data: newData })
   };
 
   closeSearchBar = () => {
@@ -102,15 +108,11 @@ export class TopNavigationBarComponent extends React.Component<TopNavigationBarP
   }
 
   searchList = () => {
+    var { data } = this.state;
     if (this.state.search.length > 0) {
       return (
-        devices.devices.map((item, key) =>
-          <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} key={key} onPress={() => this.deviceData(item)}>
-            <View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} >
-              <Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }} >{item.id}</Text>
-            </View>
-          </TouchableHighlight >
-        )
+        <FlatList data={data} renderItem={({ item }) => <TouchableHighlight style={{ height: 50, borderColor: '#6c757d', borderBottomWidth: 1 }} onPress={() => this.deviceData(item)}><View style={{ width: '100%', marginLeft: 10, flexDirection: 'row', marginTop: -2 }} ><Text style={{ width: '70%', color: '#ffffff', marginLeft: 10, marginTop: 15 }}>{item["id"]}</Text></View></TouchableHighlight>
+        } keyExtractor={item => item["id"]} />
       )
     }
   }
