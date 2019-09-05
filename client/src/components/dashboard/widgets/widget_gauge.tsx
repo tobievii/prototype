@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Vector } from "../../../../../server/shared/vector"
-import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
 
-interface State { }
-export default class WidgetGauge extends React.Component<WidgetComponentProps, State> {
+import { WidgetComponent } from "./widgetcomponent"
+
+export default class WidgetGauge extends WidgetComponent {
 
     name = "Gauge"
 
@@ -13,11 +13,16 @@ export default class WidgetGauge extends React.Component<WidgetComponentProps, S
         max: 100,
         valueanim: 0,
         typeError: false,
-        color: "#11cc88"
+        options: {
+            min: { type: "input", default: 0 },
+            max: { type: "input", default: 100 },
+            color: { type: "color", default: "#ff0000" }
+        }
     }
 
-
-
+    options() {
+        return this.state.options
+    }
 
     polar_to_cartesian = function (cx, cy, radius, angle) {
         var radians;
@@ -44,7 +49,10 @@ export default class WidgetGauge extends React.Component<WidgetComponentProps, S
         return ((Math.PI * 2) / 360) * degrees
     }
 
-    drawguageSvg(min, value, max) {
+    drawguageSvg(min, value, max, color) {
+
+
+
         if (this.state.typeError) {
             return null;
         } else {
@@ -53,20 +61,31 @@ export default class WidgetGauge extends React.Component<WidgetComponentProps, S
             var ratio = valr / range;
 
             var graphdegree = ((180 + 35 + 35) * ratio) - 35
-            return (<path className="value" fill="none" stroke={this.state.color} strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+            return (<path className="value" fill="none" stroke={color} strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
         }
 
     }
 
-    options() {
-        return "asdf"
-    }
+
 
     render() {
 
+        var min = this.state.options.min.default
+        var max = this.state.options.max.default
+        var color = this.state.options.color.default
+
+        // widget options:
+        if (this.props.widget.options) {
+            var db = this.props.widget.options;
+            if (db.min) min = db.min
+            if (db.color) color = db.color
+            if (db.max) max = db.max
+        }
+        //
+
         return (
             //<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
-            <div>
+            <div style={{ width: "80%", height: "80%", margin: "0 auto" }}>
                 <svg viewBox="0 0 100 100" className="gauge">
                     <text
                         x="50"
@@ -86,7 +105,7 @@ export default class WidgetGauge extends React.Component<WidgetComponentProps, S
                         fontWeight="normal"
                         textAnchor="start"
                         //alignmentBaseline="top"
-                        dominantBaseline="central">MIN:{Math.round(this.state.min)}</text>
+                        dominantBaseline="central">MIN:{Math.round(min)}</text>
 
                     <text x="100" y="80"
                         fill="#aaa"
@@ -95,10 +114,10 @@ export default class WidgetGauge extends React.Component<WidgetComponentProps, S
                         fontWeight="normal"
                         textAnchor="end"
                         //alignmentBaseline="top"
-                        dominantBaseline="central">MAX:{Math.round(this.state.max)}</text>
+                        dominantBaseline="central">MAX:{Math.round(max)}</text>
 
                     <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
-                    {this.drawguageSvg(this.state.min, this.props.value, this.state.max)}
+                    {this.drawguageSvg(min, this.props.value, max, color)}
                 </svg>
             </div>
         );

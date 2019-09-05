@@ -63,7 +63,7 @@ export interface ConfigFile {
 
 export interface WidgetType {
     type: string;
-    i?: number;
+    i?: string;
     x?: number;
     y?: number;
     w?: number;
@@ -82,4 +82,9 @@ export interface WidgetComponentProps {
     state: CorePacket
     /** Data value if drag and dropped from endpoint */
     value?: any
+}
+
+export interface OptionComponentProps {
+    name: string
+    option: any
 }

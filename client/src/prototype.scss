@@ -291,7 +291,7 @@ a:hover {
 }
 
 /* WIDGETS */
-
+/*
 .widgetTitleBar {
   background-color: $panelBg;
   height: 32px;
@@ -395,4 +395,14 @@ a:hover {
 .widget_toggleFalse {
   color: rgb(122, 112, 106);
   transition: all 0.75s;
+}
+*/
+
+///////////////////// OPTIONS
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
 }

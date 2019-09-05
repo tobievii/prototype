@@ -205,23 +205,51 @@ export class Core extends EventEmitter {
     datapost(options: { user: User, packet: CorePacket }, cb: (err: any, result?: any) => void) {
         logger.log({ message: "core.datapost", data: options, level: "verbose" });
 
-        if (!options) { cb(new Error("options missing")); return; }
-        if (!options.packet) { cb(new Error("missing packet")); return; }
-        if (!options.packet.id) { cb(new Error("missing id")); return; }
+        if (!options) {
+            let error = new Error("options missing")
+            logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
+            cb(error); return;
+        }
+        if (!options.packet) {
+            let error = new Error("missing packet")
+            logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
+            cb(error); return;
+        }
 
-        options.packet.id = options.packet.id.toLowerCase();
+        if (!options.packet.key) if (!options.packet.id) {
+            let error = new Error("missing id")
+            logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
+            cb(error); return;
+        }
 
+        if (options.packet.id) {
+            options.packet.id = options.packet.id.toLowerCase();
+        }
+
+        // key is upper/lower case mixed for security
+        console.log(options);
         //device / user?
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
 
             // ERROR CHECK
             var check = this.checkValidCorePacket(packet)
-            if (check.passed == false) { return check.error }
+            if (check.passed == false) {
+                let error = new Error("invalid core packet");
+                logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
+                return check.error
+            }
 
             // gets this device's state from the db. 
             // todo: get all subscribed instances and perform workflows on the chain, then update db.
-            this.state({ user, id: packet.id }, (err: any, statedb: any) => {
+
+
+            var finddevicequery: any = { user, id: packet.id };
+
+            if (packet.key) { finddevicequery = { user, key: packet.key } }
+
+            console.log("----")
+            this.state(finddevicequery, (err: any, statedb: any) => {
                 if (err) { if (cb) cb({ error: "db error" }); return; }
 
                 var state: CorePacket | any = {};
@@ -250,8 +278,9 @@ export class Core extends EventEmitter {
                 packet.userpublickey = user.publickey
                 packet.username = user.username
 
-                if (!packet.id) { return; }
-                packet.id = packet.id.toLowerCase();
+                //if (!packet.id) { return; }
+                //packet.id = packet.id.toLowerCase();
+                if (state.id) { if (!packet.id) packet.id = state.id }
 
                 //todo: meta
                 packet.meta = {};
@@ -259,9 +288,16 @@ export class Core extends EventEmitter {
                 //flags force boolean
                 if (packet.public != undefined) packet.public = (packet.public == true);
 
+                logger.log({ message: "core.datapost workflow", level: "verbose" });
+
                 // workflow just before saving to db.
                 this.workflow({ packet, state }, (err, processedPacket) => {
+                    logger.log({ message: "core.datapost workflow processed", level: "verbose" });
+
+                    // todo: if incoming packet has key, then do not merge.
+                    // or if { merged: false } 
                     var stateMerged = _.merge(state, processedPacket);
+                    console.log(processedPacket)
                     this.db.packets.save(processedPacket, (err: any, result: any) => {
                         delete stateMerged["_id"]
                         this.db.states.update({ key: stateMerged.key }, stateMerged, { upsert: true }, (err1: any, result1: any) => {
@@ -398,6 +434,15 @@ export class Core extends EventEmitter {
         if ((options.id) && (options.user)) {
             this.db.states.findOne({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
                 if (err) { cb({ error: "db error" }) }
+                logger.log({ message: "core.state id result", data: options, level: "verbose" });
+                cb(undefined, result);
+            })
+        }
+
+        if ((options.key) && (options.user)) {
+            this.db.states.findOne({ apikey: options.user.apikey, key: options.key }, (err: Error, result: any) => {
+                if (err) { cb({ error: "db error" }) }
+                logger.log({ message: "core.state key result", data: options, level: "verbose" });
                 cb(undefined, result);
             })
         }
@@ -517,23 +562,47 @@ export class Core extends EventEmitter {
 
     checkValidCorePacket(packet: any): { passed: boolean, error?: string } {
 
-        if (!packet.id) {
-            return { passed: false, error: "id parameter missing" }
-        }
-        if (typeof packet.id != "string") {
-            return { passed: false, error: "id must be a string" }
-        }
-        if (packet.id == "") {
-            return { passed: false, error: "id may not be empty" }
-        }
-        if (packet.id.indexOf(" ") != -1) {
-            return { passed: false, error: "id may not contain spaces" }
-        }
-        if (packet.id.match(/^[a-z0-9_]+$/i) == null) {
-            return { passed: false, error: "id may only contain a-z A-Z 0-9 and _" }
+        if (packet.key) {
+
+
+            if (typeof packet.key != "string") {
+                return { passed: false, error: "key must be a string" }
+            }
+            if (packet.key == "") {
+                return { passed: false, error: "key may not be empty" }
+            }
+            if (packet.key.indexOf(" ") != -1) {
+                return { passed: false, error: "key may not contain spaces" }
+            }
+            if (packet.key.match(/^[a-z0-9_]+$/i) == null) {
+                return { passed: false, error: "key may only contain a-z A-Z 0-9 and _" }
+            }
+
+            return { passed: true };
+
         }
 
-        return { passed: true };
+        if (packet.id) {
+
+
+            if (typeof packet.id != "string") {
+                return { passed: false, error: "id must be a string" }
+            }
+            if (packet.id == "") {
+                return { passed: false, error: "id may not be empty" }
+            }
+            if (packet.id.indexOf(" ") != -1) {
+                return { passed: false, error: "id may not contain spaces" }
+            }
+            if (packet.id.match(/^[a-z0-9_]+$/i) == null) {
+                return { passed: false, error: "id may only contain a-z A-Z 0-9 and _" }
+            }
+
+            return { passed: true };
+
+        }
+
+        return { passed: false, error: "must contain key or id parameter" }
     }
 
     // -------------------------------
