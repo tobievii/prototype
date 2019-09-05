@@ -5,8 +5,8 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css"
 import { Widget } from "./widget"
 import { generateDifficult } from "../../../../server/utils/utils"
-
 import { clone } from "../../utils/lodash_alt"
+import { api } from "../../api"
 
 interface MyProps {
     //account: User;
@@ -16,6 +16,7 @@ interface MyProps {
 interface MyState {
     grid: { width: number, cols: number, rowHeight: number }
     [index: string]: any;
+    layout: any
 }
 
 export class Dashboard extends React.Component<MyProps, MyState> {
@@ -29,6 +30,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         showB: false
     }
 
+    updatesource = "props";
     settingLayout = false;
     draggingUnique = "";
 
@@ -70,12 +72,21 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             typel = "basic"
         }
         var layout = clone(this.state.layout)
-        layout.push({ i: generateDifficult(32), x: location.x, y: location.y, w: 2, h: 5, type: typel, datapath: e.datapath, dataname: e.dataname })
-        this.setState({ layout: layout }, () => { })
+        layout.push({
+            i: generateDifficult(32),
+            x: location.x, y: location.y, w: 2, h: 5,
+            type: typel,
+            datapath: e.datapath,
+            dataname: e.dataname
+        })
+        this.updatesource = "user";
+        this.setState({ layout: layout }, () => {
+            this.updateServer();
+        })
     }
 
     gridOnDragStart = (evt) => {
-        //console.log(evt)
+        console.log("DRAG")
         //evt.preventDefault();
         //evt.stopPropagation();
     }
@@ -85,7 +96,8 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         //evt.stopPropagation();
     }
     gridOnDragStop = () => {
-        //console.log("drag stop"); 
+        console.log("drag stop");
+        this.updatesource = "user";
     }
     gridOnResizeStart = () => {
         //console.log("resize start"); 
@@ -100,8 +112,20 @@ export class Dashboard extends React.Component<MyProps, MyState> {
     componentDidMount = () => {
         if (!this.props.state) { return; }
         if (!this.props.state.layout) { return; }
+        this.setState({ layout: this.props.state.layout })
+    }
 
-        //this.setState({ layout: this.props.state.layout })
+    componentWillReceiveProps = (props) => {
+        // console.log("recieveProps", this.props.state.layout)
+
+        var statelayout = JSON.stringify(this.state.layout);
+        var propslayout = JSON.stringify(this.props.state.layout);
+
+        if (statelayout != propslayout) {
+            console.log("Updating Layout state")
+            // update if not the same as what we had.
+            this.setState({ layout: this.props.state.layout, updatesource: "props" })
+        }
     }
 
     gridOnLayoutChange = (layout) => {
@@ -127,23 +151,71 @@ export class Dashboard extends React.Component<MyProps, MyState> {
 
         if (updated) {
             // update the server
-            // this.setState({ layout: newlayout }, () => {
-            //     this.updateServer();
-            // })
+            this.setState({ layout: newlayout }, () => {
+                this.updateServer();
+            })
         }
+        // this.setState({ layout: JSON.parse(incominglayout) }, () => {
+        //     this.updateServer();
+        // })
+
+        // var statelayout = JSON.stringify(this.state.layout);
+        // var incominglayout = JSON.stringify(layout);
+
+        // if (statelayout != incominglayout) {
+        //     console.log("gridOnLayoutChange")
+        //     this.setState({ layout: JSON.parse(incominglayout) }, () => {
+        //         this.updateServer();
+        //     })
+        // }
+
+        // var updated = false; //should we update the server? default false.
+
+        // var newlayout = clone(this.state.layout)
+        // for (var widgetup of layout) {
+        //     for (var widget of newlayout) {
+        //         if (widget.i == widgetup.i) {
+        //             // update on location/size changes
+        //             if (widget.x != widgetup.x) { widget.x = widgetup.x; updated = true; }
+        //             if (widget.y != widgetup.y) { widget.y = widgetup.y; updated = true; }
+        //             if (widget.w != widgetup.w) { widget.w = widgetup.w; updated = true; }
+        //             if (widget.h != widgetup.h) { widget.h = widgetup.h; updated = true; }
+        //         }
+        //     }
+        // }
+
+        // //if there are fewer or more widgets then we update the server
+        // if (layout.length != this.state.layout) {
+        //     updated = true;
+        // }
+
+        // if (updated) {
+        //     //update the server
+
+        //     //this.updateServer();
+
+        // }
     }
 
     updateServer = () => {
-        // todo
+        console.log("updateServer ?", this.updatesource)
+        if (this.updatesource == "props") {
+            console.log("NOT UPDATING SERVER"); return;
+        } else {
+            console.log("UPDATE SERVER!")
+            this.updatesource = "props"; //debounce
+            api.post({
+                key: this.props.state.key,
+                layout: this.state.layout
+            })
+            return;
+        }
+
     }
 
     render() {
         if (!this.props.state) { return <div>loading...</div> }
-
-
-        var layout = []
-
-        if (this.props.state.layout) { layout = this.props.state.layout }
+        if (!this.state.layout) { return <div>loading...</div> }
 
         return (<div style={{ minHeight: 50, width: "100%" }}
 
@@ -159,12 +231,12 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                 onLayoutChange={this.gridOnLayoutChange}
                 useCSSTransforms={false}
                 onResizeStop={this.gridOnResizeStop}
-                layout={layout}
+                layout={this.state.layout}
                 cols={this.state.grid.cols}
                 draggableHandle=".widgetGrab"   // drag handle class
                 rowHeight={this.state.grid.rowHeight}
                 width={this.state.grid.width}>
-                {layout.map((widget, i) => {
+                {this.state.layout.map((widget, i) => {
                     return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
                         <Widget widget={widget} state={this.props.state} />
                     </div>)

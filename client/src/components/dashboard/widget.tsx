@@ -28,6 +28,7 @@ export class Widget extends React.Component<MyProps, MyState> {
     render() {
         if (!this.props.widget) { return <div>error</div> }
 
+        if (!this.props.widget.type) { return <div>error1</div> }
         // if (this.props.widget.type.toLowerCase() == "gauge") {
         //     return (<WidgetGauge />)
         // }
