@@ -235,7 +235,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                     var layout = clone(this.state.layout)
                     for (var w of layout) { if (w.i == widget.i) { w.type = type } }
                     this.updatesource = "user"; // if updatesource == user then server will be updated
-                    this.setState({ layout })
+                    this.setState({ layout }, () => { this.updateServer() })
                     // - - - - 
                 }
             }
