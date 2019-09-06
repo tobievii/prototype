@@ -216,11 +216,31 @@ export class Dashboard extends React.Component<MyProps, MyState> {
     handleWidgetActions = (widget) => {
         return (action) => {
             console.log("dashboard.handleWidgetActions", widget, action)
-
-            if (action.remove) { this.removeWidget(widget); }
+            if (action.remove) { this.removeWidget(widget) }
+            if (action.type) { this.changeWidgetType(widget, action.type) }
         }
     }
 
+    /** change the type of a widget */
+    changeWidgetType(widget: { i: string }, type: string) {
+        api.stateupdate({
+            query: { key: this.props.state.key, "layout.i": widget.i },
+            update: { $set: { "layout.$.type": type } }
+        }, (err, result) => {
+            if (err) { console.log(err); }
+            if (result) {
+                if (result.nModified == 1) {
+                    /** successfully changed in db*/
+                    // - - - - 
+                    var layout = clone(this.state.layout)
+                    for (var w of layout) { if (w.i == widget.i) { w.type = type } }
+                    this.updatesource = "user"; // if updatesource == user then server will be updated
+                    this.setState({ layout })
+                    // - - - - 
+                }
+            }
+        })
+    }
 
     /** removes a widget from the dashboard (and db)*/
     removeWidget(widget: { i: string }) {
@@ -232,12 +252,10 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             if (result) {
                 console.log(result);
                 if (result.nModified == 1) {
-                    /** successfully removed */
+                    /** successfully removed in db */
                     // - - - - 
                     var layout = clone(this.state.layout)
-                    console.log(layout);
                     layout = layout.filter((w) => { return (w.i != widget.i) })
-                    console.log(layout);
                     this.updatesource = "user"; // if updatesource == user then server will be updated
                     this.setState({ layout })
                     // - - - - 
