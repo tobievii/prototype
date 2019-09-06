@@ -18,7 +18,7 @@
       "playStoreUrl": "Enter this when app is published"
     },
     "androidStatusBar": {
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#262626"
     },
     "assetBundlePatterns": [
       "src/assets/images/source/*",
