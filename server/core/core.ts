@@ -523,9 +523,11 @@ export class Core extends EventEmitter {
 
     // -------------------------------
 
-    // manage access to a single device
-
-    access(options: { remove?: boolean, devicekey: string, userkey: string, user: User }, cb?: (err: Error | undefined, result?: any) => void) {
+    /** manage access to a single device */
+    access(options: {
+        remove?: boolean, devicekey: string,
+        userkey: string, user: User
+    }, cb?: (err: Error | undefined, result?: any) => void) {
         logger.log({ message: "core.access", data: options, level: "verbose" });
 
         if (!options.devicekey) {
@@ -554,6 +556,23 @@ export class Core extends EventEmitter {
                     if (cb) { cb(undefined, result) } else { console.log(result) }
                 }
             })
+    }
+
+    /** stateupdate - used to remove widgets from device state layout. might be useful for other tasks aswell */
+    stateupdate(options: any, cb: any) {
+        logger.log({ message: "core.stateupdate", data: options, level: "verbose" });
+        if (!options) { return; }
+        if (!options.request) { return; }
+        if (!options.request.query) { return; }
+        if (!options.user) { return; }
+        if (!options.user.apikey) { return; }
+        options.request.query.apikey = options.user.apikey;
+        this.db.states.update(options.request.query, options.request.update, (err: Error, result: any) => {
+            if (err) { cb(err); return; }
+            if (result) {
+                cb(undefined, result);
+            }
+        })
     }
 
 

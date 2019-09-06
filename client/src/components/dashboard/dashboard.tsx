@@ -124,7 +124,8 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         if (statelayout != propslayout) {
             console.log("Updating Layout state")
             // update if not the same as what we had.
-            this.setState({ layout: this.props.state.layout, updatesource: "props" })
+            this.updatesource = "props"
+            this.setState({ layout: this.props.state.layout })
         }
     }
 
@@ -210,7 +211,39 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             })
             return;
         }
+    }
 
+    handleWidgetActions = (widget) => {
+        return (action) => {
+            console.log("dashboard.handleWidgetActions", widget, action)
+
+            if (action.remove) { this.removeWidget(widget); }
+        }
+    }
+
+
+    /** removes a widget from the dashboard (and db)*/
+    removeWidget(widget: { i: string }) {
+        api.stateupdate({
+            query: { key: this.props.state.key },
+            update: { $pull: { layout: { i: widget.i } } }
+        }, (err, result) => {
+            if (err) { console.log(err); }
+            if (result) {
+                console.log(result);
+                if (result.nModified == 1) {
+                    /** successfully removed */
+                    // - - - - 
+                    var layout = clone(this.state.layout)
+                    console.log(layout);
+                    layout = layout.filter((w) => { return (w.i != widget.i) })
+                    console.log(layout);
+                    this.updatesource = "user"; // if updatesource == user then server will be updated
+                    this.setState({ layout })
+                    // - - - - 
+                }
+            }
+        })
     }
 
     render() {
@@ -238,7 +271,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                 width={this.state.grid.width}>
                 {this.state.layout.map((widget, i) => {
                     return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
-                        <Widget widget={widget} state={this.props.state} />
+                        <Widget widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
                     </div>)
                 })}
             </GridLayout>

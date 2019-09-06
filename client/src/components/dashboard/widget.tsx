@@ -3,10 +3,12 @@ import { CorePacket, WidgetType } from "../../../../server/shared/interfaces";
 import * as widgets from './widgets'
 import { OptionMenu } from "./optionmenu"
 import { objectByString } from "../../../../server/shared/shared"
+import { api } from "../../api"
 
 interface MyProps {
     widget: WidgetType;
     state: CorePacket;
+    action: Function;
     [index: string]: any;
 }
 
@@ -19,10 +21,9 @@ export class Widget extends React.Component<MyProps, MyState> {
         showMenu: false
     };
 
+    /** pass action up to parent dashboard */
     handleActionMenu = (data) => {
-        console.log("handleActionMenu", data)
-        if (data.type) { }
-        if (data.remove) { }
+        this.props.action(data);
     }
 
     render() {

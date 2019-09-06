@@ -387,6 +387,20 @@ export class API extends EventEmitter {
     //         }
     //     })
     // }
+
+    /** used to remove widgets from device state layout. 
+     * could possibly be used for other tasks */
+    stateupdate = (options, cb?) => {
+        request.post(this.uri + "/api/v4/stateupdate",
+            { headers: this.headers, json: options },
+            (err, res, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    if (body.error) { cb(body); return; }
+                    cb(null, body);
+                }
+            })
+    }
 }
 
 var apiinstance = new API()
