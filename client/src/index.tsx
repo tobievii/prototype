@@ -50,17 +50,18 @@ export default class App extends React.Component {
 
     registerServiceWorker();
 
-    this.getlocation();
+    // todo: disable location for now
+    // this.getlocation();
   }
 
   getlocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(gps => {
         console.log(gps);
-        api.post({
-          id: "you",
-          data: { gps: { lat: gps.coords.latitude, lon: gps.coords.longitude } }
-        });
+        // api.post({
+        //   id: "you",
+        //   data: { gps: { lat: gps.coords.latitude, lon: gps.coords.longitude } }
+        // });
       });
     } else {
       console.log("Geolocation is not supported by this browser.");
