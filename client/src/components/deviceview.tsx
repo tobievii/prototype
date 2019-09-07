@@ -30,47 +30,49 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   }
 
   componentDidMount = () => {
-    console.log("DeviceView")
-
-
-    // if (this.props.username && this.props.id) {
-    //   logger.log({
-    //     message: "loading deviceview",
-    //     data: this.props,
-    //     level: "verbose"
-    //   });
-
-    //   api.subscribe({ username: this.props.username });
-
-    //   api.view(
-    //     { username: this.props.username, id: this.props.id },
-    //     (err, state) => {
-    //       if (err) {
-    //         console.log(err);
-    //         this.setState({ message: err });
-    //       }
-
-    //       if (state) {
-    //         this.setState({ state });
-    //       }
-    //     }
-    //   );
-    // }
+    if (this.props.username && this.props.id) {
+      this.loadfromusernameid(this.props.username, this.props.id)
+    }
 
     if (this.props.publickey) {
-      api.view({ publickey: this.props.publickey }, (err, state) => {
+      this.loadfrompublickey(this.props.publickey);
+    }
+  };
+
+  loadfromusernameid = (username, id) => {
+    api.view({ username: this.props.username, id: this.props.id },
+      (err, state) => {
+        if (err) {
+          console.log(err);
+          this.setState({ message: err });
+        }
+
+        if (state) {
+          this.setState({ state });
+
+          api.subscribe({ publickey: state.publickey }, (state) => {
+            this.setState({ state })
+          });
+
+        }
+      }
+    );
+  }
+
+  loadfrompublickey = (publickey) => {
+    if (publickey) {
+      api.view({ publickey: publickey }, (err, state) => {
         if (err) { this.setState({ message: err }) }
         if (state) {
           if (state.publickey) this.setState({ state })
         }
       })
 
-      api.subscribe({ publickey: this.props.publickey }, (state) => {
+      api.subscribe({ publickey: publickey }, (state) => {
         this.setState({ state })
       });
     }
-
-  };
+  }
 
   componentWillUnmount = () => {
     api.removeListener("states", this.stateUpdater);
@@ -95,7 +97,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
   render() {
     if (this.state.state == undefined) {
-      return <div>...</div>;
+      return <div style={{ padding: 20 }}></div>;
     }
 
     if (this.state.state) {
