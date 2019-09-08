@@ -83,6 +83,9 @@ export default class WidgetGauge extends WidgetComponent {
         }
         //
 
+        var value = 0;
+        if (this.props.value) { value = parseInt(this.props.value) }
+
         return (
             //<Widget label={this.props.data.dataname} options={this.options} dash={this.props.dash} setOptions={this.setOptions}>
             <div style={{ width: "80%", height: "80%", margin: "0 auto" }}>
@@ -96,7 +99,7 @@ export default class WidgetGauge extends WidgetComponent {
                         fontWeight="normal"
                         textAnchor="middle"
                         alignmentBaseline="middle"
-                        dominantBaseline="central">{this.props.value.toFixed(2)}</text>
+                        dominantBaseline="central">{value}</text>
 
                     <text x="0" y="80"
                         fill="#aaa"
@@ -117,7 +120,7 @@ export default class WidgetGauge extends WidgetComponent {
                         dominantBaseline="central">MAX:{Math.round(max)}</text>
 
                     <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
-                    {this.drawguageSvg(min, this.props.value, max, color)}
+                    {this.drawguageSvg(min, value, max, color)}
                 </svg>
             </div>
         );

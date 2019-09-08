@@ -9,6 +9,7 @@ import * as repl from "repl";
 import { SocketServer } from './core/socketserver';
 import { MQTTServer } from "./core/mqtt"
 import { cfg } from "./core/config"
+import { Migration } from "./utils/migrate"
 
 console.log(cfg.config)
 
@@ -85,6 +86,8 @@ if (cluster.isMaster) {
             var replserver = repl.start(">");
             replserver.context.state = state;
             replserver.context.api = core;
+
+            var migration = new Migration({ documentstore })
         });
 
     }, 2000)
@@ -109,7 +112,7 @@ if (cluster.isMaster) {
         // only allow webserver to recieve api calls once db is ready.
         core = new Core({ documentstore, config: cfg.config })
         webserver = new Webserver({ core, config: cfg.config });
-        socketserver = new SocketServer({ server: webserver.server, core });
+        if (webserver.server) socketserver = new SocketServer({ server: webserver.server, core });
         mqttserver = new MQTTServer({ core })
 
         // update client that packets has changed
