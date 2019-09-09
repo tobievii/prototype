@@ -4,10 +4,18 @@ import React, { Component } from "react";
 export interface OptionComponentProps {
     name: string
     option: any
+    action: Function
 }
 
-interface State { }
+interface State {
+    val: any
+}
 
 export class OptionMaster extends React.Component<OptionComponentProps, State> {
+
+
+    apply() {
+        this.props.action({ apply: this.state.val })
+    }
 
 }

@@ -4,20 +4,30 @@ import { OptionMaster } from "./optionmaster"
 
 
 export default class OptionsInput extends OptionMaster {
-  state = {
-    value: "test"
+  state = { val: "default1" }
+
+
+  constructor(props) {
+    super(props);
+
+    var value = "default2" // default
+    if (props) {
+      if (props.option) {
+        if (props.option.default) { value = props.option.default }
+        if (props.option.val) { value = this.props.option.val }
+      }
+    }
+
+    this.state.val = value;
   }
+
   componentDidMount() {
     // this.state = { value: this.props.option.value }
     // this.onChange = this.onChange.bind(this);
     // this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  apply() {
-    // var option = {}
-    // option[this.props.option.name] = this.state.value;
-    // this.props.setOptions(option)
-  }
+
 
   onKeyPress = (e) => {
     if (e.key == "Enter") {
@@ -26,8 +36,9 @@ export default class OptionsInput extends OptionMaster {
   }
 
   onChange = (event) => {
-    //console.log(event.target.value)
-    //this.setState({ value: event.target.value });
+    this.setState({ val: event.target.value }, () => {
+      this.apply();
+    });
   }
 
   render() {
@@ -41,7 +52,7 @@ export default class OptionsInput extends OptionMaster {
           <input
             style={{ width: "100%" }}
             type="text"
-            value={this.state.value}
+            value={this.state.val}
             onKeyPress={this.onKeyPress}
             onChange={this.onChange} >
           </input>

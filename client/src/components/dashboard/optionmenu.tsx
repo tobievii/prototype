@@ -25,6 +25,15 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
         options: []
     };
 
+    action = (optionName) => {
+        return (data) => {
+            console.log("OptionMenu.action", optionName, data);
+            var option = {}
+            option[optionName] = data.apply;
+            this.props.action({ option })
+        }
+    }
+
     render() {
         var options = [];
 
@@ -71,8 +80,8 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
 
             {Object.keys(options).map((x, i) => {
                 var OptionToDraw = optionsComponents[options[x].type.toLowerCase()]
-                if (!OptionToDraw) { return <div>Error {options[x].type.toLowerCase()}</div> }
-                return <div key={i}><OptionToDraw name={x} option={options[x]} /></div>
+                if (!OptionToDraw) { return <div style={{ padding: colors.padding }}>Error {options[x].type.toLowerCase()}</div> }
+                return <div style={{ padding: colors.padding }} key={i}><OptionToDraw name={x} option={options[x]} action={this.action(x)} /></div>
             })}
         </div >)
     }

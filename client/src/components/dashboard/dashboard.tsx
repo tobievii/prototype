@@ -106,7 +106,8 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         //console.log("resize "); 
     }
     gridOnResizeStop = () => {
-        //console.log("resize stop"); 
+        console.log("resize stop");
+        this.updatesource = "user"
     }
 
     componentDidMount = () => {
@@ -218,7 +219,26 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             console.log("dashboard.handleWidgetActions", widget, action)
             if (action.remove) { this.removeWidget(widget) }
             if (action.type) { this.changeWidgetType(widget, action.type) }
+            if (action.option) { this.changeWidgetOption(widget, action.option); }
+            if (action.save) {
+                this.updatesource = "user";
+                this.updateServer()
+            }
         }
+    }
+
+    /** sets a widget option non permanently */
+    changeWidgetOption(widget: { i: string }, option) {
+        var layout = clone(this.state.layout);
+        layout = layout.map((w) => {
+            if (w.i == widget.i) {
+                if (!w.options) { w.options = option; } else {
+                    w.options = { ...w.options, ...option }
+                }
+            }
+            return w
+        })
+        this.setState({ layout })
     }
 
     /** change the type of a widget */

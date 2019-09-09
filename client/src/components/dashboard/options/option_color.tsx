@@ -4,7 +4,7 @@ import { OptionMaster } from "./optionmaster"
 
 
 export default class OptionsColor extends OptionMaster {
-  state = { value: "#FFFFFF" }
+  state = { val: "#FFFFFF" }
 
   constructor(props) {
     super(props);
@@ -17,13 +17,7 @@ export default class OptionsColor extends OptionMaster {
       }
     }
 
-    this.state.value = value;
-  }
-
-  apply() {
-    // var option = {}
-    // option[this.props.option.name] = value;
-    // this.props.setOptions(option)
+    this.state.val = value;
   }
 
   onKeyPress = (e) => {
@@ -34,12 +28,10 @@ export default class OptionsColor extends OptionMaster {
 
   onChange = (event) => {
     //console.log(event.target.value)
-    this.setState({ value: event.target.value }, () => {
+    this.setState({ val: event.target.value }, () => {
       this.apply();
     });
   }
-
-
 
   render() {
     return (<div className="widgetMenuItem" style={{ display: "flex", flexDirection: "row" }} >
@@ -49,15 +41,15 @@ export default class OptionsColor extends OptionMaster {
       <input
         style={{
           display: "block", borderTopLeftRadius: 5, borderBottomLeftRadius: 5,
-          background: this.state.value, border: 0, height: "35px", padding: 2, margin: 0,
+          background: this.state.val, border: 0, height: "35px", padding: 2, margin: 0,
           width: "35px"
         }}
         type="color"
-        value={this.state.value}
+        value={this.state.val}
         // onKeyPress={this.onKeyPress}
         onChange={this.onChange} />
 
-      <input type="text" value={this.state.value} onChange={this.onChange} />
+      <input type="text" value={this.state.val} onChange={this.onChange} />
     </div>)
   }
 }
