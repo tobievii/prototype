@@ -2,8 +2,39 @@ import React, { Component } from 'react';
 import { Vector } from "../../../../../server/shared/vector"
 import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
 
-interface State { }
+interface WidgetOption {
+    type: string
+    default: any
+    value?: any
+}
+
+interface WidgetOptions {
+    [index: string]: WidgetOption;
+}
+
+interface State {
+    options: WidgetOptions
+}
 export class WidgetComponent extends React.Component<WidgetComponentProps, State> {
 
+    options() {
+        return this.state.options
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        for (var opt of Object.keys(state.options)) {
+            //default
+            state.options[opt].value = state.options[opt].default
+
+            //override
+            if (props.widget.options) {
+                if (props.widget.options[opt]) {
+                    //console.log(props.widget.options[opt])
+                    state.options[opt].value = props.widget.options[opt]
+                }
+            }
+        }
+        return state;
+    }
 };
 
