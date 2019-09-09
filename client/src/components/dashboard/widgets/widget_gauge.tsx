@@ -16,7 +16,7 @@ export default class WidgetGauge extends WidgetComponent {
         options: {
             min: { type: "input", default: 0 },
             max: { type: "input", default: 100 },
-            color: { type: "color", default: "#ff0000" }
+            color: { type: "color", default: "#00ff00" }
         }
     }
 
@@ -61,7 +61,7 @@ export default class WidgetGauge extends WidgetComponent {
             var ratio = valr / range;
 
             var graphdegree = ((180 + 35 + 35) * ratio) - 35
-            return (<path className="value" fill="none" stroke={color} strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
+            return (<path className="value" fill="none" stroke={color} strokeWidth="1" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))}></path>)
         }
 
     }
@@ -119,7 +119,7 @@ export default class WidgetGauge extends WidgetComponent {
                         //alignmentBaseline="top"
                         dominantBaseline="central">MAX:{Math.round(max)}</text>
 
-                    <path className="value" fill="none" stroke="#222" strokeWidth="2.5" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
+                    <path className="value" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))}></path>
                     {this.drawguageSvg(min, value, max, color)}
                 </svg>
             </div>

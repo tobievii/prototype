@@ -17,7 +17,9 @@ export const colors = {
   alarm: "#d9283a",
   checkmark: "#16d271", //green
   transparent: 0.15,
-  borders: "1px solid #545454" // #2b4255"
+  lines: "#333", //same as borders below
+  borders: "1px solid #333", // 
+  padding: 10
 };
 
 // DEFINE COLOURS HERE:

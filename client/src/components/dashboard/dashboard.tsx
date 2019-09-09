@@ -115,7 +115,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         this.setState({ layout: this.props.state.layout })
     }
 
-    componentWillReceiveProps = (props) => {
+    UNSAFE_componentWillReceiveProps = (props) => {
         // console.log("recieveProps", this.props.state.layout)
 
         var statelayout = JSON.stringify(this.state.layout);
@@ -268,7 +268,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         if (!this.props.state) { return <div>loading...</div> }
         if (!this.state.layout) { return <div>loading...</div> }
 
-        return (<div style={{ minHeight: 50, width: "100%" }}
+        return (<div style={{ width: "100%", background: "rgba(0,0,0,0.2)" }}
 
             onDragOver={(e) => this.onDragOver(e)}
             onDrop={(e) => this.onDrop(e, "complete")} >

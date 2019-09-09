@@ -6,9 +6,23 @@ import { OptionMaster } from "./optionmaster"
 export default class OptionsColor extends OptionMaster {
   state = { value: "#FFFFFF" }
 
+  constructor(props) {
+    super(props);
+
+    var value = "#ff0000" // default
+    if (props) {
+      if (props.option) {
+        if (props.option.default) { value = props.option.default }
+        if (props.option.val) { value = this.props.option.val }
+      }
+    }
+
+    this.state.value = value;
+  }
+
   apply() {
-    var option = {}
-    // option[this.props.option.name] = this.state.value;
+    // var option = {}
+    // option[this.props.option.name] = value;
     // this.props.setOptions(option)
   }
 
@@ -24,6 +38,8 @@ export default class OptionsColor extends OptionMaster {
       this.apply();
     });
   }
+
+
 
   render() {
     return (<div className="widgetMenuItem" style={{ display: "flex", flexDirection: "row" }} >

@@ -102,7 +102,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     if (this.state.state) {
       return (
-        <div style={{ margin: 0, width: "100%", height: "100%", overflow: "hidden" }}>
+        <div style={{ margin: 0, width: "100%", height: "100%" }}>
 
 
 

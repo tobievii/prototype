@@ -142,6 +142,20 @@ h2 {
 
 /* INPUT */
 
+select {
+  box-sizing: border-box;
+  border: 1px solid darken($gray, 30%);
+  color: lighten($gray, 65%);
+  padding: 9px;
+  background: darken($gray, 40%);
+  outline: none;
+}
+
+select:focus {
+  border: 1px solid darken($gray, 20%);
+  background: darken($gray, 35%);
+}
+
 input {
   box-sizing: border-box;
   border: 1px solid darken($gray, 30%);

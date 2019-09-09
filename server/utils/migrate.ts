@@ -15,6 +15,7 @@ import { DocumentStore } from "../core/data";
 import * as _ from "lodash"
 import { User } from "../shared/interfaces";
 
+import * as utils from "../utils/utils"
 
 
 export class Migration extends EventEmitter {
@@ -29,7 +30,9 @@ export class Migration extends EventEmitter {
         this.migrateDeviceStatesId(() => {
             this.migrateDeviceStateUsernames(() => {
                 this.migrateDeviceStateWidgets(() => {
-                    console.log("done.")
+                    this.migrateDeviceStateKeys(() => {
+                        console.log("done.")
+                    })
                 })
             })
         });
@@ -105,6 +108,25 @@ export class Migration extends EventEmitter {
 
         })
         // end migrate widget
+    }
+
+    /** add the needed public/private keys to devices that do not have them */
+    migrateDeviceStateKeys(cb: Function) {
+        this.db.states.find({ $or: [{ publickey: { $exists: false } }, { publickey: null }] }, (e: Error, devices: any[]) => {
+            var countdone = 0;
+            for (var dev of devices) {
+                dev.publickey = utils.generate(32).toLowerCase()
+                this.db.states.update({ "_id": dev["_id"] }, dev, (err: Error, result: any) => {
+                    countdone++;
+                    console.log(dev.id + " publickey added for user " + dev.username)
+                    if (countdone == devices.length) {
+                        cb();
+                    }
+                })
+            }
+
+            if (devices.length == 0) cb();
+        })
     }
 
 }
