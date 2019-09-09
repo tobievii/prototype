@@ -7,24 +7,41 @@ export class DataView extends React.Component {
     state: {
         open;
         arrow;
+        arrow2;
         preview;
+        meta;
     }
 
     componentWillMount() {
         this.setState({ open: "none" })
         this.setState({ preview: "" })
+        this.setState({ meta: "none" })
         this.setState({ arrow: "caretright" })
+        this.setState({ arrow2: "caretright" })
     }
-    open = () => {
-        if (this.state.open == "none") {
-            this.setState({ open: "" })
-            this.setState({ preview: "none" })
-            this.setState({ arrow: "caretdown" })
+
+    open = (kind) => {
+        if (kind == "data") {
+            if (this.state.open == "none") {
+                this.setState({ open: "" })
+                this.setState({ preview: "none" })
+                this.setState({ arrow: "caretdown" })
+            }
+            else {
+                this.setState({ open: "none" })
+                this.setState({ preview: "" })
+                this.setState({ arrow: "caretright" })
+            }
         }
         else {
-            this.setState({ open: "none" })
-            this.setState({ preview: "" })
-            this.setState({ arrow: "caretright" })
+            if (this.state.meta == "none") {
+                this.setState({ meta: "" })
+                this.setState({ arrow2: "caretdown" })
+            }
+            else {
+                this.setState({ meta: "none" })
+                this.setState({ arrow2: "caretright" })
+            }
         }
     }
 
@@ -80,7 +97,7 @@ export class DataView extends React.Component {
                     if (typeof data[name] == "object") {
                         if (name == "data") {
                             return (
-                                <TouchableHighlight onPress={() => { this.open() }} key={i}>
+                                <TouchableHighlight onPress={() => { this.open("data") }} key={i}>
                                     <View style={{ marginLeft: 24, marginBottom: 10 }} >
                                         <View>
                                             <Text style={{ color: "white", fontSize: 20, flexDirection: "row" }}><AntDesign name={this.state.arrow} size={20} color="white" />  {name}:{this.preview()}</Text></View>
@@ -89,11 +106,11 @@ export class DataView extends React.Component {
                         }
                         else {
                             return (
-                                <TouchableHighlight onPress={() => { this.open() }} key={i}>
+                                <TouchableHighlight onPress={() => { this.open("meta") }} key={i}>
                                     <View style={{ marginLeft: 24, marginBottom: 10 }} >
                                         <View>
-                                            <Text style={{ color: "white", fontSize: 20, flexDirection: "row" }}><AntDesign name={this.state.arrow} size={20} color="white" />  {name}:</Text></View>
-                                        <View style={{ display: this.state.open }}>{this.renderData(data[name], level, path + "." + name)}</View>
+                                            <Text style={{ color: "white", fontSize: 20, flexDirection: "row" }}><AntDesign name={this.state.arrow2} size={20} color="white" />  {name}:</Text></View>
+                                        <View style={{ display: this.state.meta }}>{this.renderData(data[name], level, path + "." + name)}</View>
                                     </View></TouchableHighlight>)
                         }
                     } else {
