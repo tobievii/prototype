@@ -7,6 +7,7 @@ import { Widget } from "./widget"
 import { generateDifficult } from "../../../../server/utils/utils"
 import { clone } from "../../utils/lodash_alt"
 import { api } from "../../api"
+import { colors } from "../../theme";
 
 interface MyProps {
     //account: User;
@@ -288,7 +289,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         if (!this.props.state) { return <div>loading...</div> }
         if (!this.state.layout) { return <div>loading...</div> }
 
-        return (<div style={{ width: "100%", background: "rgba(0,0,0,0.2)" }}
+        return (<div style={{ width: "100%", background: "rgba(255,255,255,0.01)", minHeight: 500, border: colors.borders }}
 
             onDragOver={(e) => this.onDragOver(e)}
             onDrop={(e) => this.onDrop(e, "complete")} >

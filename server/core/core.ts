@@ -232,6 +232,8 @@ export class Core extends EventEmitter {
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
 
+
+
             // ERROR CHECK
             var check = this.checkValidCorePacket(packet)
             if (check.passed == false) {
@@ -239,6 +241,18 @@ export class Core extends EventEmitter {
                 logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
                 return check.error
             }
+
+
+            // add a recieved timestamp to the packet.
+            packet["_recieved"] = new Date()
+
+            //override from device when this data was valid. for historical graphing and reconnection log purposes
+            if (packet.timestamp) {
+                packet["_timestamp"] = new Date(packet.timestamp)
+            } else {
+                packet["_timestamp"] = new Date()
+            }
+
 
             // gets this device's state from the db. 
             // todo: get all subscribed instances and perform workflows on the chain, then update db.
@@ -251,6 +265,8 @@ export class Core extends EventEmitter {
             console.log("----")
             this.state(finddevicequery, (err: any, statedb: any) => {
                 if (err) { if (cb) cb({ error: "db error" }); return; }
+
+                packet["_recieved"] = new Date()
 
                 var state: CorePacket | any = {};
                 if (statedb) {
@@ -281,6 +297,9 @@ export class Core extends EventEmitter {
                 //if (!packet.id) { return; }
                 //packet.id = packet.id.toLowerCase();
                 if (state.id) { if (!packet.id) packet.id = state.id }
+
+
+
 
                 //todo: meta
                 packet.meta = {};

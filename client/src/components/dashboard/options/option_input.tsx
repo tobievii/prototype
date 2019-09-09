@@ -13,8 +13,8 @@ export default class OptionsInput extends OptionMaster {
     var value = "default2" // default
     if (props) {
       if (props.option) {
-        if (props.option.default) { value = props.option.default }
-        if (props.option.val) { value = this.props.option.val }
+        if (props.option.default != undefined) { value = props.option.default }
+        if (props.option.val != undefined) { value = this.props.option.val }
       }
     }
 
