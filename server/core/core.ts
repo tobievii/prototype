@@ -12,7 +12,8 @@ import * as _ from "lodash"
 
 import * as vm2 from "vm2"
 
-import { User, CorePacket } from "../shared/interfaces"
+import { User, CorePacket, CorePacketsOptions } from "../shared/interfaces"
+
 import { cleanString } from "../shared/shared";
 
 export class Core extends EventEmitter {
@@ -433,15 +434,21 @@ export class Core extends EventEmitter {
         }
     }
 
-    // returns device packets (history);
-    packets(options: any, cb: any) {
+    /** Returns device packet history; 
+     * 
+     *  
+     * */
+    packets(options: CorePacketsOptions, cb: any) {
+        console.log(options)
+        var { request, user } = options;
         logger.log({ message: "core.packets", data: options, level: "verbose" });
 
-        if ((options.id) && (options.user)) {
-            this.db.packets.find({ apikey: options.user.apikey, id: options.id }, (err: Error, result: any) => {
-                if (err) { cb({ error: "db error" }) }
-                if (result) { cb(undefined, result) }
-            })
+
+        if ((request.find) && (request.sort) && (request.limit)) {
+            var { find, sort, limit } = request
+            // var query: any = { key: options.request.key }
+            // query[request.datapath] = { $exists: true }
+            this.db.packets.find(find).sort(sort).limit(limit, cb)
         }
     }
 
@@ -646,35 +653,44 @@ export class Core extends EventEmitter {
     // -------------------------------
 
     activity(options: { request: any, user: User }, cb: (err: Error | undefined, result?: any) => void) {
-        this.db.packets.aggregate(
-            [
-                {
-                    $match: {
-                        _timestamp: { $gt: new Date("2019-01-01T00:00:00.000Z") },
-                        key: options.request.key
-                    }
-                },
-                {
-                    $group: {
-                        _id: {
-                            date: {
-                                $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
-                            }
-                        },
-                        day: {
-                            $first: {
-                                $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
-                            }
-                        },
-                        value: { $sum: 1 }
-                    }
-                },
-                { $sort: { day: 1 } }
-            ], (err: Error, results: any) => {
-                if (err) { cb(err); return; }
-                if (results) { cb(undefined, results); }
-            }
-        );
+
+        if (options.request.key && options.request.pathname) {
+            console.log("----!")
+        }
+
+        if ((options.request.key) && (!options.request.pathname)) {
+            this.db.packets.aggregate(
+                [
+                    {
+                        $match: {
+                            _timestamp: { $gt: new Date("2019-01-01T00:00:00.000Z") },
+                            key: options.request.key
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                date: {
+                                    $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                                }
+                            },
+                            day: {
+                                $first: {
+                                    $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                                }
+                            },
+                            value: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { day: 1 } }
+                ], (err: Error, results: any) => {
+                    if (err) { cb(err); return; }
+                    if (results) { cb(undefined, results); }
+                }
+            );
+        }
+
+
     }
 }
 

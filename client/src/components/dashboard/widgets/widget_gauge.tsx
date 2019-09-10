@@ -8,7 +8,7 @@ export default class WidgetGauge extends WidgetComponent {
         options: {
             min: { type: "input", default: 0, value: undefined },
             max: { type: "input", default: 100, value: undefined },
-            color: { type: "color", default: "#11CC88", value: undefined }
+            color: { type: "color", default: colors.widgetDefault, value: undefined }
         }
     }
 

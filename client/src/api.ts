@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import { request } from "./utils/requestweb"
-import { User, CorePacket } from "../../server/shared/interfaces"
+import { User, CorePacket, ClientPacketOptions } from "../../server/shared/interfaces"
 import { logger } from "../../server/shared/log"
 //import { liteio } from "./utils/liteio"
 
@@ -222,12 +222,17 @@ export class API extends EventEmitter {
             })
     }
 
-    /*
-        retrieve device packet history
+
+
+    /** To utilize the packets api see below: 
+     * 
+     * @param find mongodb find query object
+     * @param sort mongodb sort query object
+     * @param limit number
     */
-    packets(id: string, cb: Function) {
+    packets(options: ClientPacketOptions, cb: Function) {
         request.post(this.uri + "/api/v4/packets",
-            { headers: this.headers, json: { id } },
+            { headers: this.headers, json: options },
             (err, res, body) => {
                 if (err) cb(err);
                 if (body) {
@@ -366,6 +371,8 @@ export class API extends EventEmitter {
             }
         }
     }
+
+    /// STANDARDIZED:
 
     search = (options, cb?: (err: Error, result?: any) => void) => {
         request.post(this.uri + "/api/v4/search",

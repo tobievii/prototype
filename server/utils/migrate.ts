@@ -95,18 +95,26 @@ export class Migration extends EventEmitter {
 
             for (var dev of result) {
                 var updatethisdev = false;
+
                 for (var widget of dev.layout) {
                     if (widget.datapath) {
+
                         if (widget.datapath.indexOf("root.payload.data") >= 0) {
                             widget.datapath = widget.datapath.replace("root.payload.data", "root.data");
                             updatethisdev = true;
-                            counttodo++;
+
+                        }
+
+                        if (widget.datapath.indexOf("root.") == 0) {
+                            widget.datapath = widget.datapath.slice(5);
+                            updatethisdev = true;
                         }
                     }
                 }
 
 
                 if (updatethisdev) {
+                    counttodo++;
                     this.db.states.update({ "_id": dev["_id"] }, dev, (e: Error, r: any) => {
                         console.log(dev.id + " widgets migrated for user " + dev.username)
                         countdone++;

@@ -98,13 +98,13 @@ export function webapiv3(app: Application, core: Core) {
         })
     })
 
-    // view packets history
+    /** API V3 view packets history */
     app.post("/api/v3/packets", (req: any, res) => {
-        core.packets({ id: req.body.id, user: req.user }, (err: any, result: any) => {
+        core.packets({ request: req.body, user: req.user }, (err: any, result: any) => {
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
         })
-    })
+    });
 
     app.post("/api/v3/state/delete", (req: any, res) => {
         core.delete({ id: req.body.id, user: req.user }, (err: any, result: any) => {

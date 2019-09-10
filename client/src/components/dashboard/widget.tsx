@@ -38,7 +38,7 @@ export class Widget extends React.Component<MyProps, WidgetState> {
 
         var value;
         if (this.props.widget.datapath) {
-            value = objectByString(this.props.state, this.props.widget.datapath.split("root.")[1])
+            value = objectByString(this.props.state, this.props.widget.datapath)
         }
 
         return (<div style={{ background: "#0e0e0e", height: "100%", position: "relative", display: "flex", flexDirection: "column", border: colors.borders }}

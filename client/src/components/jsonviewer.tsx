@@ -135,7 +135,7 @@ export class JSONviewer extends React.Component<MyProps, MyState> {
       this.dragging = true;
       e.data = data;
       e.dataname = name;
-      e.datapath = path;
+      e.datapath = path.slice(5)
 
       setTimeout(() => {
         this.dragging = false;

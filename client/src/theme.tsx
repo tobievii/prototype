@@ -19,7 +19,8 @@ export const colors = {
   transparent: 0.15,
   lines: "#333", //same as borders below
   borders: "1px solid rgba(128,128,128,0.01)", // 
-  padding: 10
+  padding: 10,
+  widgetDefault: "#11CC88"
 };
 
 // DEFINE COLOURS HERE:

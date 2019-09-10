@@ -68,6 +68,19 @@ export interface WidgetType {
     y?: number;
     w?: number;
     h?: number;
+    /** 
+     * 
+     * dot.notation.path.to.nested.data
+     * 
+     * 
+     * This specific widget may have a datapath assigned to it.      * 
+     * Usually this is set when you drag and drop an object from the device data panel. 
+     * 
+     * eg: root.id 
+     * 
+     *      root.data.temperature
+     * 
+     * */
     datapath?: string;
     dataname: string;
     /** If any options have been set on this widget */
@@ -87,4 +100,32 @@ export interface WidgetComponentProps {
 export interface OptionComponentProps {
     name: string
     option: any
+}
+
+/** To utilize the packets api see below: 
+ * 
+ * @param find mongodb find query object
+ * @param sort? (optional) mongodb sort query object
+ * @param limit? (optional) number
+*/
+export interface ClientPacketOptions {
+    find: any;
+    sort?: any;
+    limit?: number
+
+    // /** Specify the key of the state you want to retrieve from */
+    // key?: CorePacket["key"]
+    // /** Specify the datapath of the packet history you want to query
+    //  * eg "root.data.temperature"
+    //  */
+    // datapath?: string
+}
+
+/** CorePacketsOptions
+ * @param request
+ * @param user
+ */
+export interface CorePacketsOptions {
+    request: ClientPacketOptions,
+    user: User
 }
