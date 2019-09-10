@@ -41,7 +41,7 @@ export class Widget extends React.Component<MyProps, WidgetState> {
             value = objectByString(this.props.state, this.props.widget.datapath.split("root.")[1])
         }
 
-        return (<div style={{ background: "rgba(255, 255, 255, 0.01)", height: "100%", position: "relative", display: "flex", flexDirection: "column", border: colors.borders }}
+        return (<div style={{ background: "#0e0e0e", height: "100%", position: "relative", display: "flex", flexDirection: "column", border: colors.borders }}
 
             onDrag={e => { e.preventDefault(); e.stopPropagation(); }} >
 

@@ -6,9 +6,9 @@ import { colors } from "../../../theme"
 export default class WidgetGauge extends WidgetComponent {
     state = {
         options: {
-            min: { type: "input", default: 0, value: -1 },
-            max: { type: "input", default: 100, value: 101 },
-            color: { type: "color", default: "#00ff00", value: "#0000ff" }
+            min: { type: "input", default: 0, value: undefined },
+            max: { type: "input", default: 100, value: undefined },
+            color: { type: "color", default: "#11CC88", value: undefined }
         }
     }
 
@@ -42,13 +42,13 @@ export default class WidgetGauge extends WidgetComponent {
             className="value"
             fill="none"
             stroke={this.state.options.color.value}
-            strokeWidth="1"
+            strokeWidth="3"
             d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(graphdegree))} />)
     }
 
     render() {
         var value = 0;
-        if (this.props.value) { value = parseInt(this.props.value) }
+        if (this.props.value) { value = parseFloat(this.props.value) }
         var undermin = (value <= this.state.options.min.value) ? true : false
         var overmax = (value >= this.state.options.max.value) ? true : false
 
@@ -73,7 +73,7 @@ export default class WidgetGauge extends WidgetComponent {
                             fontWeight="normal"
                             textAnchor="middle"
                             alignmentBaseline="middle"
-                            dominantBaseline="central">{value}</text>
+                            dominantBaseline="central">{value.toFixed(2)}</text>
 
                         <text x="0" y="80"
                             fill="#aaa"
@@ -96,7 +96,7 @@ export default class WidgetGauge extends WidgetComponent {
 
 
                         <path className="value" fill="none" stroke="rgba(255,255,255,0.1)"
-                            strokeWidth="1" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))} />
+                            strokeWidth="3" d={this.svg_arc_path(50, 50, 40, this.degrees(-35), this.degrees(180 + 35))} />
                         {this.drawguageSvg(this.state.options.min.value, value, this.state.options.max.value)}
                     </svg>
                 </div>

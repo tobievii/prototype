@@ -289,7 +289,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         if (!this.props.state) { return <div>loading...</div> }
         if (!this.state.layout) { return <div>loading...</div> }
 
-        return (<div style={{ width: "100%", background: "rgba(255,255,255,0.01)", minHeight: 500, border: colors.borders }}
+        return (<div style={{ width: "100%", background: "#181818", minHeight: 500, border: colors.borders }}
 
             onDragOver={(e) => this.onDragOver(e)}
             onDrop={(e) => this.onDrop(e, "complete")} >
