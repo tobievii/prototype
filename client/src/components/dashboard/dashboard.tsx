@@ -107,7 +107,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         //console.log("resize "); 
     }
     gridOnResizeStop = () => {
-        console.log("resize stop");
+        //console.log("resize stop");
         this.updatesource = "user"
     }
 
@@ -124,7 +124,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         var propslayout = JSON.stringify(this.props.state.layout);
 
         if (statelayout != propslayout) {
-            console.log("Updating Layout state")
+            // console.log("Updating Layout state")
             // update if not the same as what we had.
             this.updatesource = "props"
             this.setState({ layout: this.props.state.layout })
@@ -201,11 +201,12 @@ export class Dashboard extends React.Component<MyProps, MyState> {
     }
 
     updateServer = () => {
-        console.log("updateServer ?", this.updatesource)
+        //console.log("updateServer ?", this.updatesource)
         if (this.updatesource == "props") {
-            console.log("NOT UPDATING SERVER"); return;
+            //console.log("NOT UPDATING SERVER"); 
+            return;
         } else {
-            console.log("UPDATE SERVER!")
+            //console.log("UPDATE SERVER!")
             this.updatesource = "props"; //debounce
             api.post({
                 key: this.props.state.key,
@@ -271,7 +272,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         }, (err, result) => {
             if (err) { console.log(err); }
             if (result) {
-                console.log(result);
+                //console.log(result);
                 if (result.nModified == 1) {
                     /** successfully removed in db */
                     // - - - - 
