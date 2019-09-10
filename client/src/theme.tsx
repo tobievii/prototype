@@ -171,6 +171,75 @@ export const theme: any = {
   colors
 };
 
+
+/** used for calendar widget 
+ * todo: simplify themes.
+*/
+export const widgetCalendar: any = {
+  dayBorderColor: "rgba(247, 57, 67,0)",
+  monthBorderColor: "rgba(125, 125, 125,0.15)",
+  emptyColor: "rgba(125, 125, 125,0.05)",
+  margin: {
+    "top": 35,
+    "right": 35,
+    "bottom": 0,
+    "left": 35
+  },
+  colors: [
+    "rgba(255, 57, 66,0.4)",
+    "rgba(255, 57, 66,0.5)",
+    "rgba(255, 57, 66,0.7)",
+    "rgba(255, 57, 66,1)"
+  ],
+  theme: {
+    axis: {
+      domain: {
+        line: {
+          strokeWidth: 0,
+          stroke: '#889eae',
+        },
+      },
+      ticks: {
+        line: {
+          stroke: '#889eae',
+        },
+        text: {
+          fill: '#6a7c89',
+        },
+      },
+      legend: {
+        fill: '#fff',
+      },
+    },
+    grid: {
+      line: {
+        stroke: 'rgba(125, 125, 125,0.15)',
+      },
+    },
+    legends: {
+      text: {
+        fontSize: 12,
+        fill: '#fff',
+        color: "#fff"
+      },
+    },
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        background: 'rgba(18, 28, 33, 0.9)',
+        color: '#ddd',
+      }
+    },
+    labels: {
+      text: {
+        fill: '#eee',
+        fontSize: 12,
+        fontWeight: 500,
+      },
+    }
+  }
+}
+
 // https://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
 
 export function shadeColor(color, percent) {
