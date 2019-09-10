@@ -102,17 +102,12 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     if (this.state.state) {
       return (
-        <div style={{ margin: 0, width: "100%", height: "100%" }}>
+        <div style={{ margin: 0, width: "100%", maxHeight: window.innerHeight, overflow: "hidden" }}>
 
+          <div style={{ display: "flex", flexDirection: "row", maxHeight: window.innerHeight, overflow: "hidden" }}>
+            <div style={{ width: 450 }}>
 
-
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ width: 300 }}>
-              <div style={{ padding: 20 }}>
-                USERNAME: {this.state.state.username}<br />
-                ID: {this.state.state.id}
-              </div>
-              <div style={{ height: 500, overflowY: "scroll" }}>
+              <div style={{ height: "100%", overflowY: "scroll" }}>
                 <JSONviewer object={this.state.state} />
               </div>
 
@@ -123,10 +118,15 @@ export class DeviceView extends React.Component<MyProps, MyState> {
             </div> */}
 
             <div style={{ width: "100%" }}>
+              <div style={{ padding: 20 }}>
+                USERNAME: {this.state.state.username}<br />
+                ID: {this.state.state.id}
+              </div>
               <Dashboard state={this.state.state} />
             </div>
 
           </div>
+
         </div>
       );
     }

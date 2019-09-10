@@ -93,7 +93,9 @@ export class Migration extends EventEmitter {
             var counttodo = 0;
             var countdone = 0;
 
+            console.log(result.length);
             for (var dev of result) {
+
                 var updatethisdev = false;
 
                 for (var widget of dev.layout) {
@@ -109,7 +111,13 @@ export class Migration extends EventEmitter {
                             widget.datapath = widget.datapath.slice(5);
                             updatethisdev = true;
                         }
+
+
+
                     }
+                    console.log(widget.type)
+                    if (widget.type.toLowerCase() == "blank") { widget.type = "basic"; updatethisdev = true; }
+                    if (widget.type.toLowerCase() == "chartline") { widget.type = "graph"; updatethisdev = true; }
                 }
 
 
@@ -118,13 +126,12 @@ export class Migration extends EventEmitter {
                     this.db.states.update({ "_id": dev["_id"] }, dev, (e: Error, r: any) => {
                         console.log(dev.id + " widgets migrated for user " + dev.username)
                         countdone++;
-
                         if (countdone == counttodo) cb();
                     })
                 }
             }
 
-            if (counttodo == 0) { cb(); }
+
 
         })
         // end migrate widget
