@@ -14,6 +14,7 @@ interface WidgetOptions {
 
 interface State {
     options: WidgetOptions
+    [index: string]: any
 }
 export class WidgetComponent extends React.Component<WidgetComponentProps, State> {
 

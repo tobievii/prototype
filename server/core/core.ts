@@ -645,7 +645,37 @@ export class Core extends EventEmitter {
 
     // -------------------------------
 
-    // add helper functions here
+    activity(options: { request: any, user: User }, cb: (err: Error | undefined, result?: any) => void) {
+        this.db.packets.aggregate(
+            [
+                {
+                    $match: {
+                        _timestamp: { $gt: new Date("2019-01-01T00:00:00.000Z") },
+                        key: options.request.key
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            date: {
+                                $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                            }
+                        },
+                        day: {
+                            $first: {
+                                $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                            }
+                        },
+                        value: { $sum: 1 }
+                    }
+                },
+                { $sort: { day: 1 } }
+            ], (err: Error, results: any) => {
+                if (err) { cb(err); return; }
+                if (results) { cb(undefined, results); }
+            }
+        );
+    }
 }
 
 

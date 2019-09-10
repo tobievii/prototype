@@ -379,19 +379,21 @@ export class API extends EventEmitter {
             })
     }
 
-    // workflow = (options, cb?) => {
-    //     request.post(this.uri + "/api/v4/workflow", { json: options }, (err, res, body: any) => {
-    //         if (err) if (cb) cb(err);
-    //         if (body) {
-    //             if (cb) cb(undefined, body);
-    //         }
-    //     })
-    // }
-
-    /** used to remove widgets from device state layout. 
-     * could possibly be used for other tasks */
     stateupdate = (options, cb?) => {
         request.post(this.uri + "/api/v4/stateupdate",
+            { headers: this.headers, json: options },
+            (err, res, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    if (body.error) { cb(body); return; }
+                    cb(null, body);
+                }
+            })
+    }
+
+
+    activity = (options, cb) => {
+        request.post(this.uri + "/api/v4/activity",
             { headers: this.headers, json: options },
             (err, res, body: any) => {
                 if (err) cb(err);

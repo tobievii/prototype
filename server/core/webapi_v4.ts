@@ -130,4 +130,12 @@ export function webapiv4(app: express.Application, core: Core) {
             if (result) { res.json(result); }
         })
     })
+
+    app.post("/api/v4/activity", (req: any, res) => {
+        console.log("--------")
+        core.activity({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
 }

@@ -12,11 +12,11 @@ interface MyProps {
     [index: string]: any;
 }
 
-interface MyState {
-    [index: string]: any;
+interface WidgetState {
+    showMenu: boolean
 }
 
-export class Widget extends React.Component<MyProps, MyState> {
+export class Widget extends React.Component<MyProps, WidgetState> {
     state = {
         showMenu: false
     };
@@ -50,7 +50,9 @@ export class Widget extends React.Component<MyProps, MyState> {
                 <div className="widgetOptions">
                     <div className="widgetOptionsButton"
                         onClick={() => { this.setState({ showMenu: !this.state.showMenu }) }}
-                        style={{ cursor: "pointer", padding: "7px", color: "rgba(255, 255, 255, 0.1)" }} ><i className="fas fa-wrench"  ></i></div>
+                        style={{
+                            cursor: "pointer", padding: "7px", color: (this.state.showMenu) ? "rgba(255, 255, 255, 0.75)" : "rgba(255, 255, 255, 0.1)"
+                        }} ><i className="fas fa-wrench"  ></i></div>
 
                     {(this.state.showMenu) ? <OptionMenu
                         options={WidgetOptions}
