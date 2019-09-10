@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import { Vector } from "../../../../../server/shared/vector"
+import React from 'react';
 import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
 
 interface WidgetOption {
