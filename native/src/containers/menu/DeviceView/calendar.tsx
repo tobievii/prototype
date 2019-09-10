@@ -1,0 +1,81 @@
+import React, { Component } from 'react';
+import { Text, Dimensions, AsyncStorage } from 'react-native';
+import { ContributionGraph } from 'react-native-chart-kit'
+const screenWidth = Dimensions.get('window').width
+const chartConfig = {
+    backgroundGradientFrom: 'black',
+    backgroundGradientTo: 'black',
+    color: (opacity = 1) => `rgba(255, 57, 99, ${opacity})`,
+    strokeWidth: 2,// optional, default 3
+}
+var data;
+var d = new Date();
+var year = d.getFullYear();
+export class Calendar extends Component {
+    state: {
+        data;
+        packets;
+    }
+
+    componentWillMount = () => {
+        this.setState({ data: false })
+        this.setState({ packet: [] })
+        this.example()
+    }
+
+    addpackets = (data) => {
+        var result = [];
+        for (var i in data) {
+            result.push({ date: data[i].timestamp, count: 0 })
+        }
+        for (var i in result) {
+            for (var r in result) {
+                if (result[i].date.slice(0, 10) == result[r].date.slice(0, 10)) {
+                    result[r].count += 1
+                }
+            }
+        }
+        this.setState({ packets: result })
+        this.setState({ data: true })
+    }
+
+    displayCalendar = () => {
+        if (this.state.data == true) {
+            return (<ContributionGraph
+                values={this.state.packets}
+                endDate={new Date(year + '-12-31')}
+                numDays={365}
+                width={screenWidth * 3}
+                height={220}
+                chartConfig={chartConfig}
+                accessor={this.state.packets.timestamp}
+            />)
+        }
+        else {
+            return (<Text style={{ color: "white", textAlign: "center" }}>Loading...</Text>)
+        }
+    }
+    example = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('user'));
+        try {
+            const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/packets', {
+                method: 'POST',
+                headers: {
+                    'Authorization': user.auth,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: this.props['data'].id })
+            })
+            data = await response.json()
+            this.addpackets(data)
+        }
+        catch (err) {
+            return console.error(err.toString());
+        }
+    }
+
+    render() {
+        return (
+            this.displayCalendar())
+    }
+}
