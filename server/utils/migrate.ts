@@ -93,7 +93,6 @@ export class Migration extends EventEmitter {
             var counttodo = 0;
             var countdone = 0;
 
-            console.log(result.length);
             for (var dev of result) {
 
                 var updatethisdev = false;
@@ -115,7 +114,6 @@ export class Migration extends EventEmitter {
 
 
                     }
-                    console.log(widget.type)
                     if (widget.type.toLowerCase() == "blank") { widget.type = "basic"; updatethisdev = true; }
                     if (widget.type.toLowerCase() == "chartline") { widget.type = "graph"; updatethisdev = true; }
                 }
