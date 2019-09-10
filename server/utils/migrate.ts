@@ -1,11 +1,4 @@
-/** This code helps to migrate database from 5.0.x to 5.1.x
- *
- *  Changes:
- *
- *  db.states
- *
- *  device id parameter renamed from "devid" to "id" to conform to the rest of the protocol and system standard.
- */
+/** This code helps to migrate database from 5.0.x to 5.1.x */
 
 
 import { EventEmitter } from "events";
@@ -16,7 +9,6 @@ import * as _ from "lodash"
 import { User } from "../shared/interfaces";
 
 import * as utils from "../utils/utils"
-
 
 export class Migration extends EventEmitter {
     db: any;
@@ -42,9 +34,29 @@ export class Migration extends EventEmitter {
     /** migrate device dbs from 5.0 to 5.1 */
     migrateDeviceStatesId(cb: Function) {
         // rename devid to id
-        this.db.states.update({ devid: { $exists: true } }, { $rename: { 'devid': 'id', 'payload.data': 'data' } }, (err: Error, result: any) => {
-            console.log(result.nModified + " device id updated.")
-            cb();
+        this.db.states.find({ devid: { $exists: true } }, (err: Error, result: any) => {
+            var countdone = 0;
+            for (var dev of result) {
+                // , { $rename: { 'devid': 'id', 'payload.data': 'data' } }
+                var id = _.clone(dev.devid);
+                dev.id = id;
+                delete dev["devid"]
+                // -----
+                var oldpayload = _.clone(dev.payload)
+                dev = { ...oldpayload, ...dev }
+                delete dev["payload"]
+
+                this.db.states.update({ _id: dev._id }, dev, (errupd: Error, resultupd: any) => {
+                    console.log(resultupd)
+                    countdone++;
+                    if (countdone == result.length) { console.log(countdone + " device id and payload updated."); cb(); }
+                })
+            }
+
+            if (result.length == 0) { cb(); }
+
+
+
         })
     }
 
