@@ -6,12 +6,7 @@ import { widgetCalendar } from "../../../theme"
 
 export default class WidgetCalendar extends WidgetComponent {
     state = {
-        options: {
-            color: { type: "color", default: "#111111", value: "" },
-            background: { type: "color", default: "#11cc88", value: "" },
-            command: { type: "input", default: JSON.stringify({ "foo": true }), value: "" },
-            buttonText: { type: "input", default: "SEND", value: "" },
-        },
+        options: {},
         gettingdata: false,
         data: []
     }
