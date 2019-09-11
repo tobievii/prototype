@@ -2,10 +2,11 @@ import React from "react";
 import { api } from "../api";
 import { CorePacket } from "../../../server/shared/interfaces";
 import { JSONviewer } from "./jsonviewer";
-import { logger } from "../../../server/shared/log";
 
 import { ProtoEditor } from "./editor"
 import { Dashboard } from "./dashboard/dashboard"
+import { colors } from "../theme";
+
 
 interface MyProps {
   username?: string;
@@ -92,7 +93,6 @@ export class DeviceView extends React.Component<MyProps, MyState> {
     //     }
     //   }
     // }
-
   };
 
   render() {
@@ -102,12 +102,12 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     if (this.state.state) {
       return (
-        <div style={{ margin: 0, width: "100%", maxHeight: window.innerHeight, overflow: "hidden" }}>
+        <div style={{ margin: colors.padding * 2, width: "100%", maxHeight: window.innerHeight, overflow: "hidden" }}>
 
           <div style={{ display: "flex", flexDirection: "row", maxHeight: window.innerHeight, overflow: "hidden" }}>
             <div style={{ width: 450 }}>
 
-              <div style={{ height: "100%", overflowY: "scroll" }}>
+              <div style={{ maxHeight: "800px", overflowY: "scroll" }}>
                 <JSONviewer object={this.state.state} />
               </div>
 
@@ -118,7 +118,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
             </div> */}
 
             <div style={{ width: "100%" }}>
-              <div style={{ padding: 20 }}>
+              <div style={{ padding: colors.padding }}>
                 USERNAME: {this.state.state.username}<br />
                 ID: {this.state.state.id}
               </div>

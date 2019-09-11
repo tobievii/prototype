@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import "../prototype.scss";
 import { User } from "../../../server/shared/interfaces";
-import { theme } from "../theme"
+import { theme, colors } from "../theme"
 import { api } from "../api"
 import { SearchBox } from "./searchbox"
 
@@ -35,11 +35,12 @@ export class NavBar extends React.Component<MyProps, MyState> {
       const menuitemsLogged = [
         { text: "Notifications", path: "/notifications", icon: "bell" },
         { text: "Settings", path: "/settings", icon: "cog" },
-        { text: api.data.account.username, path: "/settings/account", icon: "user-circle" }
+        { text: api.data.account.username, path: "/settings/account", icon: "user-circle" },
+        { text: "Docs", path: "/docs", icon: "book" }
       ]
 
       return (
-        <div style={theme.global.navbar}>
+        <div style={{ background: colors.panels, padding: colors.padding, margin: colors.padding * 2 }}>
 
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left", padding: theme.paddings.default }}>

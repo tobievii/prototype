@@ -103,9 +103,8 @@ export class Webserver extends EventEmitter {
         this.app.get("/products", (req, res) => { res.end(reactHtml); })
         this.app.get("/register", (req, res) => { res.end(reactHtml); })
         this.app.get("/login", (req, res) => { res.end(reactHtml); })
-
         this.app.get("/account", (req, res) => { res.end(reactHtml); })
-
+        this.app.get("/docs*", (req, res) => { res.end(reactHtml); })
         this.app.get("/settings", (req, res) => { res.end(reactHtml); })
         this.app.get("/settings/account", (req, res) => { res.end(reactHtml); })
 

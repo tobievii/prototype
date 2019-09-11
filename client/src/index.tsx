@@ -6,7 +6,7 @@ import { Login } from "./components/login";
 import { Landing } from "./pages/landing";
 import { api } from "./api";
 import { DeviceList } from "./components/devicelist";
-import { theme } from "./theme";
+import { theme, colors } from "./theme";
 import { SideBar } from "./components/sidebar";
 import { DeviceView } from "./components/deviceview";
 import { BGgrad } from "./pages/bggrad";
@@ -15,7 +15,7 @@ import { Settings } from "./components/settings";
 import { ProtoMap as Map } from "./components/map";
 import { clone } from "./utils/lodash_alt";
 import { registerServiceWorker } from "./serviceworker/serviceworker_register"
-
+import { Documentation } from "./pages/docs"
 
 export default class App extends React.Component {
   state = {
@@ -113,7 +113,7 @@ export default class App extends React.Component {
       return <div>loading</div>
     }
 
-    // NEW/RETURNING VISTORS
+    // NEW VISTORS
     if (this.state.account.level == 0) {
       return (
         <BrowserRouter>
@@ -136,6 +136,8 @@ export default class App extends React.Component {
         <BrowserRouter>
           <Route exact path="/" component={this.home} />
           <Route exact path="/u/:username" component={this.userView} />
+          <Route exact path="/docs" component={this.docs} />
+          <Route exact path="/docs/:page" component={this.docs} />
           <Route
             exact
             path="/u/:username/view/:id"
@@ -170,10 +172,18 @@ export default class App extends React.Component {
   }
 
 
+  docs = props => {
+    return (<div>
+      <BGgrad />
+      <NavBar />
+      <Documentation page={props.match.params.page} />
+    </div>)
+  }
 
   settings = props => {
     return (
       <div>
+        <BGgrad />
         <NavBar />
         <Settings />
       </div>
@@ -183,6 +193,7 @@ export default class App extends React.Component {
   account = props => {
     return (
       <div>
+        <BGgrad />
         <NavBar />
         <Account />
       </div>
@@ -207,27 +218,24 @@ export default class App extends React.Component {
     wrapper.height = this.state.height;
 
     return (
-      <div style={wrapper}>
-        <div style={theme.global.responsive.navbar}>
-          <NavBar />
-        </div>
-
-        <div style={theme.global.responsive.content}>
-          {size == "small" ? (
-            <DeviceList />
-          ) : (
-              <div style={theme.global.responsive.contenthorizontal}>
-                <div>
-                  <DeviceList />
-                </div>
-                <div style={theme.global.responsive.contentright}>
-                  <Map />
-                </div>
+      <div >
+        <BGgrad />
+        <NavBar />
+        <div style={{ margin: colors.padding * 2 }}>
+          {size == "small"
+            ? <DeviceList />
+            : <div style={theme.global.responsive.contenthorizontal}>
+              <div>
+                <DeviceList />
               </div>
-            )}
+              <div style={theme.global.responsive.contentright}>
+                <Map />
+              </div>
+            </div>
+          }
         </div>
 
-        <div style={{ flex: "0 1 40px" }}>footer</div>
+        <div style={{ flex: "0 1 40px" }}><Documentation /></div>
       </div>
     );
   };
@@ -276,7 +284,9 @@ export default class App extends React.Component {
   };
 
   viewByPublickey = props => {
-    return (<div><DeviceView publickey={props.match.params.publickey} /></div>)
+    return (<div>
+      <NavBar />
+      <DeviceView publickey={props.match.params.publickey} /></div>)
   }
 
   deviceView = props => {

@@ -2,8 +2,8 @@
 $spotA: rgb(242, 53, 58); //main colour
 $spotB: #3b3b3b; // #0a203b; //gradientBot
 $spotC: #1a1a1a; // #09111a; //gradientTop
-$spotD: #202020; //background
-$spotE: #fff;
+$colbackground: #202020; //background
+$spotE: #cccccc;
 $spotF: #2b2b2b; // #17232b;
 $gray: #888888;
 $panelBg: #181818; // rgba(3, 4, 5, 0.5);
@@ -27,7 +27,7 @@ $backgroundPanels: #121212; // rgba(3, 4, 5, 0.5);
 body {
   margin: 0;
   font-family: "Share Tech Mono", Arial, Helvetica, sans-serif;
-  background: $spotD;
+  background: $colbackground;
   overflow-x: hidden;
   color: $spotE;
 }
@@ -120,7 +120,7 @@ summary {
 }
 
 .svg-banner-shape {
-  fill: $spotD;
+  fill: $colbackground;
 }
 
 /* TEXT STYLE */
@@ -205,7 +205,7 @@ a:hover {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: $spotD;
+  background: $colbackground;
 }
 
 /* Handle */
