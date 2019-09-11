@@ -17,7 +17,7 @@ export class DocsApikey extends React.Component<MyProps, MyState> {
 
     componentDidMount() {
         var hiddenkey = ""
-        for (var x = 0; x < api.data.account.apikey.length; x++) { hiddenkey += "-" }
+        for (var x = 0; x < api.data.account.apikey.length; x++) { hiddenkey += "_" }
         this.setState({ hiddenkey })
     }
 
@@ -33,7 +33,7 @@ export class DocsApikey extends React.Component<MyProps, MyState> {
                     }}>
                         {(this.state.reveal)
                             ? <span style={{ color: colors.spotA, background: colors.spotC, padding: colors.padding }} id="accountApikey">{api.data.account.apikey}</span>
-                            : <span style={{ color: colors.spotA, background: colors.spotC, padding: colors.padding }} id="accountApikey">{this.state.hiddenkey}</span>}
+                            : <span style={{ color: colors.spotB, background: colors.spotC, padding: colors.padding }} id="accountApikey">{this.state.hiddenkey}</span>}
 
                         <button ><i className={"fa fa-key"} ></i> show</button>
                     </div>

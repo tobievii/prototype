@@ -16,7 +16,7 @@ import { logger } from "../shared/log"
 import { Core } from "./core"
 
 import { webapiv3 } from "./webapi_v3"
-import { webapiv4 } from "./webapi_v4"
+import { webapiv4, apispec } from "./webapi_v4"
 import { threadId } from 'worker_threads';
 import { LogEvent, ConfigFile } from '../shared/interfaces';
 

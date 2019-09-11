@@ -410,6 +410,12 @@ export class API extends EventEmitter {
                 }
             })
     }
+
+    getapispec = (cb) => {
+        request.get(this.uri + "/api/v4",
+            { headers: this.headers, json: true },
+            (err, res, body: any) => { cb(err, body); });
+    }
 }
 
 var apiinstance = new API()

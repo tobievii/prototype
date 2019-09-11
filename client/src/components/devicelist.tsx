@@ -258,13 +258,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 width: "100%",
                 height: "100%", overflow: "hidden", display: "flex", flexDirection: "column"
             }} >
-                <div style={{ background: colors.spotC, display: "flex", flexDirection: "row" }}>
-
-                    <div style={{ flex: "1 auto", textAlign: "center" }}>
-                        <div style={{ padding: 8 }}><span>DEVICE LIST</span></div>
-                    </div>
-
-                </div>
 
                 <div style={theme.global.menubars}>
                     <DeviceListMenu action={this.handleAction_deviceListMenu} />

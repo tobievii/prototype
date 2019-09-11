@@ -53,7 +53,7 @@ export class CodeBlock extends React.PureComponent<CustomProps, States> {
 
         else if (this.props.type == "modify") {
             return (
-                <pre style={{ height: "100px" }} ref={this.setRef} className={`language-${this.props.language}`}>
+                <pre ref={this.setRef} className={`language-${this.props.language}`}>
                     {this.props.value}
                 </pre>
             )
@@ -61,7 +61,7 @@ export class CodeBlock extends React.PureComponent<CustomProps, States> {
     }
 
     render() {
-        return (<div>
+        return (<div style={{ fontSize: "0.85em" }}>
             {this.view()}</div>
         )
     }

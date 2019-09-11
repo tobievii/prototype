@@ -95,6 +95,13 @@ export class Core extends EventEmitter {
     }
     // end register
 
+    /** update an account with a change json
+     * 
+     * EXAMPLE:
+     * ```js
+     * this.account({ user, change: {"_last_seen": new Date() }})
+     * ```
+    */
     account(options: { user: User, change: any, ip?: string }, cb?: (err: Error | undefined, result?: any) => void) {
         logger.log({ message: "core.account", data: options, level: "verbose" });
 
@@ -114,7 +121,7 @@ export class Core extends EventEmitter {
     }
     // end account
 
-    // everything to do with finding a user
+    /** Everything to do with finding a user */
     user(options: { username?: string, uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
         logger.log({ message: "core.user", data: options, level: "verbose" });
 
@@ -188,7 +195,12 @@ export class Core extends EventEmitter {
         if (options.uuid) {
             this.db.users.findOne({ uuid: options.uuid }, (err: Error | undefined, user?: any) => {
                 if (err) { cb(err); return; }
-                if (user) { cb(undefined, user); } else { cb(new Error("user not found by uuid")); }
+                if (user) {
+                    this.account({ user, change: { "_last_seen": new Date() } }, (e, r) => {
+                        cb(undefined, user);
+                    })
+
+                } else { cb(new Error("user not found by uuid")); }
             })
         }
 
