@@ -4,7 +4,9 @@ import { Text, View, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
 export class DataView extends React.Component {
+
     state: {
+        data;
         open;
         arrow;
         arrow2;
@@ -144,6 +146,5 @@ export class DataView extends React.Component {
         } else {
             return (<Text>loading..</Text >)
         }
-
     }
 }

@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
-import { DataView } from './dataView';
 import { TopNavigation } from '@kitten/ui';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { textStyle } from '@src/components/common'
-import { Calendar } from './calendar';
+import { Widget } from './dashboard/widget';
+import { DataView } from './dashboard/dataView'
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
         device: [];
@@ -52,9 +52,7 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
                 <ScrollView>
                     <DataView data={this.state.device} />
                 </ScrollView >
-                <ScrollView horizontal={true} >
-                    <Calendar data={this.state.device} />
-                </ScrollView>
+                <Widget device={this.state.device} />
             </ScrollView >
         </View >
         );

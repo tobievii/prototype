@@ -3,10 +3,10 @@ import { Text, Dimensions, AsyncStorage } from 'react-native';
 import { ContributionGraph } from 'react-native-chart-kit'
 const screenWidth = Dimensions.get('window').width
 const chartConfig = {
-    backgroundGradientFrom: 'black',
-    backgroundGradientTo: 'black',
-    color: (opacity = 1) => `rgba(255, 57, 99, ${opacity})`,
-    strokeWidth: 2,// optional, default 3
+    backgroundGradientFrom: '#262626',
+    backgroundGradientTo: '#262626',
+    color: (opacity = 1) => `rgba(255, 57, 66, ${opacity})`,
+    strokeWidth: 2
 }
 var data;
 var d = new Date();
