@@ -67,7 +67,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             //     typel = "booleanButtonFalse"
             //   }
         } else if (typeof e.data == "string" || typeof e.data == "boolean") {
-            typel = "Blank"
+            typel = "basic"
         } else {
             //typel = "Gauge"
             typel = "basic"

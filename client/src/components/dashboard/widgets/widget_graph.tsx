@@ -49,7 +49,7 @@ export default class WidgetCanvas extends WidgetComponent {
     render() {
 
         //if (this.props.widget.datapath) { return <div>{this.props.widget.datapath}</div> }
-        if (this.state.data.length == 0) { return <div>loading...</div> }
+        if (this.state.data.length == 0) { return <div></div> }
 
         var labels = [];
         var data = [];
