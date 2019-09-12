@@ -7,6 +7,8 @@ import { emit } from "cluster";
 import { theme, colors } from "../theme";
 
 interface MyProps {
+    /** The selected user from the drop down. */
+    onSelect?: Function
 }
 
 interface MyState {
@@ -70,10 +72,16 @@ export class SearchBox extends React.Component<MyProps, MyState> {
                     border: colors.borders
                 }}>
                     {this.state.result.map((user, i) => {
+                        /** we can either browser to the user, or use the user selected in other UI components. 
+                         * Currently used for top search box and share popup. */
                         return <div
                             key={i}
                             style={{ padding: "5px", borderBottom: "1px solid #333" }}>
-                            <Link to={"/u/" + user.username} >{user.username}</Link>
+                            {(this.props.onSelect)
+                                ? <button style={{ width: "100%" }} onClick={() => { this.props.onSelect(user); this.setState({ result: [] }) }}>{user.username}</button>
+                                : <Link to={"/u/" + user.username} >{user.username}</Link>
+                            }
+
                         </div>
                     })}
                 </div>

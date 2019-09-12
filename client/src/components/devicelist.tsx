@@ -8,6 +8,8 @@ import { DeviceListMenu } from "./devicelistmenu"
 
 import { sortBy, clone, filter } from "../utils/lodash_alt"
 import { logger } from "../../../server/shared/log"
+import { PopupShare } from "./popups/popup_share";
+import { PopupConfirm } from "./popups/popup_confirm";
 
 interface MyProps {
     username?: string;
@@ -32,6 +34,8 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         filter: "",
         states: [],
         statesraw: [],
+        sharedevicepopupvisible: false,
+        deletedevicepopupvisible: false
     }
 
     constructor(props) {
@@ -43,6 +47,10 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         this.getData();
         //dynamic updates:
         api.on("states", this.stateUpdater)
+
+        api.on("doupdate", () => {
+            this.getData();
+        })
     }
 
     getData = () => {
@@ -196,12 +204,6 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
     /**
      * Handles actions coming from the menu.
-     * @param action Possible values: 
-     * { selectall: true|false }
-     * { removeselected: true}
-     * { sort }
-     * { search }
-     * 
      */
     handleAction_deviceListMenu = (action) => {
         if (action.selectall != undefined) {
@@ -214,13 +216,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         }
 
         if (action.removeselected) {
-            console.log("remove selected:")
-            var states = clone(this.state.states)
-            for (var device of states) {
-                if (device.selected) {
-                    this.deleteItem(device)
-                }
-            }
+            this.setState({ deletedevicepopupvisible: true })
         }
 
         if (action.sort) {
@@ -233,6 +229,20 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             this.setState({ search: action.search.trim() }, () => {
                 this.applySortFilter(clone(api.data.states));
             })
+        }
+
+        console.log("ACTION", action);
+        if (action.shareset) {
+            this.setState({ sharedevicepopupvisible: true });
+        }
+    }
+
+    deletePopupConfirm = () => {
+        var states = clone(this.state.states)
+        for (var device of states) {
+            if (device.selected) {
+                this.deleteItem(device)
+            }
         }
     }
 
@@ -256,6 +266,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
         return (
             <div style={{
+                background: colors.panels,
                 width: "100%",
                 height: "100%", overflow: "hidden", display: "flex", flexDirection: "column"
             }} >
@@ -264,6 +275,23 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                     <DeviceListMenu
                         action={this.handleAction_deviceListMenu}
                         selection={this.state.states.filter((s) => { if (s.selected) return s })} />
+
+                    {(this.state.sharedevicepopupvisible)
+                        ? <PopupShare
+                            devices={this.state.states.filter((s) => { if (s.selected) return s })}
+                            onClose={() => { this.setState({ sharedevicepopupvisible: false }) }} />
+                        : ""}
+
+                    {(this.state.deletedevicepopupvisible)
+                        ? <PopupConfirm
+                            message={"Are you sure to delete " + this.state.states.filter((s) => { if (s.selected) return s }).length + " devices?"}
+                            onConfirm={() => {
+                                this.deletePopupConfirm();
+                                this.setState({ deletedevicepopupvisible: false })
+                            }}
+                            onClose={() => { this.setState({ deletedevicepopupvisible: false }) }} />
+                        : ""}
+
                 </div>
 
                 <div style={{ overflowX: "hidden", width: "100%", flex: 1, overflowY: "scroll" }}>

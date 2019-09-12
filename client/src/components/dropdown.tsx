@@ -67,7 +67,10 @@ export class Dropdown extends React.Component<Props, State> {
 
           if (item.enabled) {
             return <button style={{ textAlign: "left" }} key={i}
-              onClick={() => item.onClick()}>
+              onClick={() => {
+                item.onClick();
+                this.setState({ show: false }); //hides the dropdown when clicking a menu option
+              }}>
               <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
                 <i className={"fas fa-" + icon} /></div>
               {item.label}

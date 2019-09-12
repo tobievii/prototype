@@ -561,7 +561,8 @@ export class Core extends EventEmitter {
 
     // -------------------------------
 
-    /** manage access to a single device */
+    /** DEPRECIATED 5.1 
+     * manage access to a single device */
     access(options: {
         remove?: boolean, devicekey: string,
         userkey: string, user: User
@@ -701,9 +702,22 @@ export class Core extends EventEmitter {
                 }
             );
         }
-
-
     }
+
+    // ----------------------------------------------------------------------------------
+
+    users(options: any, cb: any) {
+        console.log("=============== USERS")
+        console.log(options);
+        if (options.request.find) {
+            if (options.request.find.publickey) {
+                this.db.users.find(options.request.find, { username: 1, publickey: 1 }, cb);
+            }
+        }
+
+        //this.db.users.find(options)
+    }
+
 }
 
 

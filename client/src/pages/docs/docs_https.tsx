@@ -38,7 +38,7 @@ export class DocsHTTPS extends React.Component<MyProps, MyState> {
 
     componentDidMount = () => {
         api.getapispec((err, spec) => {
-            console.log(spec);
+            //console.log(spec);
             this.setState({ spec })
         })
     }

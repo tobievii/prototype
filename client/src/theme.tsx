@@ -20,7 +20,8 @@ export const colors = {
   lines: "#333", //same as borders below
   borders: "1px solid rgba(128,128,128,0.01)", // 
   padding: 10,
-  widgetDefault: "#11CC88"
+  widgetDefault: "#11CC88",
+  backgroundPopup: "rgba(32, 32, 32, 0.5)"
 };
 
 // DEFINE COLOURS HERE:
@@ -154,17 +155,6 @@ export const theme: any = {
         //overflowY: "auto",
         boxSizing: "border-box",
         width: "100%"
-      },
-      contenthorizontal: {
-        boxSizing: "border-box",
-        //overflow: "hidden",
-        display: "flex",
-        flexFlow: "row",
-        height: "100%",
-        width: "100%"
-      },
-      contentright: {
-        flex: "1 0 auto"
       }
     }
   },

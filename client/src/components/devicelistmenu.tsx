@@ -2,7 +2,6 @@ import React from "react";
 import { theme } from "../theme"
 import { SortButton } from "./sortbutton"
 import { clone } from "../utils/lodash_alt"
-
 import { Dropdown } from "./dropdown"
 
 interface MenuProps {

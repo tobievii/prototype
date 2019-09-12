@@ -416,6 +416,22 @@ export class API extends EventEmitter {
             { headers: this.headers, json: true },
             (err, res, body: any) => { cb(err, body); });
     }
+
+    /** query users to obtain username etc of other users
+     * 
+     *  eg: api.users({publickey: xxxxxxxx}, (e,user)=>{})
+    */
+    users = (options, cb) => {
+        request.post(this.uri + "/api/v4/users",
+            { headers: this.headers, json: options },
+            (err, res, body: any) => {
+                if (err) cb(err);
+                if (body) {
+                    if (body.error) { cb(body); return; }
+                    cb(null, body);
+                }
+            })
+    }
 }
 
 var apiinstance = new API()

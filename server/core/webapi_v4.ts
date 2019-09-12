@@ -287,6 +287,30 @@ export function webapiv4(app: express.Application, core: Core) {
         res.json(core.config.version)
     })
 
+    // ----------------------------------------------------------------------------------
+
+    apispec.push({
+        method: "post",
+        path: "/api/v4/users",
+        description: "Request information on users",
+        post: { "publickey": "xxxxxxxxxxx" },
+        response:
+            [{
+                "publickey": "xxxxxxxxxxx",
+                "username": "joe"
+            }]
+
+    })
+
+    app.post("/api/v4/users", (req: any, res) => {
+        core.users({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    // ----------------------------------------------------------------------------------
+
 
     //////////////////////////////// LAST API SPEC
     apispec.push({
@@ -317,4 +341,7 @@ export function webapiv4(app: express.Application, core: Core) {
     app.get("/api/v4", (req, res) => {
         res.end(JSON.stringify(apispec, null, 2))
     })
+
+
+
 }

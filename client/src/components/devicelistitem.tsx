@@ -5,9 +5,11 @@ import { theme, colors } from "../theme"
 import { Link } from "react-router-dom";
 import { moment } from "../utils/momentalt"
 import { JSONviewer } from "./jsonviewer";
+import { PopupShare } from "./popups/popup_share";
 
 interface MyState {
     [index: string]: any;
+    sharedevicepopupvisible: boolean;
 }
 
 interface DeviceProps {
@@ -18,7 +20,9 @@ interface DeviceProps {
 export class DeviceListItem extends React.Component<DeviceProps, MyState> {
 
     state = {
-        collapsed: true
+        collapsed: true,
+        /** share popup for this device */
+        sharedevicepopupvisible: false
     }
 
     intervalupdater;
@@ -74,6 +78,15 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
 
     render() {
 
+        var shared = false;
+        var sharedtooltip = "Click to share this device"
+        if (this.props.device.access) {
+            if (this.props.device.access.length > 0) {
+                shared = true;
+                sharedtooltip = "This device is shared with " + this.props.device.access.length + " users."
+            }
+        }
+
         var cleanState = JSON.parse(JSON.stringify(this.props.device));
 
         for (var a of Object.keys(cleanState)) {
@@ -84,6 +97,13 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
 
         return (
             <div style={{ background: "#202020", padding: 0, margin: 0 }}>
+
+                {(this.state.sharedevicepopupvisible)
+                    ? <PopupShare
+                        devices={[this.props.device]}
+                        onClose={() => { this.setState({ sharedevicepopupvisible: false }) }} />
+                    : ""}
+
                 <div className="device" style={this.calcStyle()}>
                     <div style={theme.global.devicelist.columnleftselect} >
                         {(this.props.device.selected)
@@ -123,11 +143,12 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                             : <i style={{ opacity: colors.transparent }} className="fas fa-exclamation-triangle" />}
                     </div>
 
-                    <div style={theme.global.devicelist.columns}>
-                        {(this.props.device.shared)
-                            ? <i style={{ color: colors.share }} className="fas fa-share-alt" />
-                            : <i style={{ opacity: colors.transparent }} className="fas fa-share-alt" />}
-
+                    <div style={theme.global.devicelist.columns} >
+                        <div title={sharedtooltip} onClick={() => { this.setState({ sharedevicepopupvisible: true }) }} style={{ cursor: "pointer" }}>
+                            {(shared == true)
+                                ? <i style={{ color: colors.share }} className="fas fa-share-alt" />
+                                : <i style={{ opacity: colors.transparent }} className="fas fa-share-alt" />}
+                        </div>
                     </div>
 
                     <div style={theme.global.devicelist.columns}>

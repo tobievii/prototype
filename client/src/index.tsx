@@ -221,14 +221,17 @@ export default class App extends React.Component {
       <div >
         <BGgrad />
         <NavBar />
-        <div style={{ margin: colors.padding * 2 }}>
+        <div style={{ margin: colors.padding * 2, minHeight: "500px" }}>
           {size == "small"
             ? <DeviceList />
-            : <div style={theme.global.responsive.contenthorizontal}>
-              <div>
+            : <div style={{
+              boxSizing: "border-box", display: "flex",
+              flexDirection: "row", width: "100%"
+            }}>
+              <div style={{ flex: "0", height: "500px", minWidth: "400px" }}>
                 <DeviceList />
               </div>
-              <div style={theme.global.responsive.contentright}>
+              <div style={{ flex: "1" }}>
                 <Map />
               </div>
             </div>
@@ -245,33 +248,26 @@ export default class App extends React.Component {
   userView = props => {
     var size = window.innerWidth < 800 ? "small" : "large";
 
-    var wrapper = clone(theme.global.responsive.wrapper);
-    wrapper.height = this.state.height;
-
-    var content = clone(theme.global.responsive.content);
-    content.width = window.innerWidth;
-
-    var contentSplit = clone(theme.global.responsive.content);
-    contentSplit.width = window.innerWidth - 500;
-
     return (
-      <div style={wrapper}>
-        <div style={theme.global.responsive.navbar}>
-          <NavBar />
-        </div>
+      <div>
+        <BGgrad />
+        <NavBar />
 
-        <div style={content}>
+        <div style={{ margin: colors.padding * 2, minHeight: "500px" }}>
           {size == "small" ? (
             <DeviceView
               username={props.match.params.username}
               id={props.match.params.id}
             />
           ) : (
-              <div style={theme.global.responsive.contenthorizontal}>
-                <div style={{ flex: "0 auto", width: "500px" }}>
+              <div style={{
+                boxSizing: "border-box", display: "flex",
+                flexDirection: "row", width: "100%"
+              }}>
+                <div style={{ flex: "0", height: "500px", minWidth: "400px" }}>
                   <DeviceList username={props.match.params.username} />
                 </div>
-                <div style={contentSplit}>
+                <div style={{ flex: "1" }}>
                   <Map />
                 </div>
               </div>
