@@ -70,7 +70,7 @@ export class WidgetButton extends Component {
     render() {
         return (
             <TouchableHighlight onPress={() => { this.onClick() }}>
-                <View style={{ width: 375, height: 250, backgroundColor: this.state.background, justifyContent: "center", alignItems: "center" }}>
+                <View style={{ width: "100%", height: "100%", backgroundColor: this.state.background, justifyContent: "center", alignItems: "center" }}>
                     <Text style={{ color: this.state.color }}>
                         {this.state.buttonText}
                     </Text>
