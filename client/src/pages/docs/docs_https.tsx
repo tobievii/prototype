@@ -58,7 +58,11 @@ export class DocsHTTPS extends React.Component<MyProps, MyState> {
                         <div>
                             <div style={{ padding: colors.padding, width: "50%", boxSizing: "border-box", float: "left" }}>
 
-                                <strong>{a.method.toUpperCase()} {a.path} </strong>
+                                {(a.method == "get")
+                                    ? <strong><a href={a.path}>{a.method.toUpperCase()} {a.path} </a></strong>
+                                    : <strong>{a.method.toUpperCase()} {a.path} </strong>
+                                }
+
 
                                 <CodeBlock language='json' value={JSON.stringify(a.post, null, 2)} /></div>
                             <div style={{ padding: colors.padding, width: "50%", boxSizing: "border-box", float: "right" }}>

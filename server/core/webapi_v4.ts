@@ -44,6 +44,191 @@ export function webapiv4(app: express.Application, core: Core) {
 
     // ----------------------------------------------------------------------------------
 
+    // post packet data
+    apispec.push({
+        method: "post",
+        path: "/api/v4/data/post",
+        description: `Create a new device by using a unique id. Post again with new data to update. This post packet can contain 
+        many other properties that may be useful.`,
+        post: {
+            "id": "yourDevice001",
+            "data": {
+                "temperature": 24.54,
+                "doorOpen": false,
+                "gps": {
+                    "lat": 25.123,
+                    "lon": 28.125
+                }
+            }
+        },
+        response: { result: "success" }
+    })
+    app.post("/api/v4/data/post", (req: any, res) => {
+        core.datapost({ packet: req.body, user: req.user }, (err: object, result: object) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    // ----------------------------------------------------------------------------------
+
+    apispec.push({
+        description: "Get all your device state information.",
+        method: "get",
+        path: "/api/v4/states",
+        response: [{
+            "_created_on": "2019-09-04T12:34:23.196Z",
+            "_last_seen": "2019-09-11T15:29:36.870Z",
+            "_recieved": "2019-09-11T15:29:36.870Z",
+            "_timestamp": "2019-09-11T15:29:36.868Z",
+            "publickey": "xxxx",
+            "key": "xxxx",
+            "id": "poolsensor",
+            "data": {
+                "temperature": 30,
+                "gps": {
+                    "lat": -24.12435,
+                    "lon": 21.586536
+                }
+            },
+            "public": true,
+            "userpublickey": "xxxx",
+            "username": "joe",
+            "meta": {},
+            "history": [],
+            "layout": []
+        }]
+    })
+    app.get("/api/v4/states", (req: any, res) => {
+        core.view({ user: req.user }, (err, result) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    // ----------------------------------------------------------------------------------
+
+    // view state simple
+    apispec.push({
+        method: "post",
+        path: "/api/v4/view",
+        description: `Used to view the current state of a device. If you post an empty {} you will recieve an array of all devices.`,
+        post: { id: "yourDevice001" },
+        response: {
+            "_created_on": "2019-09-04T12:34:23.196Z",
+            "_last_seen": "2019-09-11T15:29:36.870Z",
+            "_recieved": "2019-09-11T15:29:36.870Z",
+            "_timestamp": "2019-09-11T15:29:36.868Z",
+            "publickey": "xxxx",
+            "key": "xxxx",
+            "id": "poolsensor",
+            "data": {
+                "temperature": 30,
+                "gps": {
+                    "lat": -24.12435,
+                    "lon": 21.586536
+                }
+            },
+            "public": true,
+            "userpublickey": "xxxx",
+            "username": "joe",
+            "meta": {},
+            "history": [],
+            "layout": []
+        }
+    })
+    app.post("/api/v4/view", (req: any, res) => {
+        var query = _.clone(req.body);
+        query.user = req.user;
+        core.view(query, (err, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) {
+                if (Array.isArray(result)) {
+                    for (var r of result) {
+                        delete r["_id"]
+                        delete r["apikey"]
+                    }
+                } else {
+                    delete result["apikey"]
+                    delete result["_id"]
+                }
+
+                res.json(result);
+            }
+        })
+    })
+
+    //apispec.push({ method: "post", path: "/api/v4/state" })
+    app.post("/api/v4/state", (req: any, res) => {
+        var query = _.clone(req.body);
+        query.user = req.user;
+
+        core.view(query, (err, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+
+
+    //apispec.push({ method: "post", path: "/api/v4/states" })
+    app.post("/api/v4/states", (req: any, res) => {
+        var options = _.clone(req.body)
+        options.user = req.user;
+        console.log(options);
+        core.view(options, (err, result) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    /** Todo switch to method DELETE */
+    //apispec.push({ method: "post", path: "/api/v4/state/delete" })
+    app.post("/api/v4/state/delete", (req: any, res) => {
+        core.delete({ id: req.body.id, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+
+    // general search api for finding users/devices across the system
+    //apispec.push({ method: "post", path: "/api/v4/search" })
+    app.post("/api/v4/search", (req: any, res) => {
+        core.search({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    //apispec.push({ method: "post", path: "/api/v4/stateupdate" })
+    app.post("/api/v4/stateupdate", (req: any, res) => {
+        core.stateupdate({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    //apispec.push({ method: "post", path: "/api/v4/activity" })
+    app.post("/api/v4/activity", (req: any, res) => {
+        core.activity({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    // view packets history
+    //apispec.push({ method: "post", path: "/api/v4/packets" })
+    app.post("/api/v4/packets", (req: any, res) => {
+        core.packets({ request: req.body, user: req.user }, (err: any, result: any) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+
+    // ----------------------------------------------------------------------------------
+
 
     apispec.push({
         method: "get",
@@ -102,164 +287,33 @@ export function webapiv4(app: express.Application, core: Core) {
         res.json(core.config.version)
     })
 
-    // ----------------------------------------------------------------------------------
-
-    // post packet data
-    apispec.push({
-        method: "post",
-        path: "/api/v4/data/post",
-        description: `Create a new device by using a unique id. Post again with new data to update. This post packet can contain 
-        many other properties that may be useful.`,
-        post: {
-            "id": "yourDevice001",
-            "data": {
-                "temperature": 24.54,
-                "doorOpen": false,
-                "gps": {
-                    "lat": 25.123,
-                    "lon": 28.125
-                }
-            }
-        },
-        response: { result: "success" }
-    })
-    app.post("/api/v4/data/post", (req: any, res) => {
-        core.datapost({ packet: req.body, user: req.user }, (err: object, result: object) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    // ----------------------------------------------------------------------------------
-
-    // view state simple
-    apispec.push({
-        method: "post",
-        path: "/api/v4/view",
-        description: `Used to view the current state of a device. If you post an empty {} you will recieve an array of all devices.`,
-        post: { id: "yourDevice001" },
-        response: {
-            "_created_on": "2019-09-04T12:34:23.196Z",
-            "_last_seen": "2019-09-11T15:29:36.870Z",
-            "_recieved": "2019-09-11T15:29:36.870Z",
-            "_timestamp": "2019-09-11T15:29:36.868Z",
-            "publickey": "xxxx",
-            "key": "xxxx",
-            "id": "poolsensor",
-            "data": {
-                "temperature": 30,
-                "gps": {
-                    "lat": -24.12435,
-                    "lon": 21.586536
-                }
-            },
-            "public": true,
-            "userpublickey": "xxxx",
-            "username": "joe",
-            "meta": {},
-            "history": [],
-            "layout": []
-        }
-    })
-    app.post("/api/v4/view", (req: any, res) => {
-        var query = _.clone(req.body);
-        query.user = req.user;
-        core.view(query, (err, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) {
-                if (Array.isArray(result)) {
-                    for (var r of result) {
-                        delete r["_id"]
-                        delete r["apikey"]
-                    }
-                } else {
-                    delete result["apikey"]
-                    delete result["_id"]
-                }
-
-                res.json(result);
-            }
-        })
-    })
-
-    apispec.push({ method: "post", path: "/api/v4/state" })
-    app.post("/api/v4/state", (req: any, res) => {
-        var query = _.clone(req.body);
-        query.user = req.user;
-
-        core.view(query, (err, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    apispec.push({ method: "get", path: "/api/v4/states" })
-    app.get("/api/v4/states", (req: any, res) => {
-        core.view({ user: req.user }, (err, result) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    apispec.push({ method: "post", path: "/api/v4/states" })
-    app.post("/api/v4/states", (req: any, res) => {
-        var options = _.clone(req.body)
-        options.user = req.user;
-        console.log(options);
-        core.view(options, (err, result) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    /** Todo switch to method DELETE */
-    apispec.push({ method: "post", path: "/api/v4/state/delete" })
-    app.post("/api/v4/state/delete", (req: any, res) => {
-        core.delete({ id: req.body.id, user: req.user }, (err: any, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-
-    // general search api for finding users/devices across the system
-    apispec.push({ method: "post", path: "/api/v4/search" })
-    app.post("/api/v4/search", (req: any, res) => {
-        core.search({ request: req.body, user: req.user }, (err: any, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    apispec.push({ method: "post", path: "/api/v4/stateupdate" })
-    app.post("/api/v4/stateupdate", (req: any, res) => {
-        core.stateupdate({ request: req.body, user: req.user }, (err: any, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    apispec.push({ method: "post", path: "/api/v4/activity" })
-    app.post("/api/v4/activity", (req: any, res) => {
-        core.activity({ request: req.body, user: req.user }, (err: any, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-    // view packets history
-    apispec.push({ method: "post", path: "/api/v4/packets" })
-    app.post("/api/v4/packets", (req: any, res) => {
-        core.packets({ request: req.body, user: req.user }, (err: any, result: any) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
-
-
 
     //////////////////////////////// LAST API SPEC
-    apispec.push({ method: "get", path: "/api/v4" })
+    apispec.push({
+        description: "This api documentation in JSON format.",
+        method: "get", path: "/api/v4",
+        response: [
+            {
+                "method": "post",
+                "path": "/api/v4/data/post",
+                "description": "Create a new device by using a unique id. Post again with new data to update. This post packet can contain \n        many other properties that may be useful.",
+                "post": {
+                    "id": "yourDevice001",
+                    "data": {
+                        "temperature": 24.54,
+                        "doorOpen": false,
+                        "gps": {
+                            "lat": 25.123,
+                            "lon": 28.125
+                        }
+                    }
+                },
+                "response": {
+                    "result": "success"
+                }
+            }, {}, {}]
+    }
+    )
     app.get("/api/v4", (req, res) => {
         res.end(JSON.stringify(apispec, null, 2))
     })
