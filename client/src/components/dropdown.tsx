@@ -8,58 +8,84 @@ import { SearchBox } from "./searchbox"
 
 
 interface Props {
-    //account: User;
-    icon?: string;
-    label: string
-    items: { label: string, onClick: Function, icon?: string }[]
+  //account: User;
+  enabled?: boolean
+  icon?: string;
+  label: string
+  items: { enabled?: boolean, label: string, onClick: Function, icon?: string }[]
 }
 
 interface State {
-    [index: string]: any;
+  [index: string]: any;
 }
 
 /** Makes a dropdown menu component */
 
 export class Dropdown extends React.Component<Props, State> {
-    state = {
-        mobileMenuActive: false,
-        show: false,
-        icon: "chevron-down"
-    };
+  state = {
+    mobileMenuActive: false,
+    show: false,
+    icon: "chevron-down"
+  };
 
-    componentDidMount = () => {
-        if (this.props.icon) {
-            this.setState({ icon: this.props.icon })
-        }
+  componentDidMount = () => {
+    if (this.props.icon) {
+      this.setState({ icon: this.props.icon })
     }
+  }
 
-    render() {
-        return <div>
-            <button onClick={() => { this.setState({ show: !this.state.show }) }}>
-                <i className={"fas fa-" + this.state.icon} /> {this.props.label}
+  render() {
+
+    var enabled = true; //default
+    if (this.props.enabled != undefined) { enabled = this.props.enabled }
+
+    return <div>
+
+      {(enabled)
+        ? <button onClick={() => { this.setState({ show: !this.state.show }) }}>
+          <i className={"fas fa-" + this.state.icon} /> {this.props.label}
+        </button>
+        : <button style={{ opacity: 0.5 }} onClick={() => { this.setState({ show: !this.state.show }) }}>
+          <i className={"fas fa-" + this.state.icon} /> {this.props.label}
+        </button>
+      }
+
+
+
+      <div style={{
+        display: (this.state.show) ? "flex" : "none",
+        flexDirection: "column",
+        position: "absolute",
+        background: colors.panels,
+        zIndex: 100
+      }}>
+        {this.props.items.map((item, i) => {
+          var icon = (item.icon) ? item.icon : "caret-right";
+
+          var buttonenabled = true; //default true
+          if (item.enabled != undefined) { buttonenabled = item.enabled } //optional override
+
+          if (item.enabled) {
+            return <button style={{ textAlign: "left" }} key={i}
+              onClick={() => item.onClick()}>
+              <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
+                <i className={"fas fa-" + icon} /></div>
+              {item.label}
             </button>
+          } else {
+            return <button style={{ textAlign: "left", opacity: 0.5, cursor: "not-allowed" }} key={i} disabled>
+              <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
+                <i className={"fas fa-" + icon} /></div>
+              {item.label}
+            </button>
+          }
 
-            <div style={{
-                display: (this.state.show) ? "flex" : "none",
-                flexDirection: "column",
-                position: "absolute",
-                background: colors.panels,
-                zIndex: 100
-            }}>
-                {this.props.items.map((item, i) => {
 
-                    var icon = (item.icon) ? item.icon : "caret-right";
-                    return <button style={{ textAlign: "left" }} key={i}
-                        onClick={() => item.onClick()}>
-                        <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
-                            <i className={"fas fa-" + icon} /></div>
-                        {item.label}
-                    </button>
-                })}
-            </div>
+        })}
+      </div>
 
-        </div>
-    }
+    </div>
+  }
 }
 
 /*

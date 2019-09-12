@@ -253,6 +253,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     render() {
+
         return (
             <div style={{
                 width: "100%",
@@ -260,7 +261,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             }} >
 
                 <div style={theme.global.menubars}>
-                    <DeviceListMenu action={this.handleAction_deviceListMenu} />
+                    <DeviceListMenu
+                        action={this.handleAction_deviceListMenu}
+                        selection={this.state.states.filter((s) => { if (s.selected) return s })} />
                 </div>
 
                 <div style={{ overflowX: "hidden", width: "100%", flex: 1, overflowY: "scroll" }}>

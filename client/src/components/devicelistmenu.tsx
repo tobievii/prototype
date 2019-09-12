@@ -7,6 +7,7 @@ import { Dropdown } from "./dropdown"
 
 interface MenuProps {
     action: Function;
+    selection: any[]
 }
 
 interface MenuState { }
@@ -67,6 +68,9 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
     }
 
     render() {
+
+        var hasSelection = (this.props.selection.length > 0) ? true : false
+
         return (
             <div>
                 <div style={theme.global.menubars}>
@@ -92,20 +96,23 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
                         <div style={{ flex: "0 auto" }}>
                             <Dropdown
+                                enabled={hasSelection}
                                 label='Modify'
                                 items={[
-                                    { icon: "th", label: 'Dashboard Preset', onClick: () => { this.props.action({ dashboardset: true }); } },
-                                    { icon: "code", label: 'Code', onClick: () => { this.props.action({ scriptset: true }) } },
-                                    { icon: "share-alt", label: 'Share', onClick: () => { this.props.action({ shareset: true }) } },
-                                    { icon: "trash", label: 'Delete', onClick: () => { this.props.action({ removeselected: true }) } }
+                                    { enabled: hasSelection, icon: "th", label: 'Dashboard Preset', onClick: () => { this.props.action({ dashboardset: true }); } },
+                                    { enabled: hasSelection, icon: "code", label: 'Code', onClick: () => { this.props.action({ scriptset: true }) } },
+                                    { enabled: hasSelection, icon: "share-alt", label: 'Share', onClick: () => { this.props.action({ shareset: true }) } },
+                                    { enabled: hasSelection, icon: "trash", label: 'Delete', onClick: () => { this.props.action({ removeselected: true }) } }
                                 ]}
                             />
                         </div>
 
                         <div style={{ flex: "0 auto" }}>
-                            <button onClick={() => { this.props.action({ removeselected: true }) }}>
-                                <i className="fas fa-trash" /> REMOVE
-                            </button>
+                            {(hasSelection)
+                                ? <button onClick={() => { this.props.action({ removeselected: true }) }}><i className="fas fa-trash" /> REMOVE</button>
+                                : <button style={{ opacity: 0.5 }}><i className="fas fa-trash" /> REMOVE</button>
+                            }
+
                         </div>
 
                     </div>
