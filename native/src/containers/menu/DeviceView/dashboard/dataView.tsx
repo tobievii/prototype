@@ -3,7 +3,7 @@ import { NavigationScreenProps } from 'react-navigation';
 import { Text, View, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 
-export class DataView extends React.Component {
+export class DataView extends Component {
 
     state: {
         data;

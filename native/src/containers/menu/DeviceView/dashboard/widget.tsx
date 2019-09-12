@@ -3,6 +3,7 @@ import { NavigationScreenProps } from 'react-navigation';
 import { Text, View, TouchableHighlight, TouchableOpacity, ScrollView, Picker } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { Calendar } from './calendar';
+import { WidgetButton } from './widgetButton'
 
 export class Widget extends Component {
     state: {
@@ -13,7 +14,7 @@ export class Widget extends Component {
 
     componentWillMount() {
         this.setState({ showmenu: "none" })
-        this.setState({ widgetTitle: "Widget" })
+        this.setState({ widgetTitle: this.props['widget'].type })
         this.setState({ widgetState: "white" })
     }
 
@@ -29,9 +30,24 @@ export class Widget extends Component {
     }
 
     widget = () => {
-        return (<ScrollView horizontal={true} >
-            <Calendar data={this.props['device']} />
-        </ScrollView>)
+        if (this.state.widgetTitle == "Calendar") {
+            return (<ScrollView horizontal={true}  >
+                <Calendar data={this.props['device']} />
+            </ScrollView>)
+        }
+
+        else if (this.state.widgetTitle == "widgetButton") {
+            return (<View  >
+                <WidgetButton data={this.props['device']} widget={this.props['widget']} />
+            </View>)
+        }
+        else {
+            return (
+                <View>
+                    <Text style={{ color: "white" }}>Widget has not been created yet...</Text>
+                </View>
+            )
+        }
     }
 
     openMenu = () => {
