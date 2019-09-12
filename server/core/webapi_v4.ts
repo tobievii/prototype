@@ -293,7 +293,7 @@ export function webapiv4(app: express.Application, core: Core) {
         method: "post",
         path: "/api/v4/users",
         description: "Request information on users",
-        post: { "publickey": "xxxxxxxxxxx" },
+        post: { find: { "username": "joe" } },
         response:
             [{
                 "publickey": "xxxxxxxxxxx",
