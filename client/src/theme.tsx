@@ -6,7 +6,7 @@ export const colors = {
   spotA: "rgb(242, 53, 58)", // main colour
   spotB: "#3b3b3b", // "#0a203b", //gradientBot
   spotC: "#1a1a1a", // "#09111a", //gradientTop
-  spotD: "#202020", // "#0d243d", //background
+  spotD: "#353535", // "#0d243d", //background
   spotE: "#fff",
   spotF: "#2b2b2b", //"#17232b", //panelbg
   panels: "#262626", // "#131E27",
