@@ -6,7 +6,6 @@ import { OptionMaster } from "./optionmaster"
 export default class OptionsInput extends OptionMaster {
   state = { val: "default1" }
 
-
   constructor(props) {
     super(props);
 
@@ -20,14 +19,6 @@ export default class OptionsInput extends OptionMaster {
 
     this.state.val = value;
   }
-
-  componentDidMount() {
-    // this.state = { value: this.props.option.value }
-    // this.onChange = this.onChange.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-
 
   onKeyPress = (e) => {
     if (e.key == "Enter") {

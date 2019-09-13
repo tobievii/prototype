@@ -22,7 +22,8 @@ interface MyState {
 export class DeviceView extends React.Component<MyProps, MyState> {
   state = {
     state: undefined,
-    message: undefined
+    message: undefined,
+    showEditor: false
   };
 
   wrapper;
@@ -106,18 +107,22 @@ export class DeviceView extends React.Component<MyProps, MyState> {
         <div style={{ padding: colors.padding * 2 }}>
 
           <div style={{ textAlign: "right" }}>
-            <Menu active={"dashboard"} config={{
+            <Menu align="right" active={"dashboard"} config={{
               menuitems: [
                 { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
                 { responsive: true, link: "/docs/websocket", icon: "server", text: "Data", onClick: () => { } },
-                { responsive: true, link: "/docs/websocket", icon: "code", text: "Code", onClick: () => { } },
+                {
+                  responsive: true, icon: "code", text: "Code", onClick: () => {
+                    this.setState({ showEditor: !this.state.showEditor })
+                  }
+                },
                 { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
                 { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
                 { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
             }} />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "row", overflow: "hidden" }}>
+          <div style={{ display: "flex", flexDirection: "row" }}>
             <div style={{ flex: "0", width: "400px" }}>
 
               <div style={{ overflowY: "scroll" }}>
@@ -128,7 +133,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
             <div style={{ flex: "5" }}>
               <div>
-                <ProtoEditor state={this.state.state} />
+                {(this.state.showEditor) && <ProtoEditor state={this.state.state} />}
+
               </div>
               <div>
                 <Dashboard state={this.state.state} />

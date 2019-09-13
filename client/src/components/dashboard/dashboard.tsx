@@ -9,6 +9,9 @@ import { clone } from "../../utils/lodash_alt"
 import { api } from "../../api"
 import { colors } from "../../theme";
 
+import { Button } from "../button"
+import { Menu } from "../menu";
+
 interface MyProps {
     //account: User;
     state: CorePacket;
@@ -168,46 +171,6 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                 this.updateServer();
             })
         }
-        // this.setState({ layout: JSON.parse(incominglayout) }, () => {
-        //     this.updateServer();
-        // })
-
-        // var statelayout = JSON.stringify(this.state.layout);
-        // var incominglayout = JSON.stringify(layout);
-
-        // if (statelayout != incominglayout) {
-        //     console.log("gridOnLayoutChange")
-        //     this.setState({ layout: JSON.parse(incominglayout) }, () => {
-        //         this.updateServer();
-        //     })
-        // }
-
-        // var updated = false; //should we update the server? default false.
-
-        // var newlayout = clone(this.state.layout)
-        // for (var widgetup of layout) {
-        //     for (var widget of newlayout) {
-        //         if (widget.i == widgetup.i) {
-        //             // update on location/size changes
-        //             if (widget.x != widgetup.x) { widget.x = widgetup.x; updated = true; }
-        //             if (widget.y != widgetup.y) { widget.y = widgetup.y; updated = true; }
-        //             if (widget.w != widgetup.w) { widget.w = widgetup.w; updated = true; }
-        //             if (widget.h != widgetup.h) { widget.h = widgetup.h; updated = true; }
-        //         }
-        //     }
-        // }
-
-        // //if there are fewer or more widgets then we update the server
-        // if (layout.length != this.state.layout) {
-        //     updated = true;
-        // }
-
-        // if (updated) {
-        //     //update the server
-
-        //     //this.updateServer();
-
-        // }
     }
 
     updateServer = () => {
@@ -296,6 +259,13 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         })
     }
 
+    addWidget = () => {
+        var layout = clone(this.state.layout)
+        layout.push({ i: generateDifficult(32), x: 0, y: 0, w: 2, h: 5, type: "basic", datapath: "", dataname: "" })
+        this.updatesource = "user"
+        this.setState({ layout }, () => { })
+    }
+
     render() {
         if (!this.props.state) { return <div>loading...</div> }
         if (this.state.layout == undefined) {
@@ -306,11 +276,18 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         return (
             <div>
 
-                <div>
-
+                <div style={{
+                    borderTopRightRadius: "12px",
+                    background: "rgba(0,0,0,0.1)",
+                    display: "flex", flexDirection: "row"
+                }}>
+                    <div style={{ flex: "5", paddingTop: colors.padding, textAlign: "center" }}>Dashboard</div>
+                    <div style={{ flex: "1" }}>
+                        <Menu align="right" config={{ menuitems: [{ responsive: true, icon: "plus-square", text: "New widget", onClick: () => { this.addWidget() } }] }} />
+                    </div>
                 </div>
 
-                <div style={{ width: "100%", background: "#181818", minHeight: 500, border: colors.borders }}
+                <div style={{ width: "100%", background: "#181818", border: colors.borders }}
 
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, "complete")} >
@@ -329,6 +306,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                         draggableHandle=".widgetGrab"   // drag handle class
                         rowHeight={this.state.grid.rowHeight}
                         width={this.state.grid.width}>
+
                         {this.state.layout.map((widget, i) => {
                             return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
                                 <Widget widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />

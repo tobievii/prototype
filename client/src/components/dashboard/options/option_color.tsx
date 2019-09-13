@@ -27,7 +27,6 @@ export default class OptionsColor extends OptionMaster {
   }
 
   onChange = (event) => {
-    //console.log(event.target.value)
     this.setState({ val: event.target.value }, () => {
       this.apply();
     });

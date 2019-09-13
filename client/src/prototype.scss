@@ -420,3 +420,55 @@ input[type="color"]::-webkit-color-swatch-wrapper {
 input[type="color"]::-webkit-color-swatch {
   border: none;
 }
+
+//--------------- FORM WIDGET
+
+// .rjsf {
+//   color: #ccc;
+// }
+
+fieldset {
+  //   margin: 4px;
+  //   padding: 4px;
+  border: 1px solid $borders;
+  margin: 0 4px 0 4px;
+  padding: 0 4px 0 4px;
+}
+
+// div.form-group {
+//   padding: 5px;
+//   background: "rgba(255,0,0,0.2)";
+//   display: "block";
+// }
+
+div.form-group.field {
+  //border: 1px solid #fff;
+  color: #ccc;
+  //display: "flex";
+  //flex-direction: row;
+  //justify-content: flex-end;
+  padding: 5px;
+}
+
+// div.form-group.field.field-string:after {
+//   clear: both;
+// }
+
+// label.control-label {
+//   // box-sizing: border-box;
+//   // //flex: 1;
+//   // float: left;
+//   // background: #660;
+//   // padding-right: 10px;
+//   // color: #aaa;
+//   // clear: both;
+// }
+
+.rjsf input {
+  width: 100%;
+}
+
+.rjsf button[type="submit"] {
+  float: right;
+  margin: 20px;
+}

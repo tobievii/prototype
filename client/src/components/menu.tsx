@@ -4,8 +4,10 @@ import { theme, colors } from "../theme"
 import { SortButton } from "./sortbutton"
 import { clone } from "../utils/lodash_alt"
 import { Dropdown } from "./dropdown"
+import { TextAlignProperty } from "csstype";
 
 interface MenuProps {
+    align?: TextAlignProperty,
     active?: string;
     config: {
         menuitems: {
@@ -14,7 +16,7 @@ interface MenuProps {
             text: string,
             icon?: string,
             onClick: any,
-            link: string
+            link?: string
         }[]
     }
 }
@@ -25,12 +27,15 @@ interface MenuState { }
 export class Menu extends React.Component<MenuProps, MenuState> {
     state = {
         active: 0,
-        useLinks: false
-
+        useLinks: false,
+        align: "left"
     }
 
 
     componentWillMount = () => {
+
+        if (this.props.align) { this.setState({ align: this.props.align }) }
+
         if (this.props.active) {
             for (var m in this.props.config.menuitems) {
                 if (this.props.config.menuitems[m].text.toLowerCase().indexOf(this.props.active.toLowerCase()) >= 0) {
@@ -46,15 +51,14 @@ export class Menu extends React.Component<MenuProps, MenuState> {
         var size = "large";
         if (window.innerWidth < 800) { size = "small" }
 
+        var align: any = this.state.align
+
         return (
-            <div>
+            <div style={{ textAlign: align }}>
                 {this.props.config.menuitems.map((item, i, arr) => {
 
                     var onClick = (e) => {
-
-                        console.log("click");
                         this.setState({ active: i })
-
                         item.onClick();
                     }
 
@@ -67,10 +71,16 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                         }
                         : { borderBottom: "0px" }
 
+                    if (item.link) {
+                        return <NavLink exact to={item.link} key={i}  ><button onClick={onClick} style={style}>
+                            <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
+                        </button></NavLink>
+                    } else {
+                        return <button key={i} onClick={onClick} style={style}>
+                            <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
+                        </button>
+                    }
 
-                    return <NavLink exact to={item.link} key={i}  ><button onClick={onClick} style={style}>
-                        <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
-                    </button></NavLink>
 
                 })}
             </div >
