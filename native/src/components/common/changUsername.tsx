@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Button, Text, TextInput, AsyncStorage } from 'react-native';
+import { url } from '../../app.component'
 
 interface Props {
     account: string;
@@ -20,7 +21,7 @@ class ChangeUsername extends React.Component<Props> {
     }
 
     private changeUn = async () => {
-        await fetch('https://prototype.dev.iotnxt.io/api/v3/account/updateusername', {
+        await fetch(url+'/api/v3/account/updateusername', {
             method: 'POST',
             headers: {
                 "Authorization": this.state.account.auth,
@@ -42,7 +43,7 @@ class ChangeUsername extends React.Component<Props> {
 
     private onUnChange = async (username) => {
         if (username.length >= 3) {
-            await fetch('https://prototype.dev.iotnxt.io/api/v3/account/checkupdateusername', {
+            await fetch(url+'/api/v3/account/checkupdateusername', {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',

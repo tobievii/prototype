@@ -6,6 +6,7 @@ import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { textStyle } from '@src/components/common'
 import { Widget } from './dashboard/widget';
 import { DataView } from './dashboard/dataView'
+import { url } from '../../../app.component'
 var data;
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
@@ -26,7 +27,7 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
     widgetLayoutInfo = async (device) => {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
         try {
-            const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/states/full', {
+            const response = await fetch(url + '/api/v3/states/full', {
                 method: 'GET',
                 headers: {
                     'Authorization': user.auth,

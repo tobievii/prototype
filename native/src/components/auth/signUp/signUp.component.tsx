@@ -22,6 +22,7 @@ import {
   textStyle,
 } from '../../../../src/components/common';
 import { PlusIconFill } from '../../../../src/assets/icons';
+import { url } from '../../../app.component'
 
 interface ComponentProps {
   onSignUpPress: (formData: SignUpFormData) => void;
@@ -57,7 +58,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
 
   private onSignUpButtonPress = () => {
     this.setState({ response: "Please Wait ...." })
-    fetch("https://prototype.dev.iotnxt.io/api/v3/account/checkupdateusername", {
+    fetch(url + "/api/v3/account/checkupdateusername", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -78,7 +79,7 @@ class SignUp2Component extends React.Component<SignUp2Props, State> {
   };
 
   private register = () => {
-    fetch("https://prototype.dev.iotnxt.io/api/v3/admin/register", {
+    fetch(url + "/api/v3/admin/register", {
       //https://8bo.org/api/v4/admin/register
       method: "POST",
       headers: {

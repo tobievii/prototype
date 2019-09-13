@@ -18,7 +18,9 @@ import {
   themes,
   ThemeStore,
 } from '../src/core/themes';
-
+const prod = "https://prototype.iotnxt.io"
+const dev = "https://prototype.dev.iotnxt.io"
+export var url = prod;
 const images: ImageRequireSource[] = [
 
 ];

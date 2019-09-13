@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Button, Text, TextInput, AsyncStorage } from 'react-native';
 import { PasswordValidator } from '../../../src/core/validators';
 import { ValidationInput } from '../../../src/components/common';
+import { url } from '../../app.component'
 
 interface Props {
     account: string;
@@ -30,7 +31,7 @@ class ChangePassword extends React.Component<Props> {
     }
 
     private changeCookie = async (username) => {
-        fetch("https://prototype.dev.iotnxt.io/api/v3/passChanged", {
+        fetch(url+"/api/v3/passChanged", {
             method: "POST", body: JSON.stringify({ username: username }), headers: { "Accept": "application/json", "Content-Type": "application/json" },
         }).then(response => response.json()).then(serverresponse => {
             this.setState({ passwordInfo: "Password successfully changed", disablebutton: true })
@@ -42,7 +43,7 @@ class ChangePassword extends React.Component<Props> {
             this.setState({ passwordInfo: "Please check the current password and verify information above. Current password and new must be different." })
             this.setState({ disablebutton: true })
         } else {
-            await fetch("https://prototype.dev.iotnxt.io/api/v3/admin/userpassword", {
+            await fetch(url+"/api/v3/admin/userpassword", {
                 method: "POST",
                 headers: {
                     "Authorization": this.state.account.auth,

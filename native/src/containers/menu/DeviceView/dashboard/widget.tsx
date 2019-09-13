@@ -4,6 +4,7 @@ import { Text, View, TouchableHighlight, ScrollView, TextInput, AsyncStorage, Al
 import { FontAwesome, AntDesign } from '@expo/vector-icons';
 import { Calendar } from './calendar';
 import { WidgetButton } from './widgetButton'
+import { url } from '../../../../app.component'
 import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
 export class Widget extends Component {
@@ -18,7 +19,14 @@ export class Widget extends Component {
     componentWillMount() {
         this.setState({ showmenu: "none", widgetTitle: this.props['widget'].type, widgetState: "white" })
         if (this.props['widget'].type == "widgetButton") {
-            this.setState({ text: this.props['widget'].options.command })
+            if (this.props['widget'].options) {
+                if (this.props['widget'].options.command) {
+                    this.setState({ text: this.props['widget'].options.command })
+                }
+            }
+            else {
+                this.setState({ text: JSON.stringify({ "foo": true }) })
+            }
         }
     }
 
@@ -37,7 +45,7 @@ export class Widget extends Component {
     onClick = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
         try {
-            fetch("https://prototype.dev.iotnxt.io/api/v3/data/post", {
+            fetch(url + "/api/v3/data/post", {
                 method: "POST", headers: { 'Authorization': user.auth, "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({ id: this.props['device'].id, data: JSON.parse(this.state.text) })
             }).then(response => response.json()).then(resp => {

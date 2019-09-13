@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, Dimensions, AsyncStorage } from 'react-native';
 import { ContributionGraph } from 'react-native-chart-kit'
+import { url } from '../../../../app.component'
 const screenWidth = Dimensions.get('window').width
 const chartConfig = {
     backgroundGradientFrom: '#262626',
@@ -58,7 +59,7 @@ export class Calendar extends Component {
     example = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
         try {
-            const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/packets', {
+            const response = await fetch(url + '/api/v3/packets', {
                 method: 'POST',
                 headers: {
                     'Authorization': user.auth,
