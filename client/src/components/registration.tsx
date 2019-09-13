@@ -40,7 +40,7 @@ export class Registration extends React.Component<MyProps, MyState> {
     }
 
     signin = () => {
-        api.signin(this.state.email, this.state.pass, (err, result) => {
+        api.signin({ email: this.state.email, pass: this.state.pass }, (err, result) => {
             if (err) {
                 this.setState({ message: err.err })
                 setTimeout(() => {

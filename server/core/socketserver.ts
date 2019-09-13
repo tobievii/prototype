@@ -35,7 +35,7 @@ export class SocketServer extends EventEmitter {
 
         this.wss.on('connection', (socket: any) => {
             logger.log({ message: "socket new connection", level: "verbose", group: "ws" })
-            socket.send(JSON.stringify({ server: "welcome" }))
+            socket.send(JSON.stringify({ server: "welcome", sendthistoserver: { connect: true, apikey: "yourapikey" } }))
 
             socket.on('message', (message: string) => {
                 logger.log({ message: "socket rx", level: "verbose", group: "ws" })

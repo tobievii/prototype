@@ -1,6 +1,5 @@
 import { describe, it } from "mocha";
 import * as _ from "lodash"
-
 import * as request from "request"
 
 var config = {

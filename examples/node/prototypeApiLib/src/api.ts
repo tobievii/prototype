@@ -1,15 +1,20 @@
 import { EventEmitter } from "events"
-import { request } from "./utils/requestweb"
-import { User, CorePacket, ClientPacketOptions } from "../../server/shared/interfaces"
-import { logger } from "../../server/shared/log"
+import * as request from "request" // "./utils/requestweb"
+import { User, CorePacket, ClientPacketOptions } from "./interfaces"
+//import { console } from "../../server/shared/log"
 //import { liteio } from "./utils/liteio"
 
-import { PrototypeWS } from "../../server/shared/prototypews"
+import { PrototypeWS } from "./prototypews"
 
-// v5.0
+// 5.1 
+
+/** test */
+interface RegisterResult {
+    account: User
+}
 
 export class API extends EventEmitter {
-    uri: string = ""
+    uri: string = "http://localhost:8080" //"ws://localhost:8080"
     headers = {};
     apikey: string;
     accountData: User | undefined;
@@ -22,22 +27,48 @@ export class API extends EventEmitter {
         packets: []
     }
 
+    /** enable debug logging? */
+    debug = false;
+
     subscriptions: any = [];
 
-    constructor() {
+    constructor(options?) {
         super();
-        logger.log({ message: "API initialized", level: "verbose" })
+
+        if (options) {
+            if (options.uri) this.uri = options.uri
+
+        }
+
+        if (this.debug) console.log({ message: "API initialized", level: "verbose" })
     }
 
-    register(options: { email: string, pass: string }, cb: (err, result?) => void) {
-        request.post(this.uri + "/api/v4/admin/register",
-            { json: { email: options.email, pass: options.pass } },
-            (err, res, body: any) => {
+    /** Handles account registration, just send a json object with email and 
+     *  password both as strings ofcourse:      * 
+     *  
+     *  ```ts
+     *  // EXAMPLE:
+     *  api.register({email: "some@mail.com",pass: "hunt3r"}, (err, account) => {
+     *  if (err) console.log(err);
+     *      console.log(account);
+     *  });
+       ```
+     * 
+     */ 
+    register(json: { email: string, pass: string }, cb: (err, result?:{account:User}) => void) {
+        request.post(this.uri + "/api/v4/admin/register", {json},(err, res, body: any) => {
                 if (err) cb(err);
                 if (body) {
-                    if (body.error) { cb(new Error(body.error)); return; }
+                    if (body.err) { 
+                        cb(body); 
+                        return; 
+                    }
+
+                    if (body.account == undefined) { cb(new Error("registeration error")); return; }
                     if (body.account.apikey) {
+                        
                         this.apikey = body.account.apikey
+
                         this.rebuildHeader();
                         this.connectSocket();
 
@@ -47,7 +78,7 @@ export class API extends EventEmitter {
             });
     }
 
-    // takes the apikey and generates the base64 auth header
+    /** Takes the apikey and generates the base64 auth header. */
     rebuildHeader() {
         this.headers = {
             Authorization: "Basic " + Buffer.from("api:key-" + this.apikey).toString("base64"),
@@ -55,8 +86,17 @@ export class API extends EventEmitter {
         }
     }
 
-    /** allows you to login using email + pass */
-    signin(json: { email: string, pass: string }, cb: Function) {
+    /** Allows you to login using email + pass 
+     * 
+     * 
+     * ```ts
+     * api.signin(randomTestAccount, (err,result) => {
+     *  result.signedin = true // signedin?
+     *  result.auth = "Basic asdfgjhfdkl" //html header
+     * })
+     *  ```
+    */
+    signin(json: { email: string, pass: string }, cb: (err:Error,result?:{signedin:boolean, auth:string})=>void) {
         request.post(this.uri + "/signin", { json }, (err, res, body: any) => {
             if (err) cb(err);
             if (body) {
@@ -71,7 +111,7 @@ export class API extends EventEmitter {
 
     // gets our latest account details
     account = (options?: any | Function, cb?: Function) => {
-        logger.log({ message: "api account load", level: "verbose" })
+        if (this.debug) console.log({ message: "api account load", level: "verbose" })
 
         var opt;
         var callback;
@@ -83,7 +123,7 @@ export class API extends EventEmitter {
         }
 
         if (opt) {
-            logger.log({ message: "api account load1", level: "verbose" })
+            if (this.debug) console.log({ message: "api account load1", level: "verbose" })
             request.post(this.uri + "/api/v4/account",
                 { json: opt },
                 (err, res, body: any) => {
@@ -126,25 +166,23 @@ export class API extends EventEmitter {
     }
 
     connectSocket() {
-        var uri = "ws://localhost:8080"
-        if (location) {
-            uri = location.origin.replace("http", "ws")
-        }
+        //var uri = "ws://localhost:8080"
+        // if (this.location) {
+        //     uri = location.origin.replace("http", "ws")
+        // }
 
-        logger.log({ message: "api connect socket", level: "verbose" })
+        var uri = this.uri.replace("http", "ws")
+
+        if (this.debug) console.log({ message: "api connect socket", level: "verbose" })
         this.prototypews = new PrototypeWS({ uri, apikey: this.apikey });
 
         this.prototypews.on("connect", () => {
-            logger.log({ message: "Websocket auth success", level: "verbose" })
+            if (this.debug) console.log({ message: "Websocket auth success", level: "verbose" })
         });
 
         this.prototypews.on("states", (states) => {
             this.updateStates(states)
         })
-    }
-
-    originToWSuri() {
-        location.origin
     }
 
     listenSocketChannel = (channel) => {
@@ -170,7 +208,7 @@ export class API extends EventEmitter {
         let found: boolean = false;
         for (var s in this.data.states) {
             if (this.data.states[s].key == data.key) {
-                //logger.log({ message: "recieved new device state", data: data, level: "verbose" })
+                if (this.debug) console.log({ message: "recieved new device state", data: data, level: "verbose" })
                 this.data.states[s] = data;
                 found = true;
             }
@@ -189,6 +227,7 @@ export class API extends EventEmitter {
     }
 
 
+    
 
     version(cb: Function) {
         request.get(this.uri + "/api/v4/version", { json: true }, (err, res, body) => {
@@ -281,7 +320,7 @@ export class API extends EventEmitter {
     */
 
     states = (options?, cb?: (err, states?: object) => void) => {
-        logger.log({ message: "api states", data: { options }, level: "verbose" })
+        if (this.debug) console.log({ message: "api states", data: { options }, level: "verbose" })
         var callback;
         var opt;
         if (cb) {
@@ -359,14 +398,14 @@ export class API extends EventEmitter {
             this.search({ username: options.username }, (e, r) => {
                 if (r) {
                     let publickey = r.publickey
-                    logger.log({ message: "joining publickey", data: { publickey }, level: "verbose", group: "ws" })
+                    if (this.debug) console.log({ message: "joining publickey", data: { publickey }, level: "verbose", group: "ws" })
                     this.prototypews.subscribe(r.publickey)
                 }
             })
         }
 
         if (options.publickey) {
-            logger.log({ message: "joining publickey", data: { publickey: options.publickey }, level: "verbose", group: "ws" })
+            if (this.debug) console.log({ message: "joining publickey", data: { publickey: options.publickey }, level: "verbose", group: "ws" })
             this.prototypews.subscribe(options.publickey)
 
             if (cb) {
@@ -437,11 +476,9 @@ export class API extends EventEmitter {
     }
 }
 
-var apiinstance = new API()
+// var apiinstance = new API()
 
-const globalAny: any = global;
-globalAny.api = apiinstance
-
-
-export var api = apiinstance
+// const globalAny: any = global;
+// globalAny.api = apiinstance
+// export var api = apiinstance
 //window.api = api;

@@ -1,6 +1,8 @@
-const WebSocket = require('isomorphic-ws')
+const WebSocket = require('ws')
+
 
 import { EventEmitter } from "events";
+
 export class PrototypeWS extends EventEmitter {
     socket: any;
     apikey: string;
@@ -61,3 +63,4 @@ export class PrototypeWS extends EventEmitter {
         }
     }
 }
+ 
