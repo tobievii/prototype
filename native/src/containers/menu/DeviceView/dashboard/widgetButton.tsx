@@ -44,32 +44,10 @@ export class WidgetButton extends Component {
         }
     }
 
-    onClick = async () => {
-        const user = JSON.parse(await AsyncStorage.getItem('user'));
-        try {
-            fetch("https://prototype.dev.iotnxt.io/api/v3/data/post", {
-                method: "POST", headers: { 'Authorization': user.auth, "Accept": "application/json", "Content-Type": "application/json" },
-                body: JSON.stringify({ id: this.props['data'].id, data: JSON.parse(JSON.stringify({ "foo": true })) })
-            }).then(response => response.json()).then(resp => {
-                console.log(resp);
-                Alert.alert(
-                    'Command Sent',
-                    this.state.command,
-                    [{ text: 'Cancel', onPress: () => console.log(''), style: 'cancel', },
-                    { text: 'OK', onPress: () => console.log('') },
-                    ],
-                    { cancelable: false },
-                );
-            })
-        }
-        catch (err) {
-            return console.error(err.toString());
-        }
-    }
 
     render() {
         return (
-            <TouchableHighlight onPress={() => { this.onClick() }}>
+            <TouchableHighlight onPress={ this.props.onClick }>
                 <View style={{ width: "100%", height: "100%", backgroundColor: this.state.background, justifyContent: "center", alignItems: "center" }}>
                     <Text style={{ color: this.state.color }}>
                         {this.state.buttonText}
