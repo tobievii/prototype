@@ -57,10 +57,10 @@ export class LoadingAnimationComponent extends React.Component<Props, State> {
 
     return (
       <Animated.View
-        style={[styles.container, { opacity }]}>
+        style={[styles.container, { opacity }, { alignItems: 'center', justifyContent: 'center' }]}>
         <Animated.Image
           source={splash.imageSource}
-          style={[styles.image, { transform }]}
+          style={[styles.image, { transform }, { backgroundColor: "#262626" }]}
         />
       </Animated.View>
     );
@@ -77,12 +77,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: "#262626",
   },
   image: {
-    width: undefined,
-    height: undefined,
-    ...StyleSheet.absoluteFillObject,
+    width: 90,
+    height: 90,
     resizeMode: 'contain',
   },
 });

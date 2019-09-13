@@ -68,7 +68,7 @@ class SignInComponent extends React.Component<SignInProps> {
 
     return (
       <ScrollableAvoidKeyboard style={themedStyle.container}>
-        <View style={themedStyle.headerContainer}>
+        <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
           <Text
             style={themedStyle.helloLabel}
             category='h1'
