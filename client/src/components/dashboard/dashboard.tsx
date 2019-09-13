@@ -113,21 +113,31 @@ export class Dashboard extends React.Component<MyProps, MyState> {
 
     componentDidMount = () => {
         if (!this.props.state) { return; }
-        if (!this.props.state.layout) { return; }
-        this.setState({ layout: this.props.state.layout })
+        if (!this.props.state.layout) {
+            this.setState({ layout: [] })
+        } else {
+            this.setState({ layout: this.props.state.layout })
+        }
+
     }
 
     UNSAFE_componentWillReceiveProps = (props) => {
         // console.log("recieveProps", this.props.state.layout)
 
         var statelayout = JSON.stringify(this.state.layout);
+
+        if (statelayout == undefined) { statelayout = "[]" }
+
         var propslayout = JSON.stringify(this.props.state.layout);
 
         if (statelayout != propslayout) {
             // console.log("Updating Layout state")
             // update if not the same as what we had.
             this.updatesource = "props"
-            this.setState({ layout: this.props.state.layout })
+
+            var layout = this.props.state.layout
+            if (layout == undefined) { layout = [] }
+            this.setState({ layout })
         }
     }
 
@@ -288,7 +298,10 @@ export class Dashboard extends React.Component<MyProps, MyState> {
 
     render() {
         if (!this.props.state) { return <div>loading...</div> }
-        if (!this.state.layout) { return <div>loading...</div> }
+        if (this.state.layout == undefined) {
+            console.log(this.state.layout)
+            return <div>no layout</div>
+        }
 
         return (<div style={{ width: "100%", background: "#181818", minHeight: 500, border: colors.borders }}
 
