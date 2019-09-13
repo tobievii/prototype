@@ -8,7 +8,6 @@ import { Dropdown } from "./dropdown"
 interface MenuProps {
     active?: string;
     config: {
-        theme: { active: { background: string }, inactive: { background: string } },
         menuitems: {
             /** show only icon on small screens */
             responsive: boolean,
@@ -27,6 +26,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
     state = {
         active: 0,
         useLinks: false
+
     }
 
 
@@ -63,7 +63,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                         ? {
                             borderBottom: "0px",
                             borderTop: "1px solid " + colors.spotA,
-                            background: this.props.config.theme.active.background
+                            background: colors.panels
                         }
                         : { borderBottom: "0px" }
 

@@ -6,6 +6,7 @@ import { JSONviewer } from "./jsonviewer";
 import { ProtoEditor } from "./editor"
 import { Dashboard } from "./dashboard/dashboard"
 import { colors } from "../theme";
+import { Menu } from "./menu";
 
 
 interface MyProps {
@@ -102,28 +103,45 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     if (this.state.state) {
       return (
-        <div style={{ margin: colors.padding * 2, width: "100%", maxHeight: window.innerHeight, overflow: "hidden" }}>
+        <div style={{ padding: colors.padding * 2 }}>
 
-          <div style={{ display: "flex", flexDirection: "row", maxHeight: window.innerHeight, overflow: "hidden" }}>
-            <div style={{ width: 450 }}>
+          <div style={{ textAlign: "right" }}>
+            <Menu active={"dashboard"} config={{
+              menuitems: [
+                { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
+                { responsive: true, link: "/docs/websocket", icon: "server", text: "Data", onClick: () => { } },
+                { responsive: true, link: "/docs/websocket", icon: "code", text: "Code", onClick: () => { } },
+                { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
+                { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
+                { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
+            }} />
+          </div>
 
-              <div style={{ maxHeight: "800px", overflowY: "scroll" }}>
+          <div style={{ display: "flex", flexDirection: "row", overflow: "hidden" }}>
+            <div style={{ flex: "0", width: "400px" }}>
+
+              <div style={{ overflowY: "scroll" }}>
                 <JSONviewer object={this.state.state} />
               </div>
 
             </div>
 
-            {/* <div style={{ width: 300 }}>
-              <ProtoEditor state={this.state.state} />
-            </div> */}
+            <div style={{ flex: "5" }}>
+              <div>
+                <ProtoEditor state={this.state.state} />
+              </div>
+              <div>
+                <Dashboard state={this.state.state} />
+              </div>
+            </div>
 
-            <div style={{ width: "100%" }}>
-              <div style={{ padding: colors.padding }}>
+
+            {/* <div style={{ padding: colors.padding }}>
                 USERNAME: {this.state.state.username}<br />
                 ID: {this.state.state.id}
-              </div>
-              <Dashboard state={this.state.state} />
-            </div>
+              </div> */}
+
+
 
           </div>
 

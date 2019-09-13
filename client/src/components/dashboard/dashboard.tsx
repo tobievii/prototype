@@ -303,32 +303,39 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             return <div>no layout</div>
         }
 
-        return (<div style={{ width: "100%", background: "#181818", minHeight: 500, border: colors.borders }}
+        return (
+            <div>
 
-            onDragOver={(e) => this.onDragOver(e)}
-            onDrop={(e) => this.onDrop(e, "complete")} >
+                <div>
 
-            <GridLayout
-                onDragStart={this.gridOnDragStart}
-                onDrag={this.gridOnDrag}
-                onDragStop={this.gridOnDragStop}
-                onResizeStart={this.gridOnResizeStart}
-                onResize={this.gridOnResize}
-                onLayoutChange={this.gridOnLayoutChange}
-                useCSSTransforms={false}
-                onResizeStop={this.gridOnResizeStop}
-                layout={this.state.layout}
-                cols={this.state.grid.cols}
-                draggableHandle=".widgetGrab"   // drag handle class
-                rowHeight={this.state.grid.rowHeight}
-                width={this.state.grid.width}>
-                {this.state.layout.map((widget, i) => {
-                    return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
-                        <Widget widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
-                    </div>)
-                })}
-            </GridLayout>
-        </div>
+                </div>
+
+                <div style={{ width: "100%", background: "#181818", minHeight: 500, border: colors.borders }}
+
+                    onDragOver={(e) => this.onDragOver(e)}
+                    onDrop={(e) => this.onDrop(e, "complete")} >
+
+                    <GridLayout
+                        onDragStart={this.gridOnDragStart}
+                        onDrag={this.gridOnDrag}
+                        onDragStop={this.gridOnDragStop}
+                        onResizeStart={this.gridOnResizeStart}
+                        onResize={this.gridOnResize}
+                        onLayoutChange={this.gridOnLayoutChange}
+                        useCSSTransforms={false}
+                        onResizeStop={this.gridOnResizeStop}
+                        layout={this.state.layout}
+                        cols={this.state.grid.cols}
+                        draggableHandle=".widgetGrab"   // drag handle class
+                        rowHeight={this.state.grid.rowHeight}
+                        width={this.state.grid.width}>
+                        {this.state.layout.map((widget, i) => {
+                            return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
+                                <Widget widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
+                            </div>)
+                        })}
+                    </GridLayout>
+                </div></div>
         )
     }
 }

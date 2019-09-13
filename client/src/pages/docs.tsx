@@ -93,14 +93,6 @@ export class Documentation extends React.Component<MyProps, MyState> {
         return (
             <div className="apiInfo" style={{ padding: colors.padding * 2 }} >
                 <Menu active={this.props.page} config={{
-                    theme: {
-                        active: {
-                            background: this.state.background
-                        },
-                        inactive: {
-                            background: "#202020"
-                        }
-                    },
                     menuitems: [
                         { responsive: true, link: "/docs/apikey", icon: "key", text: "APIKEY", onClick: this.onClickMenuTab(1) },
                         { responsive: false, link: "/docs/http", text: "HTTP/S", onClick: this.onClickMenuTab(2) },

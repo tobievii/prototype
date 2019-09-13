@@ -77,7 +77,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
                         <div style={{ flex: "0 auto" }}>
                             <button onClick={() => { this.props.action({ add: true }) }}>
-                                <i className="fas fa-plus" /> ADD
+                                <i className="fas fa-plus" /> Add
                             </button>
                         </div>
 
@@ -87,8 +87,8 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                                 this.setState({ selectall: !this.state.selectall }); //toggle
                             }}>
                                 {(this.state.selectall)
-                                    ? <span><i className="fas fa-check-double" /> SELECT ALL</span>
-                                    : <span><i className="fas fa-square" /> SELECT NONE</span>
+                                    ? <span><i className="fas fa-check-double" /> Select All</span>
+                                    : <span><i className="fas fa-square" /> Select None</span>
                                 }
                             </button>
                         </div>
@@ -108,8 +108,8 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
 
                         <div style={{ flex: "0 auto" }}>
                             {(hasSelection)
-                                ? <button onClick={() => { this.props.action({ removeselected: true }) }}><i className="fas fa-trash" /> REMOVE</button>
-                                : <button style={{ opacity: 0.5 }}><i className="fas fa-trash" /> REMOVE</button>
+                                ? <button onClick={() => { this.props.action({ removeselected: true }) }}><i className="fas fa-trash" /> Delete</button>
+                                : <button style={{ opacity: 0.5 }}><i className="fas fa-trash" /> Delete</button>
                             }
 
                         </div>
