@@ -1,20 +1,60 @@
 import React, { Component } from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { Text, View, TouchableHighlight, TouchableOpacity, ScrollView, Picker } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { Text, View, TouchableHighlight, ScrollView, TextInput, AsyncStorage, Alert } from 'react-native';
+import { FontAwesome, AntDesign } from '@expo/vector-icons';
 import { Calendar } from './calendar';
+import { WidgetButton } from './widgetButton'
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
 
 export class Widget extends Component {
     state: {
         showmenu;
         widgetTitle;
         widgetState;
+        text;
     }
+    _menu = null;
 
     componentWillMount() {
-        this.setState({ showmenu: "none" })
-        this.setState({ widgetTitle: "Widget" })
-        this.setState({ widgetState: "white" })
+        this.setState({ showmenu: "none", widgetTitle: this.props['widget'].type, widgetState: "white" })
+        if (this.props['widget'].type == "widgetButton") {
+            this.setState({ text: this.props['widget'].options.command })
+        }
+    }
+
+    setMenuRef = ref => {
+        this._menu = ref;
+    };
+
+    hideMenu = () => {
+        this._menu.hide();
+    };
+
+    showMenu = () => {
+        this._menu.show();
+    };
+
+    onClick = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('user'));
+        try {
+            fetch("https://prototype.dev.iotnxt.io/api/v3/data/post", {
+                method: "POST", headers: { 'Authorization': user.auth, "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({ id: this.props['device'].id, data: JSON.parse(this.state.text) })
+            }).then(response => response.json()).then(resp => {
+                console.log(resp);
+                Alert.alert(
+                    'Command Sent',
+                    this.state.text,
+                    [{ text: 'Cancel', onPress: () => console.log(''), style: 'cancel', },
+                    { text: 'OK', onPress: () => console.log('') },
+                    ],
+                    { cancelable: false },
+                );
+            })
+        }
+        catch (err) {
+            return console.error(err.toString());
+        }
     }
 
     menuState = () => {
@@ -29,17 +69,31 @@ export class Widget extends Component {
     }
 
     widget = () => {
-        return (<ScrollView horizontal={true} >
-            <Calendar data={this.props['device']} />
-        </ScrollView>)
+        if (this.state.widgetTitle == "Calendar") {
+            return (<ScrollView horizontal={true}  >
+                <Calendar data={this.props['device']} />
+            </ScrollView>)
+        }
+        else if (this.state.widgetTitle == "widgetButton") {
+            return (<View key={this.props['widget'].i} >
+                <WidgetButton data={this.props['device']} widget={this.props['widget']} onClick={this.onClick} />
+            </View>)
+        }
+        else {
+            return (
+                <View>
+                    <Text style={{ color: "white" }}>Widget has not been created yet...</Text>
+                </View>
+            )
+        }
     }
 
     openMenu = () => {
-        if (this.state.showmenu != "none") {
-            return (<View style={{ backgroundColor: "black", width: "100%", height: "100%", display: this.state.showmenu }}>
-                <Picker style={{ backgroundColor: "black" }} mode="dropdown"
+        if (this.state.showmenu !== "none") {
+            return (<View style={{ backgroundColor: "#262626", width: "100%", height: "100%", display: this.state.showmenu }}>
+                {/* <Picker style={{ backgroundColor: "black", height: "40%", borderWidth: 5, borderColor: "#262626" }} mode="dialog"
                     onValueChange={(itemValue) =>
-                        this.setState({ widgetTitle: itemValue, showmenu: "none", widgetState: "white" })}>
+                        this.setState({ widgetTitle: itemValue })}>
                     <Picker.Item color="grey" label="Calendar" value="Calendar" />
                     <Picker.Item color="grey" label="NivoLine" value="NivoLine" />
                     <Picker.Item color="grey" label="ChartLine" value="ChartLine" />
@@ -53,7 +107,26 @@ export class Widget extends Component {
                     <Picker.Item color="grey" label="schedular" value="schedular" />
                     <Picker.Item color="grey" label="widgetButton" value="widgetButton" />
                     <Picker.Item color="grey" label="chart" value="chart" />
-                </Picker>
+                </Picker> */}
+                <Menu
+                    ref={this.setMenuRef}
+                    button={
+                        <Text onPress={this.showMenu} style={{ backgroundColor: "black", color: "white", width: "40%", height: "50%", fontSize: 20 }}>
+                            {this.state.widgetTitle}<AntDesign name="caretdown" size={20} color="white" /> </Text>}>
+                    <MenuItem onPress={() => { this.hideMenu(), this.setState({ widgetTitle: "Calendar" }), this.menuState() }}>Calendar</MenuItem>
+                    <MenuItem onPress={() => { this.hideMenu(), this.setState({ widgetTitle: "widgetButton" }), this.menuState() }}>WidgetButton</MenuItem>
+                    <MenuItem onPress={this.hideMenu} disabled>Blank</MenuItem>
+                    <MenuDivider />
+                    <MenuItem onPress={this.hideMenu}>Coming soon...</MenuItem>
+                </Menu>
+                <Text style={{ color: "white" }}>Command:</Text>
+                <TextInput
+                    placeholder={this.state.text}
+                    multiline={true}
+                    numberOfLines={3}
+                    onChangeText={(text) => this.setState({ text })}
+                    value={this.state.text}
+                    style={{ height: "40%", backgroundColor: "black", borderColor: "#262626", borderWidth: 5, color: "white" }} />
             </View>)
         }
     }

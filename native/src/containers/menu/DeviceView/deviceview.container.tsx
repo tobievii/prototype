@@ -1,15 +1,16 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { View, TouchableOpacity, ScrollView } from 'react-native';
+import { View, TouchableOpacity, ScrollView, AsyncStorage, Text } from 'react-native';
 import { TopNavigation } from '@kitten/ui';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { textStyle } from '@src/components/common'
 import { Widget } from './dashboard/widget';
 import { DataView } from './dashboard/dataView'
+var data;
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
         device: [];
-        dragging: false
+        widgetLayout;
     }
     static navigationOptions = {
         header: null,
@@ -19,6 +20,46 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
     componentWillMount() {
         var { navigation } = this.props;
         this.setState({ device: navigation.getParam('user') })
+        this.widgetLayoutInfo(navigation.getParam('user'))
+    }
+
+    widgetLayoutInfo = async (device) => {
+        const user = JSON.parse(await AsyncStorage.getItem('user'));
+        try {
+            const response = await fetch('https://prototype.dev.iotnxt.io/api/v3/states/full', {
+                method: 'GET',
+                headers: {
+                    'Authorization': user.auth,
+                    'Content-Type': 'application/json',
+                },
+            })
+            data = await response.json()
+            for (var i in data) {
+                if (data[i].devid == device['id']) {
+                    this.setState({ widgetLayout: data[i].layout })
+                }
+            }
+        }
+        catch (err) {
+            return console.error(err.toString());
+        }
+    }
+
+    widgetDisplay = () => {
+        if (this.state.widgetLayout) {
+            return (
+                this.state.widgetLayout.map((widget, i) => {
+                    return (
+                        <Widget device={this.state.device} widget={this.state.widgetLayout[i]} key={i} />
+                    )
+                }
+                )
+            )
+        }
+        else
+            return (
+                <View ><Text style={{ color: "white" }}>No widgets to display.....</Text></View>
+            )
     }
 
     Controls = (control) => {
@@ -52,7 +93,7 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
                 <ScrollView>
                     <DataView data={this.state.device} />
                 </ScrollView >
-                <Widget device={this.state.device} />
+                {this.widgetDisplay()}
             </ScrollView >
         </View >
         );

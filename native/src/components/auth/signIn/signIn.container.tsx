@@ -68,10 +68,7 @@ export class SignInContainer extends React.Component<NavigationScreenProps> {
         if (res.signedin === true && res.auth) {
           this.getAccount(res);
         } else {
-          this.props.navigation.navigate({
-            key: this.navigationKey,
-            routeName: 'Home',
-          });
+          this.props.navigation.navigate('Sign In')
         }
       })
       .catch((error) => {
