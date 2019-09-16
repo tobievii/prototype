@@ -83,11 +83,12 @@ export class Dropdown extends React.Component<Props, State> {
 
     dropdownmenubuttonsstyle.minWidth = this.state.minWidth
     wrapperstyle.background = "none"
+    wrapperstyle.width = "100%"
 
     return <div style={wrapperstyle} ref={this.wrapper}>
 
       {(enabled)
-        ? <button style={dropdownmenubuttonsstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
+        ? <button style={buttonstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
           <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
         : <button style={{ ...buttonstyle, ...{ opacity: 0.5 } }} onClick={() => { this.setState({ show: !this.state.show }) }} disabled>
