@@ -13,6 +13,7 @@ interface MyProps {
   username?: string;
   id?: string;
   publickey?: string;
+  hidecontrols?: boolean;
 }
 
 interface MyState {
@@ -24,7 +25,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
     state: undefined,
     message: undefined,
     showEditor: false,
-    showData: false
+    showData: false,
+    hidecontrols: false
   };
 
   wrapper;
@@ -34,6 +36,11 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   }
 
   componentDidMount = () => {
+
+    if (this.props.hidecontrols) {
+      this.state.hidecontrols = this.props.hidecontrols;
+    }
+
     if (this.props.username && this.props.id) {
       this.loadfromusernameid(this.props.username, this.props.id)
     }
@@ -107,17 +114,18 @@ export class DeviceView extends React.Component<MyProps, MyState> {
       return (
         <div style={{ padding: colors.padding * 2 }}>
 
-          <div style={{ textAlign: "right" }}>
-            <Menu align="right" active={"dashboard"} config={{
-              menuitems: [
-                { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
-                { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
-                { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
-                { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
-                { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
-                { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
-            }} />
-          </div>
+          {(!this.state.hidecontrols) &&
+            <div style={{ textAlign: "right" }}>
+              <Menu style={{ background: "rgba(0,0,0,0)", color: "rgba(255,255,255,0.5)" }} align="right" active={"dashboard"} config={{
+                menuitems: [
+                  { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
+                  { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
+                  { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
+                  { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
+                  { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
+                  { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
+              }} />
+            </div>}
 
           <div style={{ display: "flex", flexDirection: "row" }}>
 
@@ -134,7 +142,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
               {(this.state.showEditor) && <div><ProtoEditor state={this.state.state} /> </div>}
 
               <div style={{ paddingTop: colors.padding }}>
-                <Dashboard state={this.state.state} />
+                <Dashboard hidecontrols={this.state.hidecontrols} state={this.state.state} />
               </div>
             </div>
 

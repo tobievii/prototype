@@ -273,8 +273,8 @@ export default class App extends React.Component {
 
   viewByPublickey = props => {
     return (<div>
-      <NavBar />
-      <DeviceView publickey={props.match.params.publickey} /></div>)
+      {/* <NavBar /> */}
+      <DeviceView publickey={props.match.params.publickey} hidecontrols={true} /></div>)
   }
 
   deviceView = props => {

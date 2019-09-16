@@ -80,7 +80,7 @@ export default class WidgetForm extends WidgetComponent {
         }
 
         return (
-            <div style={{ color: this.state.options.color.value, wordBreak: "break-all", paddingTop: 20 }}>
+            <div style={{ color: this.state.options.color.value, wordBreak: "break-all", paddingTop: 0 }}>
                 <Form schema={schema}
                     uiSchema={uischema}
                     formData={this.state.formData}

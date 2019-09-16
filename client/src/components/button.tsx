@@ -23,8 +23,8 @@ export class Button extends React.Component<MenuProps, MenuState> {
                 boxSizing: "border-box",
                 cursor: "pointer",
                 fontSize: "20px",
-                border: "1px solid rgba(170, 39, 55,1)",
-                borderTop: "1px solid #dd3e47"
+                border: "none",
+                borderTop: "none"
             }} onClick={this.props.onClick} ><i className="fas fa-times"></i></button>
         )
     }

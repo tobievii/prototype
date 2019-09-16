@@ -19,7 +19,7 @@ export default class WidgetImage extends WidgetComponent {
         return (
             <div style={{ height: "100%", textAlign: "center", background: this.state.options.background.value, whiteSpace: "nowrap" }}>
                 <span style={{ display: "inline-block", height: "100%", verticalAlign: "middle" }}></span>
-                <img src={this.state.options.imageurl.value} style={{ width: "100%", verticalAlign: "middle" }} />
+                <img src={this.state.options.imageurl.value} style={{ maxWidth: "100%", maxHeight: "100%", verticalAlign: "middle" }} />
                 {/* <button
                     onClick={() => { this.onClick() }}
                     style={{

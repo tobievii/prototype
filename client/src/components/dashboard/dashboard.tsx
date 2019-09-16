@@ -15,6 +15,7 @@ import { Menu } from "../menu";
 interface MyProps {
     //account: User;
     state: CorePacket;
+    hidecontrols: boolean;
 }
 
 interface MyState {
@@ -26,8 +27,8 @@ interface MyState {
 export class Dashboard extends React.Component<MyProps, MyState> {
     state = {
         grid: {
-            width: 4000,
-            cols: 40,
+            width: 1300,
+            cols: 13,
             rowHeight: 30
         },
         layout: [],
@@ -195,7 +196,13 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                 update: { $set: { layout: this.state.layout } }
             }, (err, result) => {
                 if (err) console.log(err);
-                if (result) { console.log(result); }
+                if (result) {
+                    console.log(result);
+                    api.post({
+                        key: this.props.state.key,
+                        layout: this.state.layout
+                    })
+                }
             })
 
             return;
@@ -286,22 +293,29 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             return <div>no layout</div>
         }
 
+        var dashboardstyle: any = { width: "100%" }
+
+        //if (this.props.hidecontrols) { dashboardstyle = {} }
+
         return (
-            <div style={{ background: "rgba(0,0,0,0.1)" }} >
+            <div style={dashboardstyle} >
 
-                <div style={{ background: "rgba(0,0,0,0.1)", display: "flex", flexDirection: "row" }}>
-                    <div style={{ flex: "5", paddingTop: colors.padding, paddingLeft: colors.padding, textAlign: "left" }}>{this.props.state.id}</div>
-                    <div style={{ flex: "1" }}>
-                        <Menu align="right" config={{
-                            menuitems: [
-                                { responsive: true, icon: "pencil-ruler", text: "Edit", onClick: () => { this.setState({ editMode: !this.state.editMode }) } },
-                                { responsive: true, icon: "plus-square", text: "New widget", onClick: () => { this.addWidget() } }
-                            ]
-                        }} />
-                    </div>
-                </div>
+                {(!this.props.hidecontrols) &&
+                    <div style={{ background: "rgba(0,0,0,0.1)", display: "flex", flexDirection: "row" }}>
+                        <div style={{ flex: "5", paddingTop: colors.padding, paddingLeft: colors.padding, textAlign: "left" }}>{this.props.state.id}</div>
+                        <div style={{ flex: "1" }}>
 
-                <div style={{ width: "100%", minHeight: 600 }}
+                            <Menu style={{ background: "rgba(0,0,0,0)", color: "rgba(255,255,255,0.5)" }}
+                                align="right" config={{
+                                    menuitems: [
+                                        { responsive: true, icon: "pencil-ruler", text: "Edit", onClick: () => { this.setState({ editMode: !this.state.editMode }) } },
+                                        { responsive: true, icon: "plus-square", text: "New widget", onClick: () => { this.addWidget() } }
+                                    ]
+                                }} />
+                        </div>
+                    </div>}
+
+                <div style={{ background: "rgba(0,0,0,0.1)", width: 1300, minHeight: 600, margin: "0 auto"; }}
 
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, "complete")} >
