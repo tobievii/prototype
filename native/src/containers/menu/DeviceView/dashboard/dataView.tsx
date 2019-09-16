@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { NavigationScreenProps } from 'react-navigation';
 import { Text, View, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { url } from '../../../../app.component';
 
 export class DataView extends Component {
 
@@ -128,6 +129,14 @@ export class DataView extends Component {
     }
 
     render() {
+        if (url == "https://8bo.org") {
+            delete (this.props['data'].username)
+            delete (this.props['data']._id)
+            delete (this.props['data']._recieved)
+            delete (this.props['data'].apikey)
+            delete (this.props['data'].userpublickey)
+            delete (this.props['data']._id)
+        }
 
         if (this.props['data']) {
             if (this.props['data'].payload) {

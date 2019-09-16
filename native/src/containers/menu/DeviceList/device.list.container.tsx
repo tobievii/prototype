@@ -3,7 +3,7 @@ import { NavigationScreenProps } from 'react-navigation';
 import { AsyncStorage, ScrollView, Text, View, TouchableHighlight } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 const devices = require('../devices');
-import { url } from '../../../app.component'
+import { url, version } from '../../../app.component'
 export class DeviceListContainer extends React.Component<NavigationScreenProps> {
 
   state = {
@@ -14,7 +14,7 @@ export class DeviceListContainer extends React.Component<NavigationScreenProps> 
     const user = JSON.parse(await AsyncStorage.getItem('user'));
 
     try {
-      const response = await fetch(url + '/api/v3/states', {
+      const response = await fetch(url + '/api/' + version + '/states', {
         // https://8bo.org/api/v4/states
         method: 'GET',
         headers: {

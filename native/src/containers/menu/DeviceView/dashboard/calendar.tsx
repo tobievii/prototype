@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, Dimensions, AsyncStorage } from 'react-native';
 import { ContributionGraph } from 'react-native-chart-kit'
-import { url } from '../../../../app.component'
+import { url, version } from '../../../../app.component'
 const screenWidth = Dimensions.get('window').width
 const chartConfig = {
     backgroundGradientFrom: '#262626',
@@ -26,17 +26,25 @@ export class Calendar extends Component {
 
     addpackets = (data) => {
         var result = [];
-        for (var i in data) {
-            result.push({ date: data[i].timestamp, count: 0 })
-        }
-        for (var i in result) {
-            for (var r in result) {
-                if (result[i].date.slice(0, 10) == result[r].date.slice(0, 10)) {
-                    result[r].count += 1
+        if (url !== "https://8bo.org") {
+            for (var i in data) {
+                result.push({ date: data[i].timestamp, count: 0 })
+            }
+            for (var i in result) {
+                for (var r in result) {
+                    if (result[i].date.slice(0, 10) == result[r].date.slice(0, 10)) {
+                        result[r].count += 1
+                    }
                 }
             }
+            this.setState({ packets: result })
         }
-        this.setState({ packets: result })
+        else {
+            for (var i in data) {
+                result.push({ date: data[i].day, count: data[i].value })
+            }
+            this.setState({ packets: result })
+        }
         this.setState({ data: true })
     }
 
@@ -59,16 +67,30 @@ export class Calendar extends Component {
     example = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
         try {
-            const response = await fetch(url + '/api/v3/packets', {
-                method: 'POST',
-                headers: {
-                    'Authorization': user.auth,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: this.props['data'].id })
-            })
-            data = await response.json()
-            this.addpackets(data)
+            if (url !== "https://8bo.org") {
+                const response = await fetch(url + '/api/' + version + '/packets', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': user.auth,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: this.props['data'].id })
+                })
+                data = await response.json()
+                this.addpackets(data)
+            }
+            else {
+                const response = await fetch(url + '/api/' + version + '/activity', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': user.auth,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ key: this.props['data'].key })
+                })
+                data = await response.json()
+                this.addpackets(data)
+            }
         }
         catch (err) {
             return console.error(err.toString());

@@ -20,7 +20,11 @@ import {
 } from '../src/core/themes';
 const prod = "https://prototype.iotnxt.io"
 const dev = "https://prototype.dev.iotnxt.io"
-export var url = prod;
+const newDev = "https://8bo.org"
+const v3 = "v3"//prod or dev
+const v4 = "v4"//8bo site
+export var url = newDev;
+export var version = v4
 const images: ImageRequireSource[] = [
 
 ];

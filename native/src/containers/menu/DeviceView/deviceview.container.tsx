@@ -1,12 +1,12 @@
 import React from 'react';
 import { NavigationScreenProps } from 'react-navigation';
-import { View, TouchableOpacity, ScrollView, AsyncStorage, Text } from 'react-native';
+import { View, TouchableOpacity, ScrollView, AsyncStorage, Text, KeyboardAvoidingView } from 'react-native';
 import { TopNavigation } from '@kitten/ui';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { textStyle } from '@src/components/common'
 import { Widget } from './dashboard/widget';
 import { DataView } from './dashboard/dataView'
-import { url } from '../../../app.component'
+import { url, version } from '../../../app.component'
 var data;
 export class DeviceViewContainer extends React.Component<NavigationScreenProps> {
     state: {
@@ -16,6 +16,7 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
     static navigationOptions = {
         header: null,
     };
+
     private navigationKey: string = 'DeviceViewContainer';
 
     componentWillMount() {
@@ -26,23 +27,28 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
 
     widgetLayoutInfo = async (device) => {
         const user = JSON.parse(await AsyncStorage.getItem('user'));
-        try {
-            const response = await fetch(url + '/api/v3/states/full', {
-                method: 'GET',
-                headers: {
-                    'Authorization': user.auth,
-                    'Content-Type': 'application/json',
-                },
-            })
-            data = await response.json()
-            for (var i in data) {
-                if (data[i].devid == device['id']) {
-                    this.setState({ widgetLayout: data[i].layout })
+        if (url !== "https://8bo.org") {
+            try {
+                const response = await fetch(url + '/api/' + version + '/states/full', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': user.auth,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                data = await response.json()
+                for (var i in data) {
+                    if (data[i].devid == device['id']) {
+                        this.setState({ widgetLayout: data[i].layout })
+                    }
                 }
             }
+            catch (err) {
+                return console.error(err.toString());
+            }
         }
-        catch (err) {
-            return console.error(err.toString());
+        else {
+            this.setState({ widgetLayout: this.state.device['layout'] })
         }
     }
 
@@ -50,8 +56,13 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
         if (this.state.widgetLayout) {
             return (
                 this.state.widgetLayout.map((widget, i) => {
+                    var deviceprops = {
+                        device: this.state.device,
+                        widget: this.state.widgetLayout[i],
+                        key: i
+                    }
                     return (
-                        <Widget device={this.state.device} widget={this.state.widgetLayout[i]} key={i} />
+                        <Widget {...deviceprops} />
                     )
                 }
                 )
@@ -81,6 +92,9 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
     }
 
     render() {
+        var deviceprops = {
+            data: this.state.device
+        }
         return (<View style={{ height: "100%", backgroundColor: '#202020' }}>
             <TopNavigation
                 alignment='center'
@@ -90,12 +104,15 @@ export class DeviceViewContainer extends React.Component<NavigationScreenProps> 
                 rightControls={this.Controls("right")}
                 style={{ position: "relative", backgroundColor: "#262626" }}
             ></TopNavigation>
-            <ScrollView>
+            <KeyboardAvoidingView
+                behavior="padding">
                 <ScrollView>
-                    <DataView data={this.state.device} />
+                    <ScrollView>
+                        <DataView {...deviceprops} />
+                    </ScrollView >
+                    {this.widgetDisplay()}
                 </ScrollView >
-                {this.widgetDisplay()}
-            </ScrollView >
+            </KeyboardAvoidingView>
         </View >
         );
     }
