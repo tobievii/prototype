@@ -1,24 +1,35 @@
 import React from "react";
 import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import { theme, colors } from "../theme"
-import { SortButton } from "./sortbutton"
 import { clone } from "../utils/lodash_alt"
 import { Dropdown } from "./dropdown"
-import { TextAlignProperty } from "csstype";
+import { TextAlignProperty, StandardLonghandProperties } from "csstype";
+import { button } from "./dashboard/widgets";
+
+interface MenuItems {
+    /** show only icon on small screens */
+    responsive: boolean,
+    text: string,
+    icon?: string,
+    onClick: any,
+    link?: string,
+    menuitems?: MenuItems[]
+    enabled?: boolean
+}
 
 interface MenuProps {
     align?: TextAlignProperty,
     active?: string;
     config: {
-        menuitems: {
-            /** show only icon on small screens */
-            responsive: boolean,
-            text: string,
-            icon?: string,
-            onClick: any,
-            link?: string
-        }[]
-    }
+        menuitems: MenuItems[],
+
+    },
+    style?: {
+        color?: string
+        background?: string
+    },
+    fill?: boolean,
+    height?: number
 }
 
 interface MenuState { }
@@ -53,8 +64,28 @@ export class Menu extends React.Component<MenuProps, MenuState> {
 
         var align: any = this.state.align
 
+        var menustyle = {
+            color: colors.spotE,
+            background: colors.panels
+        }
+        if (this.props.style) {
+            if (this.props.style.background) { menustyle.background = this.props.style.background }
+            if (this.props.style.color) { menustyle.color = this.props.style.color }
+        }
+
+
+        var wrapperstyle: any = { textAlign: align }
+
+        if (this.props.fill) {
+            wrapperstyle.display = "flex"
+            wrapperstyle.flexFlow = "row nowrap"
+            wrapperstyle.height = (this.props.height) ? this.props.height : "100%"
+            //wrapperstyle.flexDirection = "row";
+            //wrapperstyle.backgroundColor = "#33ffff"
+        }
+
         return (
-            <div style={{ textAlign: align }}>
+            <div style={wrapperstyle}>
                 {this.props.config.menuitems.map((item, i, arr) => {
 
                     var onClick = (e) => {
@@ -63,23 +94,41 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                     }
 
                     var icon = (item.icon) ? item.icon : "angle-right";
-                    var style: any = (i == this.state.active)
+                    var buttonstyle: any = (i == this.state.active)
                         ? {
-                            borderBottom: "0px",
-                            borderTop: "1px solid " + colors.spotA,
-                            background: colors.panels
+                            display: "inline-block",
+                            //borderTop: "1px solid " + colors.spotA,
+                            color: menustyle.color,
+                            background: menustyle.background
                         }
-                        : { borderBottom: "0px" }
+                        : {
+                            display: "inline-block",
+                            //borderTop: "1px solid rgba(0,0,0,0)",
+                            color: menustyle.color,
+                            background: menustyle.background
+                        }
 
-                    if (item.link) {
-                        return <NavLink exact to={item.link} key={i}  ><button onClick={onClick} style={style}>
-                            <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
-                        </button></NavLink>
-                    } else {
-                        return <button key={i} onClick={onClick} style={style}>
-                            <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
-                        </button>
+                    if (this.props.fill) {
+                        buttonstyle.width = "100%"
+                        buttonstyle.height = "100%"
                     }
+
+                    if (item.menuitems != undefined) {
+                        return <Dropdown height={this.props.height} style={buttonstyle} key={i} text={item.text} items={item.menuitems} />
+                    } else {
+                        if (item.link) {
+                            return <NavLink exact to={item.link} key={i}  >
+                                <button onClick={onClick} style={buttonstyle}>
+                                    <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
+                                </button></NavLink>
+                        } else {
+                            return <button key={i} onClick={onClick} style={buttonstyle}>
+                                <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
+                            </button>
+                        }
+                    }
+
+
 
 
                 })}

@@ -6,13 +6,25 @@ import { theme, colors } from "../theme"
 import { api } from "../api"
 import { SearchBox } from "./searchbox"
 
+interface MenuItems {
+  /** show only icon on small screens */
+  responsive?: boolean,
+  text: string,
+  icon?: string,
+  onClick?: any,
+  link?: string,
+  menuitems?: MenuItems[]
+  enabled?: boolean
+}
 
 interface Props {
   //account: User;
   enabled?: boolean
   icon?: string;
-  label: string
-  items: { enabled?: boolean, label: string, onClick: Function, icon?: string }[]
+  text: string
+  items: MenuItems[]
+  style?: any;
+  height?: number;
 }
 
 interface State {
@@ -25,32 +37,64 @@ export class Dropdown extends React.Component<Props, State> {
   state = {
     mobileMenuActive: false,
     show: false,
-    icon: "chevron-down"
+    icon: "chevron-down",
+    minWidth: 50 //this auto adjusts
   };
+
+  wrapper;
 
   componentDidMount = () => {
     if (this.props.icon) {
       this.setState({ icon: this.props.icon })
     }
+    this.wrapper = React.createRef();
+  }
+
+
+  componentDidUpdate() {
+    /* detect width of button so dropdown menu items can use this width as a minimum*/
+    if (this.wrapper) {
+      if (this.wrapper.current) {
+        var minWidth = this.wrapper.current.offsetWidth;
+        this.setState((state) => {
+          if (state.minWidth != minWidth) { return { minWidth }; }
+        })
+      }
+    }
   }
 
   render() {
 
+    var buttonstyle: any = { display: "inline-block", textAlign: "left" }
+    if (this.props.style) { buttonstyle = this.props.style }
+
     var enabled = true; //default
     if (this.props.enabled != undefined) { enabled = this.props.enabled }
 
-    return <div>
+    var dropdownmenubuttonsstyle: any = { textAlign: "left" }
+
+    if (buttonstyle.background) { dropdownmenubuttonsstyle.background = buttonstyle.background; }
+    if (buttonstyle.color) { dropdownmenubuttonsstyle.color = buttonstyle.color }
+
+    if (this.props.height) {
+      dropdownmenubuttonsstyle.height = this.props.height
+
+    }
+
+    dropdownmenubuttonsstyle.minWidth = this.state.minWidth
+
+    console.log(dropdownmenubuttonsstyle.minWidth);
+
+    return <div style={buttonstyle} ref={this.wrapper}>
 
       {(enabled)
-        ? <button onClick={() => { this.setState({ show: !this.state.show }) }}>
-          <i className={"fas fa-" + this.state.icon} /> {this.props.label}
+        ? <button style={buttonstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
+          <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
-        : <button style={{ opacity: 0.5 }} onClick={() => { this.setState({ show: !this.state.show }) }}>
-          <i className={"fas fa-" + this.state.icon} /> {this.props.label}
+        : <button style={{ ...buttonstyle, ...{ opacity: 0.5 } }} onClick={() => { this.setState({ show: !this.state.show }) }} disabled>
+          <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
       }
-
-
 
       <div style={{
         display: (this.state.show) ? "flex" : "none",
@@ -65,21 +109,21 @@ export class Dropdown extends React.Component<Props, State> {
           var buttonenabled = true; //default true
           if (item.enabled != undefined) { buttonenabled = item.enabled } //optional override
 
-          if (item.enabled) {
-            return <button style={{ textAlign: "left" }} key={i}
+          if (buttonenabled) {
+            return <button style={dropdownmenubuttonsstyle} key={i}
               onClick={() => {
                 item.onClick();
                 this.setState({ show: false }); //hides the dropdown when clicking a menu option
               }}>
               <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
                 <i className={"fas fa-" + icon} /></div>
-              {item.label}
+              {item.text}
             </button>
           } else {
-            return <button style={{ textAlign: "left", opacity: 0.5, cursor: "not-allowed" }} key={i} disabled>
+            return <button style={{ ...dropdownmenubuttonsstyle, ...{ textAlign: "left", opacity: 0.5, cursor: "not-allowed" } }} key={i} disabled>
               <div style={{ width: 20, textAlign: "center", float: "left", paddingRight: 5 }}>
                 <i className={"fas fa-" + icon} /></div>
-              {item.label}
+              {item.text}
             </button>
           }
 
@@ -87,7 +131,7 @@ export class Dropdown extends React.Component<Props, State> {
         })}
       </div>
 
-    </div>
+    </div >
   }
 }
 

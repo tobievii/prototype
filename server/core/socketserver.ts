@@ -15,6 +15,7 @@ import { CorePacket } from "../shared/interfaces";
 
 import * as ws from "ws";
 
+import * as net from "net";
 //const WebSocketServer = require("ws").Server
 // const WebSocketServerWrapper = require("ws-server-wrapper");
 
@@ -22,7 +23,7 @@ import * as ws from "ws";
 export class SocketServer extends EventEmitter {
     server: http.Server | https.Server;
     io: any;
-    wss: any;
+    wss: ws.Server;
 
     connections: any = [];
 
@@ -43,7 +44,6 @@ export class SocketServer extends EventEmitter {
                     var msg: any = JSON.parse(message);
 
                     // login?
-
                     if (msg.connect) {
                         if (msg.apikey) {
                             options.core.user(msg, (err, user) => {
@@ -68,10 +68,21 @@ export class SocketServer extends EventEmitter {
                         }
                     }
 
+                    // logged in:
                     if (socket.user) {
-                        // logged in
+
                         if (msg.key) {
                             socket.subscriptions.push(msg.key);
+                        }
+
+                        if (msg.id) {
+                            console.log(msg);
+                            options.core.datapost({ user: socket.user, packet: msg }, (err, result) => {
+                                console.log("socket data post ---------")
+                                if (err) { console.log(err); }
+                                if (result) { console.log(result); }
+                                console.log("socket data post --------- end")
+                            })
                         }
                     }
 
@@ -81,7 +92,17 @@ export class SocketServer extends EventEmitter {
                 }
             });
 
+            socket.on("end", () => {
+                console.log("-------!@! disconnected!")
+            })
 
+            socket.on("close", () => {
+                console.log("socket closed!");
+            });
+
+            socket.on("unexpected-response", () => {
+                console.log("socket unexpected-response !")
+            })
 
         })
 

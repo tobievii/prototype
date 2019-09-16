@@ -4,19 +4,24 @@ import { OptionMaster } from "./optionmaster"
 const MonacoEditor = React.lazy(() => import('react-monaco-editor'))
 
 export default class OptionsJSON extends OptionMaster {
-  state = { val: "default1" }
+  state = { val: {}, editortext: "editortext" }
 
   constructor(props) {
     super(props);
 
-    var value = "default2" // default
+    var value = "{}" // default
     if (props) {
       if (props.option) {
-        if (props.option.default != undefined) { value = props.option.default }
-        if (props.option.val != undefined) { value = this.props.option.val }
+        if (props.option.default != undefined) {
+          value = props.option.default
+        }
+        if (props.option.val != undefined) {
+          value = this.props.option.val
+        }
       }
     }
 
+    this.state.editortext = JSON.stringify(value, null, 2);
     this.state.val = value;
   }
 
@@ -26,13 +31,31 @@ export default class OptionsJSON extends OptionMaster {
     }
   }
 
-  onChange = (newValue, e) => {
-    this.setState({ val: newValue }, () => {
-      this.apply();
-    });
+  onChange = (newValue: string, e) => {
+
+    //first confirm if it is valid json
+
+    if (this.validjson(newValue)) {
+      this.setState({ editortext: newValue, val: JSON.parse(newValue) }, () => {
+        this.apply();
+      })
+    } else {
+      this.setState({ editortext: newValue }, () => { });
+    }
+
+
   }
 
   editorDidMount() { }
+
+  validjson(datain) {
+    try {
+      var a = JSON.parse(datain);
+      if (a) { return true; } else { return false; }
+    } catch (err) {
+      return false;
+    }
+  }
 
   render() {
 
@@ -62,7 +85,7 @@ export default class OptionsJSON extends OptionMaster {
               height="600"
               language="json"
               theme="vs-dark"
-              value={this.state.val}
+              value={this.state.editortext}
               options={options}
               onChange={this.onChange}
               editorDidMount={this.editorDidMount}

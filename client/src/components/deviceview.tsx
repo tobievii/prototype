@@ -23,7 +23,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   state = {
     state: undefined,
     message: undefined,
-    showEditor: false
+    showEditor: false,
+    showData: false
   };
 
   wrapper;
@@ -110,12 +111,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
             <Menu align="right" active={"dashboard"} config={{
               menuitems: [
                 { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
-                { responsive: true, link: "/docs/websocket", icon: "server", text: "Data", onClick: () => { } },
-                {
-                  responsive: true, icon: "code", text: "Code", onClick: () => {
-                    this.setState({ showEditor: !this.state.showEditor })
-                  }
-                },
+                { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
+                { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
                 { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
                 { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
                 { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
@@ -123,20 +120,20 @@ export class DeviceView extends React.Component<MyProps, MyState> {
           </div>
 
           <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ flex: "0", width: "400px" }}>
 
-              <div style={{ overflowY: "scroll" }}>
-                <JSONviewer object={this.state.state} />
+            {(this.state.showData) &&
+              <div style={{ flex: "0", width: "400px" }}>
+                <div style={{ overflowY: "scroll" }}>
+                  <JSONviewer object={this.state.state} />
+                </div>
               </div>
+            }
 
-            </div>
 
-            <div style={{ flex: "5" }}>
-              <div>
-                {(this.state.showEditor) && <ProtoEditor state={this.state.state} />}
+            <div style={{ flex: "5", paddingTop: colors.padding }}>
+              {(this.state.showEditor) && <div><ProtoEditor state={this.state.state} /> </div>}
 
-              </div>
-              <div>
+              <div style={{ paddingTop: colors.padding }}>
                 <Dashboard state={this.state.state} />
               </div>
             </div>

@@ -9,6 +9,7 @@ export interface OptionComponentProps {
 
 interface State {
     val: any
+    [index: string]: any;
 }
 
 export class OptionMaster extends React.Component<OptionComponentProps, State> {

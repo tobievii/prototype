@@ -74,7 +74,7 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
             </div>
 
             <div style={{ padding: colors.padding }}>
-                <button onClick={e => this.props.action({ save: true })}><i className="fas fa-save"></i> APPLY</button>
+                <button onClick={e => this.props.action({ save: true })}><i className="fas fa-save"></i> SAVE</button>
                 <button onClick={e => this.props.action({ remove: true })}><i className="fas fa-trash-alt"></i> REMOVE</button>
             </div>
 

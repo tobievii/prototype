@@ -96,12 +96,12 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                         <div style={{ flex: "0 auto" }}>
                             <Dropdown
                                 enabled={hasSelection}
-                                label='Modify'
+                                text='Modify'
                                 items={[
-                                    { enabled: hasSelection, icon: "th", label: 'Dashboard Preset', onClick: () => { this.props.action({ dashboardset: true }); } },
-                                    { enabled: hasSelection, icon: "code", label: 'Code', onClick: () => { this.props.action({ scriptset: true }) } },
-                                    { enabled: hasSelection, icon: "share-alt", label: 'Share', onClick: () => { this.props.action({ shareset: true }) } },
-                                    { enabled: hasSelection, icon: "trash", label: 'Delete', onClick: () => { this.props.action({ removeselected: true }) } }
+                                    { enabled: hasSelection, icon: "th", text: 'Dashboard Preset', onClick: () => { this.props.action({ dashboardset: true }); } },
+                                    { enabled: hasSelection, icon: "code", text: 'Code', onClick: () => { this.props.action({ scriptset: true }) } },
+                                    { enabled: hasSelection, icon: "share-alt", text: 'Share', onClick: () => { this.props.action({ shareset: true }) } },
+                                    { enabled: hasSelection, icon: "trash", text: 'Delete', onClick: () => { this.props.action({ removeselected: true }) } }
                                 ]}
                             />
                         </div>
