@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import { colors } from "../theme"
+import { clone } from "../utils/lodash_alt";
 
 
 interface MenuItems {
@@ -63,7 +64,12 @@ export class Dropdown extends React.Component<Props, State> {
   render() {
 
     var buttonstyle: any = { display: "inline-block", textAlign: "left" }
-    if (this.props.style) { buttonstyle = this.props.style }
+    var wrapperstyle: any = { display: "inline-block", textAlign: "left" }
+
+    if (this.props.style) {
+      buttonstyle = this.props.style
+      wrapperstyle = clone(this.props.style);
+    }
 
     var enabled = true; //default
     if (this.props.enabled != undefined) { enabled = this.props.enabled }
@@ -76,11 +82,12 @@ export class Dropdown extends React.Component<Props, State> {
     if (this.props.height) { dropdownmenubuttonsstyle.height = this.props.height }
 
     dropdownmenubuttonsstyle.minWidth = this.state.minWidth
+    wrapperstyle.background = "none"
 
-    return <div style={buttonstyle} ref={this.wrapper}>
+    return <div style={wrapperstyle} ref={this.wrapper}>
 
       {(enabled)
-        ? <button style={buttonstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
+        ? <button style={dropdownmenubuttonsstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
           <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
         : <button style={{ ...buttonstyle, ...{ opacity: 0.5 } }} onClick={() => { this.setState({ show: !this.state.show }) }} disabled>

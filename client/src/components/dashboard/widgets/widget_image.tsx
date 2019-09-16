@@ -6,7 +6,8 @@ export default class WidgetImage extends WidgetComponent {
     state = {
         options: {
             imageurl: { type: "input", default: "", value: "" },
-            background: { type: "color", default: "#1d364d", value: undefined }
+            background: { type: "color", default: "#1d364d", value: undefined },
+            link: { type: "input", default: "/", value: "" }
         }
     }
 
@@ -19,7 +20,7 @@ export default class WidgetImage extends WidgetComponent {
         return (
             <div style={{ height: "100%", textAlign: "center", background: this.state.options.background.value, whiteSpace: "nowrap" }}>
                 <span style={{ display: "inline-block", height: "100%", verticalAlign: "middle" }}></span>
-                <img src={this.state.options.imageurl.value} style={{ maxWidth: "100%", maxHeight: "100%", verticalAlign: "middle" }} />
+                <a href={this.state.options.link.value}><img src={this.state.options.imageurl.value} style={{ maxWidth: "100%", maxHeight: "100%", verticalAlign: "middle" }} /></a>
                 {/* <button
                     onClick={() => { this.onClick() }}
                     style={{

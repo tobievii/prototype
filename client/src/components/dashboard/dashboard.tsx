@@ -49,6 +49,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
     }
 
     onDrop = (e, f) => {
+        if (!this.state.editMode) { return; }
         console.log("...")
         e.preventDefault();
         var typel = undefined;
@@ -315,7 +316,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                         </div>
                     </div>}
 
-                <div style={{ background: "rgba(0,0,0,0.1)", width: 1300, minHeight: 600, margin: "0 auto"; }}
+                <div style={{ background: "rgba(0,0,0,0.1)", width: 1300, minHeight: 600, margin: "0 auto" }}
 
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, "complete")} >
