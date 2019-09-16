@@ -21,7 +21,7 @@ interface Props {
   text: string
   items: MenuItems[]
   style?: any;
-  height?: number;
+  height?: number | string;
 }
 
 interface State {
