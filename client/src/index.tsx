@@ -120,11 +120,7 @@ export default class App extends React.Component {
           <Route exact path="/" component={this.landing} />
           <Route exact path="/u/:username" component={this.userView} />
           <Route exact path="/v/:publickey" component={this.viewByPublickey} />
-          <Route
-            exact
-            path="/u/:username/view/:id"
-            component={this.deviceView}
-          />
+          <Route path="/u/:username/view/:id" component={this.deviceView} />
           <Route path="/login" component={this.login} />
         </BrowserRouter>
       );
@@ -138,11 +134,7 @@ export default class App extends React.Component {
           <Route exact path="/u/:username" component={this.userView} />
           <Route exact path="/docs" component={this.docs} />
           <Route exact path="/docs/:page" component={this.docs} />
-          <Route
-            exact
-            path="/u/:username/view/:id"
-            component={this.deviceView}
-          />
+          <Route path="/u/:username/view/:id" component={this.deviceView} />
           <Route exact path="/v/:publickey" component={this.viewByPublickey} />
           <Route path="/signout" component={this.signout} />
           <Route exact path="/settings" component={this.settings} />
@@ -286,7 +278,7 @@ export default class App extends React.Component {
   }
 
   deviceView = props => {
-
+    console.log("deviceView", props)
     return <div>
       <NavBar />
 

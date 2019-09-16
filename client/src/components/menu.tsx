@@ -29,7 +29,7 @@ interface MenuProps {
         background?: string
     },
     fill?: boolean,
-    height?: number
+    height?: number | string
 }
 
 interface MenuState { }

@@ -77,6 +77,7 @@ export class Webserver extends EventEmitter {
 
         this.app.use('/view', express.static('../client/dist'))
         this.app.use('/u/:username/view', express.static('../client/dist'))
+        this.app.use('/u/:username/view/*', express.static('../client/dist'))
         this.app.use('/v/:publickey', express.static('../client/dist'))
 
 
@@ -129,12 +130,10 @@ export class Webserver extends EventEmitter {
 
         ///////////////////////////////////////////////////////
 
-        // this.app.use('/view', express.static('../client/dist'))
-        // this.app.use('/u/:username/view', express.static('../client/dist'))
-
         this.app.use('/view', (req, res) => { res.end(reactHtml); })
         this.app.use('/u/:username', (req, res) => { res.end(reactHtml); })
         this.app.use('/u/:username/view', (req, res) => { res.end(reactHtml); })
+        this.app.use('/u/:username/view/*', (req, res) => { res.end(reactHtml); })
         this.app.use('/v/:publickey', (req, res) => { res.end(reactHtml); })
 
         this.app.get('/signout', (req, res) => {

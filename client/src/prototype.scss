@@ -433,11 +433,14 @@ input[type="color"]::-webkit-color-swatch {
 
 fieldset {
   color: #aaa;
-  border: 1px solid #444;
+  //border: 2px solid rgba(0, 0, 0, 0.3);
+  border: none;
+  //background: rgba(255, 255, 255, 0.1);
 }
 
 legend {
   color: #ccc;
+  font-size: 1.2em;
 }
 
 // div.form-group {
@@ -466,8 +469,32 @@ legend {
 
 .rjsf > div.form-group.field.field-object > fieldset > div {
   //background: rgba(255, 0, 255, 0.75);
-  width: 50%;
+  width: 418px;
   float: left;
+}
+
+.rjsf > div.form-group.field.field-object > fieldset > div > fieldset > div {
+  padding: 10px 1px 10px 1px;
+}
+
+.rjsf > div.panel.panel-danger.errors {
+  display: none;
+}
+
+.rjsf span.required {
+  visibility: hidden;
+}
+
+.rjsf span.required:after {
+  float: right;
+  content: "required";
+  visibility: visible;
+  display: block;
+  font-size: 0.7em;
+  opacity: 0.5;
+  position: relative;
+  top: 30px;
+  right: 10px;
 }
 
 // div.form-group.field.field-string:after {
@@ -491,4 +518,10 @@ legend {
 .rjsf button[type="submit"] {
   float: right;
   margin: 20px;
+}
+
+.rjsf > div.form-group.field.field-object > fieldset > div > fieldset > div > label {
+  padding: 0px 0px 10px 10px;
+  margin-bottom: 10px;
+  display: "block";
 }

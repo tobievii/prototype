@@ -31,7 +31,11 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             rowHeight: 30
         },
         layout: [],
-        showB: false
+        showB: false,
+        /** Enable/disable dashboard editing 
+         *  TODO: Get from account?
+        */
+        editMode: false
     }
 
     updatesource = "props";
@@ -181,10 +185,19 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         } else {
             //console.log("UPDATE SERVER!")
             this.updatesource = "props"; //debounce
-            api.post({
-                key: this.props.state.key,
-                layout: this.state.layout
+            // api.post({
+            //     key: this.props.state.key,
+            //     layout: this.state.layout
+            // })
+
+            api.stateupdate({
+                query: { key: this.props.state.key },
+                update: { $set: { layout: this.state.layout } }
+            }, (err, result) => {
+                if (err) console.log(err);
+                if (result) { console.log(result); }
             })
+
             return;
         }
     }
@@ -274,20 +287,21 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         }
 
         return (
-            <div>
+            <div style={{ background: "rgba(0,0,0,0.1)" }} >
 
-                <div style={{
-                    borderTopRightRadius: "12px",
-                    background: "rgba(0,0,0,0.1)",
-                    display: "flex", flexDirection: "row"
-                }}>
-                    <div style={{ flex: "5", paddingTop: colors.padding, textAlign: "center" }}>Dashboard</div>
+                <div style={{ background: "rgba(0,0,0,0.1)", display: "flex", flexDirection: "row" }}>
+                    <div style={{ flex: "5", paddingTop: colors.padding, paddingLeft: colors.padding, textAlign: "left" }}>{this.props.state.id}</div>
                     <div style={{ flex: "1" }}>
-                        <Menu align="right" config={{ menuitems: [{ responsive: true, icon: "plus-square", text: "New widget", onClick: () => { this.addWidget() } }] }} />
+                        <Menu align="right" config={{
+                            menuitems: [
+                                { responsive: true, icon: "pencil-ruler", text: "Edit", onClick: () => { this.setState({ editMode: !this.state.editMode }) } },
+                                { responsive: true, icon: "plus-square", text: "New widget", onClick: () => { this.addWidget() } }
+                            ]
+                        }} />
                     </div>
                 </div>
 
-                <div style={{ width: "100%", background: "#181818", border: colors.borders }}
+                <div style={{ width: "100%", minHeight: 600 }}
 
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, "complete")} >
@@ -305,11 +319,14 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                         cols={this.state.grid.cols}
                         draggableHandle=".widgetGrab"   // drag handle class
                         rowHeight={this.state.grid.rowHeight}
-                        width={this.state.grid.width}>
+                        width={this.state.grid.width}
+                        isResizable={this.state.editMode}
+                    >
+
 
                         {this.state.layout.map((widget, i) => {
                             return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
-                                <Widget widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
+                                <Widget edit={this.state.editMode} widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
                             </div>)
                         })}
                     </GridLayout>

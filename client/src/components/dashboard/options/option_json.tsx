@@ -16,7 +16,17 @@ export default class OptionsJSON extends OptionMaster {
           value = props.option.default
         }
         if (props.option.val != undefined) {
-          value = this.props.option.val
+          if (typeof this.props.option.val == "string") {
+            if (this.validjson(this.props.option.val)) {
+              value = JSON.parse(this.props.option.val)
+            } else {
+              value = this.props.option.val
+            }
+
+          } else {
+            value = this.props.option.val
+          }
+
         }
       }
     }
