@@ -146,14 +146,7 @@ export class Webserver extends EventEmitter {
             res.redirect('/');
         });
 
-        this.app.get("*", (req, res) => {
-            //res.status(404).end(reactHtml);
-            res.status(404).json({ err: 404 })
-        })
 
-        this.app.post("*", (req, res) => {
-            res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
-        })
 
         if (options.config.ssl) {
             if (!options.config.sslOptions) { console.error("missing sslOptions from config"); return; }
@@ -177,6 +170,18 @@ export class Webserver extends EventEmitter {
     }
 
     listen() {
+
+        // ADD CATCH 404 INVALID PATHS AT THE END.
+
+        this.app.get("*", (req, res) => {
+            //res.status(404).end(reactHtml);
+            res.status(404).json({ err: 404 })
+        })
+
+        this.app.post("*", (req, res) => {
+            res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
+        })
+
         if (!this.server) { console.error("http/s server not initialized"); return; }
         this.server.listen(this.port, () => {
             logger.log({ message: "webserver started", data: { port: this.port }, level: "info" })
@@ -239,4 +244,10 @@ export class Webserver extends EventEmitter {
         next();
     }
 
+
+    addroute(path: string) {
+        this.app.get(path, (req, res) => {
+            res.json({ success: "whoo" })
+        })
+    }
 }  

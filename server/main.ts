@@ -45,9 +45,6 @@ var state: State = {
     workers: []
 }
 
-//console.log(state)
-
-console.log("!!!!!!!!!!!!!!!!")
 
 if (cluster.isMaster) {
 
@@ -99,15 +96,15 @@ if (cluster.isMaster) {
     logger.log({ message: "cluster fork active", data: { workerpid: process.pid }, level: "info" })
 
     var core;
-    var webserver;
+    var webserver: Webserver;
     var socketserver: SocketServer;
     var mqttserver: MQTTServer;
 
+    var pluginInstances = [];
+
     var documentstore = new DocumentStore({ mongoConnection: cfg.config.mongoConnection });
 
-    console.log("---------!")
-    console.log(plugins);
-    console.log("---------#")
+
 
     process.on('message', (msg) => {
         logger.log({ message: "worker process recv", data: { msg }, level: "verbose" });
@@ -118,6 +115,7 @@ if (cluster.isMaster) {
         // only allow webserver to recieve api calls once db is ready.
         core = new Core({ documentstore, config: cfg.config })
         webserver = new Webserver({ core, config: cfg.config });
+
         if (webserver.server) socketserver = new SocketServer({ server: webserver.server, core });
         mqttserver = new MQTTServer({ core })
 
@@ -147,6 +145,20 @@ if (cluster.isMaster) {
                 mqttserver.emit("users", data.fullDocument);
             }
         })
+
+        var pluginprops = { core, documentstore, webserver }
+
+        var loadedplugins: any = plugins;
+        for (var pluginname of Object.keys(loadedplugins)) {
+            if (pluginname != "__esModule") {
+                var pluginClass = loadedplugins[pluginname]
+                var pluginInst = new pluginClass(pluginprops);
+                pluginInstances.push(pluginInst)
+            }
+
+        }
+
+
 
         webserver.listen();
     });

@@ -156,13 +156,16 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
     const gridstyle = { borderBottom: "1px solid rgba(255,255,255,0.1)", paddingTop: 4, paddingBottom: 4 }
     var blockstyle: any = {
-      border: "1px solid rgba(0,0,0,0.1)", boxSizing: "border-box",
+      border: "1px solid rgba(0,0,0,0.1)",
       background: "rgba(0,0,0,0.2)",
       margin: 0,
       padding: 20
     }
-    var gridHeadingStyle = {
-      borderBottom: "2px solid rgba(255,255,255,0.2)"
+
+    var gridHeadingStyle: any = {
+      borderBottom: "2px solid rgba(255,255,255,0.2)",
+      display: "flex",
+      flexDirection: "row"
     };
 
     if (this.props.gateways) {
@@ -171,18 +174,17 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
 
         return (
-          <div style={blockstyle}>
+          <div style={blockstyle} >
             <div className="row" style={gridHeadingStyle}>
 
-              <div className="col-4" style={{ paddingLeft: 34 }}>GatewayId</div>
-              <div className="col-1" style={{ textAlign: "right" }}>ENV</div>
-              <div className="col-2" style={{ textAlign: "left" }}>CONNECTED</div>
-              <div className="col-2" style={{ textAlign: "left" }}>CLUSTER</div>
-
-
+              <div style={{ flex: "1" }}>GatewayId</div>
+              <div style={{ flex: "1" }}>ENV</div>
+              <div style={{ flex: "1" }}>CONNECTED</div>
+              <div style={{ flex: "1" }}>CLUSTER</div>
+              <div style={{ flex: "1" }}>OPTIONS</div>
             </div>
 
-            {this.props.gateways.map(gateway => {
+            {this.props.gateways.map((gateway, i) => {
 
               // var accountdefault = false;
               // if (this.state.accountgatewaydefault) {
@@ -197,8 +199,8 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
 
               return (
-                <div key={gateway.GatewayId} className="row" style={gridstyle}>
-                  <div className="col-4" style={{ paddingTop: 10 }}>
+                <div key={i} style={{ display: "flex", flexDirection: "row" }} >
+                  <div style={{ flex: 1 }}>
 
                     <div title={this.valueToggle(gateway.connected,
                       [{ value: true, result: "connected" },
@@ -226,67 +228,29 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
                         { value: "connecting", result: <i className="fas fa-circle-notch fa-spin"></i> },
                         { value: "error", result: <i className="fas fa-exclamation-circle"></i> },
                         { value: undefined, result: <i className="fas fa-question-circle"></i> }])}
-
                     </div>
 
                     {gateway.GatewayId}
                   </div>
 
                   {/* ENV */}
-                  <div className="col-1" style={{ textAlign: "right", paddingTop: 11, }} >
+                  <div style={{ flex: 1 }}>
                     {gateway.HostAddress.split(".")[1].toUpperCase()}
                   </div>
 
                   {/* CONNECTED */}
-                  <div className="col-2" style={{ textAlign: "left", paddingTop: 11, }} >
+                  <div style={{ flex: 1 }}>
                     <span title={gateway["_connected_last"]}>{moment(gateway["_connected_last"]).fromNow()}</span>
                   </div>
 
                   {/* CLUSTER */}
-                  <div className="col-2" style={{ textAlign: "left", paddingTop: 11, }} >
+                  <div style={{ flex: 1 }}>
                     {gateway.instance_id}
                   </div>
 
-                  {/* <div className="col-6" style={cellstyle} >
-                    <div
-                      onClick={this.setgatewayserverdefault(gateway)}
-                      title={
-                        gateway.default
-                          ? "Active default"
-                          : "Click to set to default"
-                      }
-                      style={{
-                        float: "left",
-                        paddingRight: 10,
-                        paddingTop: 1,
-                        opacity: gateway.default ? 1.0 : 0.15,
-                        cursor: gateway.default ? "" : "pointer"
-                      }}
-                    >
-                      <FontAwesomeIcon icon="server" />
-                    </div>
-
-                    <div
-                      onClick={this.setgatewayaccountdefault(gateway, accountdefault)}
-                      title={
-                        accountdefault
-                          ? "Click to unset account gateway"
-                          : "Click to set to default"
-                      }
-                      style={{
-                        float: "left",
-                        paddingRight: 10,
-                        paddingTop: 1,
-                        opacity: accountdefault ? 1.0 : 0.25,
-                        cursor: "pointer"
-                      }}
-                    >
-                      <FontAwesomeIcon icon="user" />
-                    </div> 
-                  </div>*/}
-
-                  <div className="col-1" style={{ padding: 10, textAlign: "right" }} >
-                    {this.renderDelete(gateway)}
+                  <div style={{ flex: 1 }}>
+                    {/* {this.renderDelete(gateway)} */}
+                    reconnect | delete
                   </div>
                 </div>
               );

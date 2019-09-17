@@ -3,39 +3,58 @@ import { EventEmitter } from 'events';
 import { logger } from "../shared/log"
 import { Package, DBchange, User, ConfigFile } from "../shared/interfaces"
 
-
-
 export class Config extends EventEmitter {
-    filepath: string = '../../../../iotconfig.json';
-    config: ConfigFile = {
-        ssl: false,
-        httpPort: 8080,
-        mongoConnection: "mongodb://localhost:27017/prototype" //default
-    };
+    filepath: string = '../../iotconfig.json';
+    config: ConfigFile;
     package: any | Package = {}
 
     constructor(options?: any) {
         super();
+
+        // DEFAULTS
+        this.config = {
+            ssl: false,
+            httpPort: 8080,
+            mongoConnection: "mongodb://localhost:27017/prototype",
+            version: {
+                name: "prototype",
+                version: "5.1.0-default",
+                description: "typescript realtime data coordination system"
+            }
+        }
+
         if (options) { this.filepath = options.filepath }
         this.loadnodepkg();
-        this.loadconfig();
+        this.loadconfig((err, configfile) => {
+            this.config = { ...this.config, ...configfile }
+            console.log("========= EFFECTIVE MERGED CONFIG:")
+            console.log(JSON.stringify(this.config, null, 2))
+            console.log("==================== END MERGED")
+        });
+
         this.config.version = {
             name: this.package.name,
             version: this.package.version,
             description: this.package.description
         }
 
+
         this.loadsslkeys();
     }
 
-    loadconfig() {
+    loadconfig(cb: (err: Error | undefined, configfile?: ConfigFile) => void) {
+
         try {
-            var mainconfig = JSON.parse(fs.readFileSync(this.filepath).toString());
-            this.config = mainconfig;
+            var readconfig: ConfigFile = JSON.parse(fs.readFileSync(this.filepath).toString());
+            console.log("============== CONFIG READ:")
+            console.log(JSON.stringify(readconfig, null, 2))
+            console.log("============================ END")
+            cb(undefined, readconfig)
         }
         catch (err) {
             logger.log({ message: "config " + err.toString(), level: "error" })
             console.log("USING DEFAULT CONFIG")
+            cb(err);
         }
     }
 

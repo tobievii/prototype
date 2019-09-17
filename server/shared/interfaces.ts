@@ -5,6 +5,17 @@ export interface Package {
     main: string;
 }
 
+/** When you want to log something 
+ * 
+ * @remarks 
+ * This is a remark?? {@link core-library#Statistics | Statistics subsystem}
+ * 
+ * @param message - The first input number
+ * @param data - The second input number
+ * @returns The arithmetic mean of `x` and `y`
+ *
+ * @beta
+*/
 export interface LogEvent {
     message: string;
     data?: any;
@@ -41,7 +52,7 @@ export interface User {
     apikey: string;
     publickey: string;
     level: number;
-
+    admin: boolean;
 }
 
 export interface ConfigFile {
@@ -58,7 +69,14 @@ export interface ConfigFile {
     httpPort: number
     httpsPort?: number
     mongoConnection: string
-    version?: any;
+    version: {
+        /** package.json name */
+        name: string
+        /** version of prototype from package.json */
+        version: string
+        /** description from package.json */
+        description: string
+    };
 }
 
 export interface WidgetType {

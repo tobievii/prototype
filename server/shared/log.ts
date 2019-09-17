@@ -23,11 +23,16 @@ class Logger {
 
   logverbosity: number;
 
+  constructor() {
+    this.logverbosity = 1;
+  }
+
+  /**
+   * Logging
+   * @param event message test
+   */
   log(event: LogEvent) {
 
-    return;
-
-    this.logverbosity = 1;
     if (event.message) {
       var tabs = "\t"
       if (event.message.length < 10) { tabs = "\t\t" }
