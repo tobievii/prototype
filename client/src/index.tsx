@@ -10,12 +10,15 @@ import { theme, colors } from "./theme";
 import { SideBar } from "./components/sidebar";
 import { DeviceView } from "./components/deviceview";
 import { BGgrad } from "./pages/bggrad";
-import { Account } from "./components/account";
-import { Settings } from "./components/settings";
+
+
+
 import { ProtoMap as Map } from "./components/map";
 import { clone } from "./utils/lodash_alt";
 import { registerServiceWorker } from "./serviceworker/serviceworker_register"
+
 import { Documentation } from "./pages/docs"
+import { Settings } from "./pages/settings";
 
 export default class App extends React.Component {
   state = {
@@ -130,15 +133,20 @@ export default class App extends React.Component {
     if (this.state.account) {
       return (
         <BrowserRouter>
+          <Route path="/signout" component={this.signout} />
+
           <Route exact path="/" component={this.home} />
           <Route exact path="/u/:username" component={this.userView} />
-          <Route exact path="/docs" component={this.docs} />
-          <Route exact path="/docs/:page" component={this.docs} />
+
           <Route path="/u/:username/view/:id" component={this.deviceView} />
           <Route exact path="/v/:publickey" component={this.viewByPublickey} />
-          <Route path="/signout" component={this.signout} />
+
+
+          <Route exact path="/docs" component={this.docs} />
+          <Route exact path="/docs/:page" component={this.docs} />
+
           <Route exact path="/settings" component={this.settings} />
-          <Route exact path="/settings/account" component={this.account} />
+          <Route exact path="/settings/:page" component={this.settings} />
         </BrowserRouter>
       );
     }
@@ -177,20 +185,11 @@ export default class App extends React.Component {
       <div>
         <BGgrad />
         <NavBar />
-        <Settings />
+        <Settings page={props.match.params.page} />
       </div>
     );
   };
 
-  account = props => {
-    return (
-      <div>
-        <BGgrad />
-        <NavBar />
-        <Account />
-      </div>
-    );
-  };
 
   // new vistors home/landing page..
   landing = props => {

@@ -1,5 +1,14 @@
 import React from 'react';
-import { WidgetComponentProps } from '../../../../../server/shared/interfaces';
+import { CorePacket, WidgetType } from '../../../../../server/shared/interfaces';
+
+export interface WidgetComponentProps {
+    /** Settings relevant to this widget */
+    widget: WidgetType
+    /** This device full state */
+    state: CorePacket
+    /** Data value if drag and dropped from endpoint */
+    value?: any
+}
 
 interface WidgetOption {
     type: string
