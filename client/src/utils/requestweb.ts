@@ -41,6 +41,10 @@ export class RequestWeb {
                     cb(resp);
                     return;
                 }
+                if (resp.error) {
+                    cb(resp);
+                    return;
+                }
                 cb(undefined, true, resp);
             }).catch((err) => {
                 console.log(err.toString());

@@ -11,6 +11,8 @@ import { MQTTServer } from "./core/mqtt"
 import { cfg } from "./core/config"
 import { Migration } from "./utils/migrate"
 
+import * as plugins from "../plugins/plugins_list_server"
+
 console.log(cfg.config)
 
 logger.log({ message: "process start", level: "info" })
@@ -45,7 +47,7 @@ var state: State = {
 
 //console.log(state)
 
-
+console.log("!!!!!!!!!!!!!!!!")
 
 if (cluster.isMaster) {
 
@@ -103,6 +105,10 @@ if (cluster.isMaster) {
 
     var documentstore = new DocumentStore({ mongoConnection: cfg.config.mongoConnection });
 
+    console.log("---------!")
+    console.log(plugins);
+    console.log("---------#")
+
     process.on('message', (msg) => {
         logger.log({ message: "worker process recv", data: { msg }, level: "verbose" });
         if (process) if (process.send) if (msg) process.send(msg);
@@ -114,6 +120,8 @@ if (cluster.isMaster) {
         webserver = new Webserver({ core, config: cfg.config });
         if (webserver.server) socketserver = new SocketServer({ server: webserver.server, core });
         mqttserver = new MQTTServer({ core })
+
+
 
         // update client that packets has changed
         documentstore.on("packets", (data: DBchange) => {

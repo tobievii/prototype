@@ -26,13 +26,16 @@ export class Webserver extends EventEmitter {
     app: express.Application;
     ssl: any;
     server: http.Server | undefined;
-
     port: number = 8080;
     core: Core;
+
+
 
     constructor(options: { core: Core, config: ConfigFile }) {
         super();
 
+
+        const pathclientdist = '../../client/dist';
         this.app = express();
 
 
@@ -72,13 +75,13 @@ export class Webserver extends EventEmitter {
             next();
         })
 
-        this.app.use(express.static('../public'))
-        this.app.use(express.static('../client/dist'))
+        this.app.use(express.static('../../public'))
+        this.app.use(express.static(pathclientdist))
 
-        this.app.use('/view', express.static('../client/dist'))
-        this.app.use('/u/:username/view', express.static('../client/dist'))
-        this.app.use('/u/:username/view/*', express.static('../client/dist'))
-        this.app.use('/v/:publickey', express.static('../client/dist'))
+        this.app.use('/view', express.static(pathclientdist))
+        this.app.use('/u/:username/view', express.static(pathclientdist))
+        this.app.use('/u/:username/view/*', express.static(pathclientdist))
+        this.app.use('/v/:publickey', express.static(pathclientdist))
 
 
         webapiv3(this.app, this.core);
@@ -86,7 +89,7 @@ export class Webserver extends EventEmitter {
 
         var reactHtml = "";
 
-        fs.readFile('../public/react.html', (err, data: any) => {
+        fs.readFile('../../public/react.html', (err, data: any) => {
             reactHtml = data.toString();
         })
 

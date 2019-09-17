@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { request } from "../../../client/src/utils/requestweb";
 
 interface GatewayProps {
     update: Function
@@ -50,39 +51,52 @@ export class AddGatewayPanel extends React.Component<GatewayProps, GatewayState>
     addGateway = () => {
         // console.log(this.state)
 
-        fetch('/api/v3/iotnxt/addgateway', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.state.addGatewayForm)
-        }).then((response) => {
-            if (!response.ok) {
-                this.setState({ message: "ERROR:" + response.status + " " + response.statusText })
-            } else {
-                return response.json()
+
+
+        request.post('/api/v3/iotnxt/addgateway', { json: this.state.addGatewayForm }, (err, res, body) => {
+            if (err) {
+                console.log(err);
+                this.setState({ message: JSON.stringify(err) })
             }
-        }).then((data) => {
-            console.log(data);
-            if (data.err) {
-                this.setState({ message: "ERROR:" + data.err })
-                return;
+            if (body) {
+                this.setState({ message: "success?todo" })
             }
-            if (this.props.update) { this.props.update(); }
-        }).catch(
-            (err) => {
-                // console.log("------")
-                // console.error(err.toString());
-                // this.setState({ message: err.toString() })
-            }
-        )
+        })
+
+
+        // fetch('/api/v3/iotnxt/addgateway', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(this.state.addGatewayForm)
+        // }).then((response) => {
+        //     if (!response.ok) {
+        //         this.setState({ message: "ERROR:" + response.status + " " + response.statusText })
+        //     } else {
+        //         return response.json()
+        //     }
+        // }).then((data) => {
+        //     console.log(data);
+        //     if (data.err) {
+        //         this.setState({ message: "ERROR:" + data.err })
+        //         return;
+        //     }
+        //     if (this.props.update) { this.props.update(); }
+        // }).catch(
+        //     (err) => {
+        //         // console.log("------")
+        //         // console.error(err.toString());
+        //         // this.setState({ message: err.toString() })
+        //     }
+        // )
 
     }
 
     render() {
-        var formLabelStyle: any = { textAlign: "right", padding: "15px 3px 0 0" }
-        var formInputStyle = { padding: 4, marginTop: "10px" }
+        var formLabelStyle: any = { textAlign: "left", padding: "25px 1px 0 3px" }
+        var formInputStyle = { padding: 4, marginTop: "5px" }
         var formRowStyle = { marginRight: 20 }
         return (
             <div style={{
@@ -93,6 +107,8 @@ export class AddGatewayPanel extends React.Component<GatewayProps, GatewayState>
             }}>
 
                 <h4>ADD GATEWAY</h4>
+
+                <p>Note: Please make sure this gateway is already "associated" on portal.</p>
 
                 <div className="row" style={formRowStyle} >
                     <div className="col-4 alignLeft" style={formLabelStyle} >
@@ -121,51 +137,20 @@ export class AddGatewayPanel extends React.Component<GatewayProps, GatewayState>
                     </div>
                 </div>
 
-                <div className="row" style={formRowStyle} >
-                    <div className="col-4 alignLeft" style={formLabelStyle} >
-                        <div style={{ marginTop: 6 }}>Presets: </div>
-                    </div>
-                    <div className="col-4" style={formInputStyle}>
-                        <div className="smallButton" onClick={this.choosePreset("dev")} >DEVELOPMENT</div>
-                    </div>
-                    <div className="col-4" style={formInputStyle}>
-                        <div className="smallButton" onClick={this.choosePreset("prod")}>PRODUCTION</div>
-                    </div>
-                </div>
 
-                <div className="row" style={formRowStyle} >
-                    <div className="col-4 alignLeft" style={formLabelStyle} >
-                        Host address:
-                    </div>
-                    <div className="col-8" style={formInputStyle}>
-                        <input
-                            style={{ width: "100%" }}
-                            value={this.state.addGatewayForm.HostAddress}
-                            onChange={this.changeInput("HostAddress")}
-                        />
-                    </div>
-                </div>
 
-                <div className="row" style={formRowStyle} >
-                    <div className="col-4 alignLeft" style={formLabelStyle} >
-                        Public key:
-                    </div>
-                    <div className="col-8" style={formInputStyle}>
-                        <input
-                            style={{ width: "100%" }}
-                            value={this.state.addGatewayForm.PublicKey}
-                            onChange={this.changeInput("PublicKey")}
-                        />
-                    </div>
+                <div style={{ marginTop: 20 }}>
+                    <button onClick={this.choosePreset("dev")} >DEVELOPMENT
+                        </button> or <button onClick={this.choosePreset("prod")}>PRODUCTION</button>
                 </div>
 
 
                 <div className="row" style={formRowStyle} >
                     <div className="col-4" style={formLabelStyle} ></div>
                     <div className="col-8" style={formInputStyle}>
-                        <div className="commanderBgPanel commanderBgPanelClickable"
+                        <button className="commanderBgPanel commanderBgPanelClickable"
                             onClick={this.addGateway}>
-                            <i className="fas fa-plus"></i> ADD GATEWAY</div>
+                            <i className="fas fa-plus"></i> ADD GATEWAY</button>
                         <div style={{ padding: 7 }}>{this.state.message}</div>
                     </div>
                 </div>

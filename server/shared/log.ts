@@ -24,6 +24,9 @@ class Logger {
   logverbosity: number;
 
   log(event: LogEvent) {
+
+    return;
+
     this.logverbosity = 1;
     if (event.message) {
       var tabs = "\t"

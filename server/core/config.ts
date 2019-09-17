@@ -6,7 +6,7 @@ import { Package, DBchange, User, ConfigFile } from "../shared/interfaces"
 
 
 export class Config extends EventEmitter {
-    filepath: string = '../../../iotconfig.json';
+    filepath: string = '../../../../iotconfig.json';
     config: ConfigFile = {
         ssl: false,
         httpPort: 8080,
@@ -41,7 +41,7 @@ export class Config extends EventEmitter {
 
     loadnodepkg() {
         try {
-            var nodePackage: Package = JSON.parse(fs.readFileSync("../package.json").toString());
+            var nodePackage: Package = JSON.parse(fs.readFileSync("../../package.json").toString());
             this.package = nodePackage;
 
         } catch (err) {
