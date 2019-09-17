@@ -7,6 +7,7 @@ import { Account } from "./settings/account";
 
 import * as plugins from '../../../plugins/plugins_list_ui'
 import { MenuVertical } from "../components/menu_vertical"
+import { api } from "../api";
 
 interface MyProps {
     page?: string
@@ -69,6 +70,13 @@ export class Settings extends React.Component<MyProps, MyState> {
             <div className="apiInfo" style={{ padding: colors.padding * 2, display: "flex", flexDirection: "row" }} >
 
                 <div style={{ background: "rgba(0,0,0,0.1)", width: 300, margin: colors.padding, padding: colors.padding * 2, }}>
+
+                    {(api.data.account.admin) &&
+                        <div>
+                            <h3>ADMIN AREA</h3>
+                        </div>
+                    }
+
                     <div>
                         <h3>SETTINGS</h3>
                         <MenuVertical active={this.props.page} menuitems={settingsMenuItems} />

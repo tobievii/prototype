@@ -26,7 +26,7 @@ export class RequestWeb {
             });
     }
 
-    post(uri: string, data: { headers?: object, json: object }, cb: (err: Error, res?: any, body?: object) => void) {
+    post(uri: string, options: { json: object }, cb: (err: Error, res?: any, body?: object) => void) {
         fetch(uri, {
             method: "POST",
             headers: {
@@ -34,7 +34,7 @@ export class RequestWeb {
                 "Content-Type": "application/json"
             },
             credentials: "same-origin",
-            body: JSON.stringify(data.json)
+            body: JSON.stringify(options.json)
         }).then(response => response.json())
             .then(resp => {
                 if (resp.err) {

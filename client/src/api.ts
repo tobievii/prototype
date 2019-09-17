@@ -200,7 +200,7 @@ export class API extends EventEmitter {
     }
 
     post(packet: CorePacket, cb?: (err, result?) => void) {
-        request.post(this.uri + "/api/v4/data/post", { headers: this.headers, json: packet },
+        request.post(this.uri + "/api/v4/data/post", { json: packet },
             (err, res, body: any) => {
                 if (err) if (cb) cb(err);
                 if (body) {
@@ -216,7 +216,7 @@ export class API extends EventEmitter {
     // view state of a device by id
     view(query: object, cb: Function) {
         request.post(this.uri + "/api/v4/view",
-            { headers: this.headers, json: query },
+            { json: query },
             (err, res, body) => {
                 if (err) cb(err);
                 if (body) {
@@ -235,7 +235,7 @@ export class API extends EventEmitter {
     */
     packets(options: ClientPacketOptions, cb: Function) {
         request.post(this.uri + "/api/v4/packets",
-            { headers: this.headers, json: options },
+            { json: options },
             (err, res, body) => {
                 if (err) cb(err);
                 if (body) {
@@ -252,7 +252,7 @@ export class API extends EventEmitter {
 
         if (typeof query == "object") {
             request.post(this.uri + "/api/v4/state",
-                { headers: this.headers, json: query },
+                { json: query },
                 (err, res, body: CorePacket) => {
                     if (err) cb(err);
                     if (body) {
@@ -379,7 +379,7 @@ export class API extends EventEmitter {
 
     search = (options, cb?: (err: Error, result?: any) => void) => {
         request.post(this.uri + "/api/v4/search",
-            { headers: this.headers, json: options },
+            { json: options },
             (err, res, body: any) => {
                 if (err) cb(err);
                 if (body) {
@@ -391,7 +391,7 @@ export class API extends EventEmitter {
 
     stateupdate = (options, cb?) => {
         request.post(this.uri + "/api/v4/stateupdate",
-            { headers: this.headers, json: options },
+            { json: options },
             (err, res, body: any) => {
                 if (err) cb(err);
                 if (body) {
@@ -404,7 +404,7 @@ export class API extends EventEmitter {
 
     activity = (options, cb) => {
         request.post(this.uri + "/api/v4/activity",
-            { headers: this.headers, json: options },
+            { json: options },
             (err, res, body: any) => {
                 if (err) cb(err);
                 if (body) {
@@ -416,7 +416,7 @@ export class API extends EventEmitter {
 
     getapispec = (cb) => {
         request.get(this.uri + "/api/v4",
-            { headers: this.headers, json: true },
+            { json: true },
             (err, res, body: any) => { cb(err, body); });
     }
 
@@ -426,7 +426,7 @@ export class API extends EventEmitter {
     */
     users = (options, cb) => {
         request.post(this.uri + "/api/v4/users",
-            { headers: this.headers, json: options },
+            { json: options },
             (err, res, body: any) => {
                 if (err) cb(err);
                 if (body) {
@@ -435,6 +435,18 @@ export class API extends EventEmitter {
                 }
             })
     }
+
+    // httpget = (url, cb) => {
+    //     request.get(this.uri + url,
+    //         { json: true },
+    //         (err, res, body: any) => { cb(err, body); });
+    // }
+
+    // httppost = (url, json, cb) => {
+    //     request.post(this.uri + url,
+    //         { json },
+    //         (err, res, body: any) => { cb(err, body); });
+    // }
 }
 
 var apiinstance = new API()
