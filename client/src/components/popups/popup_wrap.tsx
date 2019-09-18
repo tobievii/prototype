@@ -22,6 +22,13 @@ export class PopupWrap extends Popup<PopupWrapProps> {
         user: undefined
     }
 
+    componentDidMount() {
+        if (this.props.title) {
+            this.setState({ title: this.props.title })
+        }
+    }
+
+
     render() {
         return this.popuprender(<div style={{ display: "flex", flexDirection: "column" }}>
             {this.props.children}

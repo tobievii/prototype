@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
+import { PluginSuperClientside, PluginState, PluginProps } from "../../client/src/components/plugins_super_clientside"
 import { AddGatewayPanel } from "./components/addGateway"
 import { GatewayList } from "./components/gatewayList"
 import { request } from "../../client/src/utils/requestweb"
 import { GatewayType } from "./lib/iotnxtqueue"
+import { CorePacket } from '../../server/shared/interfaces';
+import { api } from '../../client/src/api';
+import { colors } from '../../client/src/theme';
 
 interface ActionTypes {
     addGateway?: GatewayType
@@ -11,10 +14,12 @@ interface ActionTypes {
     deleteGateway?: GatewayType
 }
 
+
+
+//export default class Iotnxt<IotnxtProps extends PluginProps, IotnxtState extends PluginState> extends PluginSuperClientside {
 export default class Iotnxt extends PluginSuperClientside {
-    state = {
-        gateways: []
-    }
+
+    state = { gateways: [] }
 
     constructor(props) {
         super(props);
@@ -35,7 +40,7 @@ export default class Iotnxt extends PluginSuperClientside {
 
     loadServerGateways() {
         console.log("requesting gateways...")
-        request.get('/api/v3/iotnxt/gateways', {}, (err, res, body) => {
+        request.get('/api/v3/iotnxt/gateways', {}, (err, res, body: GatewayType[]) => {
             if (err) console.log(err);
             if (body) {
                 console.log(body);
@@ -71,22 +76,6 @@ export default class Iotnxt extends PluginSuperClientside {
                 if (result) { this.loadServerGateways() }
                 if (cb) cb();
             })
-            // fetch("/api/v3/iotnxt/removegateway", {
-            //     method: "POST",
-            //     headers: {
-            //       Accept: "application/json",
-            //       "Content-Type": "application/json"
-            //     },
-            //     body: JSON.stringify(gateway)
-            //   })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //       // console.log(data)
-            //       if (this.props.update) {
-            //         this.props.update();
-            //       }
-            //     })
-            //     .catch(err => console.error(err.toString()));
         }
 
         if (action.reconnectGateway) {
@@ -95,7 +84,7 @@ export default class Iotnxt extends PluginSuperClientside {
 
     }
 
-    render() {
+    settings() {
         return (
             <div>
                 <AddGatewayPanel action={(action) => { this.actionHandler(action); }} update={this.update} />
@@ -104,8 +93,60 @@ export default class Iotnxt extends PluginSuperClientside {
         );
     }
 
-    deviceViewPluginPanel() {
-        return (<div>Iotnxt deviceview plugin panel</div>)
+
+    /** Shows the box of data on the plugin window if the device is currently linked to a gateway */
+    renderDeviceGateway = () => {
+        if (!this.props.state["plugins_iotnxt_gateway"]) { return <div>No gateway set. Select from the dropdown.</div> }
+        if (this.props.state["plugins_iotnxt_gateway"]["GatewayId"] == " ") { return <div>No gateway set. Select from the dropdown.</div> }
+
+        return <div style={{ background: "rgba(0,0,0,0.25)", padding: colors.padding }}>
+            GatewayID<br />
+            <span style={{ fontSize: "1.25em", fontWeight: "bold" }}>{this.props.state["plugins_iotnxt_gateway"]["GatewayId"]}</span><br />
+            {this.props.state["plugins_iotnxt_gateway"]["HostAddress"]}
+        </div>
+
+    }
+
+    /** We recieve the gateway unique string from the dropdown select onChange in deviceview */
+    setGatewayOnDevice(json: { key: string, id: string, plugins_iotnxt_gateway: { GatewayId: string, HostAddress: string } }) {
+        console.log("setGatewayOnDevice", json);
+
+        api.post(json, (err, result) => {
+            console.log(err, result);
+        })
+    }
+
+    /** Render the plugin popup on deviceview */
+    deviceview() {
+
+        return (<div>
+
+            {this.renderDeviceGateway()}
+
+            <p>Connects this device to IoTnxt portal/commander.</p>
+            <h5>SELECT FROM AVAILABLE GATEWAYS:</h5>
+
+            <select style={{ width: "100%" }} className="settingsSelect" onChange={(e) => {
+                this.setGatewayOnDevice({
+                    key: this.props.state.key,
+                    id: this.props.state.id,
+                    plugins_iotnxt_gateway: {
+                        GatewayId: e.target.value.split("|")[0],
+                        HostAddress: e.target.value.split("|")[1]
+                    }
+                });
+            }}
+                defaultValue="">
+                <option key="none" value="none">select gateway</option>
+                <option key="clear" value=" | ">clear</option>
+                {
+                    this.state.gateways.map((sGateway: GatewayType, i) => {
+                        return <option key={sGateway.GatewayId + "|" + sGateway.HostAddress} value={sGateway.GatewayId + "|" + sGateway.HostAddress} >{sGateway.GatewayId + "|" + sGateway.HostAddress}</option>
+                    })
+                }
+            </select>
+
+        </div>)
     }
 };
 

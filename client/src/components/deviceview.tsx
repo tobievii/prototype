@@ -122,9 +122,9 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   };
 
   pluginsRenderPopupComponents = () => {
-    var PopupComponentToDisplay = plugins[this.state.pluginPopupsVisibility]
-    return <PopupWrap onClose={() => { this.setState({ pluginPopupsVisibility: undefined }) }}>
-      <PopupComponentToDisplay />
+    var Plugin_deviceview = plugins[this.state.pluginPopupsVisibility]
+    return <PopupWrap title={this.state.pluginPopupsVisibility} onClose={() => { this.setState({ pluginPopupsVisibility: undefined }) }}>
+      <Plugin_deviceview view="deviceview" state={this.state.state} />
     </PopupWrap>
   }
 
@@ -217,4 +217,6 @@ export class DeviceView extends React.Component<MyProps, MyState> {
       );
     }
   }
+
+
 }
