@@ -138,7 +138,7 @@ export default class App extends React.Component {
           <Route exact path="/" component={this.home} />
           <Route exact path="/u/:username" component={this.userView} />
 
-          <Route path="/u/:username/view/:id" component={this.deviceView} />
+          <Route exact path="/u/:username/view/:id" component={this.deviceView} />
           <Route exact path="/v/:publickey" component={this.viewByPublickey} />
 
 

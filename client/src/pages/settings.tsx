@@ -6,6 +6,7 @@ import { Menu } from "../components/menu"
 import { Account } from "./settings/account";
 
 import * as plugins from '../../../plugins/plugins_list_ui'
+
 import { MenuVertical } from "../components/menu_vertical"
 import { api } from "../api";
 

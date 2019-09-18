@@ -103,5 +103,9 @@ export default class Iotnxt extends PluginSuperClientside {
             </div>
         );
     }
+
+    deviceViewPluginPanel() {
+        return (<div>Iotnxt deviceview plugin panel</div>)
+    }
 };
 

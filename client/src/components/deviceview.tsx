@@ -6,8 +6,9 @@ import { JSONviewer } from "./jsonviewer";
 import { ProtoEditor } from "./editor"
 import { Dashboard } from "./dashboard/dashboard"
 import { colors } from "../theme";
-import { Menu } from "./menu";
+import { Menu2 } from "./menu_2";
 
+import * as plugins from '../../../plugins/plugins_list_ui'
 
 interface MyProps {
   username?: string;
@@ -106,6 +107,14 @@ export class DeviceView extends React.Component<MyProps, MyState> {
   };
 
   render() {
+
+    /** build the plugins menuitems list */
+    var pluginsMenuItems = []
+    for (var p of Object.keys(plugins).sort()) {
+      pluginsMenuItems.push({ text: p, icon: "plug", onClick: () => { } })
+    }
+
+
     if (this.state.state == undefined) {
       return <div style={{ padding: 20 }}></div>;
     }
@@ -116,16 +125,24 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
           {(!this.state.hidecontrols) &&
             <div style={{ textAlign: "right" }}>
-              <Menu style={{ background: "rgba(0,0,0,0)", color: "rgba(255,255,255,0.5)" }} align="right" active={"dashboard"} config={{
-                menuitems: [
-                  { responsive: true, link: "/docs/apikey", icon: "digital-tachograph", text: "Dashboard", onClick: () => { } },
-                  { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
-                  { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
-                  { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
-                  { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
-                  { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
-              }} />
+              <Menu2 menuitems={[
+                { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
+                { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
+                { responsive: true, icon: "plug", text: "plugins", onClick: () => { }, menuitems: pluginsMenuItems },
+                { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
+                { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
+                { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]}
+              />
             </div>}
+
+          <div>
+            PLUGINS TEMP
+            {
+              Object.keys(plugins).sort().map((plugin, i) => {
+                return <div key={i} >{plugin}</div>
+              })
+            }
+          </div>
 
           <div style={{ display: "flex", flexDirection: "row" }}>
 
@@ -136,6 +153,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
                 </div>
               </div>
             }
+
 
 
             <div style={{ flex: "5", paddingTop: colors.padding }}>

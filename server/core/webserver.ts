@@ -35,7 +35,7 @@ export class Webserver extends EventEmitter {
         super();
 
 
-        const pathclientdist = '../../client/dist';
+
         this.app = express();
 
 
@@ -76,32 +76,19 @@ export class Webserver extends EventEmitter {
         })
 
         this.app.use(express.static('../../public'))
-        this.app.use(express.static(pathclientdist))
+        this.app.use(express.static('../../client/dist'))
+        this.app.use('/u/:username/view', express.static('../../client/dist'))
+        this.app.use('/u/:username/view/:device', express.static('../../client/dist'))
 
-        this.app.use('/view', express.static(pathclientdist))
-        this.app.use('/u/:username/view', express.static(pathclientdist))
-        this.app.use('/u/:username/view/*', express.static(pathclientdist))
-        this.app.use('/v/:publickey', express.static(pathclientdist))
 
 
         webapiv3(this.app, this.core);
         webapiv4(this.app, this.core);
 
         var reactHtml = "";
+        fs.readFile('../../public/react.html', (err, data: any) => { reactHtml = data.toString(); })
 
-        fs.readFile('../../public/react.html', (err, data: any) => {
-            reactHtml = data.toString();
-        })
-
-        this.app.get("/", (req: any, res) => {
-
-            // fs.readFile('../public/react.html', (err, data: any) => {
-            //     reactHtml = data.toString();
-            // })
-
-            res.end(reactHtml);
-        })
-
+        this.app.get("/", (req: any, res) => { res.end(reactHtml); })
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })
         this.app.get("/features", (req, res) => { res.end(reactHtml); })
         this.app.get("/products", (req, res) => { res.end(reactHtml); })
@@ -134,11 +121,10 @@ export class Webserver extends EventEmitter {
 
         ///////////////////////////////////////////////////////
 
-        this.app.use('/view', (req, res) => { res.end(reactHtml); })
-        this.app.use('/u/:username', (req, res) => { res.end(reactHtml); })
-        this.app.use('/u/:username/view', (req, res) => { res.end(reactHtml); })
-        this.app.use('/u/:username/view/*', (req, res) => { res.end(reactHtml); })
-        this.app.use('/v/:publickey', (req, res) => { res.end(reactHtml); })
+        this.app.get('/u/:username', (req, res) => { res.end(reactHtml); })
+        this.app.get('/u/:username/view', (req, res) => { res.end(reactHtml); })
+        this.app.get('/u/:username/view/:id', (req, res) => { res.end(reactHtml); })
+        this.app.get('/v/:publickey', (req, res) => { res.end(reactHtml); })
 
         this.app.get('/signout', (req, res) => {
             console.log("SIGNOUT");
