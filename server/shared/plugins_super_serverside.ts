@@ -1,6 +1,6 @@
-import { DocumentStore } from "../server/core/data";
-import { Core } from "../server/core/core";
-import { Webserver } from "../server/core/webserver";
+import { DocumentStore } from "../core/data";
+import { Core } from "../core/core";
+import { Webserver } from "../core/webserver";
 
 /** This is the class all serverside plugins need to import and extend */
 interface PluginSuperServersideProps {

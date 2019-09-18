@@ -1,6 +1,4 @@
-//import express = require('express');
-import lodash = require('lodash');
-import express = require("express")
+import * as express from "express"
 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -10,14 +8,13 @@ import { EventEmitter } from 'events';
 
 import * as http from "http";
 import * as https from "https";
-
 import * as fs from "fs";
+import * as path from "path"
+
 import { logger } from "../shared/log"
 import { Core } from "./core"
-
 import { webapiv3 } from "./webapi_v3"
 import { webapiv4, apispec } from "./webapi_v4"
-import { threadId } from 'worker_threads';
 import { LogEvent, ConfigFile } from '../shared/interfaces';
 
 
@@ -68,17 +65,17 @@ export class Webserver extends EventEmitter {
                 }, level: "verbose"
             }
 
-            // log current user if logged in (req.user);
+            // log current user if logged in (req.user);            
             if (req.user) { logmsg.data.user = { username: req.user.username, email: req.user.email } }
 
             logger.log(logmsg)
             next();
         })
 
-        this.app.use(express.static('../../public'))
-        this.app.use(express.static('../../client/dist'))
-        this.app.use('/u/:username/view', express.static('../../client/dist'))
-        this.app.use('/u/:username/view/:device', express.static('../../client/dist'))
+        this.app.use(express.static(path.resolve(__dirname, '../../../public')))
+        this.app.use(express.static(path.resolve(__dirname, '../../../client/dist')))
+        this.app.use('/u/:username/view', express.static(path.resolve(__dirname, '../../../client/dist')))
+        this.app.use('/u/:username/view/:device', express.static(path.resolve(__dirname, '../../../client/dist')))
 
 
 
@@ -86,7 +83,7 @@ export class Webserver extends EventEmitter {
         webapiv4(this.app, this.core);
 
         var reactHtml = "";
-        fs.readFile('../../public/react.html', (err, data: any) => { reactHtml = data.toString(); })
+        fs.readFile(path.resolve(__dirname, '../../../public/react.html'), (err, data: any) => { reactHtml = data.toString(); })
 
         this.app.get("/", (req: any, res) => { res.end(reactHtml); })
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })
@@ -231,9 +228,4 @@ export class Webserver extends EventEmitter {
     }
 
 
-    addroute(path: string) {
-        this.app.get(path, (req, res) => {
-            res.json({ success: "whoo" })
-        })
-    }
 }  

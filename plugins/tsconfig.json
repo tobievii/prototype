@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    // Allow importing like `import React from 'react'`
+    "allowSyntheticDefaultImports": true,
+    // Use ES2015 module system
+    "module": "esNext",
+    // Set React as the JSX factory
+    "jsx": "react",
+    // Resolve modules using Node-resolution algorithm
+    "moduleResolution": "node",
+    // Target ES6 for more modern browsers
+    "target": "es6",
+    // Include typings from built-in lib declarations
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "webworker"
+    ],
+    // Include module source maps for debugging
+    "sourceMap": true
+  }
+}

@@ -20,6 +20,7 @@
     "browser-request": "^0.3.3",
     "chart.js": "^2.8.0",
     "css-loader": "^3.2.0",
+    "extra-watch-webpack-plugin": "^1.0.3",
     "highlight.js": "^9.15.10",
     "monaco-editor": "^0.17.1",
     "monaco-editor-webpack-plugin": "^1.7.0",

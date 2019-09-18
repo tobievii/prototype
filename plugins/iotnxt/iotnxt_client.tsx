@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { PluginSuperClientside } from "../plugins_super_clientside"
+import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
 import { AddGatewayPanel } from "./components/addGateway"
 import { GatewayList } from "./components/gatewayList"
 import { request } from "../../client/src/utils/requestweb"

@@ -10,6 +10,9 @@ import { Menu2 } from "./menu_2";
 
 import * as plugins from '../../../plugins/plugins_list_ui'
 
+import { PopupWrap } from "./popups/popup_wrap"
+import { clone } from "../utils/lodash_alt";
+
 interface MyProps {
   username?: string;
   id?: string;
@@ -18,7 +21,8 @@ interface MyProps {
 }
 
 interface MyState {
-  [index: string]: any;
+  pluginPopupsVisibility: any
+  [index: string]: any
 }
 
 export class DeviceView extends React.Component<MyProps, MyState> {
@@ -27,7 +31,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
     message: undefined,
     showEditor: false,
     showData: false,
-    hidecontrols: false
+    hidecontrols: false,
+    pluginPopupsVisibility: undefined
   };
 
   wrapper;
@@ -49,6 +54,16 @@ export class DeviceView extends React.Component<MyProps, MyState> {
     if (this.props.publickey) {
       this.loadfrompublickey(this.props.publickey);
     }
+
+    // plugin popup visibility
+    // var pluginPopupsVisibility: any = {}
+    // for (var pluginName of Object.keys(plugins).sort()) {
+    //   //temparray.push({ text: pluginName, icon: "plug", onClick: () => { } })
+    //   pluginPopupsVisibility[pluginName] = false;
+    // }
+
+    // this.setState({ pluginPopupsVisibility })
+
   };
 
   loadfromusernameid = (username, id) => {
@@ -106,12 +121,39 @@ export class DeviceView extends React.Component<MyProps, MyState> {
     // }
   };
 
+  pluginsRenderPopupComponents = () => {
+    var PopupComponentToDisplay = plugins[this.state.pluginPopupsVisibility]
+    return <PopupWrap onClose={() => { this.setState({ pluginPopupsVisibility: undefined }) }}>
+      <PopupComponentToDisplay />
+    </PopupWrap>
+  }
+
+
+  showPopup = (pluginName) => {
+    return (evt) => {
+      console.log("show plugin " + pluginName)
+      this.setState({ pluginPopupsVisibility: pluginName })
+    }
+  }
+
   render() {
 
     /** build the plugins menuitems list */
     var pluginsMenuItems = []
-    for (var p of Object.keys(plugins).sort()) {
-      pluginsMenuItems.push({ text: p, icon: "plug", onClick: () => { } })
+    for (var pluginName of Object.keys(plugins).sort()) {
+      pluginsMenuItems.push({
+        text: pluginName, icon: "plug", onClick: this.showPopup(pluginName) // if (this.state.pluginPopupsVisibility) {
+        //   console.log(this.state.pluginPopupsVisibility)
+        //   var pluginPopupsVisibility = clone(this.state.pluginPopupsVisibility)
+        //   // hide all
+        //   for (var p of Object.keys(pluginPopupsVisibility)) { pluginPopupsVisibility[p] = false }
+        //   // show this one
+        //   pluginPopupsVisibility[pluginName] = true;
+        //   this.setState({ pluginPopupsVisibility })
+        // }
+
+
+      })
     }
 
 
@@ -124,7 +166,8 @@ export class DeviceView extends React.Component<MyProps, MyState> {
         <div style={{ padding: colors.padding * 2 }}>
 
           {(!this.state.hidecontrols) &&
-            <div style={{ textAlign: "right" }}>
+            <div>
+
               <Menu2 menuitems={[
                 { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
                 { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
@@ -133,16 +176,12 @@ export class DeviceView extends React.Component<MyProps, MyState> {
                 { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
                 { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]}
               />
+
+
+
             </div>}
 
-          <div>
-            PLUGINS TEMP
-            {
-              Object.keys(plugins).sort().map((plugin, i) => {
-                return <div key={i} >{plugin}</div>
-              })
-            }
-          </div>
+          {(this.state.pluginPopupsVisibility) && this.pluginsRenderPopupComponents()}
 
           <div style={{ display: "flex", flexDirection: "row" }}>
 

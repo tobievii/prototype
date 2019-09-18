@@ -4,6 +4,7 @@
 // const path = require("path");
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
@@ -53,7 +54,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
     },
-    plugins: [new MonacoWebpackPlugin()]
+    plugins: [new MonacoWebpackPlugin(), new ExtraWatchWebpackPlugin({ dirs: ['../plugins'] })]
     // plugins: [new webpack.ProvidePlugin({
     //   'api': 'api'
     // })]

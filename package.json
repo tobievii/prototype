@@ -8,7 +8,8 @@
     "test": "mocha --exit ./build/tests/tests.js",
     "bench": "node ./build/tests/benchmark.js",
     "build": "tsc --sourcemap --lib es2015 ./server/main.ts ./server/tests/tests.ts ./server/tests/benchmark.ts --outDir ./build",
-    "watch": "tsc --sourcemap --w --lib es2015 ./server/main.ts ./server/tests/tests.ts ./server/tests/benchmark.ts --outDir ./build"
+    "watch": "tsc --sourcemap --w --lib es2015 ./server/main.ts ./server/tests/tests.ts ./server/tests/benchmark.ts --outDir ./build",
+    "watchserver": "nodemon build/server/main.js"
   },
   "keywords": [],
   "author": "",

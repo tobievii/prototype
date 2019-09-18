@@ -3,6 +3,7 @@
 // ADD YOUR PLUGINS HERE:
 
 export { default as iotnxt } from './iotnxt/iotnxt_client'
+export { default as myplugin } from './myplugin/myplugin_client'
 //export { default as teltonika } from './teltonika/teltonika_client'
 
 //export { default as blank } from './widget_basic'

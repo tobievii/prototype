@@ -16,7 +16,6 @@ export class Button extends React.Component<MenuProps, MenuState> {
             <button style={{
                 borderTopRightRadius: "0px",
                 width: "40px", height: "40px",
-                background: colors.alarm,
                 float: "right",
                 textAlign: "center",
                 padding: "9px",

@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import { EventEmitter } from 'events';
 import { logger } from "../shared/log"
 import { Package, DBchange, User, ConfigFile } from "../shared/interfaces"
+import { pathMatch } from 'tough-cookie';
+import * as path from 'path';
 
 export class Config extends EventEmitter {
     filepath: string = '../../iotconfig.json';
@@ -23,13 +25,10 @@ export class Config extends EventEmitter {
             }
         }
 
-        if (options) { this.filepath = options.filepath }
         this.loadnodepkg();
         this.loadconfig((err, configfile) => {
             this.config = { ...this.config, ...configfile }
-            console.log("========= EFFECTIVE MERGED CONFIG:")
-            console.log(JSON.stringify(this.config, null, 2))
-            console.log("==================== END MERGED")
+            //console.log(JSON.stringify(this.config, null, 2))
         });
 
         this.config.version = {
@@ -45,10 +44,16 @@ export class Config extends EventEmitter {
     loadconfig(cb: (err: Error | undefined, configfile?: ConfigFile) => void) {
 
         try {
-            var readconfig: ConfigFile = JSON.parse(fs.readFileSync(this.filepath).toString());
-            console.log("============== CONFIG READ:")
-            console.log(JSON.stringify(readconfig, null, 2))
-            console.log("============================ END")
+            // changed in 5.1
+            // reads config file from base folder /iotconfig.json
+            var readconfig: ConfigFile = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../iotconfig.json')).toString());
+            if (readconfig) {
+                console.log("SUCCESSFULLY READ iotconfig.json")
+                console.log(JSON.stringify(readconfig, null, 2))
+            } else {
+                console.log("COULD NOT READ iotconfig.json")
+            }
+
             cb(undefined, readconfig)
         }
         catch (err) {
@@ -60,7 +65,9 @@ export class Config extends EventEmitter {
 
     loadnodepkg() {
         try {
-            var nodePackage: Package = JSON.parse(fs.readFileSync("../../package.json").toString());
+
+            var nodePackage: Package = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../../package.json")).toString());
+
             this.package = nodePackage;
 
         } catch (err) {

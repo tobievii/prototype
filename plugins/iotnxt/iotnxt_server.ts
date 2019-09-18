@@ -1,4 +1,4 @@
-import { PluginSuperServerside } from "../plugins_super_serverside"
+import { PluginSuperServerside } from "../../server/shared/plugins_super_serverside"
 import { Core } from "../../server/core/core";
 import { Webserver } from "../../server/core/webserver";
 import { DocumentStore } from "../../server/core/data";
@@ -55,6 +55,10 @@ export default class Iotnxt extends PluginSuperServerside {
 
         this.webserver.app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
             this.getgateways({ user: req.user }, (err: Error, gateways: any) => {
+
+                console.log(gateways);
+                console.log("=============")
+
                 if (err) res.json({ err: err.toString() });
 
                 for (var g in gateways) {
@@ -130,7 +134,9 @@ export default class Iotnxt extends PluginSuperServerside {
     getgateways(query: { user: User }, cb: any) {
         var { user } = query;
         var dbquery: any = { type: "gateway" }
-        if (!user.admin) { dbquery["_createdby"] = { publickey: query.user.publickey } }
+        console.log("asdf")
+        if (!user.admin) { dbquery["_created_by.publickey"] = query.user.publickey }
+        console.log(dbquery);
         this.documentstore.db.plugins_iotnxt.find(dbquery, cb);
     }
 
