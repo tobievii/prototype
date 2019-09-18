@@ -3,6 +3,7 @@ import { request } from "../../../client/src/utils/requestweb";
 
 interface GatewayProps {
     update: Function
+    action: (action: object) => void
 }
 
 interface GatewayState {
@@ -48,51 +49,7 @@ export class AddGatewayPanel extends React.Component<GatewayProps, GatewayState>
         }
     }
 
-    addGateway = () => {
-        // console.log(this.state)
 
-
-
-        request.post('/api/v3/iotnxt/addgateway', { json: this.state.addGatewayForm }, (err, res, body) => {
-            if (err) {
-                console.log(err);
-                this.setState({ message: JSON.stringify(err) })
-            }
-            if (body) {
-                this.setState({ message: "success?todo" })
-            }
-        })
-
-
-        // fetch('/api/v3/iotnxt/addgateway', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(this.state.addGatewayForm)
-        // }).then((response) => {
-        //     if (!response.ok) {
-        //         this.setState({ message: "ERROR:" + response.status + " " + response.statusText })
-        //     } else {
-        //         return response.json()
-        //     }
-        // }).then((data) => {
-        //     console.log(data);
-        //     if (data.err) {
-        //         this.setState({ message: "ERROR:" + data.err })
-        //         return;
-        //     }
-        //     if (this.props.update) { this.props.update(); }
-        // }).catch(
-        //     (err) => {
-        //         // console.log("------")
-        //         // console.error(err.toString());
-        //         // this.setState({ message: err.toString() })
-        //     }
-        // )
-
-    }
 
     render() {
         var formLabelStyle: any = { textAlign: "left", padding: "25px 1px 0 3px" }
@@ -149,7 +106,9 @@ export class AddGatewayPanel extends React.Component<GatewayProps, GatewayState>
                     <div className="col-4" style={formLabelStyle} ></div>
                     <div className="col-8" style={formInputStyle}>
                         <button className="commanderBgPanel commanderBgPanelClickable"
-                            onClick={this.addGateway}>
+                            onClick={() => {
+                                this.props.action({ addGateway: this.state.addGatewayForm })
+                            }}>
                             <i className="fas fa-plus"></i> ADD GATEWAY</button>
                         <div style={{ padding: 7 }}>{this.state.message}</div>
                     </div>

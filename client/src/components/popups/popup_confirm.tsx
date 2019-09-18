@@ -31,11 +31,15 @@ export class PopupConfirm extends Popup<ConfirmPopupProps> {
         return this.popuprender(<div style={{ display: "flex", flexDirection: "column" }}>
             <div>{this.props.message}</div>
 
-            <div><button style={{ float: "right" }} onClick={() => {
-                this.props.onConfirm();
-            }} >
-                <i className="fas fa-check" style={{ color: colors.share, opacity: 0.5, paddingRight: "10px" }} ></i> CONFIRM
-                            </button>
+            <div style={{ paddingTop: 20 }}>
+
+                <button style={{ float: "right" }} onClick={() => { this.props.onConfirm(); }} >
+                    <i className="fas fa-check" style={{ color: colors.share, opacity: 0.5, paddingRight: "10px" }} ></i> CONFIRM
+                </button>
+
+                <button style={{ float: "right", marginRight: 20 }} onClick={() => { this.close() }} >
+                    <i className="fas fa-times" style={{ color: colors.alarm, opacity: 0.5, paddingRight: "10px" }} ></i> CANCEL
+                </button>
             </div>
 
             <div style={{ clear: "both" }} />

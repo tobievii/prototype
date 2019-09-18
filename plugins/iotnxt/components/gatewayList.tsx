@@ -1,20 +1,30 @@
 import React, { Component } from "react";
 
 import { moment } from "../../../client/src/utils/momentalt"
+import { PopupConfirm } from "../../../client/src/components/popups/popup_confirm";
+
+import { GatewayType } from "../lib/iotnxtqueue"
 
 //import { cellstyle, gridHeadingStyle, blockstyle } from "../../styles.jsx"
 
 interface GatewayListProps {
   update: Function
   gateways: any
+  action: (action: object, cb?: Function) => void
 }
 
 interface GatewayListState {
-
+  /** Show the delete popup? */
+  showDelete: boolean
+  /** The gateway of concern for the delete popup */
+  showDeleteGateway: GatewayType
 }
 
 export class GatewayList extends React.Component<GatewayListProps, GatewayListState>{
-  state = {};
+  state = {
+    showDelete: false,
+    showDeleteGateway: undefined
+  };
 
   getaccount = () => {
     // fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
@@ -48,80 +58,9 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
   }
 
   removeGateway = gateway => {
-    return event => {
-      fetch("/api/v3/iotnxt/removegateway", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(gateway)
-      })
-        .then(response => response.json())
-        .then(data => {
-          // console.log(data)
-          if (this.props.update) {
-            this.props.update();
-          }
-        })
-        .catch(err => console.error(err.toString()));
-    };
+    this.props.action({ delete: { gateway } })
   };
 
-  setgatewayserverdefault = gateway => {
-    return event => {
-      fetch("/api/v3/iotnxt/setgatewayserverdefault", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(gateway)
-      })
-        .then(response => response.json())
-        .then(data => {
-          // console.log(data);
-          this.getaccount();
-          if (this.props.update) {
-            this.props.update();
-          }
-        })
-        .catch(err => console.error(err.toString()));
-    };
-  };
-
-
-  setgatewayaccountdefault = (gateway, clear) => {
-    return event => {
-      // console.log(clear);
-
-      if (clear) {
-        fetch("/api/v3/iotnxt/cleargatewayaccountdefault").then(response => response.json())
-          .then(data => {
-            // console.log(data);
-            this.getaccount();
-            if (this.props.update) {
-              this.props.update();
-            }
-          }).catch(err => console.error(err.toString()));
-
-
-      } else fetch("/api/v3/iotnxt/setgatewayaccountdefault", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(gateway)
-      }).then(response => response.json())
-        .then(data => {
-          this.getaccount();
-          if (this.props.update) {
-            this.props.update();
-          }
-        }).catch(err => console.error(err.toString()));
-    };
-  };
 
   renderDelete = (gateway) => {
 
@@ -175,6 +114,16 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
         return (
           <div style={blockstyle} >
+
+            {(this.state.showDelete) && <PopupConfirm
+              message={"Are you sure you want to delete " + this.state.showDeleteGateway.GatewayId + "?"}
+              onConfirm={() => {
+                this.props.action({ deleteGateway: this.state.showDeleteGateway }, () => { });
+                this.setState({ showDelete: false });
+              }}
+              onClose={() => { this.setState({ showDelete: false }) }}
+            />}
+
             <div className="row" style={gridHeadingStyle}>
 
               <div style={{ flex: "1" }}>GatewayId</div>
@@ -184,7 +133,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
               <div style={{ flex: "1" }}>OPTIONS</div>
             </div>
 
-            {this.props.gateways.map((gateway, i) => {
+            {this.props.gateways.map((gateway: GatewayType, i) => {
 
               // var accountdefault = false;
               // if (this.state.accountgatewaydefault) {
@@ -213,7 +162,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
                         paddingRight: 10,
                         paddingTop: 1,
                         opacity: 1,
-                        cursor: gateway.default ? "" : "pointer",
+                        cursor: "pointer",
                         //color: gateway.connected ? "rgb(0, 222, 125)" : "rgb(255, 57, 67)"
                         color: this.valueToggle(gateway.connected,
                           [{ value: true, result: "rgb(0, 222, 125)" },
@@ -249,8 +198,8 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    {/* {this.renderDelete(gateway)} */}
-                    reconnect | delete
+                    <button onClick={() => { this.props.action({ reconnectGateway: gateway }) }}><i className="fas fa-sync-alt"></i></button>
+                    <button onClick={() => { this.setState({ showDelete: true, showDeleteGateway: gateway }) }}><i className="fas fa-trash"></i></button>
                   </div>
                 </div>
               );

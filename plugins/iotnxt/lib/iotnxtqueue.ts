@@ -17,6 +17,21 @@ var mqttcfg = {
 }
 */
 
+
+export interface GatewayType {
+  "GatewayId": string
+  "Secret": string
+  "HostAddress": string
+  "PublicKey": string
+  "connected": boolean | undefined
+  "unique": string
+  "type": string
+  "_created_on": Date
+  "_created_by": any
+  "error": any
+  "instance_id": any
+}
+
 export class IotnxtQueue extends events.EventEmitter {
   RoutingKeyBase: any;
   connected: boolean = false;
