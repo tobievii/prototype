@@ -4,14 +4,13 @@ import { Webserver } from "../../server/core/webserver";
 import { DocumentStore } from "../../server/core/data";
 
 
-export default class Iotnxt extends PluginSuperServerside {
-    name = "iotnxt";
-
+export default class MyPlugin extends PluginSuperServerside {
     constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
         super(props);
+
+        this.webserver.app.get("/api/v4/myplugin/test", (req, res) => {
+            res.json({ test: "successful123!" })
+        })
     }
-
-
-
 };
 
