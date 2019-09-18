@@ -84,10 +84,17 @@ export class DocsHTTPS extends React.Component<MyProps, MyState> {
         var apiCall = { path: window.location.origin }
         var samplePacket = { "id": "yourDevice001", "data": { "temperature": 24.54, "doorOpen": false, "gps": { "lat": 25.123, "lon": 28.125 } } }
 
+        var size = (window.innerWidth < 800) ? "small" : "large";
+
+        //responsive
+        var columnStyles: any = (window.innerWidth < 800)
+            ? { width: "100%", boxSizing: "border-box", padding: colors.padding, paddingRight: colors.padding * 4 }
+            : { width: "50%", float: "left", boxSizing: "border-box", padding: colors.padding, paddingRight: colors.padding * 4 };
+
         return (
             <div>
 
-                <div style={{ width: "50%", float: "left", boxSizing: "border-box", padding: colors.padding, paddingRight: colors.padding * 4 }}>
+                <div style={columnStyles}>
                     <h4>HTTP/S API</h4>
                     <hr />
 
@@ -233,7 +240,7 @@ export class DocsHTTPS extends React.Component<MyProps, MyState> {
 
                 </div>
 
-                <div style={{ width: "50%", float: "right", boxSizing: "border-box", padding: colors.padding * 4 }}>
+                <div style={columnStyles}>
                     {this.generateDocFromSpec()}
                 </div>
 
