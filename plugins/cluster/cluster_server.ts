@@ -23,16 +23,17 @@ export default class Cluster extends PluginSuperServerside {
 
         /** retrieves cluster data from db and sends to user */
         this.webserver.app.get("/api/v4/cluster/info", (req, res) => {
-            this.documentstore.db.cluster.findOne({ datatype: "clusterWorkers" }, (err, data) => {
+            this.refresh(() => {
+                this.documentstore.db.cluster.findOne({ datatype: "clusterWorkers" }, (err, data) => {
+                    data.worker = {
+                        hostname: hostname(),
+                        pid: process.pid,
+                        updated: new Date()
+                    }
+                    res.json(data);
+                });
+            })
 
-                data.worker = {
-                    hostname: hostname(),
-                    pid: process.pid,
-                    updated: new Date()
-                }
-
-                res.json(data);
-            });
         })
 
         /** clear out old entries from db */

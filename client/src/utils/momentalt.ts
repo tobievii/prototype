@@ -1,10 +1,16 @@
 export class MomentAlt {
     date;
     constructor(input) {
-        this.date = new Date(input);
+        if (input == undefined) {
+            // no data input...
+        } else {
+            this.date = new Date(input);
+        }
+
     }
 
     fromNow() {
+        if (this.date == undefined) { return "never" }
         var seconds = Math.floor((new Date().getTime() - this.date.getTime()) / 1000);
 
         var interval = Math.floor(seconds / 31536000);

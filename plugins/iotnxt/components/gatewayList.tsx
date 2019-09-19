@@ -26,23 +26,9 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
     showDeleteGateway: undefined
   };
 
-  getaccount = () => {
-    // fetch("/api/v3/account", { method: "GET" }).then(res => res.json()).then(user => {
-
-    //   if (user.plugins_iotnxt_gatewaydefault) {
-    //     this.setState({
-    //       accountgatewaydefault: user.plugins_iotnxt_gatewaydefault
-    //     })
-    //   } else {
-    //     this.setState({ accountgatewaydefault: undefined });
-    //   }
-
-    //   this.setState({ user: user })
-    // }).catch(err => console.error(err.toString()))
-  }
 
   componentWillMount = () => {
-    this.getaccount()
+
   }
 
   componentDidUpdate = () => {

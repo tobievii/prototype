@@ -4,6 +4,7 @@ import { request } from "../../client/src/utils/requestweb"
 import { colors } from '../../client/src/theme';
 
 import { CodeBlock } from "../../client/src/components/codeblock"
+import { moment } from '../../client/src/utils/momentalt';
 
 /** TEMPLATE PLUGIN 
  * 
@@ -24,8 +25,18 @@ export default class Cluster extends PluginSuperClientside {
     getSnapshotBeforeUpdate(prevProps, prevState) {}
     */
 
+    checker;
+    redraw;
+
     componentDidMount() {
         this.getclusterinfo()
+        this.redraw = setInterval(() => { this.setState({ counter: Math.random() }); }, 1000)
+        this.checker = setInterval(() => { this.getclusterinfo(); }, 5000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.checker);
+        clearInterval(this.redraw);
     }
 
     getclusterinfo() {
@@ -62,7 +73,7 @@ export default class Cluster extends PluginSuperClientside {
 
                 <div>
                     {this.state.info.workers.map((worker, i) => {
-                        return <div key={i} > {worker.hostname} | {worker.pid} | {worker.updated} </div>
+                        return <div key={i} > {worker.hostname} | {worker.pid} | {worker.updated} | {moment(worker.updated).fromNow()} </div>
                     })}
                 </div>
 
