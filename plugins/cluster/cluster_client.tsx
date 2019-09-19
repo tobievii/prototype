@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
 import { request } from "../../client/src/utils/requestweb"
+import { colors } from '../../client/src/theme';
 
-
+import { CodeBlock } from "../../client/src/components/codeblock"
 
 /** TEMPLATE PLUGIN 
  * 
@@ -12,7 +13,7 @@ export default class Cluster extends PluginSuperClientside {
     /** sets this plugin to be only accessible by admins */
     admin = true;
 
-    state = { info: {} }
+    state = { info: { workers: [] } }
 
     //UNSAFE_componentWillMount
     //UNSAFE_componentWillReceiveProps
@@ -24,6 +25,10 @@ export default class Cluster extends PluginSuperClientside {
     */
 
     componentDidMount() {
+        this.getclusterinfo()
+    }
+
+    getclusterinfo() {
         request.get("/api/v4/cluster/info", {}, (err, res, info) => {
             this.setState({ info })
         })
@@ -35,9 +40,41 @@ export default class Cluster extends PluginSuperClientside {
 
     /** this will render on the /settings view */
     settings() {
+
+        var boxstyles = { background: "rgba(0,0,0,0.2)", padding: 10 }
+        var codestyles = { background: "rgba(0,0,0,0.2)", padding: 10, color: "rgb(25,255,60)" }
+
         return (
             <div>
-                <pre>{JSON.stringify(this.state.info)}</pre>
+
+
+                <button style={{ float: "right", marginRight: 20 }} onClick={() => {
+                    request.get("/api/v4/cluster/refresh", {}, (err, res, response) => {
+                        this.getclusterinfo();
+                    })
+                }} >
+                    <i className="fas fa-sync-alt" style={{ color: colors.public, opacity: 0.5, paddingRight: "10px" }} ></i> REFRESH
+                </button>
+
+                <div>
+                    Number of workers: {this.state.info.workers.length}
+                </div>
+
+                <div>
+                    {this.state.info.workers.map((worker, i) => {
+                        return <div key={i} > {worker.hostname} | {worker.pid} | {worker.updated} </div>
+                    })}
+                </div>
+
+
+                <div style={boxstyles}>
+                    <h3>RAW CLUSTER DATA:</h3>
+
+
+
+                    <CodeBlock language='json' value={JSON.stringify(this.state.info, null, 2)} />
+
+                </div>
             </div>
         );
     }

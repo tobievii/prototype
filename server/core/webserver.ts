@@ -152,7 +152,7 @@ export class Webserver extends EventEmitter {
         }
     }
 
-    listen() {
+    listen(cb?: any) {
 
         // ADD CATCH 404 INVALID PATHS AT THE END.
 
@@ -168,6 +168,7 @@ export class Webserver extends EventEmitter {
         if (!this.server) { console.error("http/s server not initialized"); return; }
         this.server.listen(this.port, () => {
             logger.log({ message: "webserver started", data: { port: this.port }, level: "info" })
+            if (cb) cb();
         });
     }
 

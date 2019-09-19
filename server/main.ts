@@ -160,7 +160,9 @@ if (cluster.isMaster) {
 
         }
 
-        webserver.listen();
+        webserver.listen(() => {
+            console.log("WORKER READY" + process.pid)
+        });
     });
 }
 

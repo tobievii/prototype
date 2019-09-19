@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
 import { request } from "../../client/src/utils/requestweb"
-
+import { CodeBlock } from "../../client/src/components/codeblock"
 /** TEMPLATE PLUGIN 
  * 
  * Remember to rename MyPlugin for your own plugin */
@@ -50,19 +50,17 @@ export default class MyPlugin extends PluginSuperClientside {
                 <div style={boxstyles}>
                     <h3>GET "/api/v4/myplugin/test"</h3>
 
-                    <pre style={codestyles}>
-                        {JSON.stringify(this.state.testone, null, 2)}
-                    </pre>
+                    <CodeBlock language='json' value={JSON.stringify(this.state.testone, null, 2)} />
                 </div>
 
                 <div style={boxstyles}>
                     <h3>POST "/api/v4/myplugin/sendtest"</h3>
 
-                    <pre style={codestyles}>
-                        {JSON.stringify(this.state.testtwo, null, 2)}
-                    </pre>
+                    <CodeBlock language='json' value={JSON.stringify(this.state.testtwo, null, 2)} />
                 </div>
-            </div>
+
+
+            </div >
         );
     }
 
