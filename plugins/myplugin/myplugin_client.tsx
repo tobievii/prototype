@@ -1,23 +1,68 @@
 import React, { Component } from 'react';
 import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
-
+import { request } from "../../client/src/utils/requestweb"
 
 /** TEMPLATE PLUGIN 
  * 
  * Remember to rename MyPlugin for your own plugin */
 export default class MyPlugin extends PluginSuperClientside {
     state = {
-        gateways: []
+        testone: undefined,
+        testtwo: undefined
     }
+
+    //UNSAFE_componentWillMount
+    //UNSAFE_componentWillReceiveProps
+    //UNSAFE_componentWillUpdate
+
+    /** new React 17.0 see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html    
+    static getDerivedStateFromProps(props,state) { return null; }
+    getSnapshotBeforeUpdate(prevProps, prevState) {}
+    */
 
     /** uncomment to override alternative views for settings/deviceview 
     render() {}
     */
 
+    componentDidMount() {
+        request.get("/api/v4/myplugin/test", {}, (err, res, serverresponse) => {
+            this.setState({ testone: serverresponse })
+        })
+
+        request.post("/api/v4/myplugin/sendtest", { json: { somedata: 123 } }, (err, res, serverresponse) => {
+            this.setState({ testtwo: serverresponse })
+        })
+    }
+
     /** this will render on the /settings view */
     settings() {
+
+        var boxstyles = { background: "rgba(0,0,0,0.2)", padding: 10 }
+        var codestyles = { background: "rgba(0,0,0,0.2)", padding: 10, color: "rgb(25,255,60)" }
+
         return (
-            <div>This is MyPlugin settings view</div>
+            <div>
+
+                <p>This is MyPlugin settings view.
+                    See <a href="https://github.com/IoT-nxt/prototype/tree/5.1/plugins/myplugin">/plugins/myplugin/myplugin_server.ts</a> for the serverside code.
+                    TODO add documentation on plugin development here.</p>
+
+                <div style={boxstyles}>
+                    <h3>GET "/api/v4/myplugin/test"</h3>
+
+                    <pre style={codestyles}>
+                        {JSON.stringify(this.state.testone, null, 2)}
+                    </pre>
+                </div>
+
+                <div style={boxstyles}>
+                    <h3>POST "/api/v4/myplugin/sendtest"</h3>
+
+                    <pre style={codestyles}>
+                        {JSON.stringify(this.state.testtwo, null, 2)}
+                    </pre>
+                </div>
+            </div>
         );
     }
 

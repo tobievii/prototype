@@ -18,7 +18,6 @@ export class Migration extends EventEmitter {
         this.db = options.documentstore.db;
         //logger.log({message:{msg:"Core constructor", options}, level:"info"})
 
-        console.log("Migration 5.0 to 5.1 helper: ")
         this.migrateDeviceStatesId(() => {
             this.migrateDeviceStateUsernames(() => {
                 this.migrateDeviceStateWidgets(() => {

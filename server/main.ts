@@ -13,7 +13,7 @@ import { Migration } from "./utils/migrate"
 
 import * as plugins from "../plugins/plugins_list_server"
 
-console.log(cfg.config)
+//console.log(cfg.config)
 
 logger.log({ message: "process start", level: "info" })
 
@@ -107,8 +107,10 @@ if (cluster.isMaster) {
 
 
     process.on('message', (msg) => {
-        logger.log({ message: "worker process recv", data: { msg }, level: "verbose" });
-        if (process) if (process.send) if (msg) process.send(msg);
+        console.log("process message")
+        console.log(msg);
+        // logger.log({ message: "worker process recv", data: { msg }, level: "verbose" });
+        // if (process) if (process.send) if (msg) process.send(msg);
     });
 
     documentstore.on("ready", () => {
@@ -157,8 +159,6 @@ if (cluster.isMaster) {
             }
 
         }
-
-
 
         webserver.listen();
     });

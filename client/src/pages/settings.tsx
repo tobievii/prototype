@@ -22,8 +22,6 @@ export class Settings extends React.Component<MyProps, MyState> {
 
     showpage(page) {
 
-
-
         if ((page == "account") || (page == undefined)) {
             return <Account />
         }
@@ -58,14 +56,25 @@ export class Settings extends React.Component<MyProps, MyState> {
 
     render() {
 
+
+        /** build the ADMIN menuitems list */
+        var adminMenuItems = []
+        if (api.data.account.admin) {
+            for (var pluginName of Object.keys(plugins).sort()) {
+                let test = new plugins[pluginName]
+                if (test.admin) { adminMenuItems.push({ text: pluginName.toUpperCase(), link: "/settings/" + pluginName, icon: "shield-alt" }) }
+            }
+        }
+
         /** build the plugins menuitems list */
         var pluginsMenuItems = []
-        for (var p of Object.keys(plugins).sort()) {
-            pluginsMenuItems.push({ text: p, link: "/settings/" + p, icon: "plug" })
+        for (var pluginName of Object.keys(plugins).sort()) {
+            let test = new plugins[pluginName]
+            if (!test.admin) pluginsMenuItems.push({ text: pluginName.toUpperCase(), link: "/settings/" + pluginName, icon: "cog" })
         }
 
         var settingsMenuItems = []
-        settingsMenuItems.push({ text: "account", link: "/settings/account", icon: "user-circle" })
+        settingsMenuItems.push({ text: "ACCOUNT", link: "/settings/account", icon: "user-circle" })
 
         return (
             <div className="apiInfo" style={{ padding: colors.padding * 2, display: "flex", flexDirection: "row" }} >
@@ -74,16 +83,13 @@ export class Settings extends React.Component<MyProps, MyState> {
 
                     {(api.data.account.admin) &&
                         <div>
-                            <h3>ADMIN AREA</h3>
+                            <MenuVertical active={this.props.page} menuitems={adminMenuItems} />
                         </div>
                     }
 
                     <div>
-                        <h3>SETTINGS</h3>
                         <MenuVertical active={this.props.page} menuitems={settingsMenuItems} />
-                    </div>
 
-                    <div><h3>PLUGINS</h3>
                         <MenuVertical active={this.props.page} menuitems={pluginsMenuItems} />
                     </div>
                 </div>

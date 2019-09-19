@@ -11,7 +11,6 @@ import { Menu2 } from "./menu_2";
 import * as plugins from '../../../plugins/plugins_list_ui'
 
 import { PopupWrap } from "./popups/popup_wrap"
-import { clone } from "../utils/lodash_alt";
 
 interface MyProps {
   username?: string;
@@ -138,24 +137,37 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
   render() {
 
+
+
     /** build the plugins menuitems list */
     var pluginsMenuItems = []
     for (var pluginName of Object.keys(plugins).sort()) {
-      pluginsMenuItems.push({
-        text: pluginName, icon: "plug", onClick: this.showPopup(pluginName) // if (this.state.pluginPopupsVisibility) {
-        //   console.log(this.state.pluginPopupsVisibility)
-        //   var pluginPopupsVisibility = clone(this.state.pluginPopupsVisibility)
-        //   // hide all
-        //   for (var p of Object.keys(pluginPopupsVisibility)) { pluginPopupsVisibility[p] = false }
-        //   // show this one
-        //   pluginPopupsVisibility[pluginName] = true;
-        //   this.setState({ pluginPopupsVisibility })
-        // }
-
-
-      })
+      let test = new plugins[pluginName]
+      if (!test.admin) {
+        pluginsMenuItems.push({ text: pluginName, icon: "plug", onClick: this.showPopup(pluginName) })
+      }
     }
 
+    var menuitems = [
+      { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
+      { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
+      { responsive: true, icon: "plug", text: "Plugins", onClick: () => { }, menuitems: pluginsMenuItems },
+      { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
+      { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
+      { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]
+
+    /** build the ADMIN menuitems list */
+    if (api.data.account.admin) {
+
+      var adminMenuItems = [];
+      for (var pluginName of Object.keys(plugins).sort()) {
+        let test = new plugins[pluginName]
+        if (test.admin) {
+          adminMenuItems.push({ text: pluginName, icon: "plug", onClick: this.showPopup(pluginName) })
+        }
+      }
+      menuitems.push({ responsive: true, icon: "plug", text: "Admin", onClick: () => { }, menuitems: adminMenuItems })
+    }
 
     if (this.state.state == undefined) {
       return <div style={{ padding: 20 }}></div>;
@@ -168,14 +180,7 @@ export class DeviceView extends React.Component<MyProps, MyState> {
           {(!this.state.hidecontrols) &&
             <div>
 
-              <Menu2 menuitems={[
-                { responsive: true, icon: "server", text: "Data", onClick: () => { this.setState({ showData: !this.state.showData }); } },
-                { responsive: true, icon: "code", text: "Code", onClick: () => { this.setState({ showEditor: !this.state.showEditor }); } },
-                { responsive: true, icon: "plug", text: "plugins", onClick: () => { }, menuitems: pluginsMenuItems },
-                { responsive: true, link: "/docs/websocket", icon: "share-alt", text: "Sharing", onClick: () => { } },
-                { responsive: true, link: "/docs/websocket", icon: "eraser", text: "Clear", onClick: () => { } },
-                { responsive: true, link: "/docs/mqtt", icon: "trash", text: "Delete", onClick: () => { } }]}
-              />
+              <Menu2 menuitems={menuitems} />
 
 
 

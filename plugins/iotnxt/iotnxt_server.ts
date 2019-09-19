@@ -56,9 +56,6 @@ export default class Iotnxt extends PluginSuperServerside {
         this.webserver.app.get("/api/v3/iotnxt/gateways", (req: any, res: any) => {
             this.getgateways({ user: req.user }, (err: Error, gateways: any) => {
 
-                console.log(gateways);
-                console.log("=============")
-
                 if (err) res.json({ err: err.toString() });
 
                 for (var g in gateways) {
@@ -74,12 +71,24 @@ export default class Iotnxt extends PluginSuperServerside {
                 GatewayId: req.body.GatewayId,
                 HostAddress: req.body.HostAddress
             }
-            this.setgatewaydevice(req.user, req.body.key, gateway, req.body.id, req.body.currentGateway, (err: Error, result: any) => {
-                res.json(result);
-            })
+            this.setgatewaydevice(req.user, req.body.key, gateway, req.body.id, req.body.currentGateway,
+                (err: Error, result: any) => {
+                    if (err) { res.json({ err: err.toString() }); return; }
+                    res.json(result);
+                })
         });
 
+        this.webserver.app.post("/api/v3/iotnxt/reconnectgateway", (req: any, res: any) => {
+            this.reconnectgateway({ gateway: req.body, user: req.user }, (err, result) => {
+                if (err) { res.json({ err: err.toString() }); return; }
+                res.json(result);
+            })
+        })
+    }
 
+    reconnectgateway(query: { gateway: GatewayType, user: User }, cb: any) {
+        var { gateway, user } = query;
+        logger.log({ message: "reconnect gateway " + gateway.GatewayId, level: "warn", group: "iotnxt" })
     }
 
     addgateway(query: { gateway: any, user: User }, cb: any) {

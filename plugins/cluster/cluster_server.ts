@@ -4,17 +4,12 @@ import { Webserver } from "../../server/core/webserver";
 import { DocumentStore } from "../../server/core/data";
 
 
-export default class MyPlugin extends PluginSuperServerside {
+export default class Cluster extends PluginSuperServerside {
     constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
         super(props);
 
-        this.webserver.app.get("/api/v4/myplugin/test", (req, res) => {
-            res.json({ test: "successful123!" })
-        })
-
-        this.webserver.app.post("/api/v4/myplugin/sendtest", (req, res) => {
-            console.log(req.body);
-            res.json({ test: "sendtestsuccess", recieved: req.body })
+        this.webserver.app.get("/api/v4/cluster/info", (req, res) => {
+            res.json({ workerpid: process.pid })
         })
     }
 };

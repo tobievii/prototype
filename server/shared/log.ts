@@ -24,7 +24,7 @@ class Logger {
   logverbosity: number;
 
   constructor() {
-    this.logverbosity = 1;
+    this.logverbosity = 0;
   }
 
   /**

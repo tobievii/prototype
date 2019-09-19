@@ -23,6 +23,10 @@ export default class Iotnxt extends PluginSuperClientside {
 
     constructor(props) {
         super(props);
+
+    }
+
+    componentDidMount() {
         this.loadServerGateways();
     }
 
@@ -39,11 +43,11 @@ export default class Iotnxt extends PluginSuperClientside {
     componentDidUpdate() { }
 
     loadServerGateways() {
-        console.log("requesting gateways...")
+        //console.log("requesting gateways...")
         request.get('/api/v3/iotnxt/gateways', {}, (err, res, body: GatewayType[]) => {
             if (err) console.log(err);
             if (body) {
-                console.log(body);
+                //console.log(body);
                 this.setState({ gateways: body });
             }
         })
@@ -79,7 +83,13 @@ export default class Iotnxt extends PluginSuperClientside {
         }
 
         if (action.reconnectGateway) {
-            console.log("Reconnecting " + action.reconnectGateway.GatewayId)
+            console.log("Reconnecting", action.reconnectGateway)
+
+            request.post("/api/v3/iotnxt/reconnectgateway", { json: action.reconnectGateway }, (err, res, result) => {
+                console.log([err, result])
+                if (result) { this.loadServerGateways() }
+                if (cb) cb();
+            })
         }
 
     }

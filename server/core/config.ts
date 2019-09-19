@@ -48,17 +48,15 @@ export class Config extends EventEmitter {
             // reads config file from base folder /iotconfig.json
             var readconfig: ConfigFile = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../iotconfig.json')).toString());
             if (readconfig) {
-                console.log("SUCCESSFULLY READ iotconfig.json")
-                console.log(JSON.stringify(readconfig, null, 2))
+                logger.log({ message: "success read iotconfig.json", level: "verbose", data: readconfig })
             } else {
-                console.log("COULD NOT READ iotconfig.json")
+                logger.log({ message: "could not read iotconfig.json", level: "error" })
             }
 
             cb(undefined, readconfig)
         }
         catch (err) {
-            logger.log({ message: "config " + err.toString(), level: "error" })
-            console.log("USING DEFAULT CONFIG")
+            logger.log({ message: "could not read iotconfig.json " + err.toString(), level: "error" })
             cb(err);
         }
     }

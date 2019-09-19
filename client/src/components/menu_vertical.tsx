@@ -39,21 +39,30 @@ export class MenuVertical extends React.Component<MenuProps, MenuState> {
         align: "left"
     }
 
+    static getDerivedStateFromProps(props, state) {
 
-    componentWillMount = () => {
+        var newstate: any = {}
 
-        if (this.props.align) { this.setState({ align: this.props.align }) }
+        if (props.align) { newstate.align = props.align }
 
-        if (this.props.active) {
-            for (var m in this.props.menuitems) {
-                if (this.props.menuitems[m].text.toLowerCase().indexOf(this.props.active.toLowerCase()) >= 0) {
-                    console.log("found active")
-                    this.setState({ active: m, useLinks: true })
-                    //this.props.menuitems[m].onClick();
+        if (props.active) {
+            if (props.menuitems) {
+                for (var m in props.menuitems) {
+                    if (props.menuitems[m].text.toLowerCase().indexOf(props.active.toLowerCase()) >= 0) {
+                        newstate.active = m;
+                        newstate.useLinks = true;
+                    }
                 }
             }
         }
+
+        return newstate;
     }
+
+
+
+
+
 
     drawbutton = (icon, size, item) => {
         return <span><i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}</span>
