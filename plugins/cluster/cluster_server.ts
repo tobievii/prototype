@@ -54,7 +54,8 @@ export default class Cluster extends PluginSuperServerside {
         var worker = {
             hostname: hostname(),
             pid: process.pid,
-            updated: new Date()
+            updated: new Date(),
+            state: this.core.clusterstate
         }
 
         var workerupdate = {
@@ -90,9 +91,5 @@ export default class Cluster extends PluginSuperServerside {
             })
         })
     }
-
-
-
-
 };
 

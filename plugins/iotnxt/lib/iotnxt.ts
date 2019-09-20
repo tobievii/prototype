@@ -6,7 +6,7 @@ import { generateDifficult } from "../../../server/utils/utils";
 import { Gateway, GatewayType } from "../lib/gateway"
 import { User } from "../../../server/shared/interfaces";
 import { logger } from "../../../server/shared/log";
-import { userInfo } from "os";
+import { hostname } from "os";
 
 export class IotnxtCore extends PluginSuperServerside {
     name = "iotnxt";
@@ -107,14 +107,12 @@ export class IotnxtCore extends PluginSuperServerside {
                 var gatewayConnection = new Gateway(gateway, this.documentstore.db)
 
                 gatewayConnection.on("connected", () => {
-                    var instance_id = "0";
-                    if (process.env.pm_id) {
-                        instance_id = process.env.pm_id
-                    }
                     var update = {
                         unique: gateway.unique,
                         connected: true,
-                        instance_id,
+                        instance_id: process.pid,
+                        hostname: hostname(),
+                        lastactive: new Date(),
                         _connected_last: new Date()
                     }
                     this.updateGatewayDB(gateway.unique, update, () => { })

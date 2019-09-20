@@ -20,12 +20,19 @@ export class Core extends EventEmitter {
     db: any;
     salt: string = "nsajkdnasjkdnjkasd";
     config: any;
+    clusterstate: any = {};
 
     constructor(options: { documentstore: DocumentStore, config: any }) {
         super();
         this.db = options.documentstore.db;
         this.config = options.config;
         //logger.log({message:{msg:"Core constructor", options}, level:"info"})
+    }
+
+    /** used by plugins to coordinate state across clusters */
+    setState(datain: any) {
+        this.clusterstate = { ...this.clusterstate, ...datain };
+        this.emit("clusterstate", { state: this.clusterstate, change: datain })
     }
 
     register(options: { email: string, pass: string, username?: string, ip?: string, userAgent?: string }, cb?: (err: Error | undefined, result?: any) => void) {

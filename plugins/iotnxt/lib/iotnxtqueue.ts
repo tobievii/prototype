@@ -29,7 +29,12 @@ export interface GatewayType {
   "_created_on": Date
   "_created_by": any
   "error": any
+  /** the process.pid of the worker thread connected to this gateway */
   "instance_id": any
+  /** the hostname of the cluster machine connected to this gateway */
+  hostname: string
+  /** the timestamp this connection was last active */
+  lastactive: Date
 }
 
 export class IotnxtQueue extends events.EventEmitter {

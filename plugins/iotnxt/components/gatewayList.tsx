@@ -191,12 +191,12 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
                   {/* CONNECTED */}
                   <div style={{ flex: 1 }}>
-                    <span title={gateway["lastactive"]}>{moment(gateway["lastactive"]).fromNow()}</span>
+                    <span title={gateway["lastactive"].toString()}>{moment(gateway["lastactive"]).fromNow()}</span>
                   </div>
 
                   {/* CLUSTER */}
                   <div style={{ flex: 1 }}>
-                    {gateway.instance_id}
+                    {gateway.hostname} - {gateway.instance_id}
                   </div>
 
                   <div style={{ flex: 1 }}>
