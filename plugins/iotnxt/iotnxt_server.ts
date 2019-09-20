@@ -4,16 +4,16 @@ import { Webserver } from "../../server/core/webserver";
 import { DocumentStore } from "../../server/core/data";
 import { generateDifficult } from "../../server/utils/utils";
 import { Gateway, GatewayType } from "./lib/gateway"
-import { User } from "../../server/shared/interfaces";
+import { User, DBchange, CorePacket } from "../../server/shared/interfaces";
 import { logger } from "../../server/shared/log";
-import { userInfo } from "os";
-
+import { hostname } from "os";
 import { IotnxtCore } from "./lib/iotnxt"
 
 export default class Iotnxt extends PluginSuperServerside {
 
     iotnxt: IotnxtCore;
 
+    checker: NodeJS.Timeout;
 
     constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
         super(props);
@@ -57,10 +57,57 @@ export default class Iotnxt extends PluginSuperServerside {
                 res.json(result);
             })
         })
+
+        // stagger checking to avoid race conditions.. mostly.
+        this.checker = setInterval(() => {
+            this.iotnxt.connectIdleGatewayCluster((err: Error, result: any) => {
+                console.log("=== ?")
+            })
+        }, 1500 + Math.round(Math.random() * 1500))
+
+        ///////////////////////////////////////////////////////////////////////////
+
+
+        /** This is the main funnel of data into plugin to send on to iotnxt. We listen to packet data on the db, and process it on if needed. */
+        this.documentstore.on("packets", (data: DBchange) => {
+            if (data.fullDocument) { this.checkDBPacketForAction(data.fullDocument) }
+        })
+
+        /** Below not needed, just here for documentation of the system */
+        // update client that packets has changed
+        // this.documentstore.on("states", (data: DBchange) => {
+        //     //console.log("iotnxt plugin states event")
+        //     //console.log(data);
+        // })
+
+        // // update client that account has changed
+        // this.documentstore.on("users", (data: DBchange) => {
+        //     //console.log("iotnxt plugin users event")
+        // })
+
+
+        /////////////////////////////////////////////////////////////////////////////
     }
 
 
+    /** Checks if a packet that we need to send to a connected gateway connection. 
+     * Checks if we are connected to the gateway that we need to send this on.
+     */
+    checkDBPacketForAction(packet: CorePacket) {
+        if (packet.state) {
+            if (packet.state["plugins_iotnxt_gateway"]) {
+                if (packet.data) {
+                    this.iotnxt.areWeConnectedToGateway(packet.state["plugins_iotnxt_gateway"], (nope: any, gateway: Gateway) => {
+                        if (gateway) {
+                            logger.log({ group: "iotnxt", message: hostname() + " " + process.pid + " is sending packet to " + packet.state["plugins_iotnxt_gateway"].GatewayId, level: "verbose" })
+                            gateway.handlePacket(packet)
+                        }
+                    })
+                }
 
+            }
+        }
+    }
 
 };
 

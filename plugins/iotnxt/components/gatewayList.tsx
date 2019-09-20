@@ -18,14 +18,18 @@ interface GatewayListState {
   showDelete: boolean
   /** The gateway of concern for the delete popup */
   showDeleteGateway: GatewayType
+  redraw: any
 }
 
 export class GatewayList extends React.Component<GatewayListProps, GatewayListState>{
   state = {
     showDelete: false,
-    showDeleteGateway: undefined
+    showDeleteGateway: undefined,
+    redraw: 1
   };
 
+  redraw;
+  update;
 
   componentWillMount = () => {
 
@@ -47,6 +51,18 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
     this.props.action({ delete: { gateway } })
   };
 
+  componentWillUnmount() {
+    clearInterval(this.redraw);
+  }
+
+  componentDidMount = () => {
+    // trick to force redrawing for timestamp updates
+    this.redraw = setInterval(() => {
+      this.setState({ redraw: Math.random() })
+    }, 1000)
+
+
+  }
 
   renderDelete = (gateway) => {
 
@@ -114,7 +130,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
               <div style={{ flex: "1" }}>GatewayId</div>
               <div style={{ flex: "1" }}>ENV</div>
-              <div style={{ flex: "1" }}>CONNECTED</div>
+              <div style={{ flex: "1" }}>ACTIVITY</div>
               <div style={{ flex: "1" }}>CLUSTER</div>
               <div style={{ flex: "1" }}>OPTIONS</div>
             </div>
@@ -175,7 +191,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
                   {/* CONNECTED */}
                   <div style={{ flex: 1 }}>
-                    <span title={gateway["_connected_last"]}>{moment(gateway["_connected_last"]).fromNow()}</span>
+                    <span title={gateway["lastactive"]}>{moment(gateway["lastactive"]).fromNow()}</span>
                   </div>
 
                   {/* CLUSTER */}

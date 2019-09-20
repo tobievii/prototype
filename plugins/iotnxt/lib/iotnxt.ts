@@ -16,9 +16,25 @@ export class IotnxtCore extends PluginSuperServerside {
         super(props);
     }
 
+
+    /* are we connected to this gateway now? on this cluster node */
+    areWeConnectedToGateway(gatewayToCheck: GatewayType, cb: any) {
+        var found = false;
+        for (var gateway of this.gateways) {
+            if ((gateway.GatewayId == gatewayToCheck.GatewayId) &&
+                (gateway.HostAddress == gatewayToCheck.HostAddress)) {
+                found = true;
+                cb(undefined, gateway);
+            }
+        }
+        if (found == false) { cb({ notfound: true }) }
+    }
+
     reconnectgateway(query: { gateway: GatewayType, user: User }, cb: any) {
         var { gateway, user } = query;
         logger.log({ message: "reconnect gateway " + gateway.GatewayId, level: "warn", group: "iotnxt" })
+
+        this.connectGateway(query.gateway);
     }
 
     addgateway(query: { gateway: any, user: User }, cb: any) {
@@ -43,6 +59,7 @@ export class IotnxtCore extends PluginSuperServerside {
                 gateway.unique = generateDifficult(64);
                 gateway.type = "gateway"
                 gateway.updated = new Date();
+                gateway.usepublickey = true;
                 gateway["_created_on"] = new Date();
                 gateway["_created_by"] = { publickey: user["publickey"] };
                 this.documentstore.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
@@ -73,94 +90,57 @@ export class IotnxtCore extends PluginSuperServerside {
     getgateways(query: { user: User }, cb: any) {
         var { user } = query;
         var dbquery: any = { type: "gateway" }
-        console.log("asdf")
         if (!user.admin) { dbquery["_created_by.publickey"] = query.user.publickey }
-        console.log(dbquery);
         this.documentstore.db.plugins_iotnxt.find(dbquery, cb);
     }
 
-    connectGateway(gateway: GatewayType) {
 
+    connectGateway(gatewaytoconnect: GatewayType) {
+        console.log(process.pid + " is attempting to connect " + gatewaytoconnect.GatewayId)
+        logger.log({ group: this.name, message: gatewaytoconnect.GatewayId + "connecting... ", data: { GatewayId: gatewaytoconnect.GatewayId }, level: "verbose" })
 
+        this.documentstore.db.plugins_iotnxt.findOne({ unique: gatewaytoconnect.unique }, (e, gateway) => {
 
-        logger.log({ group: this.name, message: gateway.GatewayId + "connecting... ", data: { GatewayId: gateway.GatewayId }, level: "verbose" })
+            if (gateway) {
+                //////
+                /** We have to pass in the db for it to calculate the registration tree structure.. I know. It sucks. */
+                var gatewayConnection = new Gateway(gateway, this.documentstore.db)
 
-        // this.eventHub.emit("plugin", {
-        //     plugin: this.name,
-        //     event: {
-        //         type: "gatewayUpdate",
-        //         gateway: {
-        //             unique: gateway.unique,
-        //             connected: "connecting"
-        //         }
-        //     }
-        // })
+                gatewayConnection.on("connected", () => {
+                    var instance_id = "0";
+                    if (process.env.pm_id) {
+                        instance_id = process.env.pm_id
+                    }
+                    var update = {
+                        unique: gateway.unique,
+                        connected: true,
+                        instance_id,
+                        _connected_last: new Date()
+                    }
+                    this.updateGatewayDB(gateway.unique, update, () => { })
+                })
+                //
 
-        //this.calculateGatewayTree(gateway);
+                // handling incoming requests from commander/portal
+                gatewayConnection.on("request", (request: any) => {
+                    console.log("iotnxt incoming request!!!! TODO unhandled in 5.1")
+                })
 
-        /** We have to pass in the db for it to calculate the registration tree structure.. I know. It sucks. */
-        var gatewayConnection = new Gateway(gateway, this.documentstore.db)
-        //
-        gatewayConnection.on("connected", () => {
-            var instance_id = "0";
-            if (process.env.pm_id) {
-                instance_id = process.env.pm_id
+                // error
+                gatewayConnection.on("error", (error) => {
+                    console.log(error);
+                })
+
+                /** add this gateway connection to our list of connected gateways */
+                this.gateways.push(gatewayConnection);
+
+                //////
+            } else {
+                logger.log({ group: "iotnxt", message: "error finding gateway from db", level: "error" })
             }
-            var update = {
-                unique: gateway.unique,
-                connected: true,
-                instance_id,
-                _connected_last: new Date()
-            }
-            this.updateGatewayDB(gateway.unique, update, () => { })
-
-            // this.eventHub.emit("plugin", {
-            //     plugin: this.name,
-            //     event: {
-            //         type: "gatewayUpdate",
-            //         gateway: update
-            //     }
-            // })
-
-            // if we're part of a cluster subscribe to cluster events for this gateway
-            // if (this.isCluster) {
-            //     this.ev.on('iotnxtevents:' + gateway.HostAddress + '|' + gateway.GatewayId, (data: any) => {
-            //         // console.log("IOTNXT CLUSTER RECIEVED GATEWAY PACKET")
-            //         // console.log(data);
-            //         // console.log("RECIEVED AT:" + new Date().toISOString())
-            //         this.handlePacket(data.deviceState, data.packet, () => { })
-            //     });
-            // }
-
-        })
-        //
-
-        // handling incoming requests from commander/portal
-        gatewayConnection.on("request", (request: any) => {
-            console.log("iotnxt incoming request!!!! TODO unhandled in 5.1")
-            //this.eventHub.emit("device", request);
         })
 
-        // error
-        gatewayConnection.on("error", (error) => {
-            var update = {
-                unique: gateway.unique,
-                connected: "error",
-                error
-            }
 
-            this.updateGatewayDB(gateway.unique, update, () => { })
-            // this.eventHub.emit("plugin", {
-            //     plugin: this.name,
-            //     event: {
-            //         type: "gatewayUpdate",
-            //         gateway: update
-            //     }
-            // })
-        })
-
-        this.gateways.push(gatewayConnection);
-        //
     }
 
 
@@ -220,6 +200,24 @@ export class IotnxtCore extends PluginSuperServerside {
             })
     }
 
+    /** this function runs automatically on the node every x time, it finds an inactive gateway and attempts to connect to it. */
+    connectIdleGatewayCluster(cb) {
+        //     //var time = 24 * 60 * 60 * 1000 * days;
+        //     var time = 1000 * 60;
+
+        //     this.documentstore.db.plugins_iotnxt.findAndModify(
+        //         {
+        //             query: {
+        //                 "$or": [
+        //                     { lastactive: undefined },
+        //                     { lastactive: { $lt: new Date(Date.now() - time) } }]
+        //             },
+        //             update: { "$set": { lastactive: new Date(), connected: "connecting" } }
+        //         }, (err, gateway, lasterror) => {
+        //             // for now we assume this gateway is unconnected.
+        //             if (gateway) { this.connectGateway(gateway); }
+        //         })
+    }
 
 };
 

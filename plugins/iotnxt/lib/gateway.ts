@@ -20,6 +20,8 @@ export interface GatewayType {
   "_created_on": Date,
   "_created_by": any,
   "error": any
+  /** new 5.1 use device publickey instead of user apikey. default on new gateways. */
+  usepublickey: boolean
 }
 
 export class Gateway extends EventEmitter {
@@ -40,10 +42,15 @@ export class Gateway extends EventEmitter {
     this.gateway = gateway;
     this.deviceTree = {}
 
+    logger.log({ group: "iotnxt_gateway", message: "Gateway calc tree", level: "verbose" })
     this.calculateGatewayTree((e: Error, deviceTree: object) => {
+      logger.log({ group: "iotnxt_gateway", message: "got tree", level: "verbose" })
+      console.log(deviceTree);
       if (deviceTree) {
         this.deviceTree = deviceTree;
+        logger.log({ group: "iotnxt_gateway", message: "connect", level: "verbose" })
         this.connect(deviceTree, (err: Error, queue: any) => {
+          logger.log({ group: "iotnxt_gateway", message: "connected", level: "verbose" })
           this.emit("connected")
         });
       }
@@ -54,12 +61,7 @@ export class Gateway extends EventEmitter {
 
   /* find devices and calculate their equivalent tree for compatibility with iotnxt portal */
   calculateGatewayTree(cb: Function) {
-    this.db.states.find({
-      "plugins_iotnxt_gateway": {
-        GatewayId: this.gateway.GatewayId,
-        HostAddress: this.gateway.HostAddress
-      }
-    }, (err: Error, devices: any[]) => {
+    this.db.states.find({ "plugins_iotnxt_gateway": { GatewayId: this.gateway.GatewayId, HostAddress: this.gateway.HostAddress } }, (err: Error, devices: any[]) => {
 
 
       if (devices == null) {
@@ -68,7 +70,7 @@ export class Gateway extends EventEmitter {
         var deviceTree: any = {};
 
         for (var device of devices) {
-          var flatdata = recursiveFlat(device.payload.data);
+          var flatdata = recursiveFlat(device.data);
           var Properties: any = {};
           for (var key in flatdata) {
             if (flatdata.hasOwnProperty(key)) {
@@ -79,12 +81,21 @@ export class Gateway extends EventEmitter {
             }
           }
 
-          var Route = (device.apikey + "|1:" + device.devid + "|1").toUpperCase();
+          if (this.gateway.usepublickey) {
+
+          } else {
+
+          }
+
+          // new 5.1 switch to using publickey for new gateways.
+          var Route = (this.gateway.usepublickey) ? (device.publickey + "|1:" + device.id + "|1").toUpperCase()
+            : (device.apikey + "|1:" + device.id + "|1").toUpperCase();
+
           deviceTree[Route] = {
             Make: null,
             Model: null,
             DeviceName: Route,
-            DeviceType: device.devid,
+            DeviceType: device.id,
             Properties: Properties
           };
         }
@@ -96,13 +107,17 @@ export class Gateway extends EventEmitter {
   }
 
   connect(deviceTree: any, cb: Function) {
+
+    console.log("--------------")
+    console.log(this.gateway);
+
     this.iotnxtqueue = new iotnxt.IotnxtQueue(
       {
         GatewayId: this.gateway.GatewayId,
         secretkey: this.gateway.Secret,
         FirmwareVersion: version.version,
         Make: "PROTOTYPE",
-        Model: version.description,
+        Model: version.version,
         publickey: this.gateway.PublicKey,
         hostaddress: this.gateway.HostAddress
       }, deviceTree, true);
@@ -147,30 +162,22 @@ export class Gateway extends EventEmitter {
 
   }
 
-
-  handlePacket(deviceState: any, packet: any) {
+  /** takes in a packet and sends it to iotnxt, will also register endpoints if needed */
+  handlePacket(packet: any) {
     if (!this.iotnxtqueue) return;
-    //calculate new device tree;
-    //console.log("calculate new device tree")
     this.calculateGatewayTree((e: Error, deviceTree: object) => {
       if (deviceTree) {
-        // any new endpoints?
         var diff = difference(deviceTree, this.deviceTree)
         if (_.isEmpty(diff)) {
-          //console.log("no need to register new endpoints");
           this.updateDevicePublish(packet);
         } else {
-          //console.log("need to register new endpoints");
-          // register endpoints
           if (!this.iotnxtqueue) return;
-
           this.iotnxtqueue.registerEndpoints(deviceTree, (e: Error, result: any) => {
             if (result) {
               this.deviceTree = deviceTree;
               this.updateDevicePublish(packet);
             }
           })
-          // updateDevicePublish
         }
       }
     });
@@ -183,11 +190,13 @@ export class Gateway extends EventEmitter {
   updateDevicePublish(packet: any) {
     if (!this.iotnxtqueue) return;
 
-    var Route = (packet.apikey + "|1:" + packet.devid + "|1").toUpperCase();
+    var Route = (this.gateway.usepublickey) ? (packet.publickey + "|1:" + packet.devid + "|1").toUpperCase() : (packet.apikey + "|1:" + packet.devid + "|1").toUpperCase();
 
     this.iotnxtqueue.clearState();
 
-    var flatdata = recursiveFlat(packet.payload.data);
+    if (!packet.data) { return; }
+
+    var flatdata = recursiveFlat(packet.data);
     for (var propertyName in flatdata) {
       if (flatdata.hasOwnProperty(propertyName)) {
         if (typeof flatdata[propertyName] == "object") {

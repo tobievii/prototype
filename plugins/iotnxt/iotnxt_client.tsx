@@ -26,8 +26,17 @@ export default class Iotnxt extends PluginSuperClientside {
 
     }
 
+    poll;
+
     componentDidMount() {
         this.loadServerGateways();
+        this.poll = setInterval(() => {
+            this.loadServerGateways();
+        }, 60000)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.poll);
     }
 
     //UNSAFE_componentWillMount

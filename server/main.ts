@@ -12,15 +12,18 @@ import { cfg } from "./core/config"
 import { Migration } from "./utils/migrate"
 
 import * as plugins from "../plugins/plugins_list_server"
-
+import { hostname } from "os"
 //console.log(cfg.config)
+
+require('source-map-support').install();
 
 logger.log({ message: "process start", level: "info" })
 
 // todo:
 // ssl certs
 
-// todo switch back to cpu length for production
+/** todo switch back to cpu length for production */
+
 const numCPUs = require('os').cpus().length;
 //const numCPUs = 1;
 
@@ -82,7 +85,7 @@ if (cluster.isMaster) {
 
             core = new Core({ documentstore, config: cfg.config })
 
-            var replserver = repl.start(">");
+            var replserver = repl.start("");
             replserver.context.state = state;
             replserver.context.api = core;
 
@@ -119,8 +122,10 @@ if (cluster.isMaster) {
         webserver = new Webserver({ core, config: cfg.config });
 
         if (webserver.server) socketserver = new SocketServer({ server: webserver.server, core });
-        mqttserver = new MQTTServer({ core })
 
+        ///////////////////////////////////////////////////////////////////
+
+        mqttserver = new MQTTServer({ core })
 
 
         // update client that packets has changed
@@ -147,6 +152,7 @@ if (cluster.isMaster) {
                 mqttserver.emit("users", data.fullDocument);
             }
         })
+        ///////////////////////////////////////////////////////////////////
 
         var pluginprops = { core, documentstore, webserver }
 
@@ -161,7 +167,7 @@ if (cluster.isMaster) {
         }
 
         webserver.listen(() => {
-            console.log("WORKER READY" + process.pid)
+            logger.log({ message: "worker pid " + process.pid + " on " + hostname() + " ready", level: "info" })
         });
     });
 }

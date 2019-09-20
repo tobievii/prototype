@@ -240,7 +240,7 @@ export class Core extends EventEmitter {
         }
 
         // key is upper/lower case mixed for security
-        console.log(options);
+        //console.log(options);
         //device / user?
         if ((options.packet) && (options.user)) {
             const { packet, user } = options;
@@ -275,7 +275,6 @@ export class Core extends EventEmitter {
 
             if (packet.key) { finddevicequery = { user, key: packet.key } }
 
-            console.log("----")
             this.state(finddevicequery, (err: any, statedb: any) => {
                 if (err) { if (cb) cb({ error: "db error" }); return; }
 
@@ -328,10 +327,17 @@ export class Core extends EventEmitter {
 
                     // todo: if incoming packet has key, then do not merge.
                     // or if { merged: false } 
+                    delete state["id"]
+
+                    // idea: possibly store previous state into packet aswell so we have both the before and after in each packet?
+
                     var stateMerged = _.merge(state, processedPacket);
-                    console.log(processedPacket)
+                    if (processedPacket == undefined) { console.log("ERROR packet undefined after workflow!"); return; }
+                    delete processedPacket["id"]
+
+                    // store merged state with packet.
+                    processedPacket["state"] = stateMerged;
                     this.db.packets.save(processedPacket, (err: any, result: any) => {
-                        delete stateMerged["_id"]
                         this.db.states.update({ key: stateMerged.key }, stateMerged, { upsert: true }, (err1: any, result1: any) => {
                             if (err1) { console.log(err1) }
                             if (result1) {

@@ -56,7 +56,7 @@ export class DocumentStore extends EventEmitter {
                 })
 
                 mongoose.connection.collection("states").watch().on("change", (change) => {
-                    console.log("======= STATES CHANGE!")
+                    //console.log("======= STATES CHANGE!")
                     //console.log(change);
                     //logger.log({ message: "db change", data: { change }, level: "verbose" });
                     if (change.fullDocument) {
