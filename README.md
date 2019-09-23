@@ -1,3 +1,52 @@
+# PROTOTYPE 5.1 BETA
+
+After a mayor refactor from 5.0 to 5.1 we are now entering dev testing and QA.   
+This should last until end of October 2019 giving us one month of polish and testing   
+before production release to `master` branch.
+
+# Todo
+
+* test on dev server ( prototype.dev.iotnxt.io )
+* make sure all tests pass on v3 and v4 api.
+
+# Getting started
+
+Ideally you should run your own instance, but if that is not an option or you just want to give it a try you can use our live server(s):
+
+Production: https://prototype.iotnxt.io   
+development: https://prototype.dev.iotnxt.io
+
+
+# Running your own instance:
+
+Ideally run linux. Ubuntu does fine.
+
+https://www.pluralsight.com/guides/typescript-react-getting-started   
+
+## 5.0 to 5.1 Migration notes:
+
+We now rely on mongodb change streams https://pusher.com/tutorials/mongodb-change-streams instead of redis. This is not set in stone, and dependant on 5.1 beta phase tests. To get change streams to work you have to set mongo into replica/sharded mode:
+
+```
+mongod --replSet "rs"
+mongo
+rs.initiate()
+```
+
+You might notice that database object format has also changed and is now more consistent between the API and the storage format. You might experience workflow scripts need to migrate to the new data structure:
+
+```js
+// instead of:
+state.payload.data
+// now:
+state.data
+```
+
+Also `data` is optional on incoming packets.
+
+
+
+
 ![alt text](https://i.imgur.com/FpnXB3n.png)
 
 Live: https://prototype.iotnxt.io  
@@ -65,7 +114,13 @@ npm run build       # or build for production
 ## _Step 3_ **_Run the backend server_**
 
 ```sh
-cd build
+npm run watchserver
+```
+
+or
+
+```sh
+cd build/server
 node main.js        # runs the server
 
 # or even better, auto restart on file changes:
@@ -542,3 +597,10 @@ sudo journalctl -u prototype -f
 
 source: https://www.axllent.org/docs/view/nodejs-service-with-systemd/
 
+
+## 5.1 BETA Service worker build:
+
+```
+cd client
+npm run buildsw
+```
