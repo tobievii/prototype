@@ -227,11 +227,7 @@ export class IotnxtCore extends PluginSuperServerside {
 
         this.documentstore.db.plugins_iotnxt.findAndModify(
             {
-                query: {
-                    "$or": [
-                        { connected: false },
-                        { lastactive: { $lt: new Date(Date.now() - time) } }]
-                },
+                query: { connected: false },
                 update: { "$set": { lastactive: new Date(), connected: "connecting", hostname: hostname(), instance_id: process.pid } }
             }, (err: Error, gateway: GatewayType, lasterror: any) => {
                 // for now we assume this gateway is unconnected.
