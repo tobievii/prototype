@@ -63,6 +63,7 @@ export class IotnxtQueue extends events.EventEmitter {
   exponent: string = "";
   AES: any = {};
 
+  mqttGreen: mqtt.MqttClient | any;
   mqttRed: mqtt.MqttClient | any;
 
   constructor(config: any, Devices: any, force: boolean) {
@@ -79,8 +80,6 @@ export class IotnxtQueue extends events.EventEmitter {
       this.Location = config.Location;
     }
 
-    console.log("=======")
-    console.log(config);
     this.secretkey = config.secretkey
 
     this.modulus = config.publickey.split("<").join(',').split(">").join(',').split(',')[8];
@@ -105,15 +104,11 @@ export class IotnxtQueue extends events.EventEmitter {
             if (result) {
               this.register((err: Error, result: any) => {
 
-                //console.log("subscribe to routingkeybase")
-                //console.log(this.secret.RoutingKeyBase);
-                console.log(this.secret);
                 this.mqttRed.subscribe(this.secret.RoutingKeyBase + ".REQ", (err: Error) => {
                   if (err) console.log(err);
                 });
 
                 this.mqttRed.on('message', (topic: any, message: any) => {
-                  console.log("!!!!!!!!!!")
                   var json = JSON.parse(message.toString());
                   var payload = JSON.parse(Buffer.from(json.Payload, "base64").toString());
                   this.emit('request', payload);
@@ -131,6 +126,11 @@ export class IotnxtQueue extends events.EventEmitter {
 
   }
 
+  disconnect = () => {
+    logger.log({ group: "iotnxtqueue", level: "verbose", message: "disconnect gateway" + this.GatewayId })
+    this.mqttGreen.end();
+    this.mqttRed.end();
+  }
 
   /* ################################################################################## */
 
@@ -147,26 +147,29 @@ export class IotnxtQueue extends events.EventEmitter {
 
     var replyKey = "MessageAuthNotify.".toUpperCase() + getGUID().toUpperCase();
     var mqttGreen = mqtt.connect(mqttcfg.protocol + this.hostaddress + mqttcfg.port, greenOptions);
+    this.mqttGreen = mqttGreen;
 
     mqttGreen.on('error', (err: any) => {
       //log("IOTNXT [" + this.GatewayId + "] GREEN ERROR");
       //log(err);
-
       logger.log({ group: "iotnxt_queue", message: this.GatewayId + " greenQ error " + err, level: "error" })
-
       mqttGreen.end();
       cb(err, undefined);
     })
-    mqttGreen.on("offline", (err: any) => {
 
+    mqttGreen.on("offline", (err: any) => {
       logger.log({ group: "iotnxt_queue", message: this.GatewayId + " greenQ offline " + err, level: "error" })
       mqttGreen.end();
       cb(err, undefined);
     })
+
     mqttGreen.on("close", (err: any) => {
-      logger.log({ group: "iotnxt_queue", message: this.GatewayId + " greenQ close " + err, level: "error" })
+      if (err) {
+        logger.log({ group: "iotnxt_queue", message: this.GatewayId + " greenQ close " + err, level: "error" })
+
+        cb(err, undefined);
+      }
       mqttGreen.end();
-      cb(err, undefined);
     })
 
 
@@ -186,7 +189,6 @@ export class IotnxtQueue extends events.EventEmitter {
             Headers: {}
           }
 
-          console.log(messageAuthRequest);
 
           var cipher = createCipheriv(this.AES);
           var textBuffer = Buffer.from(JSON.stringify(messageAuthRequest));
@@ -212,7 +214,6 @@ export class IotnxtQueue extends events.EventEmitter {
             ReplyKey: replyKey.toUpperCase()
           }
 
-          console.log(wrappedMessage)
 
           mqttGreen.publish("MESSAGEAUTHREQUEST", JSON.stringify(wrappedMessage), { qos: 1 }, (err: any) => {
             logger.log({ group: "iotnxt_queue", message: this.GatewayId + " greenQ published success", level: "verbose" })
@@ -232,8 +233,6 @@ export class IotnxtQueue extends events.EventEmitter {
       var decipher = createDecipheriv(this.AES);
       var result = Buffer.concat([decipher.update(payload), decipher.final()]);
       var secret = JSON.parse(result.toString());
-
-      console.log(secret);
 
       if (secret.success == false) {
         console.log(this.GatewayId);

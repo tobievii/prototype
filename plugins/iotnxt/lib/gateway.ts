@@ -49,7 +49,6 @@ export class Gateway extends EventEmitter {
     logger.log({ group: "iotnxt_gateway", message: "Gateway calc tree", level: "verbose" })
     this.calculateGatewayTree((e: Error, deviceTree: object) => {
       logger.log({ group: "iotnxt_gateway", message: "got tree", level: "verbose" })
-      console.log(deviceTree);
       if (deviceTree) {
         this.deviceTree = deviceTree;
         logger.log({ group: "iotnxt_gateway", message: "connect", level: "verbose" })
@@ -62,6 +61,9 @@ export class Gateway extends EventEmitter {
 
   }
 
+  disconnect() {
+    if (this.iotnxtqueue) this.iotnxtqueue.disconnect();
+  }
 
   /* find devices and calculate their equivalent tree for compatibility with iotnxt portal */
   calculateGatewayTree(cb: Function) {
@@ -111,10 +113,6 @@ export class Gateway extends EventEmitter {
   }
 
   connect(deviceTree: any, cb: Function) {
-
-    console.log("--------------")
-    console.log(this.gateway);
-
     this.iotnxtqueue = new iotnxt.IotnxtQueue(
       {
         GatewayId: this.gateway.GatewayId,

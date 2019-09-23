@@ -20,8 +20,8 @@ export const logger:any = createLogger({
 */
 
 class Logger {
-
   logverbosity: number;
+  showdata: boolean = false;
 
   constructor() {
     this.logverbosity = 1;
@@ -36,36 +36,30 @@ class Logger {
     if (event.message) {
       var tabs = "\t"
       if (event.message.length < 10) { tabs = "\t\t" }
+
       var data = "";
-      if (event.data) { data = JSON.stringify(event.data) }
+      if (this.showdata) {
+        if (event.data) { data = JSON.stringify(event.data) }
+      }
 
       var leveltabs = "\t"
       if (event.level.length <= 5) {
         leveltabs = "\t\t"
       }
 
-      if (this.logverbosity == 1) {
-        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message);
+
+      if (process) {
+        console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
+      } else {
+        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
       }
 
-      if (this.logverbosity == 2) {
-        if (process.pid) {
-          console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
-        } else {
-          console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
-        }
-      }
-
-
-
-
-      //+JSON.stringify(event.message.msg))
-    } else {
-      console.log("ERROR invalid log format...")
     }
-
   }
+
 }
+
+
 
 
 export const logger = new Logger();

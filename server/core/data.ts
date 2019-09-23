@@ -74,6 +74,11 @@ export class DocumentStore extends EventEmitter {
                     }
                 })
 
+                mongoose.connection.collection("cluster").watch().on("change", (change) => {
+                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
+                    this.emit("cluster", change)
+                })
+
                 mongoose.connection.on("error", (err) => { logger.log({ message: err.toString(), level: "error" }) });
 
                 //ready

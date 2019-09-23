@@ -32,7 +32,7 @@ export default class Iotnxt extends PluginSuperClientside {
         this.loadServerGateways();
         this.poll = setInterval(() => {
             this.loadServerGateways();
-        }, 60000)
+        }, 5000)
     }
 
     componentWillUnmount() {
@@ -76,6 +76,12 @@ export default class Iotnxt extends PluginSuperClientside {
                 if (err) { console.log(err); }
                 if (result) {
                     console.log(result); this.loadServerGateways();
+                    setTimeout(() => { this.loadServerGateways(); }, 500)
+                    setTimeout(() => { this.loadServerGateways(); }, 2500)
+                    setTimeout(() => { this.loadServerGateways(); }, 5000)
+                    setTimeout(() => { this.loadServerGateways(); }, 7500)
+                    setTimeout(() => { this.loadServerGateways(); }, 10000)
+
                     if (cb) cb();
                 }
             })

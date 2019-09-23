@@ -3,6 +3,7 @@ import { Core } from "../../server/core/core";
 import { Webserver } from "../../server/core/webserver";
 import { DocumentStore } from "../../server/core/data";
 import { hostname } from "os"
+import { logger } from "../../server/shared/log";
 
 export default class Cluster extends PluginSuperServerside {
 
@@ -45,6 +46,30 @@ export default class Cluster extends PluginSuperServerside {
         // setTimeout(() => {
         //     this.refresh(() => { })
         // }, this.thresholdms);
+
+        this.on("cluster", (data) => {
+            logger.log({ group: "cluster", message: "cluster recieve", data, level: "verbose" })
+        })
+
+        // we listen on cluster collection changes for cluster messages. This is so we don't need redis.
+        this.documentstore.on("cluster", (data) => {
+            if (data.operationType == "replace") { return; }
+            if (data.operationType == "update") { return; }
+            if (data.operationType == "insert") {
+                if (data.fullDocument) {
+                    var packet = data.fullDocument;
+                    delete packet["_id"]
+                    // emit on cluster plugin events.
+                    this.emit("cluster", packet);
+                }
+            }
+        })
+    }
+
+    broadcast(data: { group: string, message: string, data: any, broadcastTime?: Date }) {
+        logger.log({ group: "cluster", message: "cluster broadcast", data, level: "verbose" })
+        data.broadcastTime = new Date();
+        this.documentstore.db["cluster"].save(data);
     }
 
     heartbeat() {
@@ -56,6 +81,8 @@ export default class Cluster extends PluginSuperServerside {
             updated: new Date(),
             state: this.core.clusterstate
         }
+
+        console.log(worker);
 
         var workerupdate = {
             "$push": {

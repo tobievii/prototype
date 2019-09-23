@@ -34,9 +34,8 @@ export default class Iotnxt extends PluginSuperServerside {
                 listofgateways.push(gatewayl)
             }
 
-
-            console.log("settings state:")
-            this.core.setState({ gateways: listofgateways })
+            //this.core.setState({ gateways: listofgateways })
+            this.core.clusterstate.gateways = listofgateways;
 
         })
 
@@ -98,12 +97,12 @@ export default class Iotnxt extends PluginSuperServerside {
                 if (packet.state) {
                     if (packet.state["plugins_iotnxt_gateway"]) {
                         if (packet.data) {
-                            this.iotnxt.areWeConnectedToGateway(packet.state["plugins_iotnxt_gateway"], (nope: any, gateway: Gateway) => {
-                                if (gateway) {
-                                    logger.log({ group: "iotnxt", message: hostname() + " " + process.pid + " is sending packet to " + packet.state["plugins_iotnxt_gateway"].GatewayId, level: "verbose" })
-                                    gateway.handlePacket(packet)
-                                }
-                            })
+                            var gateway = this.iotnxt.areWeConnectedToGateway(packet.state["plugins_iotnxt_gateway"])
+                            if (gateway) {
+                                logger.log({ group: "iotnxt", message: hostname() + " " + process.pid + " is sending packet to " + packet.state["plugins_iotnxt_gateway"].GatewayId, level: "verbose" })
+                                gateway.handlePacket(packet)
+                            }
+
                         }
 
                     }
@@ -111,6 +110,9 @@ export default class Iotnxt extends PluginSuperServerside {
 
             }
         })
+
+
+
 
         /** Below not needed, just here for documentation of the system */
         // update client that packets has changed
@@ -136,6 +138,20 @@ export default class Iotnxt extends PluginSuperServerside {
                 }, 1500 + Math.round(Math.random() * 1500))
                 //
             });
+
+
+            this.plugins.cluster.on("cluster", (packet) => {
+                console.log("IOTNXT cluster recieve message")
+                console.log(packet);
+                if (packet.message == "disconnectGateway") {
+                    // check if we are connected to a gateway and disconnect from it, remove from our list.
+                    this.iotnxt.disconnectGateway(packet.data.gateway, (e, r) => {
+                        this.iotnxt.emit("updatestate"); //update cluster state
+                    })
+                }
+                //if (packet.group)
+            })
+
         })
         ///////////////////////////////////////////////////////////////////////
     }
@@ -149,10 +165,7 @@ export default class Iotnxt extends PluginSuperServerside {
     clearOldConnections(cb) {
         //this.plugins.cluster.
         this.plugins.cluster.getlist((err, workers) => {
-            console.log("CLUSTER LIST::!!")
-            console.log(workers);
             this.documentstore.db["plugins_iotnxt"].find({ connected: true }, (err: Error, gateways: GatewayType[]) => {
-                console.log(gateways)
 
                 var count = 0;
                 //

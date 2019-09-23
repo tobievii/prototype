@@ -18,31 +18,30 @@ export class IotnxtCore extends PluginSuperServerside {
 
 
     /* are we connected to this gateway now? on this cluster node */
-    areWeConnectedToGateway(gatewayToCheck: GatewayType, cb: any) {
+    areWeConnectedToGateway(gatewayToCheck: GatewayType): Gateway {
         var found = false;
         for (var gateway of this.gateways) {
             if ((gateway.GatewayId == gatewayToCheck.GatewayId) &&
                 (gateway.HostAddress == gatewayToCheck.HostAddress)) {
                 found = true;
-                cb(undefined, gateway);
+                return gateway;
             }
         }
-        if (found == false) { cb({ notfound: true }) }
+        if (found == false) { return undefined; }
     }
 
     reconnectgateway(query: { gateway: GatewayType, user: User }, cb: any) {
-        var { gateway, user } = query;
-        logger.log({ message: "reconnect gateway " + gateway.GatewayId, level: "warn", group: "iotnxt" })
 
-        this.connectGateway(query.gateway);
+        /** send a message to entire cluster */
+        this.plugins.cluster.broadcast({ group: "iotnxt", message: "disconnectGateway", data: query })
+        cb(undefined, { reconnect: "true" })
+        // TODO:
+        // var { gateway, user } = query;
+        // logger.log({ message: "reconnect gateway " + gateway.GatewayId, level: "warn", group: "iotnxt" })
+        // this.connectGateway(query.gateway);
     }
 
     addgateway(query: { gateway: any, user: User }, cb: any) {
-        //var gateway = gatewayRequest;
-        // if (!user.publickey) {
-        //   user["publickey"] = utils.generate(32).toLowerCase();
-        // }
-
         var { gateway, user } = query
 
         if (user.level <= 0) { cb(new Error("level must be 1 or higher")); return; }
@@ -83,9 +82,9 @@ export class IotnxtCore extends PluginSuperServerside {
         this.documentstore.db.plugins_iotnxt.remove(dbQuery, cb);
     }
 
-    handlenewgateway(gateway: any) {
-        this.connectGateway(gateway);
-    }
+    // handlenewgateway(gateway: any) {
+    //     this.connectGateway(gateway);
+    // }
 
     getgateways(query: { user: User }, cb: any) {
         var { user } = query;
@@ -94,6 +93,26 @@ export class IotnxtCore extends PluginSuperServerside {
         this.documentstore.db.plugins_iotnxt.find(dbquery, cb);
     }
 
+    /** check if we are connected to a gateway, and if so disconnect from it and remove from our list of local gateway connections */
+    disconnectGateway(gateway: GatewayType, cb: any) {
+        var gatewayConn = this.areWeConnectedToGateway(gateway)
+        if (gatewayConn) {
+            gatewayConn.disconnect();
+
+            this.documentstore.db.plugins_iotnxt.update(
+                { type: "gateway", unique: gatewayConn.gateway.unique },
+                { "$set": { connected: false, lastactive: new Date() } }, (err: Error, result: any) => { })
+        }
+
+        //remove from array
+        this.gateways = this.gateways.filter(gw => {
+            if (gw.GatewayId !== gateway.GatewayId) { return true } else { return false }
+        })
+
+        this.emit("updatestate");
+
+        cb();
+    }
 
     connectGateway(gatewaytoconnect: GatewayType) {
         console.log(process.pid + " is attempting to connect " + gatewaytoconnect.GatewayId)
@@ -203,17 +222,17 @@ export class IotnxtCore extends PluginSuperServerside {
     /** this function runs automatically on the node every x time, it finds an inactive gateway and attempts to connect to it. */
     connectIdleGatewayCluster(cb) {
         //     //var time = 24 * 60 * 60 * 1000 * days;
-        //     var time = 1000 * 60;
+
+        var time = 1000 * 60 * 5;
 
         this.documentstore.db.plugins_iotnxt.findAndModify(
             {
                 query: {
-                    connected: false
-                    // "$or": [
-                    //     { lastactive: undefined },
-                    //     { lastactive: { $lt: new Date(Date.now() - time) } }]
+                    "$or": [
+                        { connected: false },
+                        { lastactive: { $lt: new Date(Date.now() - time) } }]
                 },
-                update: { "$set": { lastactive: new Date(), connected: "connecting" } }
+                update: { "$set": { lastactive: new Date(), connected: "connecting", hostname: hostname(), instance_id: process.pid } }
             }, (err: Error, gateway: GatewayType, lasterror: any) => {
                 // for now we assume this gateway is unconnected.
                 if (gateway) { this.connectGateway(gateway); }
