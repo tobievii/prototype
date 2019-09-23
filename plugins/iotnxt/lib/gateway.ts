@@ -22,6 +22,10 @@ export interface GatewayType {
   "error": any
   /** new 5.1 use device publickey instead of user apikey. default on new gateways. */
   usepublickey: boolean
+  /** worker pid */
+  instance_id?: number
+  /** worker hostname */
+  hostname?: string;
 }
 
 export class Gateway extends EventEmitter {

@@ -98,12 +98,13 @@ if (cluster.isMaster) {
 } else {
     logger.log({ message: "cluster fork active", data: { workerpid: process.pid }, level: "info" })
 
-    var core;
+    var core: Core;
     var webserver: Webserver;
     var socketserver: SocketServer;
     var mqttserver: MQTTServer;
 
-    var pluginInstances = [];
+    var pluginInstances: any = [];
+    var pluginInstancesObject: any = {};
 
     var documentstore = new DocumentStore({ mongoConnection: cfg.config.mongoConnection });
 
@@ -154,7 +155,7 @@ if (cluster.isMaster) {
         })
         ///////////////////////////////////////////////////////////////////
 
-        var pluginprops = { core, documentstore, webserver }
+        var pluginprops = { core, documentstore, webserver, plugins: pluginInstancesObject }
 
         var loadedplugins: any = plugins;
         for (var pluginname of Object.keys(loadedplugins)) {
@@ -162,11 +163,13 @@ if (cluster.isMaster) {
                 var pluginClass = loadedplugins[pluginname]
                 var pluginInst = new pluginClass(pluginprops);
                 pluginInstances.push(pluginInst)
+                pluginInstancesObject[pluginname] = pluginInst;
             }
 
         }
 
         webserver.listen(() => {
+            core.emit("ready");
             logger.log({ message: "worker pid " + process.pid + " on " + hostname() + " ready", level: "info" })
         });
     });

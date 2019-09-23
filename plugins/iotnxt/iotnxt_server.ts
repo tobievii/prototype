@@ -15,10 +15,31 @@ export default class Iotnxt extends PluginSuperServerside {
 
     checker: NodeJS.Timeout;
 
-    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
+    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver, plugins: any }) {
         super(props);
 
         this.iotnxt = new IotnxtCore(props);
+
+        this.iotnxt.on("updatestate", (data) => {
+            //console.log("======== CONNECT!")
+            //console.log(this.iotnxt.gateways);
+
+            var listofgateways: any[] = []
+            for (var gw of this.iotnxt.gateways) {
+                var gatewayl = {
+                    GatewayId: gw.gateway.GatewayId,
+                    HostAddress: gw.gateway.HostAddress,
+                    usepublickey: gw.gateway.usepublickey
+                }
+                listofgateways.push(gatewayl)
+            }
+
+
+            console.log("settings state:")
+            this.core.setState({ gateways: listofgateways })
+
+        })
+
 
         this.webserver.app.post("/api/v3/iotnxt/addgateway", (req: any, res: any) => {
             this.iotnxt.addgateway({ gateway: req.body, user: req.user }, (err: Error, result: any, gateway: any) => {
@@ -52,25 +73,43 @@ export default class Iotnxt extends PluginSuperServerside {
         });
 
         this.webserver.app.post("/api/v3/iotnxt/reconnectgateway", (req: any, res: any) => {
-            this.iotnxt.reconnectgateway({ gateway: req.body, user: req.user }, (err, result) => {
+            this.iotnxt.reconnectgateway({ gateway: req.body, user: req.user }, (err: Error, result: any) => {
                 if (err) { res.json({ err: err.toString() }); return; }
                 res.json(result);
             })
         })
 
         // stagger checking to avoid race conditions.. mostly.
-        this.checker = setInterval(() => {
-            this.iotnxt.connectIdleGatewayCluster((err: Error, result: any) => {
-                console.log("=== ?")
-            })
-        }, 1500 + Math.round(Math.random() * 1500))
+
 
         ///////////////////////////////////////////////////////////////////////////
 
 
         /** This is the main funnel of data into plugin to send on to iotnxt. We listen to packet data on the db, and process it on if needed. */
+        /** Checks if a packet that we need to send to a connected gateway connection. 
+   * Checks if we are connected to the gateway that we need to send this on.
+   */
         this.documentstore.on("packets", (data: DBchange) => {
-            if (data.fullDocument) { this.checkDBPacketForAction(data.fullDocument) }
+            if (data.fullDocument) {
+
+
+                var packet = data.fullDocument
+
+                if (packet.state) {
+                    if (packet.state["plugins_iotnxt_gateway"]) {
+                        if (packet.data) {
+                            this.iotnxt.areWeConnectedToGateway(packet.state["plugins_iotnxt_gateway"], (nope: any, gateway: Gateway) => {
+                                if (gateway) {
+                                    logger.log({ group: "iotnxt", message: hostname() + " " + process.pid + " is sending packet to " + packet.state["plugins_iotnxt_gateway"].GatewayId, level: "verbose" })
+                                    gateway.handlePacket(packet)
+                                }
+                            })
+                        }
+
+                    }
+                }
+
+            }
         })
 
         /** Below not needed, just here for documentation of the system */
@@ -86,27 +125,56 @@ export default class Iotnxt extends PluginSuperServerside {
         // })
 
 
-        /////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////
+        // DELAY as plugins are loaded...
+        this.core.on("ready", () => {
+            this.clearOldConnections(() => {
+                //
+                this.checker = setInterval(() => {
+                    this.iotnxt.connectIdleGatewayCluster((err: Error, result: any) => { })
+                }, 1500 + Math.round(Math.random() * 1500))
+                //
+            });
+        })
+        ///////////////////////////////////////////////////////////////////////
     }
 
 
-    /** Checks if a packet that we need to send to a connected gateway connection. 
-     * Checks if we are connected to the gateway that we need to send this on.
-     */
-    checkDBPacketForAction(packet: CorePacket) {
-        if (packet.state) {
-            if (packet.state["plugins_iotnxt_gateway"]) {
-                if (packet.data) {
-                    this.iotnxt.areWeConnectedToGateway(packet.state["plugins_iotnxt_gateway"], (nope: any, gateway: Gateway) => {
-                        if (gateway) {
-                            logger.log({ group: "iotnxt", message: hostname() + " " + process.pid + " is sending packet to " + packet.state["plugins_iotnxt_gateway"].GatewayId, level: "verbose" })
-                            gateway.handlePacket(packet)
-                        }
-                    })
-                }
 
-            }
-        }
+
+
+    /** this function goes through the gateways and 
+     * checks if the listed gateway cluster worker still exists, if not then marks this gateway as not connected. */
+    clearOldConnections(cb) {
+        //this.plugins.cluster.
+        this.plugins.cluster.getlist((err, workers) => {
+            console.log("CLUSTER LIST::!!")
+            console.log(workers);
+            this.documentstore.db["plugins_iotnxt"].find({ connected: true }, (err: Error, gateways: GatewayType[]) => {
+                console.log(gateways)
+
+                var count = 0;
+                //
+                for (var gateway of gateways) {
+                    var found = false;
+                    for (var worker of workers) {
+                        if ((gateway.hostname == worker.hostname) && (gateway.instance_id == worker.pid)) {
+                            found = true;
+                        }
+                    }
+
+                    // not connected
+                    if (found == false) {
+                        this.documentstore.db["plugins_iotnxt"].update({ unique: gateway.unique }, { $set: { connected: false } })
+                    }
+                }
+                //
+                cb();
+            })
+        })
+
+
     }
 
 };

@@ -12,7 +12,7 @@ export class IotnxtCore extends PluginSuperServerside {
     name = "iotnxt";
     gateways: Gateway[] = [];
 
-    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
+    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver, plugins: any }) {
         super(props);
     }
 
@@ -99,7 +99,7 @@ export class IotnxtCore extends PluginSuperServerside {
         console.log(process.pid + " is attempting to connect " + gatewaytoconnect.GatewayId)
         logger.log({ group: this.name, message: gatewaytoconnect.GatewayId + "connecting... ", data: { GatewayId: gatewaytoconnect.GatewayId }, level: "verbose" })
 
-        this.documentstore.db.plugins_iotnxt.findOne({ unique: gatewaytoconnect.unique }, (e, gateway) => {
+        this.documentstore.db.plugins_iotnxt.findOne({ unique: gatewaytoconnect.unique }, (e: Error, gateway: GatewayType) => {
 
             if (gateway) {
                 //////
@@ -115,7 +115,13 @@ export class IotnxtCore extends PluginSuperServerside {
                         lastactive: new Date(),
                         _connected_last: new Date()
                     }
-                    this.updateGatewayDB(gateway.unique, update, () => { })
+                    //this.updateGatewayDB(gateway.unique, update, () => { })
+
+                    this.documentstore.db.plugins_iotnxt.update(
+                        { type: "gateway", unique: gateway.unique },
+                        { "$set": update }, (err: Error, result: any) => { })
+
+                    this.emit("updatestate", update);
                 })
                 //
 
@@ -126,6 +132,7 @@ export class IotnxtCore extends PluginSuperServerside {
 
                 // error
                 gatewayConnection.on("error", (error) => {
+                    console.log("iotnxt.ts error:")
                     console.log(error);
                 })
 
@@ -190,12 +197,7 @@ export class IotnxtCore extends PluginSuperServerside {
 
 
     updateGatewayDB(unique: string, update: any, cb: Function) {
-        this.documentstore.db.plugins_iotnxt.update(
-            { type: "gateway", unique },
-            { "$set": update }, (err: Error, result: any) => {
-                if (err) { cb(err, undefined); }
-                if (result) { cb(err, result); }
-            })
+
     }
 
     /** this function runs automatically on the node every x time, it finds an inactive gateway and attempts to connect to it. */
@@ -203,18 +205,19 @@ export class IotnxtCore extends PluginSuperServerside {
         //     //var time = 24 * 60 * 60 * 1000 * days;
         //     var time = 1000 * 60;
 
-        //     this.documentstore.db.plugins_iotnxt.findAndModify(
-        //         {
-        //             query: {
-        //                 "$or": [
-        //                     { lastactive: undefined },
-        //                     { lastactive: { $lt: new Date(Date.now() - time) } }]
-        //             },
-        //             update: { "$set": { lastactive: new Date(), connected: "connecting" } }
-        //         }, (err, gateway, lasterror) => {
-        //             // for now we assume this gateway is unconnected.
-        //             if (gateway) { this.connectGateway(gateway); }
-        //         })
+        this.documentstore.db.plugins_iotnxt.findAndModify(
+            {
+                query: {
+                    connected: false
+                    // "$or": [
+                    //     { lastactive: undefined },
+                    //     { lastactive: { $lt: new Date(Date.now() - time) } }]
+                },
+                update: { "$set": { lastactive: new Date(), connected: "connecting" } }
+            }, (err: Error, gateway: GatewayType, lasterror: any) => {
+                // for now we assume this gateway is unconnected.
+                if (gateway) { this.connectGateway(gateway); }
+            })
     }
 
 };

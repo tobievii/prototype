@@ -5,7 +5,7 @@ import { DocumentStore } from "../../server/core/data";
 
 
 export default class Admin extends PluginSuperServerside {
-    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
+    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver, plugins: any }) {
         super(props);
 
         this.webserver.app.get("/api/v4/admin/test", (req, res) => {

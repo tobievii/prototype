@@ -7,11 +7,10 @@ import { hostname } from "os"
 export default class Cluster extends PluginSuperServerside {
 
     heartbeatms = 5000;
-    thresholdms;
+    thresholdms: number;
 
-    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver }) {
+    constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver, plugins: any }) {
         super(props);
-
         this.thresholdms = this.heartbeatms * 2;
 
         setInterval(() => {
@@ -67,9 +66,14 @@ export default class Cluster extends PluginSuperServerside {
         this.documentstore.db.cluster.update({ datatype: "clusterWorkers", "workers.hostname": worker.hostname, "workers.pid": worker.pid }, { $set: { "workers.$": worker } }, (err, result) => {
             // console.log(err)
             // console.log(result);
-            if (result.nModified == 0) {
+            if (result) {
+                if (result.nModified == 0) {
+                    this.documentstore.db.cluster.update({ datatype: "clusterWorkers" }, workerupdate, { upsert: true }, () => { });
+                }
+            } else {
                 this.documentstore.db.cluster.update({ datatype: "clusterWorkers" }, workerupdate, { upsert: true }, () => { });
             }
+
         })
     }
 
@@ -89,6 +93,19 @@ export default class Cluster extends PluginSuperServerside {
             this.documentstore.db.cluster.update({ datatype: "clusterWorkers" }, cleandata, (err, res) => {
                 cb();
             })
+        })
+    }
+
+    getlist(cb: (err: Error | undefined, clusterWorkers: any) => void) {
+        this.refresh(() => {
+            this.documentstore.db.cluster.findOne({ datatype: "clusterWorkers" }, (err: Error, data: any) => {
+                data.worker = {
+                    hostname: hostname(),
+                    pid: process.pid,
+                    updated: new Date()
+                }
+                cb(undefined, data);
+            });
         })
     }
 };
