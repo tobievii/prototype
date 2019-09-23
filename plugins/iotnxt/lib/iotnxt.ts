@@ -115,7 +115,7 @@ export class IotnxtCore extends PluginSuperServerside {
     }
 
     connectGateway(gatewaytoconnect: GatewayType) {
-        console.log(process.pid + " is attempting to connect " + gatewaytoconnect.GatewayId)
+        //console.log(process.pid + " is attempting to connect " + gatewaytoconnect.GatewayId)
         logger.log({ group: this.name, message: gatewaytoconnect.GatewayId + "connecting... ", data: { GatewayId: gatewaytoconnect.GatewayId }, level: "verbose" })
 
         this.documentstore.db.plugins_iotnxt.findOne({ unique: gatewaytoconnect.unique }, (e: Error, gateway: GatewayType) => {

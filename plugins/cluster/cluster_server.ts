@@ -82,8 +82,6 @@ export default class Cluster extends PluginSuperServerside {
             state: this.core.clusterstate
         }
 
-        console.log(worker);
-
         var workerupdate = {
             "$push": {
                 workers: worker
