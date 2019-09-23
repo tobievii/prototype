@@ -6,7 +6,7 @@
   "scripts": {
     "start": "serve",
     "watch": "webpack --env dev -w --mode development",
-    "build": "webpack --env prod --display-modules",
+    "build": "webpack --env prod -- mode production",
     "prod": "webpack -w --mode production",
     "build_dev": "webpack --env dev --mode development",
     "buildsw": "tsc -w --lib es6,webworker ./src/serviceworker/serviceworker.ts --outDir ../public"

@@ -6,7 +6,8 @@ COPY . /build
 
 # 5.1 change: RUN cd client && npm install && npm run build && cd /build && npm install && npm run build && npm install pm2 --global
 # no longer needs pm2
-RUN cd client && npm install && npm run build && cd /build && npm install && npm run build
+RUN cd /build && npm install && npm run build
+RUN cd /build/client && npm install && npm run build 
 
 # Prep for running: Create directory for config with appropriate permissions 
 # (It should be mounted in as a volume - no write permissions from inside)
