@@ -24,8 +24,8 @@ logger.log({ message: "process start", level: "info" })
 
 /** todo switch back to cpu length for production */
 
-const numCPUs = require('os').cpus().length;
-//const numCPUs = 2;
+//const numCPUs = require('os').cpus().length;
+const numCPUs = 1;
 
 // var config = {
 //     "ssl": false,

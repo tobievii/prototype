@@ -108,12 +108,15 @@ export default class Cluster extends PluginSuperServerside {
 
             var cleandata = { datatype: "clusterWorkers", workers: [] }
 
-            for (var worker of data.workers) {
-                var ago = new Date().getTime() - new Date(worker.updated).getTime()
-                if (ago < this.thresholdms) {
-                    cleandata.workers.push(worker);
+            if (data) {
+                for (var worker of data.workers) {
+                    var ago = new Date().getTime() - new Date(worker.updated).getTime()
+                    if (ago < this.thresholdms) {
+                        cleandata.workers.push(worker);
+                    }
                 }
             }
+
 
             this.documentstore.db.cluster.update({ datatype: "clusterWorkers" }, cleandata, (err, res) => {
                 cb();

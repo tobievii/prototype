@@ -27,8 +27,20 @@ export class Config extends EventEmitter {
 
         this.loadnodepkg();
         this.loadconfig((err, configfile) => {
-            this.config = { ...this.config, ...configfile }
-            //console.log(JSON.stringify(this.config, null, 2))
+
+            if (configfile) {
+                // fix mongoConnection
+                if (configfile.mongoConnection) {
+                    if (configfile.mongoConnection.indexOf("mongodb://") != 0) {
+                        console.log("mongodb config format fix.")
+                        configfile.mongoConnection = "mongodb://localhost:27017/" + configfile.mongoConnection
+                    }
+                }
+
+                this.config = { ...this.config, ...configfile }
+                //console.log(JSON.stringify(this.config, null, 2))
+            }
+
         });
 
         this.config.version = {
