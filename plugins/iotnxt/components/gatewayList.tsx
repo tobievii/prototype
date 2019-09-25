@@ -148,7 +148,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
               // }
 
 
-
+              if (gateway.lastactive == undefined) { gateway.lastactive = new Date("1970") }
               return (
                 <div key={i} style={{ display: "flex", flexDirection: "row" }} >
                   <div style={{ flex: 1 }}>
