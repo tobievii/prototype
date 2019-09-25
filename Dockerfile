@@ -24,7 +24,9 @@ RUN apt-get update && apt-get install -y libcap2-bin && apt-get clean && rm -rf 
 # Hack to get the config usable in a reasonable place
 # 5.0 OLD: RUN ln -sf /etc/iotnxt/prototype.json /iotconfig.json
 # Now iotconfig.json file is in root of package.
-RUN ln -sf /etc/iotnxt/prototype.json /build/iotconfig.json
+# RUN ln -sf /etc/iotnxt/prototype.json /build/iotconfig.json
+# hax fix because of devops
+RUN ln -sf /home/rouan.vanderende/prototype.json /build/iotconfig.json
 
 # Interface documentation
 VOLUME /etc/iotnxt
