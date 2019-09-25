@@ -24,15 +24,11 @@ logger.log({ message: "process start", level: "info" })
 
 /** todo switch back to cpu length for production */
 
-const numCPUs = require('os').cpus().length;
-//const numCPUs = 1;
+var numCPUs = require('os').cpus().length;
 
-// var config = {
-//     "ssl": false,
-//     "httpPort": 8080,
-//     "mongoConnection": 'mongodb://localhost:27017/8bo',
-//     version: { name: nodePackage.name, version: nodePackage.version, description: nodePackage.description }
-// }
+// Force cluster on single core for dev server testing
+if (numCPUs == 1) { numCPUs = 2 }
+
 
 interface State {
     isMaster: boolean;
