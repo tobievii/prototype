@@ -165,7 +165,7 @@ export default class Iotnxt extends PluginSuperServerside {
     clearOldConnections(cb) {
         //this.plugins.cluster.
         this.plugins.cluster.getlist((err, workers) => {
-            this.documentstore.db["plugins_iotnxt"].find({ connected: true }, (err: Error, gateways: GatewayType[]) => {
+            this.documentstore.db["plugins_iotnxt"].find({}, (err: Error, gateways: GatewayType[]) => {
 
                 var count = 0;
                 //
