@@ -412,7 +412,7 @@ export class IotnxtQueue extends events.EventEmitter {
 
     console.log(packetIn);
 
-    var dateNow = new Date(packetIn._timestamp);
+    var dateNow = new Date(packetIn.timestamp);
     var fromUtc = new Date(dateNow.getTime() - 15 * 1000)
 
     packet.MessageId = getGUID();

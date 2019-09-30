@@ -29,7 +29,7 @@ export default class WidgetCanvas extends WidgetComponent {
                 mask: {
                     [this.props.widget.datapath]: 1
                 },
-                sort: { "_timestamp": 1 },
+                sort: { "timestamp": 1 },
                 limit: 50
             }
 
@@ -58,7 +58,7 @@ export default class WidgetCanvas extends WidgetComponent {
 
         for (var d of this.state.data) {
             //var value = objectByString(this.props.state, this.props.widget.datapath)
-            labels.push(d["_timestamp"])
+            labels.push(d["timestamp"])
             data.push(objectByString(d, this.props.widget.datapath))
         }
 

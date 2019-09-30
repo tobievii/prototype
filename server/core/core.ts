@@ -268,9 +268,9 @@ export class Core extends EventEmitter {
 
             //override from device when this data was valid. for historical graphing and reconnection log purposes
             if (packet.timestamp) {
-                packet["_timestamp"] = new Date(packet.timestamp)
+                packet["timestamp"] = new Date(packet.timestamp)
             } else {
-                packet["_timestamp"] = new Date()
+                packet["timestamp"] = new Date()
             }
 
 
@@ -360,7 +360,7 @@ export class Core extends EventEmitter {
 
     // ---------------------------------------
 
-    view(options: any, cb: (error: { error: string } | undefined, result?: CorePacket | CorePacket[]) => void) {
+    view(options: any, cb: (error: { error: string } | undefined, result?: CorePacket | CorePacket[] | any) => void) {
         logger.log({ message: "core.view", data: options, level: "verbose" });
 
 
@@ -689,7 +689,7 @@ export class Core extends EventEmitter {
                 [
                     {
                         $match: {
-                            _timestamp: { $gt: new Date("2019-01-01T00:00:00.000Z") },
+                            timestamp: { $gt: new Date("2019-01-01T00:00:00.000Z") },
                             key: options.request.key
                         }
                     },
@@ -697,12 +697,12 @@ export class Core extends EventEmitter {
                         $group: {
                             _id: {
                                 date: {
-                                    $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                                    $dateToString: { format: "%Y-%m-%d", date: "$timestamp" }
                                 }
                             },
                             day: {
                                 $first: {
-                                    $dateToString: { format: "%Y-%m-%d", date: "$_timestamp" }
+                                    $dateToString: { format: "%Y-%m-%d", date: "$timestamp" }
                                 }
                             },
                             value: { $sum: 1 }
