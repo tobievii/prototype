@@ -101,6 +101,8 @@ export function webapiv3(app: Application, core: Core) {
     /** API V3 view packets history */
     app.post("/api/v3/packets", (req: any, res) => {
         core.packets({ request: req.body, user: req.user }, (err: any, result: any) => {
+            console.log("----- core result")
+            console.log(result);
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
         })

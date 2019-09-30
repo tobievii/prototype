@@ -130,7 +130,7 @@ export interface ClientPacketOptions {
     find: any;
     sort?: any;
     limit?: number
-
+    id?: string
     // /** Specify the key of the state you want to retrieve from */
     // key?: CorePacket["key"]
     // /** Specify the datapath of the packet history you want to query

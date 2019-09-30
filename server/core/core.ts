@@ -12,7 +12,7 @@ import * as _ from "lodash"
 
 import * as vm2 from "vm2"
 
-import { User, CorePacket, CorePacketsOptions } from "../shared/interfaces"
+import { User, CorePacket, CorePacketsOptions, ClientPacketOptions } from "../shared/interfaces"
 
 import { cleanString } from "../shared/shared";
 
@@ -223,6 +223,7 @@ export class Core extends EventEmitter {
     // end user
 
     datapost(options: { user: User, packet: CorePacket }, cb: (err: any, result?: any) => void) {
+
         logger.log({ message: "core.datapost", data: options, level: "verbose" });
 
         if (!options) {
@@ -246,116 +247,114 @@ export class Core extends EventEmitter {
             options.packet.id = options.packet.id.toLowerCase();
         }
 
-        // key is upper/lower case mixed for security
-        //console.log(options);
-        //device / user?
-        if ((options.packet) && (options.user)) {
-            const { packet, user } = options;
+        /////////////////
+
+        var { packet, user } = options;
 
 
 
-            // ERROR CHECK
-            var check = this.checkValidCorePacket(packet)
-            if (check.passed == false) {
-                let error = new Error("invalid core packet");
-                logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
-                return check.error
-            }
+        // ERROR CHECK
+        var check = this.checkValidCorePacket(packet)
+        if (check.passed == false) {
+            let error = new Error("invalid core packet");
+            logger.log({ message: "core.datapost " + error.toString(), data: options, level: "error" });
+            return check.error
+        }
 
 
-            // add a recieved timestamp to the packet.
+        // add a recieved timestamp to the packet.
+        packet["_recieved"] = new Date()
+
+        //override from device when this data was valid. for historical graphing and reconnection log purposes
+        if (packet.timestamp) {
+            packet["timestamp"] = new Date(packet.timestamp)
+        } else {
+            packet["timestamp"] = new Date()
+        }
+
+
+        // gets this device's state from the db. 
+        // todo: get all subscribed instances and perform workflows on the chain, then update db.
+
+
+        var finddevicequery: any = { user, id: packet.id };
+
+        if (packet.key) { finddevicequery = { user, key: packet.key } }
+
+        this.state(finddevicequery, (err: any, statedb: any) => {
+            if (err) { if (cb) cb({ error: "db error" }); return; }
+
             packet["_recieved"] = new Date()
 
-            //override from device when this data was valid. for historical graphing and reconnection log purposes
-            if (packet.timestamp) {
-                packet["timestamp"] = new Date(packet.timestamp)
+            var state: CorePacket | any = {};
+            if (statedb) {
+                state = statedb; //existed!
             } else {
-                packet["timestamp"] = new Date()
+                state = {
+                    "_created_on": new Date(),
+                    publickey: utils.generate(32),
+                    key: utils.generateDifficult(128)
+                }
             }
 
+            delete state["_id"]; //sanitize db data
 
-            // gets this device's state from the db. 
-            // todo: get all subscribed instances and perform workflows on the chain, then update db.
+            // timestamp it.
+            state["_last_seen"] = new Date();
 
+            //add data from state
+            packet.key = state.key;
 
-            var finddevicequery: any = { user, id: packet.id };
+            //add data from user
+            packet.apikey = user.apikey;
+            packet.publickey = state.publickey
 
-            if (packet.key) { finddevicequery = { user, key: packet.key } }
+            packet.userpublickey = user.publickey
+            packet.username = user.username
 
-            this.state(finddevicequery, (err: any, statedb: any) => {
-                if (err) { if (cb) cb({ error: "db error" }); return; }
-
-                packet["_recieved"] = new Date()
-
-                var state: CorePacket | any = {};
-                if (statedb) {
-                    state = statedb; //existed!
-                } else {
-                    state = {
-                        "_created_on": new Date(),
-                        publickey: utils.generate(32),
-                        key: utils.generateDifficult(128)
-                    }
-                }
-
-                delete state["_id"]; //sanitize db data
-
-                // timestamp it.
-                state["_last_seen"] = new Date();
-
-                //add data from state
-                packet.key = state.key;
-
-                //add data from user
-                packet.apikey = user.apikey;
-                packet.publickey = state.publickey
-
-                packet.userpublickey = user.publickey
-                packet.username = user.username
-
-                //if (!packet.id) { return; }
-                //packet.id = packet.id.toLowerCase();
-                if (state.id) { if (!packet.id) packet.id = state.id }
+            //if (!packet.id) { return; }
+            //packet.id = packet.id.toLowerCase();
+            if (state.id) { if (!packet.id) packet.id = state.id }
 
 
 
 
-                //todo: meta
-                packet.meta = {};
+            //todo: meta
+            packet.meta = {};
 
-                //flags force boolean
-                if (packet.public != undefined) packet.public = (packet.public == true);
+            //flags force boolean
+            if (packet.public != undefined) packet.public = (packet.public == true);
 
-                logger.log({ message: "core.datapost workflow", level: "verbose" });
+            logger.log({ message: "core.datapost workflow", level: "verbose" });
 
-                // workflow just before saving to db.
-                this.workflow({ packet, state }, (err, processedPacket) => {
-                    logger.log({ message: "core.datapost workflow processed", level: "verbose" });
+            // workflow just before saving to db.
+            this.workflow({ packet, state }, (err, processedPacket) => {
+                logger.log({ message: "core.datapost workflow processed", level: "verbose" });
 
-                    // todo: if incoming packet has key, then do not merge.
-                    // or if { merged: false } 
-                    delete state["id"]
+                // todo: if incoming packet has key, then do not merge.
+                // or if { merged: false } 
+                delete state["_id"]
 
-                    // idea: possibly store previous state into packet aswell so we have both the before and after in each packet?
+                // idea: possibly store previous state into packet aswell so we have both the before and after in each packet?
 
-                    var stateMerged = _.merge(state, processedPacket);
-                    if (processedPacket == undefined) { console.log("ERROR packet undefined after workflow!"); return; }
-                    delete processedPacket["id"]
+                var stateMerged = _.merge(state, processedPacket);
+                if (processedPacket == undefined) { console.log("ERROR packet undefined after workflow!"); return; }
+                delete processedPacket["_id"]
 
-                    // store merged state with packet.
-                    processedPacket["state"] = stateMerged;
-                    this.db.packets.save(processedPacket, (err: any, result: any) => {
-                        this.db.states.update({ key: stateMerged.key }, stateMerged, { upsert: true }, (err1: any, result1: any) => {
-                            if (err1) { console.log(err1) }
-                            if (result1) {
-                                if (cb) cb(undefined, { result: "success" });
-                            }
-                        })
+                // store merged state with packet.
+                processedPacket["state"] = stateMerged;
+                this.db.packets.save(processedPacket, (err: any, result: any) => {
+                    this.db.states.update({ key: stateMerged.key }, stateMerged, { upsert: true }, (err1: any, result1: any) => {
+                        if (err1) { console.log(err1) }
+                        if (result1) {
+                            if (cb) cb(undefined, { result: "success" });
+                        }
                     })
                 })
-                // done!
-            });
-        }
+            })
+            // done!
+        });
+
     }
 
     // ---------------------------------------
@@ -463,10 +462,11 @@ export class Core extends EventEmitter {
      * 
      *  
      * */
-    packets(options: CorePacketsOptions, cb: any) {
+    packets(options: { request: ClientPacketOptions, user: User }, cb: any) {
         console.log(options)
         var { request, user } = options;
         logger.log({ message: "core.packets", data: options, level: "verbose" });
+
 
 
         if ((request.find) && (request.sort) && (request.limit)) {
@@ -474,6 +474,15 @@ export class Core extends EventEmitter {
             // var query: any = { key: options.request.key }
             // query[request.datapath] = { $exists: true }
             this.db.packets.find(find).sort(sort).limit(limit, cb)
+        }
+
+        if ((request.id) && (user)) {
+            // like generic api call from v3
+            // please note the toLowerCase() since all devices are forced to lowercase when stored to db.
+            // the reason for this so we can use device id names for url's
+            var query = { id: request.id.toLowerCase(), apikey: user.apikey }
+            console.log(query);
+            this.db.packets.find(query).limit(100, cb);
         }
     }
 

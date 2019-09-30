@@ -9,6 +9,6 @@ import { test_websockets } from "./webapiv4/webapi_v4_websockets"
 
 // uncomment to run old tests
 webapi_v3()
-webapi_v4()
+//webapi_v4()
 
-test_websockets();
+//test_websockets();
