@@ -12,8 +12,11 @@ before production release to `master` branch.
 
 # Todo
 
-* test on dev server ( prototype.dev.iotnxt.io )
-* make sure all tests pass on v3 and v4 api.
+✅ Dev server upgrade   
+✅ Pass all V3 and V4 API tests   
+✅ Plugin: MQTT   
+⌛ Plugin: Teltonika (in progress ETA: 10 October)   
+⌛ Plugin: Server monitor (not started)   
 
 # Getting started
 

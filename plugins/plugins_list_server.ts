@@ -13,10 +13,14 @@ export { default as cluster } from './cluster/cluster_server'
 import { default as mqtt } from './mqtt/mqtt_server'
 export { default as mqtt } from './mqtt/mqtt_server'
 
+import { default as teltonika } from './teltonika/teltonika_server'
+export { default as teltonika } from './teltonika/teltonika_server'
+
 export interface plugins {
     iotnxt: iotnxt,
     myplugin: myplugin,
     admin: admin,
     cluster: cluster,
-    mqtt: mqtt
+    mqtt: mqtt,
+    teltonika: teltonika
 }
