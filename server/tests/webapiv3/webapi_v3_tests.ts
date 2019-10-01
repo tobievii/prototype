@@ -6,13 +6,6 @@ import * as _ from "lodash"
 import request = require("request");
 var mqtt = require('mqtt');
 
-/*
-  prototype test suite
-  env server=https://prototype.dev.iotnxt.io port=443 https=true npm run test
-*/
-
-// https://mochajs.org/#getting-started
-
 interface TESTCONFIG {
     hostname: string
     httpprot: string
@@ -25,9 +18,10 @@ export function webapi_v3() {
     var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
 
 
-    //var preset = "localhost";
-    var preset = "dev";
+    var preset = "localhost";
+    //var preset = "dev";
     //var preset = "prod";
+    //var preset = "8bo";
 
     if (preset == "localhost") {
         testconfig.hostname = "localhost"
@@ -45,6 +39,13 @@ export function webapi_v3() {
 
     if (preset == "prod") {
         testconfig.hostname = "prototype.iotnxt.io"
+        testconfig.httpport = "" // default to 443
+        testconfig.httpprot = "https://"
+        testconfig.mqttprot = "mqtt://"
+    }
+
+    if (preset == "8bo") {
+        testconfig.hostname = "8bo.org"
         testconfig.httpport = "" // default to 443
         testconfig.httpprot = "https://"
         testconfig.mqttprot = "mqtt://"
@@ -258,11 +259,11 @@ export function webapi_v3() {
             var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
             client.on('connect', () => {
-                client.subscribe(account.apikey, (err: Error) => {
+                client.subscribe(account.apikey, { qos: 1 }, (err: Error) => {
                     if (err) { console.log(err) }
-                    setTimeout(() => {
-                        request.post(uri + "/api/v3/data/post", { headers, json: packet })
-                    }, 750)
+
+                    request.post(uri + "/api/v3/data/post", { headers, json: packet })
+
                 })
             })
 
@@ -293,14 +294,14 @@ export function webapi_v3() {
             var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
             client.on('connect', () => {
-                client.subscribe(account.apikey + "|" + packet.id, (err: Error) => {
+                client.subscribe(account.apikey + "|" + packet.id, { qos: 1 }, (err: Error) => {
                     if (err) { console.log(err) }
-                    setTimeout(() => {
-                        request.post(uri + "/api/v3/data/post", { headers, json: dummypacket }, () => {
-                            // once done we post the real one.
-                            request.post(uri + "/api/v3/data/post", { headers, json: packet });
-                        })
-                    }, 750);
+
+                    request.post(uri + "/api/v3/data/post", { headers, json: dummypacket }, () => {
+                        // once done we post the real one.
+                        request.post(uri + "/api/v3/data/post", { headers, json: packet });
+                    })
+
                 })
             })
 
@@ -317,67 +318,39 @@ export function webapi_v3() {
 
         /** We test publishing on MQTT and using HTTP API to check if data was recieved correctly. */
         it("MQTT -> HTTP", done => {
+            const packet = { id: "mqttdevicetest1", data: { a: Math.random() } };
+
             var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
             client.on('connect', function () {
-                client.publish(account.apikey, JSON.stringify({ id: "mqttDevice01", data: { a: Math.random() } }));
+                client.publish(account.apikey, JSON.stringify(packet), { qos: 1 }, () => {
+                    request.post(uri + "/api/v3/view", { headers, json: { id: packet.id } }, (err, res, response) => {
+                        if (err) done(err);
+                        if (response) {
+                            if (response.data.a = packet.data.a) { done() } else { done(new Error("faulty data packet")); }
+                        }
+                    });
+                });
             })
 
         })
 
 
 
-        // it("SOCKET -> HTTP", done => {
-        //     var id = "prottestsockethttp"
-        //     var test = Math.random()
+      
+    })
 
-
-        //     var socketAccount = _.clone(testAccount);
-        //     socketAccount.protocol = "websocket";
-
-        //     var protSocket = new Prototype(socketAccount)
-
-        //     protSocket.on("connect", () => {
-        //         protSocket.post({ id, data: { test } }, (e, result) => {
-        //             new Prototype(testAccount).view(id, (e: Error, data: any) => {
-        //                 if (data.id != id) { done(new Error("id missing from packet")); return; }
-        //                 if (!data.data) { done(new Error("data missing from packet")); return; }
-        //                 if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
-        //                 done();
-        //             })
-        //             protSocket.disconnect();
-        //         })
-        //     })
-        // })
+}
 
 
 
-        // it("SOCKET -> MQTT", done => {
-        //     var id = "prottestsocketmqtt"
-        //     var test = Math.random()
 
-        //     var mqttaccount = _.clone(testAccount);
-        //     mqttaccount.protocol = "mqtt";
-        //     mqttaccount.id = id;
 
-        //     var protMqtt = new Prototype(mqttaccount)
+  /*
 
-        //     protMqtt.on("connect", () => {
-        //         var socketaccount = _.clone(testAccount);
-        //         socketaccount.protocol = "websocket"
-        //         new Prototype(socketaccount).post({ id, data: { test, asdf: "zzz" } }, () => { })
-        //     })
 
-        //     protMqtt.on("data", (data) => {
-        //         if (data.id != id) { done(new Error("id missing from packet")); return; }
-        //         if (!data.data) { done(new Error("data missing from packet")); return; }
-        //         if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
-        //         done();
-        //         protMqtt.disconnect();
-        //     })
-        // })
+TODO:::::
 
-        /*
     })
     
     describe("PLUGINS", () => {
@@ -547,6 +520,3 @@ export function webapi_v3() {
             })
         })
         */
-    })
-
-}

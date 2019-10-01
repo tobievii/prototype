@@ -188,19 +188,17 @@ export class mqttConnection extends EventEmitter {
 
                         var apikey = apikeyParse[1]; // after the key-
 
-                        console.log("emit userauth")
                         // check if this is a valid user?
                         this.emit("userauth", apikey, (err: Error, user: User) => {
-                            console.log("recievd CALLBACK!")
                             if (err) {
-                                console.log("2 ERR")
                                 //disconnect wrong username/pass
                                 this.socket.write(mqttpacket.generate({ cmd: "connack", returnCode: 4 }))
                                 return;
                             }
 
                             if (user) {
-                                console.log("1 AUTHED")
+
+                                logger.log({ group: "mqtt", level: "verbose", message: "mqtt user authed " + user.username, data: {} })
                                 this.user = user;
                                 this.apikey = apikey;
                                 this.emit("connect", { apikey: this.apikey })
