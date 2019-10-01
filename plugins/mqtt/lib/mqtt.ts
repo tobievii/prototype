@@ -58,10 +58,11 @@ export class MQTTServer extends EventEmitter {
             this.mqttConnections.push(client);
         })
 
-        client.on("subscribe", (packet) => {
+        client.on("subscribe", (packet, cb) => {
             if (client.subscriptions.includes(packet.subscribe) == false) {
                 logger.log({ message: "mqtt subscr", data: { sub: packet.subscribe }, level: "verbose" })
-                client.subscriptions.push(packet.subscribe)
+                client.subscriptions.push(packet.subscribe);
+                cb();
             }
         })
 
@@ -219,19 +220,23 @@ export class mqttConnection extends EventEmitter {
                 }
             }
 
+            /** handle subscriptions with callback */
             if (packet.cmd == "subscribe") {
-
-                // todo:
-                // check subscription
+                var count = 0;
                 for (var sub of packet.subscriptions) {
-                    this.emit("subscribe", { subscribe: sub.topic })
-                }
+                    this.emit("subscribe", { subscribe: sub.topic }, () => {
+                        count++;
 
-                this.socket.write(mqttpacket.generate({
-                    cmd: 'suback',
-                    messageId: packet.messageId,
-                    granted: [0]
-                }));
+                        if (count == packet.subscriptions.length) {
+
+                            this.socket.write(mqttpacket.generate({
+                                cmd: 'suback',
+                                messageId: packet.messageId,
+                                granted: [0]
+                            }));
+                        }
+                    })
+                }
             }
 
             if (packet.cmd == "publish") {

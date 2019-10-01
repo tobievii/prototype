@@ -25,9 +25,9 @@ export function webapi_v3() {
     var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
 
 
-    //var preset = "localhost";
+    var preset = "localhost";
     //var preset = "dev";
-    var preset = "dev";
+    //var preset = "prod";
 
     if (preset == "localhost") {
         testconfig.hostname = "localhost"
@@ -40,7 +40,7 @@ export function webapi_v3() {
         testconfig.hostname = "prototype.dev.iotnxt.io"
         testconfig.httpport = "" // default to 443
         testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtt://"
+        testconfig.mqttprot = "mqtts://"
     }
 
     if (preset == "prod") {
@@ -51,50 +51,10 @@ export function webapi_v3() {
     }
 
 
-    // var server = "localhost";
-    // //var server = "prototype.iotnxt.io";
-    // //var server = "prototype.dev.iotnxt.io";
-
-    // var httpprotocol = "http";
-    // var httpport = 443;
-
-    // //var local = true; //local or online
-    // var local = false; // use production V3
 
     var testAccount: any = { email: "test" + generateDifficult(32) + "@iotlocalhost.com", password: "newUser" };
 
-    // if (local) {
-    //     uri = "http://localhost:8080"
-    //     mqtturi = "mqtt://localhost"
 
-    //     testAccount = {
-    //         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
-    //         password: "newUser",
-
-    //         /* dev server:                          */
-    //         // host: "prototype.dev.iotnxt.io",
-    //         // https: true
-
-    //         /* localhost:                           */
-    //         host: "localhost",
-    //         https: false,
-    //         port: 8080
-    //     }
-    // } else {
-    //     testAccount = {
-    //         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
-    //         password: "newUser",
-
-    //         /* dev server:                          */
-    //         host: "prototype.iotnxt.io",
-    //         https: true
-
-    //         /* localhost:                           */
-    //         // host: "localhost",
-    //         // https: false,
-    //         // port: 8080
-    //     }
-    // }
 
     var uri = testconfig.httpprot + testconfig.hostname + testconfig.httpport;
     var mqtturi = testconfig.mqttprot + testconfig.hostname
@@ -278,7 +238,7 @@ export function webapi_v3() {
 
         it("HTTP -> SOCKETIO (DEPRECIATED)", done => { done(); })
 
-        it("HTTP -> MQTT", done => {
+        it("HTTP -> MQTT (APIKEY WIDE SUB)", done => {
 
             var packet = {
                 id: "prottesthttpmqtt",
@@ -291,6 +251,41 @@ export function webapi_v3() {
                 client.subscribe(account.apikey, (err: Error) => {
                     if (err) { console.log(err) }
                     request.post(uri + "/api/v3/data/post", { headers, json: packet })
+                })
+            })
+
+            client.on('message', (topic: string, message: Buffer) => {
+                var parsed = JSON.parse(message.toString());
+                if (parsed.data.random == packet.data.random) { done(); } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
+                client.end();
+            })
+
+        })
+
+        /** This tests if per device subscriptions work as expected. We test by subscribing to a device, then sending a dummypacket then the real packet.
+         * We verify we only recieve the expected packet for the subscription.
+         */
+        it("HTTP -> MQTT (PER DEVICE SUB)", done => {
+
+            var packet = {
+                id: "prottesthttpmqtt",
+                data: { random: generateDifficult(32) }
+            }
+
+            var dummypacket = {
+                id: "shouldnotseethis",
+                data: { random: generateDifficult(32) }
+            }
+
+            var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
+
+            client.on('connect', () => {
+                client.subscribe(account.apikey + "|" + packet.id, (err: Error) => {
+                    if (err) { console.log(err) }
+                    request.post(uri + "/api/v3/data/post", { headers, json: dummypacket }, () => {
+                        // once done we post the real one.
+                        request.post(uri + "/api/v3/data/post", { headers, json: packet });
+                    })
                 })
             })
 
