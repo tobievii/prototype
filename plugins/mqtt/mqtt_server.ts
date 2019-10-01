@@ -30,24 +30,22 @@ export default class MQTT extends PluginSuperServerside {
 
 
 
-        //
+        this.documentstore.on("packets", (data) => {
+            if (data.fullDocument) {
+                this.server_mqtt.emit("packets", data.fullDocument);
+                if (this.server_mqtt_tls) this.server_mqtt_tls.emit("packets", data.fullDocument);
+            }
+        })
 
-        // this.webserver.app.get("/api/v4/myplugin/test", (req, res) => {
-        //     res.json({ test: "successful123!" })
-        // })
 
-        // this.webserver.app.post("/api/v4/myplugin/sendtest", (req, res) => {
-        //     console.log(req.body);
-        //     res.json({ test: "sendtestsuccess", recieved: req.body })
-        // })
     }
 
-    userauth = (apikey, cb) => {
+    userauth = (apikey: string, cb: any) => {
         logger.log({ group: "mqtt_server", message: "userauth", data: {}, level: "verbose" })
         this.core.user({ apikey }, cb);
     }
 
-    publish = (data, cb) => {
+    publish = (data: any, cb: any) => {
         logger.log({ group: "mqtt_server", message: "publish", data, level: "verbose" })
         this.core.datapost({ user: data.user, packet: data.packet }, cb)
     }

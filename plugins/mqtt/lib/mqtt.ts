@@ -6,7 +6,7 @@ import * as net from "net";
 import * as tls from "tls";
 
 import * as _ from "lodash"
-import { DBchange, CorePacket } from "../../../server/shared/interfaces";
+import { DBchange, CorePacket, User } from "../../../server/shared/interfaces";
 import { logger } from "../../../server/shared/log";
 import { generateDifficult } from "../../../server/utils/utils";
 
@@ -43,12 +43,13 @@ export class MQTTServer extends EventEmitter {
         }
 
 
-        // this.on("packets", (packets) => {
-        //     this.handlePacket(packets);
-        // })
+        // incoming packets from cluster
+        this.on("packets", (packets) => {
+            this.handlePacket(packets);
+        })
     }
 
-    handleSocket = (socket) => {
+    handleSocket = (socket: net.Socket | tls.TLSSocket) => {
         logger.log({ group: "mqtt", message: "new socket", data: { remoteAddress: socket.remoteAddress, protocol: this.protocol }, level: "verbose" })
         var client = new mqttConnection({ socket })
 
@@ -188,7 +189,7 @@ export class mqttConnection extends EventEmitter {
 
                         console.log("emit userauth")
                         // check if this is a valid user?
-                        this.emit("userauth", apikey, (err, user) => {
+                        this.emit("userauth", apikey, (err: Error, user: User) => {
                             console.log("recievd CALLBACK!")
                             if (err) {
                                 console.log("2 ERR")
@@ -251,15 +252,16 @@ export class mqttConnection extends EventEmitter {
                             //"socketUuid": "..."
                         }
 
-                        this.emit("publish", { user: this.user, apikey: this.apikey, packet: requestClean }, (err, result) => {
-                            logger.log({ group: "mqtt", message: "publish success", data: {}, level: "verbose" })
-                            if (packet.qos > 0) {
-                                this.socket.write(mqttpacket.generate({
-                                    cmd: 'puback',
-                                    messageId: packet.messageId
-                                }))
-                            }
-                        })
+                        this.emit("publish", { user: this.user, apikey: this.apikey, packet: requestClean },
+                            (err: Error, result: any) => {
+                                logger.log({ group: "mqtt", message: "publish success", data: {}, level: "verbose" })
+                                if (packet.qos > 0) {
+                                    this.socket.write(mqttpacket.generate({
+                                        cmd: 'puback',
+                                        messageId: packet.messageId
+                                    }))
+                                }
+                            })
                         // this now needs to be processed and saved to db.
 
 
