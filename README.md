@@ -1,6 +1,10 @@
-# PROTOTYPE 5.1 BETA
+# PROTOTYPE
 
-[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=dev)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=dev)
+dev branch [v 5.1.0-beta](https://github.com/IoT-nxt/prototype/tree/dev):   
+[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=dev)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=dev)   
+
+master branch [v 5.0.43-prod](https://github.com/IoT-nxt/prototype/tree/master):   
+[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=dev)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=dev)   
 
 After a mayor refactor from 5.0 to 5.1 we are now entering dev testing and QA.   
 This should last until end of October 2019 giving us one month of polish and testing   
