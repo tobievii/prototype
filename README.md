@@ -39,6 +39,10 @@ mongo
 rs.initiate()
 ```
 
+```
+openssl req -nodes -new -x509 -keyout server.key -out server.cert
+```
+
 You might notice that database object format has also changed and is now more consistent between the API and the storage format. You might experience workflow scripts need to migrate to the new data structure:
 
 ```js

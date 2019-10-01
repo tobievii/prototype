@@ -320,7 +320,10 @@ export class Core extends EventEmitter {
 
 
             //todo: meta
-            packet.meta = {};
+            if (!packet.meta) {
+                packet.meta = {};
+            }
+
 
             //flags force boolean
             if (packet.public != undefined) packet.public = (packet.public == true);

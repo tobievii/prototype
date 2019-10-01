@@ -47,19 +47,26 @@ class Logger {
         leveltabs = "\t\t"
       }
 
+      var level = event.level;
+      var processid, group;
 
       if (process) {
-        console.log(new Date().toISOString() + " " + event.level + leveltabs + process.pid + " " + event.message + tabs + data);
-      } else {
-        console.log(new Date().toISOString() + " " + event.level + leveltabs + " " + event.message + tabs + data);
+        processid = process.pid;
       }
 
+      if (event.group) {
+        group = event.group
+      } else { group = "" }
+
+      console.log(new Date().toISOString() + " " + padString(group) + " " + event.level + leveltabs + processid + " " + event.message + tabs + data);
     }
   }
 
 }
 
 
-
+function padString(instr) {
+  return String(instr + "                 ").slice(0, 15);
+}
 
 export const logger = new Logger();

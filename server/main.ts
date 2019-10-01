@@ -7,7 +7,7 @@ import { logger } from './shared/log';
 import { DBchange, User } from "./shared/interfaces"
 import * as repl from "repl";
 import { SocketServer } from './core/socketserver';
-import { MQTTServer } from "./core/mqtt"
+
 import { cfg } from "./core/config"
 import { Migration } from "./utils/migrate"
 
@@ -29,6 +29,8 @@ var numCPUs = require('os').cpus().length;
 // Force cluster on single core for dev server testing
 if (numCPUs == 1) { numCPUs = 2 }
 
+// dev override
+numCPUs = 1;
 
 interface State {
     isMaster: boolean;
@@ -97,7 +99,7 @@ if (cluster.isMaster) {
     var core: Core;
     var webserver: Webserver;
     var socketserver: SocketServer;
-    var mqttserver: MQTTServer;
+    //var mqttserver: MQTTServer;
 
     var pluginInstances: any = [];
     var pluginInstancesObject: any = {};
@@ -122,14 +124,14 @@ if (cluster.isMaster) {
 
         ///////////////////////////////////////////////////////////////////
 
-        mqttserver = new MQTTServer({ core })
+        //mqttserver = new MQTTServer({ core })
 
 
         // update client that packets has changed
         documentstore.on("packets", (data: DBchange) => {
             if (data.fullDocument) {
                 socketserver.emit("packets", data.fullDocument);
-                mqttserver.emit("packets", data.fullDocument);
+                //mqttserver.emit("packets", data.fullDocument);
             }
         })
 
@@ -137,7 +139,7 @@ if (cluster.isMaster) {
         documentstore.on("states", (data: DBchange) => {
             if (data.fullDocument) {
                 socketserver.emit("states", data.fullDocument);
-                mqttserver.emit("states", data.fullDocument);
+                //mqttserver.emit("states", data.fullDocument);
             }
         })
 
@@ -146,7 +148,7 @@ if (cluster.isMaster) {
             if (data.fullDocument) {
 
                 socketserver.emit("users", data.fullDocument);
-                mqttserver.emit("users", data.fullDocument);
+                //mqttserver.emit("users", data.fullDocument);
             }
         })
         ///////////////////////////////////////////////////////////////////

@@ -3,12 +3,15 @@
 
 import { EventEmitter } from "events"
 import * as net from "net";
+import * as tls from "tls";
 
 import * as _ from "lodash"
-import { logger } from "../shared/log"
-import { generateDifficult } from "../utils/utils"
-import { Core } from "./core"
-import { DBchange, CorePacket } from "../shared/interfaces";
+import { DBchange, CorePacket } from "../../../server/shared/interfaces";
+import { logger } from "../../../server/shared/log";
+import { generateDifficult } from "../../../server/utils/utils";
+
+
+var mqttpacket = require('mqtt-packet')
 
 export class MQTTServer extends EventEmitter {
     serversMem: any[] = [];
@@ -21,58 +24,59 @@ export class MQTTServer extends EventEmitter {
     ev: any;
     clustersubs: string[] = [];
 
-    constructor(options: { core: Core }) {
+    protocol: string = "mqtt"; //default
+
+    constructor(options: { mqtts: boolean, sslOptions?: any }) {
         super();
 
-        var server = net.createServer((socket: any) => {
-            var client = new mqttConnection({ socket, core: options.core })
+        var server = (options.mqtts)
+            ? tls.createServer(options.sslOptions, this.handleSocket)
+            : net.createServer(this.handleSocket);
 
-            client.on("connect", (data) => {
-                logger.log({ message: "mqtt client conn", data: { data }, level: "verbose" })
-                this.mqttConnections.push(client);
-            })
+        if (options.mqtts) {
+            this.protocol = "mqtts"; //override
+            logger.log({ group: "mqtt", message: "tls server listening on port 8883", data: {}, level: "verbose" })
+            server.listen(8883);
+        } else {
+            logger.log({ group: "mqtt", message: "server listening on port 1883", data: {}, level: "verbose" })
+            server.listen(1883);
+        }
 
-            client.on("subscribe", (packet) => {
-                if (client.subscriptions.includes(packet.subscribe) == false) {
-                    logger.log({ message: "mqtt subscr", data: { sub: packet.subscribe }, level: "verbose" })
-                    client.subscriptions.push(packet.subscribe)
-                }
-            })
 
-            // client.on("publish", (publish) => {
-            //     var requestClean: any = {}
+        // this.on("packets", (packets) => {
+        //     this.handlePacket(packets);
+        // })
+    }
 
-            //     // error catching..
+    handleSocket = (socket) => {
+        logger.log({ group: "mqtt", message: "new socket", data: { remoteAddress: socket.remoteAddress, protocol: this.protocol }, level: "verbose" })
+        var client = new mqttConnection({ socket })
 
-            //     try {
-            //         requestClean = JSON.parse(publish.payload)
-            //         if (requestClean.data == undefined || requestClean.id == undefined) {
-            //             logger.log({ message: "mqtt data/id parameter missing", data: {}, level: "warn" })
-            //         } else {
-            //             logger.log({ message: "mqtt publish recv", data: {}, level: "info" })
-            //             requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": client.uuid }
-            //             //this.emit("device", { apikey: publish.topic, packet: requestClean }) // this now needs to be processed and saved to db.
-            //             options.core.datapost({ user: client.user, packet: requestClean })
-
-            //         }
-            //     } catch (err) {
-            //         logger.log({ message: "mqtt error", data: { err }, level: "error" });
-            //     }
-            // })
-
-            client.on("error", (err: any) => {
-                logger.log({ message: "mqtt error", data: { err }, level: "error" });
-            })
-
-            client.on("ping", () => { })
-        });
-
-        server.listen(1883);
-
-        this.on("packets", (packets) => {
-            this.handlePacket(packets);
+        client.on("connect", (data) => {
+            logger.log({ message: "mqtt client conn", data: { data }, level: "verbose" })
+            this.mqttConnections.push(client);
         })
 
+        client.on("subscribe", (packet) => {
+            if (client.subscriptions.includes(packet.subscribe) == false) {
+                logger.log({ message: "mqtt subscr", data: { sub: packet.subscribe }, level: "verbose" })
+                client.subscriptions.push(packet.subscribe)
+            }
+        })
+
+        /** forward auth request to plugin */
+        client.on("userauth", (apikey, cb) => { this.emit("userauth", apikey, cb); })
+
+        client.on("publish", (data, cb) => {
+            data.packet.meta.protocol = this.protocol;
+            this.emit("publish", data, cb);
+        })
+
+        client.on("error", (err: any) => {
+            logger.log({ message: "mqtt error", data: { err }, level: "error" });
+        })
+
+        client.on("ping", () => { })
     }
 
     handlePacket(packet: CorePacket) {
@@ -121,10 +125,9 @@ export class MQTTServer extends EventEmitter {
 
 
 
-var mqttpacket = require('mqtt-packet')
+
 
 export class mqttConnection extends EventEmitter {
-    core: Core;
     socket: net.Socket;
     apikey: string = "";
     subscriptions: any = [];
@@ -135,11 +138,10 @@ export class mqttConnection extends EventEmitter {
     parser: any;
     user: any;
 
-    constructor(options: { socket: net.Socket, core: Core }) {
+    constructor(options: { socket: net.Socket }) {
         super()
 
         this.socket = options.socket;
-        this.core = options.core;
 
         var opts = { protocolVersion: 4 } // default is 4. Usually, opts is a connect packet
         this.parser = mqttpacket.parser(opts);
@@ -150,7 +152,7 @@ export class mqttConnection extends EventEmitter {
         this.connected = true;
 
         this.parser.on("packet", (packet: any) => {
-
+            logger.log({ group: "mqtt", message: "packet " + packet.cmd, data: {}, level: "verbose" })
             if (packet.cmd == "connect") {
                 /*
                 0x00 Connection Accepted
@@ -169,31 +171,36 @@ export class mqttConnection extends EventEmitter {
                 }
 
                 if (packet.password) {
-                    var apikey = packet.password.toString().split("-");
-
+                    var apikeyParse = packet.password.toString().split("-");
 
                     // error check
-                    if ((apikey.length != 2) || (apikey[0] != "key")) {
+                    if ((apikeyParse.length != 2) || (apikeyParse[0] != "key")) {
                         //disconnect wrong username/pass
+                        console.log("mqtt apikey format fail")
                         this.socket.write(mqttpacket.generate({ cmd: "connack", returnCode: 4 }))
                         return;
                     }
 
                     // looks okay, check db
-                    if ((apikey[0] == "key") && (apikey.length == 2)) {
+                    if ((apikeyParse[0] == "key") && (apikeyParse.length == 2)) {
 
+                        var apikey = apikeyParse[1]; // after the key-
 
-
-                        this.core.user({ apikey: apikey[1] }, (err, user) => {
+                        console.log("emit userauth")
+                        // check if this is a valid user?
+                        this.emit("userauth", apikey, (err, user) => {
+                            console.log("recievd CALLBACK!")
                             if (err) {
+                                console.log("2 ERR")
                                 //disconnect wrong username/pass
                                 this.socket.write(mqttpacket.generate({ cmd: "connack", returnCode: 4 }))
                                 return;
                             }
 
                             if (user) {
+                                console.log("1 AUTHED")
                                 this.user = user;
-                                this.apikey = apikey[1];
+                                this.apikey = apikey;
                                 this.emit("connect", { apikey: this.apikey })
 
                                 this.socket.write(mqttpacket.generate({
@@ -202,6 +209,8 @@ export class mqttConnection extends EventEmitter {
                                 }));
                             }
                         })
+
+
 
 
                     }
@@ -227,26 +236,23 @@ export class mqttConnection extends EventEmitter {
             if (packet.cmd == "publish") {
                 ///////////
 
-
-                //this.emit("publish", packet);
-
-
-
-
-
-                var requestClean: any = {}
-
                 // error catching..
 
                 try {
-                    requestClean = JSON.parse(packet.payload)
+                    var requestClean = JSON.parse(packet.payload)
                     if (requestClean.data == undefined || requestClean.id == undefined) {
                         logger.log({ message: "mqtt data/id parameter missing", data: {}, level: "warn" })
                     } else {
                         logger.log({ message: "mqtt publish recv", data: {}, level: "info" })
-                        requestClean.meta = { "User-Agent": "MQTT", "method": "publish", "socketUuid": "..." }
-                        //this.emit("device", { apikey: publish.topic, packet: requestClean }) // this now needs to be processed and saved to db.
-                        options.core.datapost({ user: this.user, packet: requestClean }, (err, result) => {
+                        requestClean.meta = {
+                            "remoteip": this.socket.remoteAddress,
+                            //"User-Agent": "MQTT",
+                            //"method": "publish",
+                            //"socketUuid": "..."
+                        }
+
+                        this.emit("publish", { user: this.user, apikey: this.apikey, packet: requestClean }, (err, result) => {
+                            logger.log({ group: "mqtt", message: "publish success", data: {}, level: "verbose" })
                             if (packet.qos > 0) {
                                 this.socket.write(mqttpacket.generate({
                                     cmd: 'puback',
@@ -254,15 +260,14 @@ export class mqttConnection extends EventEmitter {
                                 }))
                             }
                         })
+                        // this now needs to be processed and saved to db.
+
+
 
                     }
                 } catch (err) {
-                    logger.log({ message: "mqtt error", data: { err }, level: "error" });
+                    logger.log({ message: "mqtt parse error", data: { err }, level: "error" });
                 }
-
-
-
-
 
 
 
