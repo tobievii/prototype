@@ -25,8 +25,8 @@ export function webapi_v3() {
     var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
 
 
-    var preset = "localhost";
-    //var preset = "dev";
+    //var preset = "localhost";
+    var preset = "dev";
     //var preset = "prod";
 
     if (preset == "localhost") {
@@ -62,9 +62,9 @@ export function webapi_v3() {
     var headers = { Authorization: "" };
     var timeout = 5000;
 
+    var account: any;           // instance for new user
+
     describe("PROTOTYPE V3 API", () => {
-        // instance for new user
-        var account: any;
 
         /** test registration of new accounts */
         it("register", function (done) {
@@ -232,13 +232,23 @@ export function webapi_v3() {
                 }
             })
         })
+    })
 
+    //////// MQTT START
 
+    describe("PROTOTYPE V3 API MQTT", () => {
 
+        it("MQTT can connect", done => {
+            var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
-        it("HTTP -> SOCKETIO (DEPRECIATED)", done => { done(); })
+            client.on('connect', () => {
+                done();
+            })
 
-        it("HTTP -> MQTT (APIKEY WIDE SUB)", done => {
+        })
+
+        it("HTTP -> MQTT (APIKEY WIDE SUB)", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
 
             var packet = {
                 id: "prottesthttpmqtt",
@@ -250,7 +260,9 @@ export function webapi_v3() {
             client.on('connect', () => {
                 client.subscribe(account.apikey, (err: Error) => {
                     if (err) { console.log(err) }
-                    request.post(uri + "/api/v3/data/post", { headers, json: packet })
+                    setTimeout(() => {
+                        request.post(uri + "/api/v3/data/post", { headers, json: packet })
+                    }, 750)
                 })
             })
 
@@ -265,7 +277,8 @@ export function webapi_v3() {
         /** This tests if per device subscriptions work as expected. We test by subscribing to a device, then sending a dummypacket then the real packet.
          * We verify we only recieve the expected packet for the subscription.
          */
-        it("HTTP -> MQTT (PER DEVICE SUB)", done => {
+        it("HTTP -> MQTT (PER DEVICE SUB)", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
 
             var packet = {
                 id: "prottesthttpmqtt",
@@ -282,77 +295,35 @@ export function webapi_v3() {
             client.on('connect', () => {
                 client.subscribe(account.apikey + "|" + packet.id, (err: Error) => {
                     if (err) { console.log(err) }
-                    request.post(uri + "/api/v3/data/post", { headers, json: dummypacket }, () => {
-                        // once done we post the real one.
-                        request.post(uri + "/api/v3/data/post", { headers, json: packet });
-                    })
+                    setTimeout(() => {
+                        request.post(uri + "/api/v3/data/post", { headers, json: dummypacket }, () => {
+                            // once done we post the real one.
+                            request.post(uri + "/api/v3/data/post", { headers, json: packet });
+                        })
+                    }, 750);
                 })
             })
 
             client.on('message', (topic: string, message: Buffer) => {
                 var parsed = JSON.parse(message.toString());
-                if (parsed.data.random == packet.data.random) { done(); } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
+                if (parsed.data.random == packet.data.random) {
+                    done();
+                    client.end();
+                } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
             })
 
         })
 
 
-        // it("MQTT -> SOCKET", function (done) {
-        //     this.timeout(5000);
-        //     var id = "prottestmqttsocket"
-        //     var test = Math.random()
+        /** We test publishing on MQTT and using HTTP API to check if data was recieved correctly. */
+        it("MQTT -> HTTP", done => {
+            var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
-        //     // SOCKET LISTEN
-        //     var socketaccount = _.clone(testAccount);
-        //     socketaccount.protocol = "websocket";
-        //     socketaccount.id = id;
-        //     var protSocket = new Prototype(socketaccount)
+            client.on('connect', function () {
+                client.publish(account.apikey, JSON.stringify({ id: "mqttDevice01", data: { a: Math.random() } }));
+            })
 
-        //     protSocket.on("connect", () => {
-        //         // MQTT POST
-        //         var mqttaccount = _.clone(testAccount);
-        //         mqttaccount.protocol = "mqtt";
-        //         mqttaccount.id = id;
-        //         var protMqtt = new Prototype(mqttaccount).post({ id, data: { test } })
-        //     })
-
-        //     protSocket.on("data", data => {
-        //         if (data.id != id) { done(new Error("id missing from socket packet")); return; }
-        //         if (!data.data) { done(new Error("data missing from socket packet")); return; }
-        //         if (data.data.test != test) { done(new Error("data mismatch from socket packet")); return; }
-        //         done();
-        //         protSocket.disconnect();
-        //     });
-
-
-
-
-        // })
-
-
-
-        // it("MQTT -> HTTP", done => {
-        //     var id = "prottestmqtt"
-        //     var test = Math.random()
-
-        //     var mqttaccount = _.clone(testAccount);
-        //     mqttaccount.protocol = "mqtt";
-
-        //     var protMqtt = new Prototype(mqttaccount);
-
-        //     protMqtt.post({ id, data: { test } }, (e, result) => {
-
-        //         new Prototype(testAccount).view(id, (e: Error, data: any) => {
-        //             if (data.id != id) { done(new Error("id missing from packet")); return; }
-        //             if (!data.data) { done(new Error("data missing from packet")); return; }
-        //             if (data.data.test != test) { done(new Error("data mismatch from packet")); return; }
-        //             done();
-        //         })
-
-        //         protMqtt.disconnect();
-        //     })
-
-        // })
+        })
 
 
 

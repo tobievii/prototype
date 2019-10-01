@@ -34,7 +34,7 @@ export class DocumentStore extends EventEmitter {
             logger.log({ message: "mongojs error", data: { err }, level: "error" })
         })
 
-        mongoose.connect(options.mongoConnection, { useNewUrlParser: true }, (err) => {
+        mongoose.connect(options.mongoConnection, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
             if (err) {
                 console.log(err);
                 logger.log({ message: "mongoose db connect error", data: { err }, level: "error" });
