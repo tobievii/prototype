@@ -10,9 +10,13 @@ export { default as admin } from './admin/admin_server'
 import { default as cluster } from './cluster/cluster_server'
 export { default as cluster } from './cluster/cluster_server'
 
+import { default as mqtt } from './mqtt/mqtt_server'
+export { default as mqtt } from './mqtt/mqtt_server'
+
 export interface plugins {
     iotnxt: iotnxt,
     myplugin: myplugin,
     admin: admin,
-    cluster: cluster
+    cluster: cluster,
+    mqtt: mqtt
 }

@@ -1,6 +1,6 @@
 # PROTOTYPE 5.1 BETA
 
-[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=master)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=master)
+[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=dev)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=dev)
 
 After a mayor refactor from 5.0 to 5.1 we are now entering dev testing and QA.   
 This should last until end of October 2019 giving us one month of polish and testing   

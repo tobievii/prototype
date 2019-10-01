@@ -4,6 +4,7 @@ import { generateDifficult } from "../../utils/utils"
 
 import * as _ from "lodash"
 import request = require("request");
+var mqtt = require('mqtt');
 
 /*
   prototype test suite
@@ -12,54 +13,94 @@ import request = require("request");
 
 // https://mochajs.org/#getting-started
 
+interface TESTCONFIG {
+    hostname: string
+    httpprot: string
+    httpport: string
+    mqttprot: string
+}
 
 export function webapi_v3() {
 
-    var uri = "https://prototype.dev.iotnxt.io";
-    //var uri = "https://prototype.iotnxt.io";
-    var mqtturi = "mqtts://prototype.iotnxt.io"
+    var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
 
-    var headers = { Authorization: "" };
 
-    //var local = true; //local or online
-    var local = false; // use production V3
+    //var preset = "localhost";
+    //var preset = "dev";
+    var preset = "dev";
 
-    var testAccount: any = {};
+    if (preset == "localhost") {
+        testconfig.hostname = "localhost"
+        testconfig.httpport = ":8080"
+        testconfig.httpprot = "http://"
+        testconfig.mqttprot = "mqtt://"
+    }
 
-    if (local) {
-        uri = "http://localhost:8080"
-        mqtturi = "mqtt://localhost"
+    if (preset == "dev") {
+        testconfig.hostname = "prototype.dev.iotnxt.io"
+        testconfig.httpport = "" // default to 443
+        testconfig.httpprot = "https://"
+        testconfig.mqttprot = "mqtt://"
+    }
 
-        testAccount = {
-            email: "test" + generateDifficult(32) + "@iotlocalhost.com",
-            password: "newUser",
-
-            /* dev server:                          */
-            // host: "prototype.dev.iotnxt.io",
-            // https: true
-
-            /* localhost:                           */
-            host: "localhost",
-            https: false,
-            port: 8080
-        }
-    } else {
-        testAccount = {
-            email: "test" + generateDifficult(32) + "@iotlocalhost.com",
-            password: "newUser",
-
-            /* dev server:                          */
-            host: "prototype.iotnxt.io",
-            https: true
-
-            /* localhost:                           */
-            // host: "localhost",
-            // https: false,
-            // port: 8080
-        }
+    if (preset == "prod") {
+        testconfig.hostname = "prototype.iotnxt.io"
+        testconfig.httpport = "" // default to 443
+        testconfig.httpprot = "https://"
+        testconfig.mqttprot = "mqtt://"
     }
 
 
+    // var server = "localhost";
+    // //var server = "prototype.iotnxt.io";
+    // //var server = "prototype.dev.iotnxt.io";
+
+    // var httpprotocol = "http";
+    // var httpport = 443;
+
+    // //var local = true; //local or online
+    // var local = false; // use production V3
+
+    var testAccount: any = { email: "test" + generateDifficult(32) + "@iotlocalhost.com", password: "newUser" };
+
+    // if (local) {
+    //     uri = "http://localhost:8080"
+    //     mqtturi = "mqtt://localhost"
+
+    //     testAccount = {
+    //         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
+    //         password: "newUser",
+
+    //         /* dev server:                          */
+    //         // host: "prototype.dev.iotnxt.io",
+    //         // https: true
+
+    //         /* localhost:                           */
+    //         host: "localhost",
+    //         https: false,
+    //         port: 8080
+    //     }
+    // } else {
+    //     testAccount = {
+    //         email: "test" + generateDifficult(32) + "@iotlocalhost.com",
+    //         password: "newUser",
+
+    //         /* dev server:                          */
+    //         host: "prototype.iotnxt.io",
+    //         https: true
+
+    //         /* localhost:                           */
+    //         // host: "localhost",
+    //         // https: false,
+    //         // port: 8080
+    //     }
+    // }
+
+    var uri = testconfig.httpprot + testconfig.hostname + testconfig.httpport;
+    var mqtturi = testconfig.mqttprot + testconfig.hostname
+
+    var headers = { Authorization: "" };
+    var timeout = 5000;
 
     describe("PROTOTYPE V3 API", () => {
         // instance for new user
@@ -67,7 +108,7 @@ export function webapi_v3() {
 
         /** test registration of new accounts */
         it("register", function (done) {
-            this.timeout(5000);
+            this.timeout(timeout);
             request.post(uri + "/api/v3/admin/register", { json: { email: testAccount.email, pass: testAccount.password } }, (err, res, response) => {
                 if (err) { done(err); return }
                 if (response) {
@@ -80,7 +121,8 @@ export function webapi_v3() {
         })
 
         /** get account information using auth header */
-        it("account", done => {
+        it("account", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
 
             //generate headers
             headers = { Authorization: "Basic " + Buffer.from("api:key-" + account.apikey).toString("base64") }
@@ -127,7 +169,7 @@ export function webapi_v3() {
         }
 
         it("device HTTP POST", function (done) {
-            this.timeout(50000);
+            this.timeout(timeout);
             request.post(uri + "/api/v3/data/post", { headers, json: packet }, (err, res, response) => {
                 if (err) done(err);
                 if (response) {
@@ -144,7 +186,7 @@ export function webapi_v3() {
 
         /** view device states */
         it("device HTTP VIEW", function (done) {
-            this.timeout(50000);
+            this.timeout(timeout);
             request.post(uri + "/api/v3/view",
                 { headers, json: { id: packet.id } }, (err, res, response) => {
                     if (err) done(err);
@@ -169,7 +211,7 @@ export function webapi_v3() {
 
 
         it("device HTTP PACKETS", function (done) {
-            this.timeout(50000); // crazy slow on prod.
+            this.timeout(timeout); // crazy slow on prod.
             request.post(uri + "/api/v3/packets", { headers, json: { id: packet.id } }, (err, res, response) => {
                 if (err) done(err);
                 if (response) {
@@ -189,7 +231,8 @@ export function webapi_v3() {
          * v4 will use "data.foo"
         */
 
-        it("device HTTP STATE", done => {
+        it("device HTTP STATE", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
             request.post(uri + "/api/v3/state", { headers, json: { id: packet.id } }, (err, res, response) => {
                 if (err) done(err);
                 if (response) {
@@ -202,7 +245,8 @@ export function webapi_v3() {
 
 
 
-        it("device HTTP STATES", done => {
+        it("device HTTP STATES", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
             request.get(uri + "/api/v3/states", { headers, json: true }, (err, res, response) => {
                 if (err) done(err);
                 if (response) {
@@ -215,7 +259,8 @@ export function webapi_v3() {
 
 
 
-        it("device HTTP DELETE", done => {
+        it("device HTTP DELETE", function (done) {
+            this.timeout(timeout); // crazy slow on prod.
             request.post(uri + "/api/v3/state/delete", { headers, json: { id: packet.id } }, (err, res, response) => {
                 if (err) done(err);
                 if (response) {
@@ -234,19 +279,18 @@ export function webapi_v3() {
         it("HTTP -> SOCKETIO (DEPRECIATED)", done => { done(); })
 
         it("HTTP -> MQTT", done => {
+
             var packet = {
                 id: "prottesthttpmqtt",
                 data: { random: generateDifficult(32) }
             }
 
-            var mqtt = require('mqtt');
             var client = mqtt.connect(mqtturi, { username: "api", password: "key-" + account.apikey });
 
             client.on('connect', () => {
                 client.subscribe(account.apikey, (err: Error) => {
                     if (err) { console.log(err) }
                     request.post(uri + "/api/v3/data/post", { headers, json: packet })
-
                 })
             })
 
