@@ -35,7 +35,7 @@ export interface CorePacket {
     workflowCode?: string;
     key?: string; // todo: is this secret?
     [index: string]: any;
-    timestamp: Date;
+    timestamp?: Date;
 }
 
 export interface DBchange {
