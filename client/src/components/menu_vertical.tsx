@@ -27,6 +27,7 @@ interface MenuProps {
     },
     fill?: boolean,
     height?: number | string
+    onClick?: Function
 }
 
 interface MenuState { }
@@ -80,13 +81,14 @@ export class MenuVertical extends React.Component<MenuProps, MenuState> {
 
                     var onClick = (e) => {
                         this.setState({ active: i })
+                        if (this.props.onClick) { this.props.onClick(); }
                         if (item.onClick) item.onClick();
                     }
 
                     var icon = (item.icon) ? item.icon : "angle-right";
 
                     return (item.link)
-                        ? <div key={i} style={{ padding: colors.padding }}><NavLink exact to={item.link}  >{this.drawbutton(icon, size, item)}</NavLink></div>
+                        ? <div key={i} style={{ padding: colors.padding }}><NavLink onClick={onClick} exact to={item.link}  >{this.drawbutton(icon, size, item)}</NavLink></div>
                         : <div key={i} style={{ padding: colors.padding }} onClick={onClick} > {this.drawbutton(icon, size, item)} </div>
                 }
                 )}

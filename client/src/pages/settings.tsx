@@ -18,7 +18,9 @@ interface MyState {
     //[index: string]: any
 }
 export class Settings extends React.Component<MyProps, MyState> {
-    state = {};
+    state = {
+        showMobileMenu: false
+    };
 
     showpage(page) {
 
@@ -29,29 +31,6 @@ export class Settings extends React.Component<MyProps, MyState> {
         var PluginToRender = plugins[page]
 
         return <PluginToRender />
-        // if (page == "iotnxt") {
-        //     return <div>Iotnxt settings</div>
-        // }
-
-        // if (page == "admin") {
-        //     return <div>Admin</div>
-        // }
-
-        // if (page == "http") {
-        //     return <div>HTTP</div>
-        // }
-
-        // if (page == "tcp") {
-        //     return <div>TCP</div>
-        // }
-
-        // if (page == "teltonika") {
-        //     return <div>Teltonika</div>
-        // }
-
-        // if (page == "hf2111a") {
-        //     return <div>HF2111a</div>
-        // }
     }
 
     render() {
@@ -76,28 +55,66 @@ export class Settings extends React.Component<MyProps, MyState> {
         var settingsMenuItems = []
         settingsMenuItems.push({ text: "ACCOUNT", link: "/settings/account", icon: "user-circle" })
 
+
+        var completemenuitems = []
+        completemenuitems = completemenuitems.concat(adminMenuItems, settingsMenuItems, pluginsMenuItems)
+        console.log(completemenuitems)
+
+
+        var size = (window.innerWidth < 800) ? "small" : "large"
+
+        var showmenu = (window.innerWidth < 800) ? false : true
+
+        if (this.state.showMobileMenu) { showmenu = true; }
+
+        var settingsStyle: any = (window.innerWidth < 800)
+            ? { padding: 0, display: "flex", flexDirection: "column" }
+            : { padding: colors.padding * 2, display: "flex", flexDirection: "row" }
+
+        var menuStyle: any = (window.innerWidth < 800)
+            ? { width: "100%", margin: 0, padding: colors.padding * 2 }
+            : { background: "rgba(0,0,0,0.1)", width: 300, margin: colors.padding, padding: colors.padding * 2, }
+
+
+        /** this shows the menu on small screens by default on /settings url (no sub page) */
+        if (size == "small") {
+            if (this.props.page == undefined) {
+                showmenu = true;
+            }
+        }
+
+        var showContent = true;
+        /** this hides content on small screens if menu is active */
+        if (size == "small") {
+            if (showmenu) {
+                showContent = false;
+            }
+        }
+
         return (
-            <div className="apiInfo" style={{ padding: colors.padding * 2, display: "flex", flexDirection: "row" }} >
+            <div className="apiInfo" style={settingsStyle} >
 
-                <div style={{ background: "rgba(0,0,0,0.1)", width: 300, margin: colors.padding, padding: colors.padding * 2, }}>
+                {(showmenu)
+                    ? <div style={menuStyle}><MenuVertical
+                        active={this.props.page}
+                        menuitems={completemenuitems}
+                        onClick={() => { this.setState({ showMobileMenu: false }) }} /></div>
+                    : < button
+                        style={{ whiteSpace: "nowrap" }}
+                        onClick={() => { this.setState({ showMobileMenu: true }) }}>
+                        <i className="fas fa-list-ul"></i> SHOW MENU</button>
+                }
 
-                    {(api.data.account.admin) &&
-                        <div>
-                            <MenuVertical active={this.props.page} menuitems={adminMenuItems} />
-                        </div>
-                    }
 
-                    <div>
-                        <MenuVertical active={this.props.page} menuitems={settingsMenuItems} />
+                {
+                    (showContent)
+                        ? <div style={{ background: "rgba(0,0,0,0.1)", flex: "1", margin: colors.padding, padding: colors.padding * 2, }}>
+                            <h2 style={{ textTransform: "uppercase" }}>{this.props.page}</h2>
+                            {this.showpage(this.props.page)}</div>
+                        : ""
+                }
 
-                        <MenuVertical active={this.props.page} menuitems={pluginsMenuItems} />
-                    </div>
-                </div>
 
-                <div style={{ background: "rgba(0,0,0,0.1)", flex: "1", margin: colors.padding, padding: colors.padding * 2, }}>
-                    <h2 style={{ textTransform: "uppercase" }}>{this.props.page}</h2>
-                    {this.showpage(this.props.page)}
-                </div>
             </div >
         );
     }
