@@ -58,8 +58,6 @@ export class Settings extends React.Component<MyProps, MyState> {
 
         var completemenuitems = []
         completemenuitems = completemenuitems.concat(adminMenuItems, settingsMenuItems, pluginsMenuItems)
-        console.log(completemenuitems)
-
 
         var size = (window.innerWidth < 800) ? "small" : "large"
 
