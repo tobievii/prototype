@@ -126,6 +126,12 @@ npm run build       # or build for production
 
 ## _Step 3_ **_Run the backend server_**
 
+Install [nodemon](https://nodemon.io/) globally (if server filewatch is needed)
+```sh
+npm install -g nodemon
+```
+Run the server start command
+
 ```sh
 npm run watchserver
 ```
@@ -142,7 +148,7 @@ nodemon main.js     # npm i nodemon -g
 
 Go to [http://localhost:8080/](http://localhost:8080/) and log in with the default account:
 
-       email: admin@localhost.com
+    email: admin@localhost.com
     password: admin
 
 # Configuration
