@@ -21,7 +21,8 @@ export const colors = {
   borders: "1px solid rgba(128,128,128,0.03)", // 
   padding: 10,
   widgetDefault: "#11CC88",
-  backgroundPopup: "rgba(32, 32, 32, 0.5)"
+  backgroundPopup: "rgba(32, 32, 32, 0.95)",
+  bgDarker: "rgba(0,0,0,0.2)"
 };
 
 // DEFINE COLOURS HERE:

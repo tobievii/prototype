@@ -27,25 +27,39 @@ export class Popup<T extends PopupProps> extends React.Component<T, {}> {
         var size = "large";
         if (window.innerWidth < 800) { size = "small" }
 
-        return (
-            <div style={{
-
+        /** wrapper div styling depending for mobile or desktop */
+        var popupwrapstyle: any = (window.innerWidth < 800)
+            ? {
+                position: "absolute",
+                top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 1000,
+                background: "#f00",
+            } : {
                 position: "absolute",
                 top: 0, left: 0, right: 0, bottom: 0,
                 background: colors.backgroundPopup,
                 paddingTop: "300px",
                 zIndex: 1000
-            }}>
-                <div style={{
-                    boxShadow: "0px 0px 25px 0px rgba(0,0,0,0.5)",
-                    background: colors.panels,
-                    padding: 0, width: "500px", margin: "0 auto",
-                    borderTopRightRadius: "12px"
-                    //border: "2px solid rgba(0,0,0,0.1)"
-                }}>
+            }
+
+        /** popup div styling depending for mobile or desktop */
+        var popupmainstyle: any = (window.innerWidth < 800) ? {
+            background: colors.panels,
+            padding: 0, width: "100%", margin: "0 auto",
+            height: "100%"
+            //border: "2px solid rgba(0,0,0,0.1)"
+        } : {
+                boxShadow: "0px 0px 25px 0px rgba(0,0,0,0.5)",
+                background: colors.panels,
+                padding: 0, width: "500px", margin: "0 auto",
+                //border: "2px solid rgba(0,0,0,0.1)"
+            }
+
+        return (
+            <div style={popupwrapstyle}>
+                <div style={popupmainstyle}>
 
                     <div style={{
-                        borderTopRightRadius: "12px",
                         background: "rgba(0,0,0,0.1)",
                         display: "flex", flexDirection: "row"
                     }}>
@@ -63,7 +77,7 @@ export class Popup<T extends PopupProps> extends React.Component<T, {}> {
 
 
                     </div>
-                    <div style={{ height: "100%", padding: colors.padding * 2 }}>
+                    <div style={{ height: "100%", padding: 0 }}>
                         {children}
                     </div>
 

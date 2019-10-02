@@ -10,6 +10,7 @@ import { sortBy, clone, filter } from "../utils/lodash_alt"
 import { logger } from "../../../server/shared/log"
 import { PopupShare } from "./popups/popup_share";
 import { PopupConfirm } from "./popups/popup_confirm";
+import { PopupAddWizard } from "./popups/popup_addwizard";
 
 interface MyProps {
     username?: string;
@@ -19,6 +20,7 @@ interface MyState {
     [index: string]: any;
 }
 
+/** This component is the entire box containing add device, the modify menu, and the list of devices. */
 export class DeviceList extends React.Component<MyProps, MyState> {
     state = {
         sort: {
@@ -35,7 +37,8 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         states: [],
         statesraw: [],
         sharedevicepopupvisible: false,
-        deletedevicepopupvisible: false
+        deletedevicepopupvisible: false,
+        addDeviceWizardPopupVisible: false
     }
 
     constructor(props) {
@@ -206,6 +209,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
      * Handles actions coming from the menu.
      */
     handleAction_deviceListMenu = (action) => {
+        console.log("ACTION", action);
         if (action.selectall != undefined) {
             console.log("selectall")
             var states = clone(this.state.states)
@@ -231,10 +235,16 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             })
         }
 
-        console.log("ACTION", action);
+
         if (action.shareset) {
             this.setState({ sharedevicepopupvisible: true });
         }
+
+        // pressed the add button
+        if (action.add) {
+            this.setState({ addDeviceWizardPopupVisible: true });   // then we show the popup
+        }
+
     }
 
     deletePopupConfirm = () => {
@@ -291,6 +301,8 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                             }}
                             onClose={() => { this.setState({ deletedevicepopupvisible: false }) }} />
                         : ""}
+
+                    {(this.state.addDeviceWizardPopupVisible) ? <PopupAddWizard onClose={() => { this.setState({ addDeviceWizardPopupVisible: false }) }} /> : ""}
 
                 </div>
 
