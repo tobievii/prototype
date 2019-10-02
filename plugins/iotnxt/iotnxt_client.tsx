@@ -144,7 +144,7 @@ export default class Iotnxt extends PluginSuperClientside {
     /** Render the plugin popup on deviceview */
     deviceview() {
 
-        return (<div>
+        return (<div style={{ padding: colors.padding * 2 }}>
 
             {this.renderDeviceGateway()}
 

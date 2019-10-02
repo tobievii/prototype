@@ -38,7 +38,7 @@ export class Popup<T extends PopupProps> extends React.Component<T, {}> {
                 position: "absolute",
                 top: 0, left: 0, right: 0, bottom: 0,
                 background: colors.backgroundPopup,
-                paddingTop: "300px",
+                paddingTop: "100px",
                 zIndex: 1000
             }
 
