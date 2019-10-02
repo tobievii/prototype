@@ -91,7 +91,7 @@ export class Dropdown extends React.Component<Props, State> {
         ? <button style={buttonstyle} onClick={() => { this.setState({ show: !this.state.show }) }}>
           <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
-        : <button style={{ ...buttonstyle, ...{ opacity: 0.5 } }} onClick={() => { this.setState({ show: !this.state.show }) }} disabled>
+        : <button style={{ ...buttonstyle, ...{ opacity: 0.25 } }} onClick={() => { this.setState({ show: !this.state.show }) }} disabled>
           <i className={"fas fa-" + this.state.icon} /> {this.props.text}
         </button>
       }

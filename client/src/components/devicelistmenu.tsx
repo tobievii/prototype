@@ -109,7 +109,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                         <div style={{ flex: "0 auto" }}>
                             {(hasSelection)
                                 ? <button onClick={() => { this.props.action({ removeselected: true }) }}><i className="fas fa-trash" /> Delete</button>
-                                : <button style={{ opacity: 0.5 }}><i className="fas fa-trash" /> Delete</button>
+                                : <button style={{ opacity: 0.25 }}><i className="fas fa-trash" /> Delete</button>
                             }
 
                         </div>
