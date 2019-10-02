@@ -125,7 +125,12 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                         <Link to={"/u/" + this.props.device.username + "/view/" + this.props.device.id} >{this.props.device.id}</Link>
                     </div>
 
-                    <div style={theme.global.devicelist.timecolumn}>
+                    <div style={{
+                        flex: 1,
+                        textAlign: "right",
+                        padding: 5,
+                        whiteSpace: "nowrap"
+                    }}>
                         {moment(this.props.device["_last_seen"]).timeDelta()}
                     </div>
 

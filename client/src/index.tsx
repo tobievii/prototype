@@ -212,14 +212,14 @@ export default class App extends React.Component {
       <div >
         <BGgrad />
         <NavBar />
-        <div style={{ margin: colors.padding * 2, minHeight: "500px" }}>
+        <div style={{ minHeight: "500px" }}>
           {size == "small"
             ? <DeviceList />
             : <div style={{
               boxSizing: "border-box", display: "flex",
               flexDirection: "row", width: "100%"
             }}>
-              <div style={{ flex: "0", height: "500px", minWidth: "400px" }}>
+              <div style={{ flex: "0", height: "500px", minWidth: "600px" }}>
                 <DeviceList />
               </div>
               <div style={{ flex: "1" }}>

@@ -40,7 +40,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
       ]
 
       return (
-        <div style={{ background: colors.panels, padding: colors.padding, margin: colors.padding * 2 }}>
+        <div style={{ background: colors.panels, padding: colors.padding }}>
 
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left", padding: theme.paddings.default }}>
