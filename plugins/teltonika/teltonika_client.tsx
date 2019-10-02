@@ -2,13 +2,18 @@ import React, { Component } from 'react';
 import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
 import { request } from "../../client/src/utils/requestweb"
 import { CodeBlock } from "../../client/src/components/codeblock"
+import { colors } from '../../client/src/theme';
 /** TEMPLATE PLUGIN 
  * 
  * Remember to rename MyPlugin for your own plugin */
+
+interface TeltonikaState {
+    port: number | undefined
+}
+
 export default class Teltonika extends PluginSuperClientside {
     state = {
-        testone: undefined,
-        testtwo: undefined
+        port: undefined
     }
 
     //UNSAFE_componentWillMount
@@ -24,13 +29,23 @@ export default class Teltonika extends PluginSuperClientside {
     render() {}
     */
 
-    componentDidMount() {
-        request.get("/api/v4/myplugin/test", {}, (err, res, serverresponse) => {
-            this.setState({ testone: serverresponse })
-        })
+    componentDidMount = () => {
+        this.updateFromServer();
+    }
 
-        request.post("/api/v4/myplugin/sendtest", { json: { somedata: 123 } }, (err, res, serverresponse) => {
-            this.setState({ testtwo: serverresponse })
+    updateFromServer() {
+        request.get("/api/v3/teltonika/info", {}, (err, res, response: any) => {
+            if (err) { console.log(err); return; }
+            console.log(response);
+            if (response.port) {
+                this.setState({ port: response.port })
+            }
+        })
+    }
+
+    enablePrivatePort = () => {
+        request.get("/api/v3/teltonika/reqport", { json: true }, (err, res, result) => {
+            console.log(result);
         })
     }
 
@@ -43,22 +58,28 @@ export default class Teltonika extends PluginSuperClientside {
         return (
             <div>
 
-                <p>This is MyPlugin settings view.
-                    See <a href="https://github.com/IoT-nxt/prototype/tree/5.1/plugins/myplugin">/plugins/myplugin/myplugin_server.ts</a> for the serverside code.
-                    TODO add documentation on plugin development here.</p>
-
-                <div style={boxstyles}>
-                    <h3>GET "/api/v4/myplugin/test"</h3>
-
-                    <CodeBlock language='json' value={JSON.stringify(this.state.testone, null, 2)} />
+                <div style={{ marginBottom: 20, background: colors.bgDarker, padding: colors.padding * 2 }}>
+                    <h4>PUBLIC PORT (new.. under development)</h4>
+                    DEFAULT PORT: 12000
+                    <p>If you set Teltonika device to connect to this port devices will be visible to
+                        administrators only. Any user can then use the ADD device wizard and type in IMEI
+                        to add device to their account.</p>
                 </div>
 
-                <div style={boxstyles}>
-                    <h3>POST "/api/v4/myplugin/sendtest"</h3>
+                <div style={{ marginBottom: 20, background: colors.bgDarker, padding: colors.padding * 2 }}>
+                    <h4>PRIVATE PORT</h4>
+                    <p>A private port for Teltonika devices will bind a server port to your account so all
+                        teltonika devices pointed to this port will automatically be added to your account.</p>
 
-                    <CodeBlock language='json' value={JSON.stringify(this.state.testtwo, null, 2)} />
+                    <div>
+                        {(this.state.port) ? <div className="commanderBgPanel"
+                        > <i className="fas fa-check-circle" style={{ color: "#11cc88" }}></i> PORT IS ACTIVE: {this.state.port} </div>
+                            : <button onClick={() => { }}
+                                style={{ marginLeft: colors.padding, whiteSpace: "nowrap" }}>
+                                <i className="fas fa-play-circle" style={{ color: colors.good }} /> ENABLE</button>}
+                    </div>
+
                 </div>
-
 
             </div >
         );
