@@ -90,7 +90,10 @@ export default class WidgetCanvas extends WidgetComponent {
         };
 
         return (
-            <Line data={graph} />
+            <Line
+                data={graph}
+                options={{ maintainAspectRatio: false }}
+            />
         )
     }
 };

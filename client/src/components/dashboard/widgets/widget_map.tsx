@@ -74,27 +74,36 @@ export default class WidgetMap extends WidgetComponent {
     };
 
     render() {
+        try {
+            var center = [this.props.value.lat, this.props.value.lon]
+            return (
+                <div style={{ width: "100%", height: "100%", overflow: "hidden" }}
+                    onMouseMove={this.mouseMove}
+                    onWheel={this.wheelHandler}
+                    ref={this.wrapper}
+                ><Map
+                    onBoundsChanged={this.onBoundsChanged}
+                    attribution={false}
+                    animate={true}
+                    center={center}
+                    zoom={parseInt(this.state.options.zoom.value)}
+                    width={this.state.width}
+                    height={this.state.height} >
+                        <Marker anchor={center} payload={1}
+                            onClick={this.handleMarkerClick}
+                        />
+                    </Map>
+                </div>
+            );
+        } catch (error) {
+            console.error(`Invalid map data format. Binding must have "lat" and "lon" properties. Current [${JSON.stringify(this.props.value)}]`)
+            return (
+                <div style={{ height: "100%", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <p>Invalid map data format. Binding must have "lat" and "lon" properties</p>
+                </div>
+            )
+        }
 
-        var center = [this.props.value.lat, this.props.value.lon]
-        return (
-            <div style={{ width: "100%", height: "100%", overflow: "hidden" }}
-                onMouseMove={this.mouseMove}
-                onWheel={this.wheelHandler}
-                ref={this.wrapper}
-            ><Map
-                onBoundsChanged={this.onBoundsChanged}
-                attribution={false}
-                animate={true}
-                center={center}
-                zoom={parseInt(this.state.options.zoom.value)}
-                width={this.state.width}
-                height={this.state.height} >
-                    <Marker anchor={center} payload={1}
-                        onClick={this.handleMarkerClick}
-                    />
-                </Map>
-            </div>
-        );
     }
 };
 
