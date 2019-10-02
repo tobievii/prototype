@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { colors } from "../../../client/src/theme";
+import { request } from "../../../client/src/utils/requestweb";
 
 export class Registration extends React.Component {
   state = {
@@ -13,13 +14,11 @@ export class Registration extends React.Component {
   }
 
   componentDidMount = () => {
-    fetch("/api/v3/admin/registration", { method: "GET", headers: { "Accept": "application/json", "Content-Type": "application/json" } }).then(response => response.json()).then(data => {
-      // console.log(data);  
-      if (data.err) { }
-      if (data.result) {
-        this.setState(data.result)
+    request.get("/api/v3/admin/registration", { json: true }, (err, res, result) => {
+      if (result) {
+        this.setState(result)
       }
-    }).catch(err => console.error(err.toString()));
+    })
   }
 
   checkBox = (flag) => {
@@ -39,37 +38,11 @@ export class Registration extends React.Component {
   }
 
   updateOptions = () => {
-
-    fetch("/api/v3/admin/registration", {
-      method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify(this.state)
-    }).then(response => response.json()).then(data => {
-      // console.log(data);
-
-    }).catch(err => console.error(err.toString()));
-
-
-
+    request.post("/api/v3/admin/registration", { json: this.state }, (err, res, result) => {
+      console.log(result);
+    });
   }
 
-  setupNodemailer = () => {
-    if (this.state.userEmailVerify) {
-      return (<div className="adminBlocksSub">
-
-        <FormInput label="host" value={this.state.nodeMailerTransportHost} onChange={this.handleFormChange("nodeMailerTransportHost")} />
-        <FormInput label="port" value={this.state.nodeMailerTransportPort} onChange={this.handleFormChange("nodeMailerTransportPort")} />
-        <FormInput label="auth user" value={this.state.nodeMailerTransportAuthUser} onChange={this.handleFormChange("nodeMailerTransportAuthUser")} />
-        <FormInput label="auth pass" value={this.state.nodeMailerTransportAuthPass} onChange={this.handleFormChange("nodeMailerTransportAuthPass")} />
-        <FormInput label="from" value={this.state.nodeMailerTransportFrom} onChange={this.handleFormChange("nodeMailerTransportFrom")} />
-
-
-        <div style={{ clear: "both" }} />
-      </div>)
-    } else {
-      return null;
-    }
-
-  }
 
   render() {
 
@@ -91,11 +64,20 @@ export class Registration extends React.Component {
         } Require email verification
         </div>
 
+        {(this.state.userEmailVerify)
+          ? <div className="adminBlocksSub">
+            <FormInput label="host" value={this.state.nodeMailerTransportHost} onChange={this.handleFormChange("nodeMailerTransportHost")} />
+            <FormInput label="port" value={this.state.nodeMailerTransportPort} onChange={this.handleFormChange("nodeMailerTransportPort")} />
+            <FormInput label="auth user" value={this.state.nodeMailerTransportAuthUser} onChange={this.handleFormChange("nodeMailerTransportAuthUser")} />
+            <FormInput label="auth pass" value={this.state.nodeMailerTransportAuthPass} onChange={this.handleFormChange("nodeMailerTransportAuthPass")} />
+            <FormInput label="from" value={this.state.nodeMailerTransportFrom} onChange={this.handleFormChange("nodeMailerTransportFrom")} />
+            <div style={{ clear: "both" }} />
+          </div> : ""}
 
-        {this.setupNodemailer()}
-        <button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={this.updateOptions} ><i className="fas fa-check" style={{ color: colors.share, opacity: 0.5, paddingRight: "10px" }} ></i> CONFIRM</button>
+
+        < button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={() => { this.updateOptions() }} ><i className="fas fa-check" style={{ color: colors.share, opacity: 0.5, paddingRight: "10px" }} ></i> CONFIRM</button>
         <div style={{ clear: "both" }} />
-      </div>
+      </div >
     )
   }
 
