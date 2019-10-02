@@ -54,11 +54,13 @@ class Logger {
         processid = process.pid;
       }
 
+      if (processid == undefined) { processid = "" }
+
       if (event.group) {
         group = event.group
       } else { group = "" }
 
-      console.log(new Date().toISOString() + " " + padString(group) + " " + event.level + leveltabs + processid + " " + event.message + tabs + data);
+      console.log(new Date().toISOString() + " " + padString(group) + " " + padString(event.level) + padString(processid) + " " + event.message + tabs + data);
     }
   }
 
