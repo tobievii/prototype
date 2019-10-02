@@ -3,49 +3,48 @@ import { PluginSuperClientside } from "../../client/src/components/plugins_super
 import { request } from "../../client/src/utils/requestweb"
 import { CodeBlock } from "../../client/src/components/codeblock"
 import { colors } from '../../client/src/theme';
+import { logger } from '../../server/shared/log';
 /** TEMPLATE PLUGIN 
  * 
  * Remember to rename MyPlugin for your own plugin */
 
 interface TeltonikaState {
+    /** if the user has a port assigned to their account for teltonika devices */
     port: number | undefined
+    /** if we need to display a server error or response to the user */
+    message: string | undefined
 }
 
 export default class Teltonika extends PluginSuperClientside {
     state = {
-        port: undefined
+        port: undefined,
+        message: undefined
     }
-
-    //UNSAFE_componentWillMount
-    //UNSAFE_componentWillReceiveProps
-    //UNSAFE_componentWillUpdate
-
-    /** new React 17.0 see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html    
-    static getDerivedStateFromProps(props,state) { return null; }
-    getSnapshotBeforeUpdate(prevProps, prevState) {}
-    */
-
-    /** uncomment to override alternative views for settings/deviceview 
-    render() {}
-    */
-
     componentDidMount = () => {
         this.updateFromServer();
     }
 
     updateFromServer() {
-        request.get("/api/v3/teltonika/info", {}, (err, res, response: any) => {
-            if (err) { console.log(err); return; }
+        request.get("/api/v3/teltonika/info", {}, (err: any, res, response: any) => {
             console.log(response);
-            if (response.port) {
-                this.setState({ port: response.port })
+            if (err) {
+                logger.log({ group: "teltonika", message: "ERROR " + err.err + " GET /api/v3/teltonika/info", level: "error" })
+                console.log(err);
             }
+
+            if (response) {
+                if (response.port) {
+                    this.setState({ port: response.port })
+                }
+            }
+
         })
     }
 
     enablePrivatePort = () => {
         request.get("/api/v3/teltonika/reqport", { json: true }, (err, res, result) => {
             console.log(result);
+            this.updateFromServer();
         })
     }
 
@@ -58,13 +57,15 @@ export default class Teltonika extends PluginSuperClientside {
         return (
             <div>
 
-                <div style={{ marginBottom: 20, background: colors.bgDarker, padding: colors.padding * 2 }}>
+
+
+                {/* <div style={{ marginBottom: 20, background: colors.bgDarker, padding: colors.padding * 2 }}>
                     <h4>PUBLIC PORT (new.. under development)</h4>
                     DEFAULT PORT: 12000
                     <p>If you set Teltonika device to connect to this port devices will be visible to
                         administrators only. Any user can then use the ADD device wizard and type in IMEI
                         to add device to their account.</p>
-                </div>
+                </div> */}
 
                 <div style={{ marginBottom: 20, background: colors.bgDarker, padding: colors.padding * 2 }}>
                     <h4>PRIVATE PORT</h4>
@@ -74,7 +75,7 @@ export default class Teltonika extends PluginSuperClientside {
                     <div>
                         {(this.state.port) ? <div className="commanderBgPanel"
                         > <i className="fas fa-check-circle" style={{ color: "#11cc88" }}></i> PORT IS ACTIVE: {this.state.port} </div>
-                            : <button onClick={() => { }}
+                            : <button onClick={() => { this.enablePrivatePort() }}
                                 style={{ marginLeft: colors.padding, whiteSpace: "nowrap" }}>
                                 <i className="fas fa-play-circle" style={{ color: colors.good }} /> ENABLE</button>}
                     </div>
