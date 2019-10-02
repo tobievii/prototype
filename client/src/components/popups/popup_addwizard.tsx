@@ -63,7 +63,7 @@ This wizard will help guide you through the process.</div>
                     <div style={{ flex: 0 }}>
                         <button onClick={() => { }}
                             style={{ marginLeft: colors.padding, float: "right", whiteSpace: "nowrap" }}>
-                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good, opacity: 0.5 }} /></button>
+                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good }} /></button>
                     </div>
 
                 </div>
@@ -74,7 +74,7 @@ This wizard will help guide you through the process.</div>
 
             <div style={{ padding: colors.padding * 2, background: colors.bgDarker }} >
                 Add device by SERIAL NUMBER or TEMPORARY CODE:
-    
+
                 <div style={{ display: "flex", flexDirection: "row", paddingTop: colors.padding, paddingBottom: colors.padding }}>
 
                     <div style={{ flex: 0 }}>
@@ -88,7 +88,7 @@ This wizard will help guide you through the process.</div>
                     <div style={{ flex: 0 }}>
                         <button onClick={() => { }}
                             style={{ marginLeft: colors.padding, float: "right", whiteSpace: "nowrap" }}>
-                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good, opacity: 0.5 }} /></button>
+                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good }} /></button>
                     </div>
 
                 </div>
