@@ -13,16 +13,9 @@ import { Migration } from "./utils/migrate"
 
 import * as plugins from "../plugins/plugins_list_server"
 import { hostname } from "os"
-//console.log(cfg.config)
 
 require('source-map-support').install();
-
 logger.log({ message: "process start", level: "info" })
-
-// todo:
-// ssl certs
-
-/** todo switch back to cpu length for production */
 
 var numCPUs = require('os').cpus().length;
 
@@ -30,7 +23,7 @@ var numCPUs = require('os').cpus().length;
 if (numCPUs == 1) { numCPUs = 2 }
 
 // dev override
-numCPUs = 1;
+// numCPUs = 1;
 
 interface State {
     isMaster: boolean;
@@ -124,14 +117,10 @@ if (cluster.isMaster) {
 
         ///////////////////////////////////////////////////////////////////
 
-        //mqttserver = new MQTTServer({ core })
-
-
         // update client that packets has changed
         documentstore.on("packets", (data: DBchange) => {
             if (data.fullDocument) {
                 socketserver.emit("packets", data.fullDocument);
-                //mqttserver.emit("packets", data.fullDocument);
             }
         })
 
@@ -139,16 +128,13 @@ if (cluster.isMaster) {
         documentstore.on("states", (data: DBchange) => {
             if (data.fullDocument) {
                 socketserver.emit("states", data.fullDocument);
-                //mqttserver.emit("states", data.fullDocument);
             }
         })
 
         // update client that account has changed
         documentstore.on("users", (data: DBchange) => {
             if (data.fullDocument) {
-
                 socketserver.emit("users", data.fullDocument);
-                //mqttserver.emit("users", data.fullDocument);
             }
         })
         ///////////////////////////////////////////////////////////////////
