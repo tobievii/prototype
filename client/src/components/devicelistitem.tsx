@@ -122,7 +122,7 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                     </div>
 
                     <div style={theme.global.devicelist.columnFill}>
-                        <Link to={"/u/" + this.props.device.username + "/view/" + this.props.device.id} >{this.props.device.id}</Link>
+                        <Link to={"/u/" + this.props.device.username + "/view/" + this.escapeNonUnicode(this.props.device.id)} >{this.props.device.id}</Link>
                     </div>
 
                     <div style={{
@@ -174,4 +174,10 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
             </div>
         )
     }
+
+
+    escapeNonUnicode(str: any) {
+        return str.replace(/[^a-z0-9{}\"\[\]: \.,_-]/gim, "");
+    }
+
 }
