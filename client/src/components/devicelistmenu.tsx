@@ -121,7 +121,7 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                     boxSizing: "border-box", background: theme.global.menubars.background, width: "100%", borderRight: "11px solid " + theme.global.menubars.background,
                     paddingBottom: "5px"
                 }} >
-                    <div style={{ display: "flex", width: "100%", marginRight: 35 }}>
+                    <div style={{ display: "flex", flexDirection: "row", width: "100%", marginRight: 35 }}>
                         <div style={theme.global.devicelist.columnleftsortselect}>
                             <SortButton onChangeSort={this.changeSort("selected")} value={this.state.sort.selected} />
                         </div>
@@ -136,11 +136,11 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                             </div>
                         </div>
 
-                        <div style={{}}>
+                        <div style={{ flex: 0, width: 26 }}>
                             <i className="fas fa-filter" style={{ fontSize: "0.85em", opacity: 0.5, paddingLeft: 0, paddingTop: 14, paddingRight: 5 }} ></i>
                         </div>
 
-                        <div style={{ flex: "5" }}>
+                        <div style={{ flex: 1 }}>
                             <input
                                 type="text"
                                 placeholder="filter"
@@ -150,19 +150,19 @@ export class DeviceListMenu extends React.Component<MenuProps, MenuState> {
                             />
                         </div>
 
-                        <div style={theme.global.devicelist.menutimesort}>
+                        <div style={{ flex: 0, width: 27 }}>
                             <div style={{}}><SortButton onChangeSort={this.changeSort("lastseen")} value={this.state.sort.lastseen} /></div>
                         </div>
-                        <div style={theme.global.devicelist.menucolumn}>
+                        <div style={{ flex: 0, width: 27 }}>
                             <SortButton onChangeSort={this.changeSort("alarm")} value={this.state.sort.alarm} />
                         </div>
-                        <div style={theme.global.devicelist.menucolumn}>
+                        <div style={{ flex: 0, width: 27 }}>
                             <SortButton onChangeSort={this.changeSort("warning")} value={this.state.sort.warning} />
                         </div>
-                        <div style={theme.global.devicelist.menucolumn}>
+                        <div style={{ flex: 0, width: 27 }}>
                             <SortButton onChangeSort={this.changeSort("shared")} value={this.state.sort.shared} />
                         </div>
-                        <div style={theme.global.devicelist.menuright}>
+                        <div style={{ flex: 0, width: 27, marginRight: 5 }}>
                             <SortButton onChangeSort={this.changeSort("public")} value={this.state.sort.public} />
                         </div>
                     </div>

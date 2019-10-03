@@ -43,31 +43,29 @@ export class SortButton extends React.Component<SortProps, SortState> {
     }
 
     render() {
-        var style: any = { width: theme.global.sortbuttons.width, textAlign: "center" }
-        var style2: any = { position: "relative", left: -5, top: 8 }
+        // var style: any = { width: theme.global.sortbuttons.width, textAlign: "center" }
+        // var style2: any = { position: "relative", left: -5, top: 8 }
+
 
 
         if (this.state.type == "vertical") {
-            return (
-                <div style={style}>
-                    <span style={style2} onClick={this.onClick}>
-                        <i className="fas fa-sort" style={{ opacity: 0.5, position: "absolute" }}></i>
-                        {this.props.value == "up" && <i className="fas fa-sort-up" style={{ position: "absolute" }}></i>}
-                        {this.props.value == "down" && <i className="fas fa-sort-down" style={{ position: "absolute" }}></i>}
-                    </span>
-                </div>
+            return (<div>
+                <span className="fa-stack fa-1x" onClick={this.onClick}>
+                    {this.props.value == "up" && <i className="fas fa-sort-up fa-stack-1x" />}
+                    {this.props.value == "down" && <i className="fas fa-sort-down fa-stack-1x" />}
+                    <i className="fas fa-sort fa-stack-1x " style={{ opacity: 0.5 }} />
+                </span>
+            </div>
             )
         }
 
         if (this.state.type == "verticalalpha") {
             return (
-                <div style={style}>
-                    <span style={style2} onClick={this.onClick}>
-                        {this.props.value == "none" && <i className="fas fa-sort-alpha-up" style={{ opacity: 0.5, position: "absolute" }}></i>}
-                        {this.props.value == "up" && <i className="fas fa-sort-alpha-up" style={{ position: "absolute" }}></i>}
-                        {this.props.value == "down" && <i className="fas fa-sort-alpha-down-alt" style={{ position: "absolute" }}></i>}
-                    </span>
-                </div>
+                <div><span onClick={this.onClick}>
+                    {this.props.value == "none" && <i className="fas fa-sort-alpha-up" style={{ opacity: 0.5 }} />}
+                    {this.props.value == "up" && <i className="fas fa-sort-alpha-up" />}
+                    {this.props.value == "down" && <i className="fas fa-sort-alpha-down-alt" />}
+                </span></div>
             )
         }
 
