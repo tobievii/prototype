@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PluginSuperClientside } from "../../client/src/components/plugins_super_clientside"
-import { Registration } from './components/registration';
+import { EmailSetup } from './emailsetup';
 
 
 /** TEMPLATE PLUGIN 
@@ -23,7 +23,7 @@ export default class Admin extends PluginSuperClientside {
     settings() {
         return (
             <div>
-                <Registration />
+                <EmailSetup />
             </div>
         );
     }

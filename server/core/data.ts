@@ -79,6 +79,17 @@ export class DocumentStore extends EventEmitter {
                     this.emit("cluster", change)
                 })
 
+                // this stuff is still very early days, I'm sure we can improve it quite a bit
+                mongoose.connection.collection("plugins_admin").watch().on("change", (change) => {
+                    //logger.log({ message: "db change", data: { change }, level: "verbose" });
+
+                    if (change.fullDocument) {
+                        delete change.fullDocument["_id"]
+                        // delete change.fullDocument["apikey"]
+                        this.emit("plugins_admin", change.fullDocument)
+                    }
+                })
+
                 mongoose.connection.on("error", (err) => { logger.log({ message: err.toString(), level: "error" }) });
 
                 //ready

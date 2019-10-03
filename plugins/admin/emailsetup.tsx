@@ -1,8 +1,11 @@
 import React, { Component } from "react";
-import { colors } from "../../../client/src/theme";
-import { request } from "../../../client/src/utils/requestweb";
+import { colors } from "../../client/src/theme";
+import { request } from "../../client/src/utils/requestweb";
 
-export class Registration extends React.Component {
+/** this panel appears at /settings/admin under Email Setup 
+ * it interacts with the `emailservice.ts` code
+*/
+export class EmailSetup extends React.Component {
   state = {
     userRegistration: false,
     userEmailVerify: false,
@@ -14,7 +17,7 @@ export class Registration extends React.Component {
   }
 
   componentDidMount = () => {
-    request.get("/api/v3/admin/registration", { json: true }, (err, res, result) => {
+    request.get("/api/v3/admin/emailsettings", { json: true }, (err, res, result) => {
       if (result) {
         this.setState(result)
       }
@@ -38,17 +41,22 @@ export class Registration extends React.Component {
   }
 
   updateOptions = () => {
-    request.post("/api/v3/admin/registration", { json: this.state }, (err, res, result) => {
+    request.post("/api/v3/admin/emailsettings", { json: this.state }, (err, res, result) => {
       console.log(result);
     });
   }
 
+  requesttestmail = () => {
+    request.get("/api/v3/admin/emailtester", {}, (err, res, result) => {
+      console.log(result);
+    })
+  }
 
   render() {
 
     return (
       <div style={{ marginTop: colors.padding, padding: colors.padding * 2, background: "rgba(0,0,0,0.1)" }}>
-        <div><h3>REGISTRATION</h3></div>
+        <div><h3>EMail Setup</h3></div>
 
         <div>{(this.state.userRegistration == true)
           ? <i className="fas fa-check-square"
@@ -74,8 +82,32 @@ export class Registration extends React.Component {
             <div style={{ clear: "both" }} />
           </div> : ""}
 
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={{ flex: 1 }}></div>
 
-        < button className="btn-spot" style={{ float: "right", marginTop: 10 }} onClick={() => { this.updateOptions() }} ><i className="fas fa-check" style={{ color: colors.share, opacity: 0.5, paddingRight: "10px" }} ></i> CONFIRM</button>
+          <div style={{ flex: 0 }}>
+            < button className="btn-spot" style={{ float: "right", marginTop: 10, whiteSpace: "nowrap" }}
+              onClick={() => { this.requesttestmail() }} ><i
+                className="fas fa-envelope" style={{
+                  opacity: 0.5,
+                  paddingRight: "10px"
+                }} /> SEND ME A TEST MAIL</button>
+          </div>
+
+          <div style={{ flex: 0 }}>
+            < button className="btn-spot" style={{ float: "right", marginTop: 10, whiteSpace: "nowrap" }}
+              onClick={() => { this.updateOptions() }} ><i
+                className="fas fa-check" style={{
+                  color: colors.share, opacity: 0.5,
+                  paddingRight: "10px"
+                }} /> CONFIRM</button>
+          </div>
+
+        </div>
+
+
+
+
         <div style={{ clear: "both" }} />
       </div >
     )
