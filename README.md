@@ -36,14 +36,25 @@ https://www.pluralsight.com/guides/typescript-react-getting-started
 
 We now rely on mongodb change streams https://pusher.com/tutorials/mongodb-change-streams instead of redis. This is not set in stone, and dependant on 5.1 beta phase tests. To get change streams to work you have to set mongo into replica/sharded mode:
 
-```
-mongod --replSet "rs"
-mongo
-rs.initiate()
-```
+Edit `mongod.conf` and add:
 
 ```
-openssl req -nodes -new -x509 -keyout server.key -out server.cert
+replication:
+  replSetName: "rs"
+```
+
+Restart the service with `sudo service mongod restart`
+
+Then open the mongo client by running:
+
+```
+mongo
+```
+
+You should see `rs:PRIMARY` if not then run:
+
+```
+rs.initiate()
 ```
 
 You might notice that database object format has also changed and is now more consistent between the API and the storage format. You might experience workflow scripts need to migrate to the new data structure:
@@ -622,4 +633,12 @@ source: https://www.axllent.org/docs/view/nodejs-service-with-systemd/
 ```
 cd client
 npm run buildsw
+```
+
+
+## To create a local ssl certificate you can use:
+
+
+```
+openssl req -nodes -new -x509 -keyout server.key -out server.cert
 ```
