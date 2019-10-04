@@ -2,10 +2,9 @@ import React from "react";
 import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 import "../prototype.scss";
 import { User } from "../../../server/shared/interfaces";
-import { theme, colors } from "../theme"
-import { api } from "../api"
-import { SearchBox } from "./searchbox"
-
+import { theme, colors } from "../theme";
+import { api } from "../api";
+import { SearchBox } from "./searchbox";
 
 interface MyProps {
   //account: User;
@@ -25,22 +24,25 @@ export class NavBar extends React.Component<MyProps, MyState> {
   };
 
   render() {
-
     var size = "large";
-    if (window.innerWidth < 800) { size = "small" }
+    if (window.innerWidth < 800) {
+      size = "small";
+    }
 
     // LOGGED IN USERS:
     if (api.data.account) {
-
       const menuitemsLogged = [
         { text: "Notifications", path: "/notifications", icon: "bell" },
         { text: "Settings", path: "/settings", icon: "cog" },
-        { text: api.data.account.username, path: "/settings/account", icon: "user-circle" }
-      ]
+        {
+          text: api.data.account.username,
+          path: "/settings/account",
+          icon: "user-circle"
+        }
+      ];
 
       return (
         <div style={{ background: colors.panels, padding: colors.padding }}>
-
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left", padding: theme.paddings.default }}>
               <img
@@ -61,13 +63,27 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
           {menuitemsLogged.map((menuitem, i, arr) => {
             if (size == "small") {
-              return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinksmall}>
-                <i className={"fa fa-" + menuitem.icon} ></i>
-              </NavLink>)
+              return (
+                <NavLink
+                  key={i}
+                  activeClassName="active"
+                  to={menuitem.path}
+                  style={theme.global.navlinksmall}
+                >
+                  <i className={"fa fa-" + menuitem.icon}></i>
+                </NavLink>
+              );
             } else {
-              return (<NavLink key={i} activeClassName="active" to={menuitem.path} style={theme.global.navlinklarge}>
-                <i className={"fa fa-" + menuitem.icon} ></i> {menuitem.text}
-              </NavLink>)
+              return (
+                <NavLink
+                  key={i}
+                  activeClassName="active"
+                  to={menuitem.path}
+                  style={theme.global.navlinklarge}
+                >
+                  <i className={"fa fa-" + menuitem.icon}></i> {menuitem.text}
+                </NavLink>
+              );
             }
           })}
 
@@ -80,12 +96,20 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
     //VISTORS:
     if (api.data.account == undefined) {
+      var menuitemsVisitor = [
+        { text: "Company", path: "/company", icon: "" },
+        { text: "Code", path: "/code", icon: "" },
+        { text: "Pricing", path: "/pricing", icon: "" },
+        { text: "Sign in", path: "/signin", icon: "" },
+        {
+          text: "Sign up",
+          path: "/signup",
+          icon: "",
+          style: { background: colors.spotA }
+        }
+      ];
 
-      const menuitemsVisitor = [
-        //{ text: "Resources", path: "/resources", icon: "" },
-        //{ text: "Features", path: "/features", icon: "" },
-        //{ text: "Products", path: "/products", icon: "" }
-      ]
+      menuitemsVisitor = menuitemsVisitor.reverse();
 
       return (
         <div
@@ -112,14 +136,18 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
           {menuitemsVisitor.map((menuitem, i, arr) => {
             if (size == "small") {
-              return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
-                <i className={"fa fa-" + menuitem.icon} ></i>
-              </NavLink>)
+              return (
+                <NavLink key={i} activeClassName="active" to={menuitem.path}>
+                  <i className={"fa fa-" + menuitem.icon}></i>
+                </NavLink>
+              );
             } else {
-              return (<NavLink key={i} activeClassName="active" to={menuitem.path}>
-                <i className={"fa fa-" + menuitem.icon} ></i>
-                {menuitem.text}
-              </NavLink>)
+              return (
+                <NavLink key={i} activeClassName="active" to={menuitem.path}>
+                  <i className={"fa fa-" + menuitem.icon}></i>
+                  {menuitem.text}
+                </NavLink>
+              );
             }
           })}
 
