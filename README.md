@@ -110,6 +110,12 @@ git clone https://github.com/IoT-nxt/prototype.git
 
 You'll need to install [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/download-center/community) as a minimum.
 
+## mongod service autostart:
+
+```
+systemctl enable mongod.service
+```
+
 Useful additional tools include [Visual Studio Code](https://code.visualstudio.com/),
 [Robo 3T](https://robomongo.org/),
 
