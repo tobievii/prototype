@@ -159,4 +159,8 @@ if (cluster.isMaster) {
     });
 }
 
-
+// catch errors instead of crashing process.
+process.on('uncaughtException', function (err) {
+    // handle the error safely
+    console.log(err)
+})
