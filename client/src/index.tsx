@@ -194,10 +194,15 @@ export default class App extends React.Component {
   // new vistors home/landing page..
   landing = props => {
     return (
-      <div>
-        <BGgrad />
-        <NavBar />
-        <Landing />
+      <div style={{ background: "#232323" }}>
+        <div style={{ zIndex: 100 }}>
+          <NavBar />
+        </div>
+        <div style={{ overflow: "hidden" }}>
+          <Landing />
+        </div>
+
+
       </div>
     );
   };

@@ -42,7 +42,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
       ];
 
       return (
-        <div style={{ background: colors.panels, padding: colors.padding }}>
+        <div style={{ background: colors.panels, padding: colors.padding, zIndex: 100 }}>
           <NavLink id="topnavhome" exact activeClassName="active" to="/">
             <div style={{ float: "left", padding: theme.paddings.default }}>
               <img
@@ -113,6 +113,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
       return (
         <div
+          style={{ zIndex: 10 }}
           id="myTopnav"
           className={
             "topnav " + (this.state.mobileMenuActive ? "responsive" : "")
