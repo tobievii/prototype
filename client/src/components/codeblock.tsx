@@ -45,7 +45,7 @@ export class CodeBlock extends React.PureComponent<CustomProps, States> {
     view = () => {
         if (this.props.type == undefined) {
             return (
-                <pre ref={this.setRef} className={`language-${this.props.language}`}>
+                <pre ref={this.setRef} className={`fontmono language-${this.props.language}`}>
                     {this.props.value}
                 </pre>
             )
@@ -53,7 +53,7 @@ export class CodeBlock extends React.PureComponent<CustomProps, States> {
 
         else if (this.props.type == "modify") {
             return (
-                <pre ref={this.setRef} className={`language-${this.props.language}`}>
+                <pre ref={this.setRef} className={`fontmono language-${this.props.language}`}>
                     {this.props.value}
                 </pre>
             )
