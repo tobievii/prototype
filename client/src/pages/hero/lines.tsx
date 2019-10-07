@@ -1,6 +1,6 @@
 import React from "react";
 
-interface MyProps { rx: boolean, tx: boolean }
+interface MyProps { rx: boolean, tx: boolean, opacity?: number, yoffset?: number }
 interface MyState { }
 
 export class Lines extends React.Component<MyProps, MyState> {
@@ -114,8 +114,11 @@ export class Lines extends React.Component<MyProps, MyState> {
         // watchmain
         var colWatchMain = "hsla(" + ((Math.sin((this.frame * 5 + 100) / 60) * 15) + 200) + ", 100%, 50%, 1)"
 
+        var yoffset = (this.props.yoffset) ? this.props.yoffset : 0;
+        var maintranslate = "translate(0 " + Math.round(yoffset) + ")"
+        var mainopacity = (this.props.opacity) ? this.props.opacity : 1;
         return (
-            <g id="layerLines">
+            <g id="layerLines" transform={maintranslate} opacity={mainopacity.toFixed(2)}>
 
                 {(1) && <path fill={colServerMain} opacity={1} id="lineServerJustUnderBase" d="M311.5,326c-0.8,0-1.6-0.2-2.2-0.5l-86-49.9l-1.5-0.9l-5.8-3.4c-1.3-0.8-1.1-2.1,0.4-2.9&#xA;&#x9;&#x9;l0.5-0.3l0,0l2.8-1.6c0.1,0,0.1,0.1,0.2,0.1l1.3,0.7v1.6l0,0c0,0.4,0.3,0.9,0.8,1.2l86.9,50.4c0.5,0.3,1.3,0.5,2,0.5&#xA;&#x9;&#x9;c0.9,0,1.9-0.2,2.6-0.7l58.1-33.6c0.7-0.4,1.1-1,1.1-1.5l0,0v-1l0.9-0.5l0.1-0.1l4,2.3c1.3,0.8,1.1,2.1-0.4,2.9l-5.4,3.1l-1.5,0.9&#xA;&#x9;&#x9;l-56,32.4C313.6,325.7,312.5,326,311.5,326" />}
 

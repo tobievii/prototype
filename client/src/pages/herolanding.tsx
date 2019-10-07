@@ -38,6 +38,7 @@ export class Hero extends React.Component<MyProps, MyState> {
                     <Background />
                     <AnimNodeGfx rx={(rx) => { this.setState({ rx }) }} tx={(tx) => { this.setState({ tx }) }} />
                     <Lines rx={this.state.rx} tx={this.state.tx} />
+                    <Lines rx={this.state.rx} tx={this.state.tx} opacity={0.1} yoffset={10} />
                     <Server rx={this.state.rx} tx={this.state.tx} />
                     <Watch rx={this.state.rx} tx={this.state.tx} />
                     <Laptop rx={this.state.rx} tx={this.state.tx} />
