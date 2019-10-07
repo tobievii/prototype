@@ -17,6 +17,10 @@ export class Landing extends React.Component<MyProps, MyState> {
 
     var paragraphstyle = { color: "#777777", fontSize: "16pt" }
 
+    const cardstyles: any = { width: 250, background: "rgba(255, 255, 255, 0.95)", margin: 10, position: "relative", padding: "120px 5px 40px 5px" }
+    const buttonstyles: any = { width: "100%", bottom: -3, left: 0, position: "absolute", borderBottom: "2px solid #333" }
+    const cardtextstyle: any = { fontSize: "0.75em", lineHeight: "1.65em" }
+
     return (
       <div style={{ paddingTop: "0", background: "#232323", height: "100%", zIndex: 1 }}>
 
@@ -27,21 +31,27 @@ export class Landing extends React.Component<MyProps, MyState> {
             </div>
           </div>
 
-          <div style={{ width: "100%", overflow: "hidden" }}>
-            <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative" }}>
+          <div className="landingBannerBg" style={{
+            width: "100%", overflow: "hidden",
+          }}>
+
+            <div style={{ maxWidth: "1400px", margin: "0 auto", position: "relative" }}>
+
               <div style={{ width: "75%", float: "right", zIndex: 1, right: 0, top: 0 }}>
                 <Hero display={true} />
               </div>
+
               <div style={{ width: "75%", padding: colors.padding * 2, zIndex: 2, position: "absolute", top: 0, left: 0 }}>
                 <h1>Internet of things for everyone.</h1>
                 <p style={paragraphstyle}>Simple as possible to connect anything.<br />
                   Build custom interfaces easily.
               </p>
               </div>
+
             </div>
           </div>
 
-          <div style={{ maxWidth: "1200px", margin: "-100px auto", marginBottom: "50px", position: "relative" }}>
+          <div style={{ maxWidth: "1400px", margin: "-100px auto", marginBottom: "50px", position: "relative" }}>
             <div style={{ display: "flex", flexDirection: "row" }}>
               <div style={{ flex: 1 }}>
                 <img src="/img/landingPage_devicelist.gif" />
@@ -61,7 +71,7 @@ export class Landing extends React.Component<MyProps, MyState> {
 
         <div style={{ background: "#1D1D1D" }}>
 
-          <div style={{ maxWidth: "1200px", margin: "0 auto", paddingTop: 100, display: "flex", flexDirection: "row" }}>
+          <div style={{ maxWidth: "1400px", margin: "0 auto", paddingTop: 100, display: "flex", flexDirection: "row" }}>
             <div style={{ flex: 1 }}>
               <h1>Dashboard</h1>
               <p style={paragraphstyle}>Drag and drop new buttons, graphs and gauges. Powerful API to build your own widgets.</p>
@@ -74,7 +84,7 @@ export class Landing extends React.Component<MyProps, MyState> {
 
 
 
-          <div style={{ maxWidth: "1200px", margin: "0 auto", paddingTop: 100, paddingBottom: 100, display: "flex", flexDirection: "row" }}>
+          <div style={{ maxWidth: "1400px", margin: "0 auto", paddingTop: 100, paddingBottom: 100, display: "flex", flexDirection: "row" }}>
             <div style={{ flex: 1 }}>
               <h1>Editor</h1>
               <p style={paragraphstyle}>Script the behaviour of your devices directly in the browser. Easily count events, automate actions and gain value from data.</p>
@@ -88,7 +98,53 @@ export class Landing extends React.Component<MyProps, MyState> {
 
         </div>
 
-        {/* <Cards /> */}
+        <section style={{ paddingTop: 50 }}>
+          <div style={{ color: colors.spotB, maxWidth: 1000, display: "flex", margin: "0 auto" }}>
+
+            <div className="cards" style={cardstyles}>
+
+              <h2>Startup</h2>
+              <p style={cardtextstyle}>Link up to 5 devices with Dashboard and automation workflows.</p>
+              <button style={buttonstyles}>FREE</button>
+            </div>
+
+            <div className="cards" style={cardstyles}>
+
+              <h2>Pro</h2>
+              <p style={cardtextstyle}>Unlimited device count. <br />Shared cluster with metered usage.</p>
+              <button style={buttonstyles}>Starting at $2.50/mo</button>
+            </div>
+
+            <div className="cards" style={cardstyles}>
+
+              <h2>Business</h2>
+              <p style={cardtextstyle}>Unlimited device count. <br />Dedicated cloud instance. <br />Isolated hosting.</p>
+              <button style={buttonstyles}>Starting at $50/mo</button>
+            </div>
+
+            <div className="cards" style={cardstyles}>
+
+              <h2>Enterprise</h2>
+              <p style={cardtextstyle}>Custom development.<br />Dedicated baremetal servers.<br />24/7 support</p>
+              <button style={buttonstyles}>Contact us</button>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <div style={{ background: "#333333" }}>
+          <div style={{ margin: "0 auto", maxWidth: "1400px", display: "flex", flexDirection: "row" }}>
+            <div style={{ flex: "1" }}>
+              <h2>Company</h2>
+            </div>
+            <div style={{ flex: "1" }}></div>
+            <div style={{ flex: "1" }}></div>
+            <div style={{ flex: "1" }}></div>
+          </div>
+        </div>
+
       </div>
     );
   }
