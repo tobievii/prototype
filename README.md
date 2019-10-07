@@ -10,14 +10,6 @@ After a mayor refactor from 5.0 to 5.1 we are now entering dev testing and QA.
 This should last until end of October 2019 giving us one month of polish and testing   
 before production release to `master` branch.
 
-# Todo
-
-✅ Dev server upgrade   
-✅ Pass all V3 and V4 API tests   
-✅ Plugin: MQTT   
-⌛ Plugin: Teltonika (in progress ETA: 10 October)   
-⌛ Plugin: Server monitor (not started)   
-
 # Getting started
 
 Ideally you should run your own instance, but if that is not an option or you just want to give it a try you can use our live server(s):
