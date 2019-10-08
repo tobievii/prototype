@@ -133,6 +133,10 @@ export class Gateway extends EventEmitter {
       }, deviceTree, true);
 
 
+    this.iotnxtqueue.on("pingresp", () => {
+      this.emit("pingresp");
+    })
+
     this.iotnxtqueue.on("error", (err: Error) => {
       logger.log({ group: "iotnxtgateway", message: "error " + this.GatewayId + " ERROR:" + err, data: { GatewayId: this.GatewayId }, level: "error" })
       this.emit("error", err);
@@ -145,18 +149,33 @@ export class Gateway extends EventEmitter {
 
     this.iotnxtqueue.on("request", (request: any) => {
 
+
+
       for (var key in request.deviceGroups) {
         if (request.deviceGroups.hasOwnProperty(key)) {
           var keyfromroute = key.split(":")[0].split("|")[0]
           var requestClean: any = {}
+
+
+
           requestClean.id = key.split(":")[1].split("|")[0]
           requestClean.req = request.deviceGroups[key];
 
+          if (!requestClean.data) {
+            var temp = JSON.parse(JSON.stringify(request.deviceGroups[key]));
+            var newtemplowercase = {}
+
+            for (var k of Object.keys(temp)) {
+              newtemplowercase[k.toLowerCase()] = request.deviceGroups[key][k]
+            }
+
+            requestClean.data = newtemplowercase
+          }
+
+
           var meta = { ip: "", userAgent: "iotnxtQueue", method: "REQ" }
 
-          if (!requestClean.data) {
-            requestClean.data = {};
-          }
+
 
           requestClean.meta = meta;
 

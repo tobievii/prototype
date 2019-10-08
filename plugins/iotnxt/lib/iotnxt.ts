@@ -174,8 +174,8 @@ export class IotnxtCore extends PluginSuperServerside {
 
                     // PROPAGATE DATA THROUGH TO USER
                     //this.emit("request", request);
-                    console.log(gateway);
-                    console.log(request);
+                    //console.log(gateway);
+                    //console.log(request);
 
                     // newer 5.1 gateways use publickey instead for security, so we don't reveal user's apikey.
                     if (gateway.usepublickey) {
@@ -199,6 +199,30 @@ export class IotnxtCore extends PluginSuperServerside {
 
                     }
                 })
+
+                /**  update lastactive// connected last on ping response.
+                 * if the server responded to our ping request on mqtt, it must mean the 
+                 * server is still connected, so we can update the UI
+                 * */
+                gatewayConnection.on("pingresp", () => {
+                    // UPDATE DB that this gateway is active.
+                    var update = {
+                        unique: gateway.unique,
+                        connected: true,
+                        instance_id: process.pid,
+                        hostname: hostname(),
+                        lastactive: new Date(),
+                        _connected_last: new Date()
+                    }
+
+                    this.documentstore.db.plugins_iotnxt.update({
+                        type: "gateway",
+                        unique: gateway.unique
+                    }, { "$set": update },
+                        (err: Error, result: any) => { })
+                    this.emit("updatestate", update);
+                })
+
 
                 // propagate errors through to UI by storing in db state.
 

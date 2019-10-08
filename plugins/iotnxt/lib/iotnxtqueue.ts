@@ -308,11 +308,25 @@ export class IotnxtQueue extends events.EventEmitter {
       username: this.secret.vHost + ":" + this.GatewayId,
       password: this.secret.Password,
       //rejectUnauthorized: false,
-      //keepalive: 60,
-      //reconnectPeriod: 9999
+      keepalive: 30,
+      reconnectPeriod: 1000
     }
 
     this.mqttRed = mqtt.connect(mqttcfg.protocol + this.secret.Hosts[0] + mqttcfg.port, redoptions);
+
+    this.mqttRed.on("packetsend", (packet) => {
+      //console.log("====== MQTTRED PACKETSEND ====")
+      //console.log(packet);
+    })
+
+    this.mqttRed.on("packetreceive", (packet) => {
+      //console.log("====== MQTTRED PACKETRECEIVE ====")
+      //console.log(packet);
+      if (packet.cmd == "pingresp") {
+        // server responded to ping response, so connection is alive.
+        this.emit("pingresp");
+      }
+    })
 
     this.mqttRed.on('connect', () => {
       this.connected = true;
