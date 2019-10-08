@@ -9,6 +9,8 @@ import * as iotnxt from "./iotnxtqueue";
 import * as _ from "lodash";
 import { logger } from "../../../server/shared/log";
 
+import { CorePacket } from "../../../server/shared/interfaces"
+
 export interface GatewayType {
   "GatewayId": string;
   "Secret": string,
@@ -67,49 +69,55 @@ export class Gateway extends EventEmitter {
 
   /* find devices and calculate their equivalent tree for compatibility with iotnxt portal */
   calculateGatewayTree(cb: Function) {
-    this.db.states.find({ "plugins_iotnxt_gateway": { GatewayId: this.gateway.GatewayId, HostAddress: this.gateway.HostAddress } }, (err: Error, devices: any[]) => {
-
-
-      if (devices == null) {
-        cb(null, {}); //empty
-      } else {
-        var deviceTree: any = {};
-
-        for (var device of devices) {
-          var flatdata = recursiveFlat(device.data);
-          var Properties: any = {};
-          for (var key in flatdata) {
-            if (flatdata.hasOwnProperty(key)) {
-              Properties[key] = {
-                PropertyName: key,
-                DataType: null
-              };
-            }
-          }
-
-          if (this.gateway.usepublickey) {
-
-          } else {
-
-          }
-
-          // new 5.1 switch to using publickey for new gateways.
-          var Route = (this.gateway.usepublickey) ? (device.publickey + "|1:" + device.id + "|1").toUpperCase()
-            : (device.apikey + "|1:" + device.id + "|1").toUpperCase();
-
-          deviceTree[Route] = {
-            Make: null,
-            Model: null,
-            DeviceName: Route,
-            DeviceType: device.id,
-            Properties: Properties
-          };
-        }
-        cb(null, deviceTree);
+    this.db.states.find({
+      "plugins_iotnxt_gateway": {
+        GatewayId: this.gateway.GatewayId,
+        HostAddress: this.gateway.HostAddress
       }
+    },
+      (err: Error, devices: CorePacket[]) => {
 
 
-    })
+        if (devices == null) {
+          cb(null, {}); //empty
+        } else {
+          var deviceTree: any = {};
+
+          for (var device of devices) {
+            var flatdata = recursiveFlat(device.data);
+            var Properties: any = {};
+            for (var key in flatdata) {
+              if (flatdata.hasOwnProperty(key)) {
+                Properties[key] = {
+                  PropertyName: key,
+                  DataType: null
+                };
+              }
+            }
+
+            if (this.gateway.usepublickey) {
+
+            } else {
+
+            }
+
+            // new 5.1 switch to using publickey for new gateways.
+            var Route = (this.gateway.usepublickey) ? (device.publickey + "|1:" + device.id + "|1").toUpperCase()
+              : (device.apikey + "|1:" + device.id + "|1").toUpperCase();
+
+            deviceTree[Route] = {
+              Make: null,
+              Model: null,
+              DeviceName: Route,
+              DeviceType: device.id,
+              Properties: Properties
+            };
+          }
+          cb(null, deviceTree);
+        }
+
+
+      })
   }
 
   connect(deviceTree: any, cb: Function) {
@@ -139,7 +147,7 @@ export class Gateway extends EventEmitter {
 
       for (var key in request.deviceGroups) {
         if (request.deviceGroups.hasOwnProperty(key)) {
-          var apikey = key.split(":")[0].split("|")[0]
+          var keyfromroute = key.split(":")[0].split("|")[0]
           var requestClean: any = {}
           requestClean.id = key.split(":")[1].split("|")[0]
           requestClean.req = request.deviceGroups[key];
@@ -152,8 +160,9 @@ export class Gateway extends EventEmitter {
 
           requestClean.meta = meta;
 
-          var deviceData = { apikey: apikey, packet: requestClean }
-          var emitsend = { apikey: apikey.toLowerCase(), packet: requestClean }
+          // new in 5.1. we dont use apikey anymore by default for security.
+          var deviceData = { key: keyfromroute, packet: requestClean }
+          var emitsend = { key: keyfromroute.toLowerCase(), packet: requestClean }
 
           this.emit("request", emitsend);
         }
@@ -189,10 +198,16 @@ export class Gateway extends EventEmitter {
     updates the state
     publishes state
   */
-  updateDevicePublish(packet: any) {
+  updateDevicePublish(packet: CorePacket) {
     if (!this.iotnxtqueue) return;
 
-    var Route = (this.gateway.usepublickey) ? (packet.publickey + "|1:" + packet.devid + "|1").toUpperCase() : (packet.apikey + "|1:" + packet.devid + "|1").toUpperCase();
+    /**  new in 5.1 we default to using per device publickeys 
+     * instead of apikey, we still honor the old apikey method 
+     * for compatibility.
+     * */
+    var Route = (this.gateway.usepublickey)
+      ? (packet.publickey + "|1:" + packet.id + "|1").toUpperCase()
+      : (packet.apikey + "|1:" + packet.id + "|1").toUpperCase();
 
     this.iotnxtqueue.clearState();
 

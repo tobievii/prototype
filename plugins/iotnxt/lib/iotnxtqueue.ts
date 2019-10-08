@@ -2,6 +2,7 @@ import * as events from 'events';
 import * as mqtt from 'mqtt';
 import * as crypto from 'crypto';
 import { logger } from '../../../server/shared/log';
+import { LogEvent } from '../../../server/shared/interfaces';
 
 var file = "/src/plugins/iotnxt/iotnxtqueue.ts"
 
@@ -35,6 +36,26 @@ export interface GatewayType {
   hostname: string
   /** the timestamp this connection was last active */
   lastactive: Date
+}
+
+
+export interface GreenQueueAuthReply {
+  Uid: string
+  Password: string
+  Exchange: string
+  vHost: string
+  Host: string
+  IoTHubCredentials: string
+  RoutingKeyBase: string
+  Hosts: string
+  RsaPrivate: string
+  Success: boolean
+  ErrorMsg: string
+  ClientId: string
+  PostUtc: string
+  Headers: any
+  MessageId: string
+  MessageSourceId: any
 }
 
 export class IotnxtQueue extends events.EventEmitter {
@@ -232,11 +253,18 @@ export class IotnxtQueue extends events.EventEmitter {
       var payload = Buffer.from(json.Payload, "base64");
       var decipher = createDecipheriv(this.AES);
       var result = Buffer.concat([decipher.update(payload), decipher.final()]);
-      var secret = JSON.parse(result.toString());
+      var secret: GreenQueueAuthReply = JSON.parse(result.toString());
 
-      if (secret.success == false) {
-        console.log(this.GatewayId);
-        console.log(secret);
+
+
+      if (secret.Success == false) {
+        var err: LogEvent = {
+          level: "error", group: "iotnxtqueue", message: "could not connect to " + this.GatewayId + " Error: " + secret.ErrorMsg, data: {
+            gateway: { GatewayId: this.GatewayId }, secret
+          }
+        }
+        logger.log(err)
+        this.emit("error", err)
       }
 
       if (secret.Success) {
@@ -360,8 +388,9 @@ export class IotnxtQueue extends events.EventEmitter {
 
     this.mqttRed.publish(topic.toUpperCase(), JSON.stringify(wrappedMessage), (err: any) => {
       if (err) {
-        logger.log({ group: "iotnxtqueue", message: "error " + this.GatewayId + " ERROR:" + err.toString(), data: { GatewayId: this.GatewayId }, level: "error" })
-        console.log(err);
+        var errLog: LogEvent = { group: "iotnxtqueue", message: "error " + this.GatewayId + " ERROR:" + err.toString(), data: { GatewayId: this.GatewayId }, level: "error" }
+        logger.log(errLog)
+        this.emit("error", errLog)
       } else {
         cb(undefined, true); //SUCCESS
       }
@@ -410,7 +439,6 @@ export class IotnxtQueue extends events.EventEmitter {
       "Raptor": "000000000000"
     };
 
-    console.log(packetIn);
 
     var dateNow = new Date(packetIn.timestamp);
     var fromUtc = new Date(dateNow.getTime() - 15 * 1000)

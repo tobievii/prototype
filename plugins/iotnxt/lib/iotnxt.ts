@@ -4,7 +4,7 @@ import { Webserver } from "../../../server/core/webserver";
 import { DocumentStore } from "../../../server/core/data";
 import { generateDifficult } from "../../../server/utils/utils";
 import { Gateway, GatewayType } from "../lib/gateway"
-import { User } from "../../../server/shared/interfaces";
+import { User, CorePacket } from "../../../server/shared/interfaces";
 import { logger } from "../../../server/shared/log";
 import { hostname } from "os";
 
@@ -32,13 +32,19 @@ export class IotnxtCore extends PluginSuperServerside {
 
     reconnectgateway(query: { gateway: GatewayType, user: User }, cb: any) {
 
-        /** send a message to entire cluster */
-        this.plugins.cluster.broadcast({ group: "iotnxt", message: "disconnectGateway", data: query })
-        cb(undefined, { reconnect: "true" })
-        // TODO:
-        // var { gateway, user } = query;
-        // logger.log({ message: "reconnect gateway " + gateway.GatewayId, level: "warn", group: "iotnxt" })
-        // this.connectGateway(query.gateway);
+        // set gateway to not connected so we may retry.
+        // cluster will then find unconnected gateway and attempt to connect.
+
+        this.documentstore.db.plugins_iotnxt.update(
+            { type: "gateway", unique: query.gateway.unique },
+            { "$set": { connected: false, lastactive: new Date() } }, (err: Error, result: any) => {
+
+                /** send a message to entire cluster */
+                this.plugins.cluster.broadcast({ group: "iotnxt", message: "disconnectGateway", data: query })
+                cb(undefined, { reconnect: "true" })
+
+            })
+
     }
 
     addgateway(query: { gateway: any, user: User }, cb: any) {
@@ -144,15 +150,85 @@ export class IotnxtCore extends PluginSuperServerside {
                 })
                 //
 
+                /**  New 5.1: 
+                 *  gateway connections to iotnxt now don't use apikeys in the route anymore 
+                 * we still support this old method for compatibility, only the old gateways will 
+                 * still have this behaviour.
+                 * */
+
                 // handling incoming requests from commander/portal
                 gatewayConnection.on("request", (request: any) => {
-                    console.log("iotnxt incoming request!!!! TODO unhandled in 5.1")
+
+                    // UPDATE DB that this gateway is active.
+                    var update = {
+                        unique: gateway.unique,
+                        connected: true,
+                        instance_id: process.pid,
+                        hostname: hostname(),
+                        lastactive: new Date(),
+                        _connected_last: new Date()
+                    }
+
+                    this.documentstore.db.plugins_iotnxt.update({ type: "gateway", unique: gateway.unique }, { "$set": update }, (err: Error, result: any) => { })
+                    this.emit("updatestate", update);
+
+                    // PROPAGATE DATA THROUGH TO USER
+                    //this.emit("request", request);
+                    console.log(gateway);
+                    console.log(request);
+
+                    // newer 5.1 gateways use publickey instead for security, so we don't reveal user's apikey.
+                    if (gateway.usepublickey) {
+                        var packet = request.packet;
+                        packet.publickey = request.key
+
+                        this.documentstore.db.states.findOne({ publickey: request.key }, (err: Error, state: CorePacket) => {
+                            if (state) {
+                                this.core.user({ apikey: state.apikey }, (e, user) => {
+                                    this.core.datapost({ user, packet }, () => { })
+                                })
+                            }
+                        })
+
+                    } else {
+                        var packet = request.packet;
+                        packet.apikey = request.key
+                        this.core.user({ apikey: request.key }, (e, user) => {
+                            this.core.datapost({ user, packet }, () => { })
+                        })
+
+                    }
                 })
 
-                // error
+                // propagate errors through to UI by storing in db state.
+
                 gatewayConnection.on("error", (error) => {
-                    console.log("iotnxt.ts error:")
-                    console.log(error);
+                    // console.log("iotnxt.ts error:")
+                    // console.log(error);
+
+                    var update = {
+                        connected: "error",
+                        instance_id: process.pid,
+                        hostname: hostname(),
+                        lastactive: new Date(),
+                        error: error.message
+                    }
+                    //this.updateGatewayDB(gateway.unique, update, () => { })
+
+                    this.documentstore.db.plugins_iotnxt.update(
+                        { type: "gateway", unique: gateway.unique },
+                        { "$set": update }, (err: Error, result: any) => { })
+
+
+                    //remove from array
+                    this.gateways = this.gateways.filter(gw => {
+                        if (gw.GatewayId !== gateway.GatewayId) { return true } else { return false }
+                    })
+
+                    this.emit("updatestate");
+
+                    //this.emit("updatestate", update);
+
                 })
 
                 /** add this gateway connection to our list of connected gateways */
