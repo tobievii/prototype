@@ -52,6 +52,16 @@ export class IotnxtCore extends PluginSuperServerside {
 
         if (user.level <= 0) { cb(new Error("level must be 1 or higher")); return; }
 
+        if (query.gateway.GatewayId.indexOf(" ") >= 0) {
+            cb(new Error("No spaces allowed in gateway names"));
+            return;
+        }
+
+        if (query.gateway.GatewayId == "") {
+            cb(new Error("Cannot have blank gateway name"));
+            return;
+        }
+
         // force uppercase for gateways.
         query.gateway.GatewayId = query.gateway.GatewayId.toUpperCase();
 
