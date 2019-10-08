@@ -52,6 +52,9 @@ export class IotnxtCore extends PluginSuperServerside {
 
         if (user.level <= 0) { cb(new Error("level must be 1 or higher")); return; }
 
+        // force uppercase for gateways.
+        query.gateway.GatewayId = query.gateway.GatewayId.toUpperCase();
+
         this.documentstore.db.plugins_iotnxt.find({ GatewayId: gateway.GatewayId }, (err: Error, result: any) => {
             if (err) { cb(err); console.log(err); return; }
             if (result) {

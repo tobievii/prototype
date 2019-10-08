@@ -112,7 +112,13 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
     if (this.props.gateways) {
       if (this.props.gateways.length > 0) {
 
+        var gateways = [];
 
+        gateways = this.props.gateways.sort((a: GatewayType, b: GatewayType) => {
+          var at = new Date(a._created_on).getTime()
+          var bt = new Date(b._created_on).getTime()
+          return at > bt ? -1 : at < bt ? 1 : 0;
+        })
 
         return (
           <div style={blockstyle} >
@@ -135,7 +141,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
               <div style={{ flex: "1" }}>OPTIONS</div>
             </div>
 
-            {this.props.gateways.map((gateway: GatewayType, i) => {
+            {gateways.map((gateway: GatewayType, i) => {
 
               // var accountdefault = false;
               // if (this.state.accountgatewaydefault) {

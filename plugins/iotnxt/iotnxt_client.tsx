@@ -144,11 +144,26 @@ export default class Iotnxt extends PluginSuperClientside {
     /** Render the plugin popup on deviceview */
     deviceview() {
 
+        var gateways = []
+
+        if (this.state.gateways) {
+
+        }
+        gateways = this.state.gateways.sort((a: GatewayType, b: GatewayType) => {
+            var at = new Date(a._created_on).getTime()
+            var bt = new Date(b._created_on).getTime()
+            return at > bt ? -1 : at < bt ? 1 : 0;
+        })
+
+
+
         return (<div style={{ padding: colors.padding * 2 }}>
+            <p>Connects this device to IoTnxt portal/commander.</p>
 
             {this.renderDeviceGateway()}
 
-            <p>Connects this device to IoTnxt portal/commander.</p>
+            <div style={{ paddingTop: 25, paddingBottom: 25 }}><a href="/settings/iotnxt"><button><i className="fas fa-list-ul"></i> MANAGE GATEWAYS</button></a></div>
+
             <h5>SELECT FROM AVAILABLE GATEWAYS:</h5>
 
             <select style={{ width: "100%" }} className="settingsSelect" onChange={(e) => {
@@ -165,7 +180,7 @@ export default class Iotnxt extends PluginSuperClientside {
                 <option key="none" value="none">select gateway</option>
                 <option key="clear" value=" | ">clear</option>
                 {
-                    this.state.gateways.map((sGateway: GatewayType, i) => {
+                    gateways.map((sGateway: GatewayType, i) => {
                         return <option key={sGateway.GatewayId + "|" + sGateway.HostAddress} value={sGateway.GatewayId + "|" + sGateway.HostAddress} >{sGateway.GatewayId + "|" + sGateway.HostAddress}</option>
                     })
                 }
