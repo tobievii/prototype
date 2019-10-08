@@ -21,6 +21,53 @@ export class Landing extends React.Component<MyProps, MyState> {
     const buttonstyles: any = { width: "100%", bottom: -3, left: 0, position: "absolute", borderBottom: "2px solid #333" }
     const cardtextstyle: any = { fontSize: "0.75em", lineHeight: "1.65em" }
 
+    /** provides the responsive styles for the landing hero segment */
+    var landingheroSegmentStyle: any = (window.innerWidth > 800)
+      ? {
+        wrapper: {
+          width: "100%", overflow: "hidden",
+        },
+        subwrap: { maxWidth: "1400px", margin: "0 auto", position: "relative" },
+        svgblock: { width: "75%", float: "right", zIndex: 1, right: 0, top: 0 },
+        textblock: { width: "75%", padding: colors.padding * 2, zIndex: 2, position: "absolute", top: 0, left: 0 }
+      }
+      : {
+        wrapper: { width: "100%", overflow: "hidden" },
+        subwrap: { width: "100%" },
+        svgblock: { width: "100%" },
+        textblock: { width: "100%", padding: colors.padding * 2, zIndex: 2 }
+      }
+
+    /** provides the responsive styles for the devicelist segment */
+    var devicelistSegmentWrapperStyle: any = (window.innerWidth > 800)
+      ? {
+        maxWidth: "1400px",
+        margin: "-100px auto",
+        marginBottom: "50px",
+        position: "relative"
+      } : {
+        maxWidth: "100%"
+      }
+
+    var devicelistSegmentWrapperSubStyle: any = (window.innerWidth > 800)
+      ? { display: "flex", flexDirection: "row" }
+      : { display: "flex", flexDirection: "column" }
+
+    /** provides the responsive styles for the dashboard/editor segments. */
+    var landingSegmentWrapperStyle: any = (window.innerWidth > 800) ? {
+      maxWidth: "1400px",
+      margin: "0 auto",
+      paddingTop: 100,
+      display: "flex",
+      flexDirection: "row"
+    }
+      : {
+        width: "100%",
+        paddingTop: 100,
+        display: "flex",
+        flexDirection: "column-reverse"
+      }
+
     return (
       <div style={{ paddingTop: "0", background: "#232323", height: "100%", zIndex: 1 }}>
 
@@ -31,17 +78,15 @@ export class Landing extends React.Component<MyProps, MyState> {
             </div>
           </div>
 
-          <div className="landingBannerBg" style={{
-            width: "100%", overflow: "hidden",
-          }}>
+          <div className="landingBannerBg" style={landingheroSegmentStyle.wrapper}>
 
-            <div style={{ maxWidth: "1400px", margin: "0 auto", position: "relative" }}>
+            <div style={landingheroSegmentStyle.subwrap}>
 
-              <div style={{ width: "75%", float: "right", zIndex: 1, right: 0, top: 0 }}>
-                <Hero display={true} />
+              <div style={landingheroSegmentStyle.svgblock}>
+                <Hero />
               </div>
 
-              <div style={{ width: "75%", padding: colors.padding * 2, zIndex: 2, position: "absolute", top: 0, left: 0 }}>
+              <div style={landingheroSegmentStyle.textblock}>
                 <h1>Internet of things for everyone.</h1>
                 <p style={paragraphstyle}>Simple as possible to connect anything.<br />
                   Build custom interfaces easily.
@@ -51,10 +96,10 @@ export class Landing extends React.Component<MyProps, MyState> {
             </div>
           </div>
 
-          <div style={{ maxWidth: "1400px", margin: "-100px auto", marginBottom: "50px", position: "relative" }}>
-            <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={devicelistSegmentWrapperStyle}>
+            <div style={devicelistSegmentWrapperSubStyle}>
               <div style={{ flex: 1 }}>
-                <img src="/img/landingPage_devicelist.gif" />
+                <img style={{ width: "100%" }} src="/img/landingPage_devicelist.gif" />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ padding: colors.padding * 2, paddingTop: 80 }}>
@@ -70,28 +115,27 @@ export class Landing extends React.Component<MyProps, MyState> {
 
 
         <div style={{ background: "#1D1D1D" }}>
-
-          <div style={{ maxWidth: "1400px", margin: "0 auto", paddingTop: 100, display: "flex", flexDirection: "row" }}>
-            <div style={{ flex: 1 }}>
+          <div style={landingSegmentWrapperStyle}>
+            <div style={{ flex: 1, padding: colors.padding }}>
               <h1>Dashboard</h1>
               <p style={paragraphstyle}>Drag and drop new buttons, graphs and gauges. Powerful API to build your own widgets.</p>
             </div>
 
             <div style={{ flex: 1 }}>
-              <img src="/img/landing_dashboard.gif" />
+              <img style={{ width: "100%" }} src="/img/landing_dashboard.gif" />
             </div>
           </div>
 
 
 
-          <div style={{ maxWidth: "1400px", margin: "0 auto", paddingTop: 100, paddingBottom: 100, display: "flex", flexDirection: "row" }}>
-            <div style={{ flex: 1 }}>
+          <div style={landingSegmentWrapperStyle}>
+            <div style={{ flex: 1, padding: colors.padding }}>
               <h1>Editor</h1>
               <p style={paragraphstyle}>Script the behaviour of your devices directly in the browser. Easily count events, automate actions and gain value from data.</p>
             </div>
 
             <div style={{ flex: 1 }}>
-              <img src="/img/landing_editor.gif" />
+              <img style={{ width: "100%" }} src="/img/landing_editor.gif" />
             </div>
 
           </div>
