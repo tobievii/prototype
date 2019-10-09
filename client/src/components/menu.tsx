@@ -1,11 +1,10 @@
 import React from "react";
-import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
-import { theme, colors } from "../theme"
-import { clone } from "../utils/lodash_alt"
+import { NavLink } from "react-router-dom";
+import { colors } from "../theme"
+
 import { Dropdown } from "./dropdown"
-import { TextAlignProperty, StandardLonghandProperties } from "csstype";
-import { button } from "./dashboard/widgets";
-import { wrap } from "module";
+import { TextAlignProperty } from "csstype";
+// import { button } from "./dashboard/widgets";
 
 export interface MenuItems {
     /** show only icon on small screens */
@@ -137,9 +136,6 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                             </button></div>
                         }
                     }
-
-
-
 
                 })}
             </div >
