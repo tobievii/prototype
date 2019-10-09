@@ -117,7 +117,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
           text: "Get Started",
           link: "/register",
           icon: "user-plus",
-          style: { background: colors.spotA }
+          style: { background: colors.good }
         }
       ]
 
