@@ -5,16 +5,18 @@ import { clone } from "../utils/lodash_alt"
 import { Dropdown } from "./dropdown"
 import { TextAlignProperty, StandardLonghandProperties } from "csstype";
 import { button } from "./dashboard/widgets";
+import { wrap } from "module";
 
-interface MenuItems {
+export interface MenuItems {
     /** show only icon on small screens */
-    responsive: boolean,
+    responsive?: boolean,
     text: string,
     icon?: string,
-    onClick: any,
+    onClick?: any,
     link?: string,
     menuitems?: MenuItems[]
     enabled?: boolean
+    style?: any
 }
 
 interface MenuProps {
@@ -52,7 +54,7 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                 if (this.props.config.menuitems[m].text.toLowerCase().indexOf(this.props.active.toLowerCase()) >= 0) {
                     console.log("found active")
                     this.setState({ active: m, useLinks: true })
-                    this.props.config.menuitems[m].onClick();
+                    if (this.props.config.menuitems[m].onClick) this.props.config.menuitems[m].onClick();
                 }
             }
         }
@@ -84,16 +86,20 @@ export class Menu extends React.Component<MenuProps, MenuState> {
             //wrapperstyle.backgroundColor = "#33ffff"
         }
 
+        wrapperstyle.display = "flex"
+        wrapperstyle.flexDirection = "row nowrap"
+
         return (
             <div style={wrapperstyle}>
                 {this.props.config.menuitems.map((item, i, arr) => {
 
                     var onClick = (e) => {
                         this.setState({ active: i })
-                        item.onClick();
+                        if (item.onClick) item.onClick();
                     }
 
                     var icon = (item.icon) ? item.icon : "angle-right";
+
                     var buttonstyle: any = (i == this.state.active)
                         ? {
                             display: "inline-block",
@@ -113,18 +119,22 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                         buttonstyle.height = "100%"
                     }
 
+                    if (item.style) buttonstyle = { ...buttonstyle, ...item.style }
+
+                    buttonstyle.whiteSpace = "nowrap"
+
                     if (item.menuitems != undefined) {
-                        return <Dropdown height={this.props.height} style={buttonstyle} key={i} text={item.text} items={item.menuitems} />
+                        return <div style={{ flex: "1" }}><Dropdown height={this.props.height} style={buttonstyle} key={i} text={item.text} items={item.menuitems} /></div>
                     } else {
                         if (item.link) {
-                            return <NavLink exact to={item.link} key={i}  >
+                            return <div style={{ flex: "1" }}><NavLink exact to={item.link} key={i}  >
                                 <button onClick={onClick} style={buttonstyle}>
                                     <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
-                                </button></NavLink>
+                                </button></NavLink></div>
                         } else {
-                            return <button key={i} onClick={onClick} style={buttonstyle}>
+                            return <div style={{ flex: "1" }}><button key={i} onClick={onClick} style={buttonstyle}>
                                 <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
-                            </button>
+                            </button></div>
                         }
                     }
 

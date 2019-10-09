@@ -17,9 +17,26 @@ export class Landing extends React.Component<MyProps, MyState> {
 
     var paragraphstyle = { color: "#777777", fontSize: "16pt" }
 
-    const cardstyles: any = { width: 250, background: "rgba(255, 255, 255, 0.95)", margin: 10, position: "relative", padding: "120px 5px 40px 5px" }
-    const buttonstyles: any = { width: "100%", bottom: -3, left: 0, position: "absolute", borderBottom: "2px solid #333" }
-    const cardtextstyle: any = { fontSize: "0.75em", lineHeight: "1.65em" }
+    const cardstyles: any = {
+      flex: "1",
+      padding: colors.padding * 2,
+      boxSizing: "border-box"
+    }
+
+    const cardstylewrap: any = {
+      //background: "rgb(35, 35, 35)",
+      background: "rgb(40,40,40)",
+      width: "100%",
+      height: 300,
+      position: "relative",
+      boxSizing: "border-box",
+      boxShadow: "0px 10px 15px -2px rgba(0,0,0,0.25)",
+      border: colors.borders,
+      borderTop: "2px solid rgba(255, 255, 255, 0.15)"
+    }
+
+    const buttonstyles: any = { bottom: 0, width: "100%", position: "absolute", padding: colors.padding * 2, fontSize: "120%" }
+    const cardtextstyle: any = {}
 
     /** provides the responsive styles for the landing hero segment */
     var landingheroSegmentStyle: any = (window.innerWidth > 800)
@@ -87,7 +104,7 @@ export class Landing extends React.Component<MyProps, MyState> {
               </div>
 
               <div style={landingheroSegmentStyle.textblock}>
-                <h1>Internet of things for everyone.</h1>
+                <h1 style={{ paddingRight: 20 }}>Internet of things for everyone.</h1>
                 <p style={paragraphstyle}>Simple as possible to connect anything.<br />
                   Build custom interfaces easily.
               </p>
@@ -98,7 +115,7 @@ export class Landing extends React.Component<MyProps, MyState> {
 
           <div style={devicelistSegmentWrapperStyle}>
             <div style={devicelistSegmentWrapperSubStyle}>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, padding: colors.padding * 2 }}>
                 <img style={{ width: "100%" }} src="/img/landingPage_devicelist.gif" />
               </div>
               <div style={{ flex: 1 }}>
@@ -114,14 +131,14 @@ export class Landing extends React.Component<MyProps, MyState> {
 
 
 
-        <div style={{ background: "#1D1D1D" }}>
+        <div style={{}}>
           <div style={landingSegmentWrapperStyle}>
-            <div style={{ flex: 1, padding: colors.padding }}>
+            <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <h1>Dashboard</h1>
               <p style={paragraphstyle}>Drag and drop new buttons, graphs and gauges. Powerful API to build your own widgets.</p>
             </div>
 
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <img style={{ width: "100%" }} src="/img/landing_dashboard.gif" />
             </div>
           </div>
@@ -129,12 +146,12 @@ export class Landing extends React.Component<MyProps, MyState> {
 
 
           <div style={landingSegmentWrapperStyle}>
-            <div style={{ flex: 1, padding: colors.padding }}>
+            <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <h1>Editor</h1>
               <p style={paragraphstyle}>Script the behaviour of your devices directly in the browser. Easily count events, automate actions and gain value from data.</p>
             </div>
 
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <img style={{ width: "100%" }} src="/img/landing_editor.gif" />
             </div>
 
@@ -142,50 +159,88 @@ export class Landing extends React.Component<MyProps, MyState> {
 
         </div>
 
-        <section style={{ paddingTop: 50 }}>
-          <div style={{ color: colors.spotB, maxWidth: 1000, display: "flex", margin: "0 auto" }}>
+        <div style={{ paddingTop: 50, paddingBottom: 50, background: "rgba(255,255,255,0.05)" }}>
 
-            <div className="cards" style={cardstyles}>
+          <div style={{ color: "#CCCCCC", maxWidth: 1400, margin: "0 auto", padding: colors.padding * 2 }}>
+            <h1>Pricing</h1>
+            <p style={paragraphstyle}>We offer both free accounts and paid services. </p>
+          </div>
 
-              <h2>Startup</h2>
-              <p style={cardtextstyle}>Link up to 5 devices with Dashboard and automation workflows.</p>
-              <button style={buttonstyles}>FREE</button>
+          <div style={{ color: "#CCCCCC", maxWidth: 1400, display: "flex", flexDirection: "row", margin: "0 auto" }}>
+
+            <div style={cardstyles}>
+              <div style={cardstylewrap}>
+                <div style={{ padding: colors.padding * 2 }}>
+                  <h2>Startup</h2>
+                  <p style={paragraphstyle}>
+                    5 devices max<br />
+                    10MB per day<br />
+                    Community support
+                  </p>
+                </div>
+                <button style={buttonstyles}>FREE</button>
+              </div>
             </div>
 
-            <div className="cards" style={cardstyles}>
-
-              <h2>Pro</h2>
-              <p style={cardtextstyle}>Unlimited device count. <br />Shared cluster with metered usage.</p>
-              <button style={buttonstyles}>Starting at $2.50/mo</button>
+            <div style={cardstyles}>
+              <div style={cardstylewrap}>
+                <div style={{ padding: colors.padding * 2 }}>
+                  <h2>Pro</h2>
+                  <p style={paragraphstyle}>Unlimited device count. <br />Shared cluster with metered usage.</p>
+                </div>
+                <button style={buttonstyles}>Starting at $2.50/mo</button>
+              </div>
             </div>
 
-            <div className="cards" style={cardstyles}>
-
-              <h2>Business</h2>
-              <p style={cardtextstyle}>Unlimited device count. <br />Dedicated cloud instance. <br />Isolated hosting.</p>
-              <button style={buttonstyles}>Starting at $50/mo</button>
+            <div style={cardstyles}>
+              <div style={cardstylewrap}>
+                <div style={{ padding: colors.padding * 2 }}>
+                  <h2>Business</h2>
+                  <p style={paragraphstyle}>Unlimited device count. <br />Dedicated cloud instance. <br />Isolated hosting.</p>
+                </div>
+                <button style={buttonstyles}>Starting at $50/mo</button>
+              </div>
             </div>
 
-            <div className="cards" style={cardstyles}>
-
-              <h2>Enterprise</h2>
-              <p style={cardtextstyle}>Custom development.<br />Dedicated baremetal servers.<br />24/7 support</p>
-              <button style={buttonstyles}>Contact us</button>
+            <div style={cardstyles}>
+              <div style={cardstylewrap}>
+                <div style={{ padding: colors.padding * 2 }}>
+                  <h2>Enterprise</h2>
+                  <p style={paragraphstyle}>Custom development.<br />Dedicated baremetal servers.<br />24/7 support</p>
+                </div>
+                <button style={buttonstyles}>Contact us</button>
+              </div>
             </div>
 
           </div>
 
-        </section>
+        </div>
 
 
-        <div style={{ background: "#333333" }}>
-          <div style={{ margin: "0 auto", maxWidth: "1400px", display: "flex", flexDirection: "row" }}>
-            <div style={{ flex: "1" }}>
-              <h2>Company</h2>
+        <div style={{ background: "rgba(255,255,255,0.1)" }}>
+          <div style={{ margin: "0 auto", maxWidth: "1400px", display: "flex", flexDirection: "row", paddingTop: 100, paddingBottom: 100 }}>
+            <div style={{ flex: "1", padding: colors.padding * 2 }}>
+              <h2>PR0T0TYP3</h2>
             </div>
-            <div style={{ flex: "1" }}></div>
-            <div style={{ flex: "1" }}></div>
-            <div style={{ flex: "1" }}></div>
+
+            <div style={{ flex: "1" }}>
+              <a href="https://www.iotnxt.com">About</a> <br />
+              <a href="https://www.iotnxt.com/#section-2">Partners</a><br />
+              <a href="https://www.iotnxt.com/#section-5">Framework</a><br />
+              <a href="https://www.iotnxt.com/#section-9">Awards</a>
+            </div>
+
+            <div style={{ flex: "1" }}>
+              <a href="https://github.com/IoT-nxt/prototype">Opensource</a> <br />
+              <a href="https://github.com/IoT-nxt/prototype#documentation">Documentation</a><br />
+              <a href="https://discord.gg/rTQmvbT">Community</a><br />
+              <a href="https://discord.gg/rTQmvbT">Help</a>
+            </div>
+
+            <div style={{ flex: "1", padding: colors.padding * 2, fontSize: "150%", textAlign: "right" }}>
+              <a className="footerButton" href="https://discord.gg/rTQmvbT"><i className="fab fa-discord"></i></a>&nbsp;
+              <a className="footerButton" href="https://github.com/IoT-nxt/prototype"><i className="fab fa-github"></i></a>
+            </div>
           </div>
         </div>
 

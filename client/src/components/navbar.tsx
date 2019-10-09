@@ -6,6 +6,8 @@ import { theme, colors } from "../theme";
 import { api } from "../api";
 import { SearchBox } from "./searchbox";
 
+import { Menu, MenuItems } from "../components/menu"
+
 interface MyProps {
   //account: User;
 }
@@ -96,65 +98,90 @@ export class NavBar extends React.Component<MyProps, MyState> {
 
     //VISTORS:
     if (api.data.account == undefined) {
-      var menuitemsVisitor = [
-        { text: "Company", path: "/company", icon: "" },
-        { text: "Code", path: "/code", icon: "" },
-        { text: "Pricing", path: "/pricing", icon: "" },
-        { text: "Sign in", path: "/signin", icon: "" },
+      // var menuitemsVisitor = [
+      //   { text: "Company", path: "https://www.iotnxt.com", icon: "" },
+      //   { text: "Code", path: "https://github.com/IoT-nxt/prototype", icon: "" },
+      //   { text: "Pricing", path: "/pricing", icon: "" },
+      //   { text: "Log in", path: "/login", icon: "" },
+      //   {
+      //     text: "Register",
+      //     path: "/register",
+      //     icon: "",
+      //     style: { background: colors.spotA }
+      //   }
+      // ];
+
+      var menuitems: MenuItems[] = [
+        { text: "Log in", link: "/login", icon: "key" },
         {
-          text: "Sign up",
-          path: "/signup",
-          icon: "",
+          text: "Get Started",
+          link: "/register",
+          icon: "user-plus",
           style: { background: colors.spotA }
         }
-      ];
+      ]
 
-      menuitemsVisitor = menuitemsVisitor.reverse();
 
       return (
-        <div
-          style={{ zIndex: 10 }}
-          id="myTopnav"
-          className={
-            "topnav " + (this.state.mobileMenuActive ? "responsive" : "")
-          }
-        >
-          <NavLink id="topnavhome" exact activeClassName="active" to="/">
-            <div style={{ float: "left" }}>
-              <img
-                src="/icon.png"
-                alt=""
-                width="23"
-                height="23"
-                style={{ float: "left" }}
-              />
+        <div>
+          <div style={{
+            zIndex: 10,
+            width: "100%",
+            maxWidth: 1400,
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "row",
+            padding: colors.padding * 2
 
-              <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }}>
-                <span className="navHeading">PR0T0TYP3</span>
-              </div>
+          }}>
+
+            <div style={{ flex: "1" }}>
+              <NavLink id="topnavhome" exact activeClassName="active" to="/">
+                <div style={{ float: "left" }}>
+                  <img
+                    src="/icon.png"
+                    alt=""
+                    width="23"
+                    height="23"
+                    style={{ float: "left" }}
+                  />
+
+                  <div style={{ paddingLeft: 5, paddingTop: 2, float: "left" }}>
+                    <span className="navHeading">PR0T0TYP3</span>
+                  </div>
+                </div>
+              </NavLink>
             </div>
-          </NavLink>
 
-          {menuitemsVisitor.map((menuitem, i, arr) => {
-            if (size == "small") {
-              return (
-                <NavLink key={i} activeClassName="active" to={menuitem.path}>
-                  <i className={"fa fa-" + menuitem.icon}></i>
-                </NavLink>
-              );
-            } else {
-              return (
-                <NavLink key={i} activeClassName="active" to={menuitem.path}>
-                  <i className={"fa fa-" + menuitem.icon}></i>
-                  {menuitem.text}
-                </NavLink>
-              );
-            }
-          })}
+            <div style={{ flex: "0", paddingRight: 50 }} >
+              <Menu config={{ menuitems }} />
+            </div>
+            {/* {menuitemsVisitor.map((menuitem, i, arr) => {
+              if (size == "small") {
+                return (
+                  <div style={{ flex: "1" }}>
+                    <NavLink key={i} activeClassName="active" to={menuitem.path}>
+                      <i className={"fa fa-" + menuitem.icon}></i>
+                    </NavLink>
+                  </div>
+                );
+              } else {
+                return (
+                  <div style={{ flex: "1" }}>
+                    <NavLink key={i} activeClassName="active" to={menuitem.path}>
+                      <i className={"fa fa-" + menuitem.icon}></i>
+                      {menuitem.text}
+                    </NavLink>
+                  </div>
+                );
+              }
+            })} */}
 
-          <a className="icon" onClick={this.mobileMenuPress}>
-            <i className="fa fa-bars" />
-          </a>
+            {/* <a className="icon" onClick={this.mobileMenuPress}>
+              <i className="fa fa-bars" />
+            </a> */}
+          </div>
+
         </div>
       );
     }
