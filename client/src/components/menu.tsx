@@ -123,15 +123,15 @@ export class Menu extends React.Component<MenuProps, MenuState> {
                     buttonstyle.whiteSpace = "nowrap"
 
                     if (item.menuitems != undefined) {
-                        return <div style={{ flex: "1" }}><Dropdown height={this.props.height} style={buttonstyle} key={i} text={item.text} items={item.menuitems} /></div>
+                        return <div key={item.text + i} style={{ flex: "1" }}><Dropdown height={this.props.height} style={buttonstyle} text={item.text} items={item.menuitems} /></div>
                     } else {
                         if (item.link) {
-                            return <div style={{ flex: "1" }}><NavLink exact to={item.link} key={i}  >
+                            return <div key={item.text + i} style={{ flex: "1" }}><NavLink exact to={item.link} >
                                 <button onClick={onClick} style={buttonstyle}>
                                     <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
                                 </button></NavLink></div>
                         } else {
-                            return <div style={{ flex: "1" }}><button key={i} onClick={onClick} style={buttonstyle}>
+                            return <div key={item.text + i} style={{ flex: "1" }}><button onClick={onClick} style={buttonstyle}>
                                 <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
                             </button></div>
                         }

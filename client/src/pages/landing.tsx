@@ -1,7 +1,6 @@
 import React from "react";
-import { Registration } from "../components/registration";
-import { colors } from "../theme";
 
+import { colors } from "../theme";
 import { Hero } from "./herolanding"
 
 interface MyProps { }
@@ -15,7 +14,7 @@ export class Landing extends React.Component<MyProps, MyState> {
 
   render() {
 
-    var paragraphstyle = { color: "#777777", fontSize: "16pt" }
+
 
     const cardstyles: any = {
       flex: "1",
@@ -23,19 +22,24 @@ export class Landing extends React.Component<MyProps, MyState> {
       boxSizing: "border-box"
     }
 
-    const cardstylewrap: any = {
-      //background: "rgb(35, 35, 35)",
-      background: "rgb(40,40,40)",
-      width: "100%",
-      height: 300,
-      position: "relative",
-      boxSizing: "border-box",
-      boxShadow: "0px 10px 15px -2px rgba(0,0,0,0.25)",
-      border: colors.borders,
-      borderTop: "2px solid rgba(255, 255, 255, 0.15)"
-    }
+    const cardstylewrap: any = { ...colors.cardShadow, ...{ height: 300 } };
 
-    const buttonstyles: any = { bottom: 0, width: "100%", position: "absolute", padding: colors.padding * 2, fontSize: "120%" }
+    //   //background: "rgb(35, 35, 35)",
+    //   background: "rgb(40,40,40)",
+    //   width: "100%",
+    //   height: 300,
+    //   position: "relative",
+    //   boxSizing: "border-box",
+    //   boxShadow: "0px 10px 15px -2px rgba(0,0,0,0.25)",
+    //   border: colors.borders,
+    //   borderTop: "2px solid rgba(255, 255, 255, 0.15)"
+    // }
+
+    const buttonstyles: any = {
+      bottom: 0, width: "100%",
+      position: "absolute", padding: colors.padding * 2, fontSize: "120%",
+      border: "none"
+    }
     const cardtextstyle: any = {}
 
     /** provides the responsive styles for the landing hero segment */
@@ -89,11 +93,7 @@ export class Landing extends React.Component<MyProps, MyState> {
       <div style={{ paddingTop: "0", background: "#232323", height: "100%", zIndex: 1 }}>
 
         <div>
-          <div style={{ background: "#171717", padding: colors.padding * 2, zIndex: 3 }}>
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-              <Registration />
-            </div>
-          </div>
+
 
           <div className="landingBannerBg" style={landingheroSegmentStyle.wrapper}>
 
@@ -103,13 +103,27 @@ export class Landing extends React.Component<MyProps, MyState> {
                 <Hero />
               </div>
 
-              <div style={landingheroSegmentStyle.textblock}>
+              <div style={{ ...landingheroSegmentStyle.textblock, ...{ paddingTop: 100, paddingBottom: 100 } }}>
                 <h1 style={{ paddingRight: 20 }}>Internet of things for everyone.</h1>
-                <p style={paragraphstyle}>Simple as possible to connect anything.<br />
+                <p style={{ ...colors.p, ...{ color: "#cccccc" } }}>
+                  Open-Source.<br />
+                  Connect any device, any process. <br />
+                  Script custom data processes in JS/TS<br />
                   Build custom interfaces easily.
-              </p>
+                </p>
+                <a href="https://github.com/IoT-nxt/prototype">
+                  <button style={{ ...colors.quickShadow, ...{ fontSize: "120%" } }}>
+                    <i className="fab fa-github" /> Source</button></a>
+                <a href="/register">
+                  <button style={{
+                    ...colors.quickShadow,
+                    ...{
+                      fontSize: "120%", background: colors.good,
+                      color: "#fff", fontWeight: "bold"
+                    }
+                  }}>
+                    <i className="fa fa-user-plus" /> Register FREE* account</button></a>
               </div>
-
             </div>
           </div>
 
@@ -121,7 +135,7 @@ export class Landing extends React.Component<MyProps, MyState> {
               <div style={{ flex: 1 }}>
                 <div style={{ padding: colors.padding * 2, paddingTop: 80 }}>
                   <h1>Devicelist</h1>
-                  <p style={paragraphstyle}>Quickly see alarm, warning, share or public status of devices while the map view shows you where you need to focus.</p>
+                  <p style={colors.p}>Quickly see alarm, warning, share or public status of devices while the map view shows you where you need to focus.</p>
                 </div>
               </div>
             </div>
@@ -135,7 +149,7 @@ export class Landing extends React.Component<MyProps, MyState> {
           <div style={landingSegmentWrapperStyle}>
             <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <h1>Dashboard</h1>
-              <p style={paragraphstyle}>Drag and drop new buttons, graphs and gauges. Powerful API to build your own widgets.</p>
+              <p style={colors.p}>Drag and drop new buttons, graphs and gauges. Powerful API to build your own widgets.</p>
             </div>
 
             <div style={{ flex: 1, padding: colors.padding * 2 }}>
@@ -148,7 +162,7 @@ export class Landing extends React.Component<MyProps, MyState> {
           <div style={landingSegmentWrapperStyle}>
             <div style={{ flex: 1, padding: colors.padding * 2 }}>
               <h1>Editor</h1>
-              <p style={paragraphstyle}>Script the behaviour of your devices directly in the browser. Easily count events, automate actions and gain value from data.</p>
+              <p style={colors.p}>Script the behaviour of your devices directly in the browser. Easily count events, automate actions and gain value from data.</p>
             </div>
 
             <div style={{ flex: 1, padding: colors.padding * 2 }}>
@@ -162,58 +176,81 @@ export class Landing extends React.Component<MyProps, MyState> {
         <div style={{ paddingTop: 50, paddingBottom: 50, background: "rgba(255,255,255,0.05)" }}>
 
           <div style={{ color: "#CCCCCC", maxWidth: 1400, margin: "0 auto", padding: colors.padding * 2 }}>
-            <h1>Pricing</h1>
-            <p style={paragraphstyle}>We offer both free accounts and paid services. </p>
+            <h1>Hosted service</h1>
+            <p style={colors.p}>We offer both free accounts and paid services for those who just want have a
+            quick test drive, or do not want the hassle of running their own cloud infrastructure. </p>
           </div>
 
           <div style={{ color: "#CCCCCC", maxWidth: 1400, display: "flex", flexDirection: "row", margin: "0 auto" }}>
 
             <div style={cardstyles}>
-              <div style={cardstylewrap}>
+              <div style={{ ...cardstylewrap, ...{ borderTop: "1px solid " + colors.good } }}>
                 <div style={{ padding: colors.padding * 2 }}>
-                  <h2>Startup</h2>
-                  <p style={paragraphstyle}>
+                  <h2 style={{ color: colors.good }}>Free</h2>
+                  <p style={colors.p}>
                     5 devices max<br />
-                    10MB per day<br />
+                    300MB per month<br />
                     Community support
                   </p>
                 </div>
-                <button style={buttonstyles}>FREE</button>
+
+                <button style={{
+                  ...buttonstyles, ...colors.quickShadow,
+                  ...{ background: colors.good, color: "#fff", fontWeight: "bold" }
+                }}>
+                  <i className="fas fa-arrow-right" /> Click here</button>
               </div>
             </div>
 
             <div style={cardstyles}>
-              <div style={cardstylewrap}>
+              <div style={{ ...cardstylewrap, ...{ borderTop: "1px solid " + colors.warning } }}>
                 <div style={{ padding: colors.padding * 2 }}>
-                  <h2>Pro</h2>
-                  <p style={paragraphstyle}>Unlimited device count. <br />Shared cluster with metered usage.</p>
+                  <h2 style={{ color: colors.warning }}>Pro</h2>
+                  <p style={colors.p}>Unlimited* device count. <br />
+                    30,000MB per month<br />
+                    Domain pointing<br />
+                    Support included
+                  </p>
                 </div>
-                <button style={buttonstyles}>Starting at $2.50/mo</button>
+                <div style={buttonstyles}>From $2.50/mo</div>
               </div>
             </div>
 
             <div style={cardstyles}>
-              <div style={cardstylewrap}>
+              <div style={{ ...cardstylewrap, ...{ borderTop: "1px solid " + colors.alarm } }}>
                 <div style={{ padding: colors.padding * 2 }}>
-                  <h2>Business</h2>
-                  <p style={paragraphstyle}>Unlimited device count. <br />Dedicated cloud instance. <br />Isolated hosting.</p>
+                  <h2 style={{ color: colors.alarm }}>Business</h2>
+                  <p style={colors.p}>
+                    Unlimited* device count. <br />
+                    60,000MB+ per month per user<br />
+                    Domain pointing<br />
+                    Business management<br />
+                    Priority support<br />
+                  </p>
                 </div>
-                <button style={buttonstyles}>Starting at $50/mo</button>
+                <div style={buttonstyles}>From $5/user/mo</div>
               </div>
             </div>
 
             <div style={cardstyles}>
-              <div style={cardstylewrap}>
+              <div style={{ ...cardstylewrap, ...{ borderTop: "1px solid " + colors.public } }}>
                 <div style={{ padding: colors.padding * 2 }}>
-                  <h2>Enterprise</h2>
-                  <p style={paragraphstyle}>Custom development.<br />Dedicated baremetal servers.<br />24/7 support</p>
+                  <h2 style={{ color: colors.public }}>Enterprise</h2>
+                  <p style={colors.p}>
+                    Business account plus:<br />
+                    Custom development.<br />
+                    Dedicated baremetal servers.<br />
+                    VIP support</p>
                 </div>
-                <button style={buttonstyles}>Contact us</button>
+                <a href="https://www.iotnxt.com/#section-contact"><button style={buttonstyles}>Contact us</button></a>
               </div>
             </div>
 
           </div>
 
+          <div style={{ color: "#CCCCCC", maxWidth: 1400, display: "flex", flexDirection: "row", margin: "0 auto" }}>
+            <p style={colors.p} >* Unlimited devices, but you'll still be capped by data usage limits to avoid system abuse.</p>
+          </div>
         </div>
 
 
@@ -244,7 +281,7 @@ export class Landing extends React.Component<MyProps, MyState> {
           </div>
         </div>
 
-      </div>
+      </div >
     );
   }
 }

@@ -216,7 +216,8 @@ button:hover {
 
 a {
   text-decoration: none;
-  color: darken($spotE, 20%);
+  border-bottom: 2px dotted rgba(255,255,255,0.1);
+  color: $spotE;
 }
 
 a:hover {

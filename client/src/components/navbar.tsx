@@ -10,6 +10,7 @@ import { Menu, MenuItems } from "../components/menu"
 
 interface MyProps {
   //account: User;
+  onlyLogo?: boolean
 }
 
 interface MyState {
@@ -61,6 +62,7 @@ export class NavBar extends React.Component<MyProps, MyState> {
             </div>
           </NavLink>
 
+
           <SearchBox />
 
           {menuitemsLogged.map((menuitem, i, arr) => {
@@ -88,6 +90,9 @@ export class NavBar extends React.Component<MyProps, MyState> {
               );
             }
           })}
+
+
+
 
           <div style={{ clear: "both" }}></div>
         </div>
@@ -153,9 +158,14 @@ export class NavBar extends React.Component<MyProps, MyState> {
               </NavLink>
             </div>
 
-            <div style={{ flex: "0", paddingRight: 50 }} >
-              <Menu config={{ menuitems }} />
-            </div>
+
+            {(this.props.onlyLogo) ? "" :
+
+              <div style={{ flex: "0", paddingRight: 50 }} >
+                <Menu config={{ menuitems }} />
+              </div>
+            }
+
             {/* {menuitemsVisitor.map((menuitem, i, arr) => {
               if (size == "small") {
                 return (

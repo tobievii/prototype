@@ -20,6 +20,12 @@ import { registerServiceWorker } from "./serviceworker/serviceworker_register"
 import { Documentation } from "./pages/docs"
 import { Settings } from "./pages/settings";
 
+// new login/register
+import { UserRegistration } from "./components/user_registration";
+import { UserLogin } from "./components/user_login";
+import { RegisterPage } from "./pages/register";
+import { LoginPage } from "./pages/login";
+
 export default class App extends React.Component {
   state = {
     count: 0,
@@ -125,6 +131,7 @@ export default class App extends React.Component {
           <Route exact path="/v/:publickey" component={this.viewByPublickey} />
           <Route path="/u/:username/view/:id" component={this.deviceView} />
           <Route path="/login" component={this.login} />
+          <Route path="/register" component={this.register} />
         </BrowserRouter>
       );
     }
@@ -337,7 +344,49 @@ export default class App extends React.Component {
   };
 
   login = props => {
-    return <Login history={props.history} getaccount={this.getaccount} />;
+    return (<div>
+      <NavBar onlyLogo={true} />
+      <LoginPage />
+      {/*       
+      <div style={{ padding: colors.padding * 2, zIndex: 3 }}>
+
+        <div style={styleregister}>
+
+          <div style={{ padding: colors.padding * 2 }}>
+            <h2>Login</h2>
+            <p style={colors.p}>Glad to see you're back. <br />
+              Please authenticate your account below and we'll get your back up and running. </p>
+          </div>
+
+          <UserLogin mode={"login"} />
+
+          <div style={{
+            ...colors.p, ...{
+              padding: colors.padding * 1,
+              paddingTop: colors.padding * 2,
+              paddingBottom: colors.padding * 3,
+              textAlign: "right",
+              fontSize: "12pt"
+            }
+          }}>
+            Don't have an account yet? You'll need to <a href="/register">register</a> an account first.
+          </div>
+
+          <div style={{ ...colors.p, ...{ background: "rgba(0,0,0,0.1)", padding: colors.padding * 1, textAlign: "right", fontSize: "12pt" } }}>
+            By logging in, you agree to our <a style={{ whiteSpace: "nowrap" }} href="/terms">Terms of Service</a>.
+          </div>
+
+        </div>
+      </div> */}
+    </div>)
+  };
+
+  /** /register page */
+  register = props => {
+    return (<div>
+      <NavBar onlyLogo={true} />
+      <RegisterPage />
+    </div>)
   };
 
   signout = props => {

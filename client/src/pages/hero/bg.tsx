@@ -43,7 +43,7 @@ export class Background extends React.Component<MyProps, MyState> {
 
         // return (<div>{this.state.y}</div>)
 
-        var bgcolor = "#171717";
+        var bgcolor = "rgba(255,255,255,0.05)";
 
         //lighter
         //bgcolor = "#081626";

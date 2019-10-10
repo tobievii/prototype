@@ -10,13 +10,14 @@ import { colors } from "../theme";
 interface MyProps {
   // getaccount: Function;
   // history: any;
+  mode: string
 }
 
 interface MyState {
   // [index: string]: any
 }
 
-export class Registration extends React.Component<MyProps, MyState> {
+export class UserRegistration extends React.Component<MyProps, MyState> {
   state = {
     email: "",
     pass: "",
@@ -78,21 +79,38 @@ export class Registration extends React.Component<MyProps, MyState> {
   };
 
   render() {
+
+    // window.innerWidth < 800
+    // force column
+    var styles: any = (true) ? {
+      wrap: { display: "flex", flexDirection: "column" },
+      wrapinputs: { flex: 1, padding: colors.padding * 2 },
+      wrapbutton: { flex: 0, padding: colors.padding * 2, textAlign: "right" }
+    } : {
+        wrap: { display: "flex", flexDirection: "row" },
+        wrapinputs: { flex: 1, padding: colors.padding },
+        wrapbutton: { flex: 0, padding: colors.padding }
+      }
+
+
+
     return (
       <div>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ flex: 1, padding: colors.padding }}>
+        <div style={styles.wrap}>
+          <div style={styles.wrapinputs}>
             <input
+              name="email"
               placeholder="Email Address"
-              type="text"
+              type="email"
               style={{ width: "100%", padding: colors.padding }}
               onChange={this.onChange("email")}
               value={this.state.email.toLowerCase()}
             />
           </div>
 
-          <div style={{ flex: 1, padding: colors.padding }}>
+          <div style={styles.wrapinputs}>
             <input
+              name="password"
               placeholder="Password"
               type="password"
               style={{ width: "100%", padding: colors.padding }}
@@ -101,8 +119,18 @@ export class Registration extends React.Component<MyProps, MyState> {
               onKeyPress={this.onKeyPress}
             />
           </div>
-          <div style={{ flex: 0, padding: colors.padding }}>
-            <button onClick={this.onClick}>OK</button>
+          <div style={styles.wrapbutton}>
+
+
+            <button
+              style={{
+                ...colors.quickShadow,
+                ...{
+                  fontSize: "120%", background: colors.good,
+                  color: "#fff", fontWeight: "bold"
+                }
+              }} onClick={this.onClick}>
+              <i className="fas fa-check" /> Register</button>
           </div>
         </div>
         <div>

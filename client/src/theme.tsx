@@ -22,7 +22,24 @@ export const colors = {
   padding: 10,
   widgetDefault: "#11CC88",
   backgroundPopup: "rgba(32, 32, 32, 0.95)",
-  bgDarker: "rgba(0,0,0,0.2)"
+  bgDarker: "rgba(0,0,0,0.2)",
+  p: { color: "#999999", fontSize: "15pt" },
+  cardShadow: {
+    //background: "rgb(35, 35, 35)",
+    background: "rgb(40,40,40)",
+    width: "100%",
+    position: "relative",
+    boxSizing: "border-box",
+    boxShadow: "0px 10px 15px -2px rgba(0,0,0,0.25)",
+    border: "1px solid rgba(128,128,128,0.03)",
+    borderTop: "2px solid rgba(255, 255, 255, 0.15)"
+  },
+  quickShadow: {
+    boxShadow: "0px 10px 15px -2px rgba(0,0,0,0.25)",
+    border: "1px solid rgba(128,128,128,0.03)",
+    borderTop: "2px solid rgba(255, 255, 255, 0.15)"
+  }
+
 };
 
 // DEFINE COLOURS HERE:
