@@ -1,6 +1,4 @@
 import React from "react";
-import { Registration } from "../components/registration";
-import { colors, theme } from "../theme";
 import { Lines } from "./hero/lines";
 import { Background } from "./hero/bg";
 import { AnimNodeGfx } from "./hero/animNodeGfx";
@@ -9,13 +7,9 @@ import { Watch } from "./hero/watch";
 import { Laptop } from "./hero/laptop";
 import { Server } from "./hero/server";
 
+interface MyProps { }
 
-
-interface MyProps { display?: boolean }
-
-interface MyState {
-    //[index: string]: any
-}
+interface MyState { }
 
 export class Hero extends React.Component<MyProps, MyState> {
     state = {
@@ -27,9 +21,6 @@ export class Hero extends React.Component<MyProps, MyState> {
 
     render() {
 
-        if (this.props.display === false) {
-            return <div style={{ width: "100%", height: "100%", background: "#f00" }}></div>
-        }
 
         return (
             <div>
