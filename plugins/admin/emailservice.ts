@@ -72,7 +72,7 @@ export class EmailService extends PluginSuperServerside {
         // here we listen to db plugins_admin emailsettings changes and connect to the new settings if possible
         this.documentstore.on("plugins_admin", (data) => {
             if (data.settings == "emailsettings") {
-                console.log("email settings change")
+                //console.log("email settings change")
                 this.checkifdbentryexists((err, smtpsettings) => {
                     this.startemailtransport(smtpsettings);
                 });
@@ -162,7 +162,10 @@ export class EmailService extends PluginSuperServerside {
     sendtestemail(options: { user: User }) {
         var user = options.user;
 
-        logger.log({ group: "email", message: "SENDING TEST EMAIL to " + user.email, level: "info" })
+        logger.log({
+            group: "email",
+            message: "SENDING TEST EMAIL to " + user.email, level: "info"
+        })
 
         var mail = {
             from: this.emailsettings.auth.user,
@@ -174,10 +177,18 @@ export class EmailService extends PluginSuperServerside {
 
         this.nodemailer.sendMail(mail, (err, info) => {
             if (err) {
-                logger.log({ group: "email", message: "SENDING TEST EMAIL error " + user.email, level: "error" })
+                logger.log({
+                    group: "email",
+                    message: "SENDING TEST EMAIL error " + user.email,
+                    level: "error"
+                })
             }
             if (info) {
-                logger.log({ group: "email", message: "SENDING TEST EMAIL success " + user.email, level: "info" })
+                logger.log({
+                    group: "email",
+                    message: "SENDING TEST EMAIL success " + user.email,
+                    level: "info"
+                })
             }
         })
     }
