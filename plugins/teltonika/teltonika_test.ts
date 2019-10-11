@@ -9,7 +9,7 @@ export default function teltonika_test(props: PluginConfigTestProps) {
         it("TELTONIKA can connect and send data", done => {
             var client = new net.Socket();
 
-            client.connect(12003, props.hostname, function () {
+            client.connect(12000, props.hostname, function () {
                 var testpacketIMEI = Buffer.from("000f333536333037303432343431303133", "hex");
                 client.write(testpacketIMEI);
             });
