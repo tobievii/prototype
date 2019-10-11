@@ -8,6 +8,18 @@ import { User, CorePacket } from "../../../server/shared/interfaces";
 import { logger } from "../../../server/shared/log";
 import { hostname } from "os";
 
+export interface GatewayAdd {
+    GatewayId: string
+    Secret: string
+    HostAddress: string
+    PublicKey: string
+}
+
+export interface GatewayRemove {
+    GatewayId: string
+    HostAddress: string
+}
+
 export class IotnxtCore extends PluginSuperServerside {
     name = "iotnxt";
     gateways: Gateway[] = [];
@@ -47,8 +59,8 @@ export class IotnxtCore extends PluginSuperServerside {
 
     }
 
-    addgateway(query: { gateway: any, user: User }, cb: any) {
-        var { gateway, user } = query
+    addgateway(query: { gateway: GatewayAdd, user: User }, cb: any) {
+        const user = query.user
 
         if (user.level <= 0) { cb(new Error("level must be 1 or higher")); return; }
 
@@ -62,24 +74,30 @@ export class IotnxtCore extends PluginSuperServerside {
             return;
         }
 
-        // force uppercase for gateways.
-        query.gateway.GatewayId = query.gateway.GatewayId.toUpperCase();
 
-        this.documentstore.db.plugins_iotnxt.find({ GatewayId: gateway.GatewayId }, (err: Error, result: any) => {
+        this.documentstore.db.plugins_iotnxt.find({ GatewayId: query.gateway.GatewayId.toUpperCase() }, (err: Error, result: any) => {
             if (err) { cb(err); console.log(err); return; }
             if (result) {
                 if (result.length != 0) { cb(new Error("Gateway with this GatewayId already exists!")); return; }
                 //////////////
                 // ADD GATEWAY
-                gateway.default = false; // defaults to not the default
-                gateway.connected = false;
-                gateway.connecting = false;
-                gateway.unique = generateDifficult(64);
-                gateway.type = "gateway"
-                gateway.updated = new Date();
-                gateway.usepublickey = true;
-                gateway["_created_on"] = new Date();
-                gateway["_created_by"] = { publickey: user["publickey"] };
+                var gateway: GatewayType = {
+                    GatewayId: query.gateway.GatewayId.toUpperCase(),
+                    Secret: query.gateway.Secret,
+                    HostAddress: query.gateway.HostAddress,
+                    PublicKey: query.gateway.PublicKey,
+                    //default: false,
+                    connected: false,
+                    //connecting: false,
+                    unique: generateDifficult(64),
+                    type: "gateway",
+                    //updated: new Date(),
+                    usepublickey: true,
+                    error: "",
+                    "_created_on": new Date(),
+                    "_created_by": { publickey: user["publickey"] }
+                };
+
                 this.documentstore.db.plugins_iotnxt.save(gateway, (err: Error, result: any) => { cb(err, result, gateway); });
                 //////////////
             }
@@ -87,18 +105,21 @@ export class IotnxtCore extends PluginSuperServerside {
     }
 
     /** Removing of gateways */
-    removegateway = (query: { gateway: Gateway, user: User }, cb: any) => {
+    removegateway = (query: { gateway: GatewayRemove, user: User }, cb: any) => {
         var { gateway, user } = query;
 
         var dbQuery: any = {
             type: "gateway",
-            GatewayId: query.gateway.GatewayId,
+            GatewayId: query.gateway.GatewayId.toUpperCase(),
             HostAddress: query.gateway.HostAddress
         }
 
         // If you are not admin you can only delete gateways you created.
-        if (!user.admin) { dbQuery["_createdby"] = { publickey: query.user.publickey } }
-        this.documentstore.db.plugins_iotnxt.remove(dbQuery, cb);
+        if (!user.admin) { dbQuery["_created_by"] = { publickey: query.user.publickey } }
+
+        this.documentstore.db.plugins_iotnxt.remove(dbQuery, (e, r) => {
+            cb(e, { deletedCount: r.deletedCount })
+        });
     }
 
     // handlenewgateway(gateway: any) {
