@@ -11,7 +11,7 @@ import { test_websockets } from "./webapiv4/webapi_v4_websockets"
 import { pluginTests } from "../../plugins/plugins_list_tests"
 
 
-
+import * as bench from "./benchmark"
 
 export interface TESTCONFIG {
     hostname: string
