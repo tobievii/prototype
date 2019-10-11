@@ -108,16 +108,19 @@ export class IotnxtCore extends PluginSuperServerside {
     removegateway = (query: { gateway: GatewayRemove, user: User }, cb: any) => {
         var { gateway, user } = query;
 
+        var string = query.gateway.GatewayId;
+        var caseInsensitiveGatewayId = new RegExp(["^", string, "$"].join(""), "i");
+
         var dbQuery: any = {
             type: "gateway",
-            GatewayId: query.gateway.GatewayId.toUpperCase(),
+            GatewayId: caseInsensitiveGatewayId,
             HostAddress: query.gateway.HostAddress
         }
 
         // If you are not admin you can only delete gateways you created.
         if (!user.admin) { dbQuery["_created_by"] = { publickey: query.user.publickey } }
 
-        this.documentstore.db.plugins_iotnxt.remove(dbQuery, (e, r) => {
+        this.documentstore.db.plugins_iotnxt.remove(dbQuery, (e: Error, r: any) => {
             cb(e, { deletedCount: r.deletedCount })
         });
     }
