@@ -49,7 +49,7 @@ export default function teltonika_test(props: PluginConfigTestProps) {
             });
 
             client.on('close', function () {
-                console.log('Connection closed');
+                //console.log('Connection closed');
 
             });
 
