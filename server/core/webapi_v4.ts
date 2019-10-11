@@ -2,15 +2,10 @@ import { Core } from "./core";
 import * as express from "express"
 import * as _ from 'lodash'
 
-interface APISPEC {
-    method: string
-    path: string
-    description?: string
-    post?: any
-    response?: any
-}
+import { APIdocumentation } from "../shared/interfaces"
 
-export var apispec: APISPEC[] = [];
+
+export var apispec: APIdocumentation[] = [];
 
 export function webapiv4(app: express.Application, core: Core) {
 

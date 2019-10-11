@@ -147,3 +147,12 @@ export interface CorePacketsOptions {
     request: ClientPacketOptions,
     user: User
 }
+
+/** All http api endpoints should have this documentation object */
+export interface APIdocumentation {
+    method: string
+    path: string
+    description?: string
+    post?: any
+    response?: any
+}
