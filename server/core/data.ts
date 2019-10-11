@@ -93,7 +93,9 @@ export class DocumentStore extends EventEmitter {
                 mongoose.connection.on("error", (err) => { logger.log({ message: err.toString(), level: "error" }) });
 
                 //ready
-                this.emit("ready");
+                setTimeout(() => {
+                    this.emit("ready");
+                }, 1000)
             }
         });
 
