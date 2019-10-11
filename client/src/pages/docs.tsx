@@ -96,13 +96,21 @@ export class Documentation extends React.Component<MyProps, MyState> {
 
         return (
             <div className="apiInfo" style={{ padding: colors.padding * 2 }} >
-                <Menu active={this.props.page} config={{
-                    menuitems: [
-                        { responsive: true, link: "/docs/apikey", icon: "key", text: "APIKEY", onClick: this.onClickMenuTab(1) },
-                        { responsive: false, link: "/docs/http", text: "HTTP/S", onClick: this.onClickMenuTab(2) },
-                        { responsive: false, link: "/docs/websocket", text: "WEBSOCKET", onClick: this.onClickMenuTab(3) },
-                        { responsive: false, link: "/docs/mqtt", text: "MQTT", onClick: this.onClickMenuTab(4) }]
-                }} />
+                <div style={{ display: "flex", flexDirection: "row" }}>
+
+                    <div style={{ flex: "0" }}>
+                        <Menu active={this.props.page} config={{
+                            menuitems: [
+                                { responsive: true, link: "/docs/apikey", icon: "key", text: "APIKEY", onClick: this.onClickMenuTab(1) },
+                                { responsive: false, link: "/docs/http", text: "HTTP/S", onClick: this.onClickMenuTab(2) },
+                                { responsive: false, link: "/docs/websocket", text: "WEBSOCKET", onClick: this.onClickMenuTab(3) },
+                                { responsive: false, link: "/docs/mqtt", text: "MQTT", onClick: this.onClickMenuTab(4) }]
+                        }} />
+                    </div>
+
+                    <div style={{ flex: "1" }}></div>
+                </div>
+
 
                 <div className="row" style={this.getMenuPageStyle(1)}><DocsApikey /></div>
                 <div className="row" style={this.getMenuPageStyle(2)}><DocsHTTPS /></div >
