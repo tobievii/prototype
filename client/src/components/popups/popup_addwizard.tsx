@@ -20,6 +20,7 @@ export class PopupAddWizard extends Popup<Props> {
 
     state = {
         title: "ADD DEVICE WIZARD",
+        addBlankId: ""
     }
 
 
@@ -37,11 +38,36 @@ export class PopupAddWizard extends Popup<Props> {
 
         return this.popuprender(<div style={{ display: "flex", flexDirection: "column" }}>
 
-            <div style={{ padding: colors.padding * 2 }}>There are many ways to link data depending on what hardware you are using.
-This wizard will help guide you through the process.</div>
-
 
             <div style={{ padding: colors.padding * 2, background: colors.bgDarker }} >
+                Add blank device.
+
+                <div style={{ display: "flex", flexDirection: "row", paddingTop: colors.padding, paddingBottom: colors.padding }}>
+
+                    <div style={{ flex: 0 }}>
+                        <i className="fas fa-plus-square" style={{ opacity: 0.5, padding: colors.padding }} />
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                        <input placeholder="type a name"
+                            style={{ width: "100%" }}
+                            value={this.state.addBlankId}
+                            onChange={(e) => { this.setState({ addBlankId: e.target.value }) }}></input>
+                    </div>
+
+                    <div style={{ flex: 0 }}>
+                        <button onClick={() => {
+                            api.post({ id: this.state.addBlankId }, () => { this.close() })
+                        }}
+                            style={{ marginLeft: colors.padding, float: "right", whiteSpace: "nowrap" }}>
+                            <i className="fas fa-check" style={{ color: colors.good }} /> Done</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div style={{ padding: colors.padding * 2, background: colors.bgDarker, marginTop: colors.padding }} >
                 Search for your device, service and/or protocol:
 
                 <div style={{ display: "flex", flexDirection: "row", paddingTop: colors.padding, paddingBottom: colors.padding }}>
@@ -63,22 +89,21 @@ This wizard will help guide you through the process.</div>
                     <div style={{ flex: 0 }}>
                         <button onClick={() => { }}
                             style={{ marginLeft: colors.padding, float: "right", whiteSpace: "nowrap" }}>
-                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good }} /></button>
+                            <i className="fas fa-chevron-right" style={{ color: colors.good }} /> Next</button>
                     </div>
 
                 </div>
 
             </div>
 
-            <div style={{ textAlign: "center", padding: colors.padding * 2 }}>OR</div>
 
-            <div style={{ padding: colors.padding * 2, background: colors.bgDarker }} >
+            <div style={{ padding: colors.padding * 2, background: colors.bgDarker, marginTop: colors.padding }} >
                 Add device by SERIAL NUMBER or TEMPORARY CODE:
 
                 <div style={{ display: "flex", flexDirection: "row", paddingTop: colors.padding, paddingBottom: colors.padding }}>
 
                     <div style={{ flex: 0 }}>
-                        <i className="fas fa-search" style={{ opacity: 0.5, padding: colors.padding }} />
+                        <i className="fas fa-tag" style={{ opacity: 0.5, padding: colors.padding }} />
                     </div>
 
                     <div style={{ flex: 1 }}>
@@ -88,7 +113,7 @@ This wizard will help guide you through the process.</div>
                     <div style={{ flex: 0 }}>
                         <button onClick={() => { }}
                             style={{ marginLeft: colors.padding, float: "right", whiteSpace: "nowrap" }}>
-                            NEXT <i className="fas fa-chevron-right" style={{ color: colors.good }} /></button>
+                            <i className="fas fa-chevron-right" style={{ color: colors.good }} /> Next</button>
                     </div>
 
                 </div>

@@ -175,15 +175,11 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
     if (this.state.state) {
       return (
-        <div style={{ padding: colors.padding * 2 }}>
+        <div style={{}}>
 
           {(!this.state.hidecontrols) &&
-            <div>
-
+            <div style={{ width: "100%", background: colors.panels }}>
               <Menu2 menuitems={menuitems} />
-
-
-
             </div>}
 
           {(this.state.pluginPopupsVisibility) && this.pluginsRenderPopupComponents()}
@@ -200,10 +196,10 @@ export class DeviceView extends React.Component<MyProps, MyState> {
 
 
 
-            <div style={{ flex: "5", paddingTop: colors.padding }}>
+            <div style={{ flex: "5", }}>
               {(this.state.showEditor) && <div><ProtoEditor state={this.state.state} /> </div>}
 
-              <div style={{ paddingTop: colors.padding }}>
+              <div style={{}}>
                 <Dashboard hidecontrols={this.state.hidecontrols} state={this.state.state} />
               </div>
             </div>

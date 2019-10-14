@@ -35,21 +35,24 @@ export class Menu2 extends React.Component<MenuProps, MenuState> {
         align: "left"
     }
 
+    // static getDerivedStateFromProps(props, state) {
+    //     // ...
+    // }
 
-    componentWillMount = () => {
+    // componentWillMount = () => {
 
-        if (this.props.align) { this.setState({ align: this.props.align }) }
+    //     if (this.props.align) { this.setState({ align: this.props.align }) }
 
-        if (this.props.active) {
-            for (var m in this.props.menuitems) {
-                if (this.props.menuitems[m].text.toLowerCase().indexOf(this.props.active.toLowerCase()) >= 0) {
-                    console.log("found active")
-                    this.setState({ active: m, useLinks: true })
-                    this.props.menuitems[m].onClick();
-                }
-            }
-        }
-    }
+    //     if (this.props.active) {
+    //         for (var m in this.props.menuitems) {
+    //             if (this.props.menuitems[m].text.toLowerCase().indexOf(this.props.active.toLowerCase()) >= 0) {
+    //                 console.log("found active")
+    //                 this.setState({ active: m, useLinks: true })
+    //                 this.props.menuitems[m].onClick();
+    //             }
+    //         }
+    //     }
+    // }
 
     render() {
         var size = "large";
@@ -90,10 +93,10 @@ export class Menu2 extends React.Component<MenuProps, MenuState> {
                         // return <div key={i} ><button key={i} onClick={onClick}>
                         //     <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
                         // </button></div>
-                        return <div><Dropdown key={i} text={item.text} items={item.menuitems} /></div>
+                        return <div key={i}><Dropdown text={item.text} items={item.menuitems} /></div>
 
                     } else {
-                        return <div key={i} ><button key={i} onClick={onClick}>
+                        return <div key={i} ><button onClick={onClick}>
                             <i className={"fa fa-" + icon} ></i> {((size == "small") && (item.responsive)) ? "" : item.text}
                         </button></div>
 

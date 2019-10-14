@@ -95,8 +95,11 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
             }
         }
 
+        var showtimeago = (window.innerWidth < 800) ? false : true;
+        var fontSize = (window.innerWidth < 800) ? "150%" : "100%"
+
         return (
-            <div style={{ background: "#202020", padding: 0, margin: 0 }}>
+            <div style={{ background: "#202020", padding: 0, margin: 0, fontSize }}>
 
                 {(this.state.sharedevicepopupvisible)
                     ? <PopupShare
@@ -125,14 +128,14 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                         <Link to={"/u/" + this.props.device.username + "/view/" + this.escapeNonUnicode(this.props.device.id)} >{this.props.device.id}</Link>
                     </div>
 
-                    <div style={{
+                    {(showtimeago) && <div style={{
                         flex: 1,
                         textAlign: "right",
                         padding: 5,
                         whiteSpace: "nowrap"
                     }}>
                         {moment(this.props.device["_last_seen"]).timeDelta()}
-                    </div>
+                    </div>}
 
                     <div style={theme.global.devicelist.columns}>
                         {(this.props.device.alarm)

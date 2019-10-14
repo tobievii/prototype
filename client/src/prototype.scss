@@ -214,13 +214,24 @@ button:hover {
   background: lighten($spotF, 5%);
 }
 
+
+
 a {
+  text-decoration: none;
+  color: $spotE;
+}
+
+a:hover {
+  color: #FFFFFF;
+}
+
+a.dotted {
   text-decoration: none;
   border-bottom: 2px dotted rgba(255,255,255,0.1);
   color: $spotE;
 }
 
-a:hover {
+a.dotted:hover {
   color: $spotE;
 }
 

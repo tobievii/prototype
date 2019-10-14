@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
-import { BrowserRouter, Route, Link, NavLink, Nav } from "react-router-dom";
+import { BrowserRouter, Route, Link, NavLink, Nav, Switch } from "react-router-dom";
 import { NavBar } from "./components/navbar";
 import { Login } from "./components/login";
 import { Landing } from "./pages/landing";
@@ -126,12 +126,15 @@ export default class App extends React.Component {
     if (this.state.account.level == 0) {
       return (
         <BrowserRouter>
-          <Route exact path="/" component={this.landing} />
-          <Route exact path="/u/:username" component={this.userView} />
-          <Route exact path="/v/:publickey" component={this.viewByPublickey} />
-          <Route path="/u/:username/view/:id" component={this.deviceView} />
-          <Route path="/login" component={this.login} />
-          <Route path="/register" component={this.register} />
+          <Switch>
+            <Route exact path="/" component={this.landing} />
+            <Route exact path="/u/:username" component={this.userView} />
+            <Route exact path="/v/:publickey" component={this.viewByPublickey} />
+            <Route path="/u/:username/view/:id" component={this.deviceView} />
+            <Route path="/login" component={this.login} />
+            <Route path="/register" component={this.register} />
+            <Route component={this.NoMatch} />
+          </Switch>
         </BrowserRouter>
       );
     }
@@ -140,6 +143,7 @@ export default class App extends React.Component {
     if (this.state.account) {
       return (
         <BrowserRouter>
+
           <Route path="/signout" component={this.signout} />
 
           <Route exact path="/" component={this.home} />
@@ -178,6 +182,16 @@ export default class App extends React.Component {
     //);
   }
 
+  NoMatch = props => {
+    console.log("nomatch");
+    console.log(props);
+    return (
+      <div>
+        <NavBar onlyLogo={true} />
+        <LoginPage />
+        {/* nomatch? login first? {JSON.stringify(props)} */}
+      </div>)
+  }
 
   docs = props => {
     return (<div>

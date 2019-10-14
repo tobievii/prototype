@@ -302,9 +302,9 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             <div style={dashboardstyle} >
 
                 {(!this.props.hidecontrols) &&
-                    <div style={{ background: "rgba(0,0,0,0.1)", display: "flex", flexDirection: "row" }}>
-                        <div style={{ flex: "5", paddingTop: colors.padding, paddingLeft: colors.padding, textAlign: "left" }}>{this.props.state.id}</div>
-                        <div style={{ flex: "1" }}>
+                    <div style={{ background: "rgba(0,0,0,0.2)", display: "flex", flexDirection: "row" }}>
+                        <div style={{ flex: "1", paddingTop: colors.padding, paddingLeft: colors.padding, textAlign: "left" }}>{this.props.state.id}</div>
+                        <div style={{ flex: "0" }}>
 
                             <Menu style={{ background: "rgba(0,0,0,0)", color: "rgba(255,255,255,0.5)" }}
                                 align="right" config={{
@@ -316,7 +316,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                         </div>
                     </div>}
 
-                <div style={{ background: "rgba(0,0,0,0.1)", width: 1300, minHeight: 600, margin: "0 auto" }}
+                <div style={{ background: "rgba(0,0,0,0.1)", minHeight: 600, margin: "0 auto" }}
 
                     onDragOver={(e) => this.onDragOver(e)}
                     onDrop={(e) => this.onDrop(e, "complete")} >
