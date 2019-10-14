@@ -27,3 +27,45 @@ export function objectByString(obj: any, str: string) {
     }
     return obj;
 }
+
+
+/** checks if the input string is a valid email address. */
+export function validEmail(input: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)
+}
+
+
+export const passwordSettings = { minlength: 5 }
+
+export interface passwordValidation {
+    valid: boolean
+    capitals: boolean
+    lowercase: boolean
+    numbers: boolean
+    symbols: boolean
+    /** does the length match the passwordSettings minimum length? */
+    length: boolean,
+    /** if the password is free of spaces. true is good, false is bad */
+    noSpace: boolean
+}
+
+export function validPassword(pw) {
+
+    var valid = /[A-Z]/.test(pw) &&
+        /[a-z]/.test(pw) &&
+        /[0-9]/.test(pw) &&
+        /[^A-Za-z0-9]/.test(pw) &&
+        (pw.indexOf(" ") < 0) &&
+        pw.length >= passwordSettings.minlength;
+
+    return {
+        valid,
+        capitals: /[A-Z]/.test(pw),
+        lowercase: /[a-z]/.test(pw),
+        numbers: /[0-9]/.test(pw),
+        symbols: /[^A-Za-z0-9]/.test(pw),
+        noSpace: (pw.indexOf(" ") < 0),
+        length: (pw.length >= passwordSettings.minlength)
+    }
+
+}
