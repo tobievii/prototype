@@ -15,12 +15,18 @@ export class Background extends React.Component<MyProps, MyState> {
     startvalue = -400;
     endvalue = 0;
 
+    intA;
+
     componentDidMount() {
 
-        setInterval(() => {
+        this.intA = setInterval(() => {
             this.animate();
         }, 50)
 
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intA);
     }
 
     animate() {

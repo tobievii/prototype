@@ -22,6 +22,8 @@ export class Server extends React.Component<MyProps, MyState> {
     endvalue = 0;
     max = 100;
 
+    intA;
+
     componentDidMount() {
         var blink = []
         for (var a = 0; a <= this.max; a++) {
@@ -40,9 +42,13 @@ export class Server extends React.Component<MyProps, MyState> {
             blink
         }) // initial all off;
 
-        setInterval(() => {
+        this.intA = setInterval(() => {
             this.animate();
         }, 50)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intA);
     }
 
     animate() {

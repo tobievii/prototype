@@ -14,6 +14,8 @@ export class AnimNodeGfx extends React.Component<MyProps, MyState> {
     frame = 0;
     max = 100;
 
+    intA;
+
     componentDidMount() {
 
         var blink = []
@@ -22,9 +24,13 @@ export class AnimNodeGfx extends React.Component<MyProps, MyState> {
         }
         this.setState({ blink }) // initial all off;
 
-        setInterval(() => {
+        this.intA = setInterval(() => {
             this.animate();
         }, 50)
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intA);
     }
 
     animate() {
