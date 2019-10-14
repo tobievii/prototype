@@ -184,7 +184,8 @@ export class UserRegistration extends React.Component<MyProps, MyState> {
             </div>
             <div style={{ padding: colors.padding, width: 20 }}>
               {(this.state.passwordValid.valid) && <i className="fas fa-check" style={{ color: colors.good }} />}
-              {(!this.state.passwordValid.valid) && <i className="fas fa-times" style={{ color: colors.alarm }} />}
+              {((this.state.pass.length > 0) && (!this.state.passwordValid.valid)) &&
+                <i className="fas fa-times" style={{ color: colors.alarm }} />}
             </div>
           </div>
 
