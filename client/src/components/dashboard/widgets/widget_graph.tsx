@@ -43,7 +43,24 @@ export default class WidgetCanvas extends WidgetComponent {
                     this.setState({ data })
                 }
             })
+
+            api.on("states", (states) => {
+                //console.log("graph new state", states)
+                for (var state of states) {
+                    if (state.key == this.props.state.key) {
+                        // its this device..
+                        var data: any = this.state.data;
+                        data.push(state);
+                        this.setState({ data })
+                    }
+                }
+            })
+
         }
+    }
+
+    componentDidUpdate() {
+        console.log("graph did update")
     }
 
     render() {
