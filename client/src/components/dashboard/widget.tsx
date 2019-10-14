@@ -25,6 +25,11 @@ export class Widget extends React.Component<MyProps, WidgetState> {
 
     /** pass action up to parent dashboard */
     handleActionMenu = (data) => {
+
+        if (data.save) {
+            this.setState({ showMenu: false })
+        }
+
         this.props.action(data);
     }
 
