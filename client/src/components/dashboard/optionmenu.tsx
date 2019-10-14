@@ -38,17 +38,19 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
         var options = [];
 
         if (this.props.options) {
-            //console.log("OptionsMenu", this.props)
             options = this.props.options;
         }
 
         if (this.props.widget) {
+
             if (this.props.widget.options) {
-                // widget options set?
                 Object.keys(this.props.widget.options).map((opt, i) => {
-                    if (options[opt]) { options[opt].val = this.props.widget.options[opt] }
+                    if (options[opt]) {
+                        options[opt].val = this.props.widget.options[opt]
+                    }
                 })
             }
+
         }
 
         return (<div className="widgetMenu" style={{
@@ -59,11 +61,22 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
             fontSize: 14,
             top: 35,
             background: colors.panels,
-            border: colors.borders,
-            padding: colors.padding
+            border: colors.borders
         }} >
 
-            <div style={{ padding: colors.padding }}>Change type:
+            <div style={{ display: "flex", flexDirection: "row" }}>
+                <div style={{ flex: 1 }}>
+                    <button style={{ width: "100%" }} onClick={e => this.props.action({ save: true })}>
+                        <i className="fas fa-save"></i> SAVE</button>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                    <button style={{ width: "100%" }} onClick={e => this.props.action({ remove: true })}>
+                        <i className="fas fa-trash-alt"></i> DELETE</button>
+                </div>
+            </div>
+
+            <div style={{ padding: colors.padding, background: "rgba(0,0,0,0.1)" }}>Change type:
                 <select
                     value={this.props.widgettypename}
                     onChange={(e => this.props.action({ type: e.target.value }))}>
@@ -73,16 +86,24 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
                 </select>
             </div>
 
-            <div style={{ padding: colors.padding }}>
-                <button onClick={e => this.props.action({ save: true })}><i className="fas fa-save"></i> SAVE</button>
-                <button onClick={e => this.props.action({ remove: true })}><i className="fas fa-trash-alt"></i> REMOVE</button>
-            </div>
+            {
+                Object.keys(options).map((x, i) => {
+                    var OptionToDraw = optionsComponents[options[x].type.toLowerCase()]
 
-            {Object.keys(options).map((x, i) => {
-                var OptionToDraw = optionsComponents[options[x].type.toLowerCase()]
-                if (!OptionToDraw) { return <div style={{ padding: colors.padding }}>Error {options[x].type.toLowerCase()}</div> }
-                return <div style={{ padding: colors.padding }} key={i}><OptionToDraw name={x} option={options[x]} action={this.action(x)} /></div>
-            })}
+                    if (!OptionToDraw) {
+                        return <div style={{ padding: colors.padding }}>
+                            Error {options[x].type.toLowerCase()}</div>
+                    }
+
+                    return <div style={{ padding: colors.padding }} key={i}>
+                        <OptionToDraw
+                            name={x}
+                            option={options[x]}
+                            action={this.action(x)} />
+                    </div>
+                })
+            }
+
         </div >)
     }
 }

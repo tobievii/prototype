@@ -341,7 +341,10 @@ export class Dashboard extends React.Component<MyProps, MyState> {
 
                         {this.state.layout.map((widget, i) => {
                             return (<div key={widget.i} onDrag={e => { e.preventDefault(); e.stopPropagation(); }}>
-                                <Widget edit={this.state.editMode} widget={widget} state={this.props.state} action={this.handleWidgetActions(widget)} />
+                                <Widget edit={this.state.editMode}
+                                    widget={widget}
+                                    state={this.props.state}
+                                    action={this.handleWidgetActions(widget)} />
                             </div>)
                         })}
                     </GridLayout>
