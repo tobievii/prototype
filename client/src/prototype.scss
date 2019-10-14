@@ -227,12 +227,13 @@ a:hover {
 
 a.dotted {
   text-decoration: none;
-  border-bottom: 2px dotted rgba(255,255,255,0.1);
+  border-bottom: 2px dotted rgba(255,255,255,0.2);
   color: $spotE;
 }
 
 a.dotted:hover {
-  color: $spotE;
+  color: #FFFFFF;
+  border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
 /* width */

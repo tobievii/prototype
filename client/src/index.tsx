@@ -25,6 +25,7 @@ import { UserRegistration } from "./components/user_registration";
 import { UserLogin } from "./components/user_login";
 import { RegisterPage } from "./pages/register";
 import { LoginPage } from "./pages/login";
+import { RecoverPage } from "./pages/recover";
 
 export default class App extends React.Component {
   state = {
@@ -133,6 +134,7 @@ export default class App extends React.Component {
             <Route path="/u/:username/view/:id" component={this.deviceView} />
             <Route path="/login" component={this.login} />
             <Route path="/register" component={this.register} />
+            <Route path="/recover" component={this.recover} />
             <Route component={this.NoMatch} />
           </Switch>
         </BrowserRouter>
@@ -143,43 +145,28 @@ export default class App extends React.Component {
     if (this.state.account) {
       return (
         <BrowserRouter>
+          <Switch>
+            <Route path="/signout" component={this.signout} />
 
-          <Route path="/signout" component={this.signout} />
+            <Route exact path="/" component={this.home} />
+            <Route exact path="/u/:username" component={this.userView} />
 
-          <Route exact path="/" component={this.home} />
-          <Route exact path="/u/:username" component={this.userView} />
-
-          <Route exact path="/u/:username/view/:id" component={this.deviceView} />
-          <Route exact path="/v/:publickey" component={this.viewByPublickey} />
+            <Route exact path="/u/:username/view/:id" component={this.deviceView} />
+            <Route exact path="/v/:publickey" component={this.viewByPublickey} />
 
 
-          <Route exact path="/docs" component={this.docs} />
-          <Route exact path="/docs/:page" component={this.docs} />
+            <Route exact path="/docs" component={this.docs} />
+            <Route exact path="/docs/:page" component={this.docs} />
 
-          <Route exact path="/settings" component={this.settings} />
-          <Route exact path="/settings/:page" component={this.settings} />
+            <Route exact path="/settings" component={this.settings} />
+            <Route exact path="/settings/:page" component={this.settings} />
+            <Route component={this.NoMatch} />
+          </Switch>
         </BrowserRouter>
       );
     }
 
-    // const { showSidebar } = this.state;
 
-    // var size = "large";
-    // if (window.innerWidth < 800) { size = "small" }
-
-    // return (
-    //   <div style={{}}>
-    //     <BrowserRouter>
-    //       <Route exact path="/" component={this.home} />
-    //       <Route exact path="/u/:username" component={this.userView} />
-    //       <Route exact path="/u/:username/view/:id" component={this.deviceView} />
-    //       <Route path="/login" component={this.login} />
-    //       <Route path="/signout" component={this.signout} />
-    //     </BrowserRouter>
-
-    //     <SideBar open={false} toggle={this.mobileMenuPress} >sidebarA</SideBar>
-    //   </div >
-    //);
   }
 
   NoMatch = props => {
@@ -188,7 +175,11 @@ export default class App extends React.Component {
     return (
       <div>
         <NavBar onlyLogo={true} />
-        <LoginPage />
+        <div style={{ margin: "0 auto", textAlign: "center", paddingTop: colors.padding * 3 }}>
+          <div style={{ fontSize: "30pt" }}>404 Not Found</div>
+          <p>Oh oh, that link does not exist.. or you might not have permission.</p>
+          <p>Go <a className="dotted" href="/">back home</a>?</p>
+        </div>
         {/* nomatch? login first? {JSON.stringify(props)} */}
       </div>)
   }
@@ -303,95 +294,19 @@ export default class App extends React.Component {
   }
 
   deviceView = props => {
-    console.log("deviceView", props)
     return <div>
       <NavBar />
-
-      {/* <DeviceList username={props.match.params.username} /> */}
       <DeviceView
         username={props.match.params.username}
         id={props.match.params.id}
       />
     </div>
-
-    var size = window.innerWidth < 800 ? "small" : "large";
-
-    var wrapper = clone(theme.global.responsive.wrapper);
-    wrapper.height = this.state.height;
-
-    var content = clone(theme.global.responsive.content);
-    content.width = window.innerWidth;
-
-    var contentSplit = clone(theme.global.responsive.content);
-    contentSplit.width = window.innerWidth - 500;
-
-    return (
-      <div style={wrapper}>
-        <div style={theme.global.responsive.navbar}>
-          <NavBar />
-        </div>
-
-        <div style={content}>
-          {size == "small" ? (
-            <DeviceView
-              username={props.match.params.username}
-              id={props.match.params.id}
-            />
-          ) : (
-              <div style={theme.global.responsive.contenthorizontal}>
-                <div style={{ flex: "0 auto", width: "500px" }}>
-                  <DeviceList username={props.match.params.username} />
-                </div>
-                <div style={contentSplit}>
-                  <DeviceView
-                    username={props.match.params.username}
-                    id={props.match.params.id}
-                  />
-                </div>
-              </div>
-            )}
-        </div>
-
-        <div style={{ flex: "0 1 40px" }}>footer</div>
-      </div>
-    );
   };
 
   login = props => {
     return (<div>
       <NavBar onlyLogo={true} />
       <LoginPage />
-      {/*       
-      <div style={{ padding: colors.padding * 2, zIndex: 3 }}>
-
-        <div style={styleregister}>
-
-          <div style={{ padding: colors.padding * 2 }}>
-            <h2>Login</h2>
-            <p style={colors.p}>Glad to see you're back. <br />
-              Please authenticate your account below and we'll get your back up and running. </p>
-          </div>
-
-          <UserLogin mode={"login"} />
-
-          <div style={{
-            ...colors.p, ...{
-              padding: colors.padding * 1,
-              paddingTop: colors.padding * 2,
-              paddingBottom: colors.padding * 3,
-              textAlign: "right",
-              fontSize: "12pt"
-            }
-          }}>
-            Don't have an account yet? You'll need to <a href="/register">register</a> an account first.
-          </div>
-
-          <div style={{ ...colors.p, ...{ background: "rgba(0,0,0,0.1)", padding: colors.padding * 1, textAlign: "right", fontSize: "12pt" } }}>
-            By logging in, you agree to our <a style={{ whiteSpace: "nowrap" }} href="/terms">Terms of Service</a>.
-          </div>
-
-        </div>
-      </div> */}
     </div>)
   };
 
@@ -402,6 +317,13 @@ export default class App extends React.Component {
       <RegisterPage />
     </div>)
   };
+
+  recover = props => {
+    return (<div>
+      <NavBar onlyLogo={true} />
+      <RecoverPage />
+    </div>)
+  }
 
   signout = props => {
     api.location("/signout");

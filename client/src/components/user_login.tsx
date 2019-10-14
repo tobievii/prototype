@@ -73,12 +73,12 @@ export class UserLogin extends React.Component<MyProps, MyState> {
     // force column
     var styles: any = (true) ? {
       wrap: { display: "flex", flexDirection: "column" },
-      wrapinputs: { flex: 1, padding: colors.padding },
-      wrapbutton: { flex: 0, padding: colors.padding, textAlign: "right" }
+      wrapinputs: { flex: 1, padding: colors.padding * 2 },
+      wrapbutton: { flex: 0, padding: colors.padding * 2, textAlign: "right" }
     } : {
         wrap: { display: "flex", flexDirection: "row" },
-        wrapinputs: { flex: 1, padding: colors.padding },
-        wrapbutton: { flex: 0, padding: colors.padding }
+        wrapinputs: { flex: 1, padding: colors.padding * 2 },
+        wrapbutton: { flex: 0, padding: colors.padding * 2 }
       }
 
 
@@ -86,7 +86,7 @@ export class UserLogin extends React.Component<MyProps, MyState> {
     return (
       <div>
         <div style={styles.wrap}>
-          <div style={{ flex: 1, padding: colors.padding }}>
+          <div style={{ flex: 1, padding: colors.padding * 2 }}>
             <input
               name="email"
               placeholder="Email Address"
@@ -108,6 +108,10 @@ export class UserLogin extends React.Component<MyProps, MyState> {
               onKeyPress={this.onKeyPress}
             />
           </div>
+
+          <div style={{ ...colors.p, ...{ paddingLeft: colors.padding * 2, fontSize: "12pt" } }}>
+            Forgot your password? You can <a className="dotted" href="/recover">recover your account</a>.</div>
+
           <div style={styles.wrapbutton}>
             <button style={{
               ...colors.quickShadow,

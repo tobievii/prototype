@@ -16,6 +16,25 @@ interface EmailSettings {
     }
 }
 
+/** When using .sendmail please use this format for the mail object */
+export interface EmailFormat {
+    /** email address from? */
+    from: string
+    /** email address to? */
+    to: string
+    subject: string
+
+    /**
+     * example: 'This is just an email test. '
+     */
+    text: string
+
+    /**
+     * example: '<p>This is just an email test.</p>'
+     */
+    html: string
+}
+
 export class EmailService extends PluginSuperServerside {
     nodemailer: nodemailer.Transporter;
     emailsettings: EmailSettings;
@@ -157,7 +176,33 @@ export class EmailService extends PluginSuperServerside {
         });
     }
 
+    sendmail(mail: EmailFormat, cb: Function) {
+        mail.from = this.emailsettings.auth.user; //override
 
+        logger.log({
+            group: "email",
+            message: "SENDING RECOVERY EMAIL to " + mail.to, level: "info"
+        })
+
+        this.nodemailer.sendMail(mail, (err, info) => {
+            if (err) {
+                logger.log({
+                    group: "email",
+                    message: "SENDING RECOVERY error " + mail.to,
+                    level: "error"
+                })
+                cb(err, info)
+            }
+            if (info) {
+                logger.log({
+                    group: "email",
+                    message: "SENDING RECOVERY success " + mail.to,
+                    level: "info"
+                })
+                cb(err, info)
+            }
+        })
+    }
 
     sendtestemail(options: { user: User }) {
         var user = options.user;
