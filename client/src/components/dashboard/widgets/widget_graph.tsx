@@ -44,9 +44,9 @@ export default class WidgetCanvas extends WidgetComponent {
                 }
             })
 
-            api.on("states", (states) => {
-                //console.log("graph new state", states)
-                for (var state of states) {
+            api.on("state", (state) => {
+                console.log("graph new state", state)
+                if (Array.isArray(state) == false) {
                     if (state.key == this.props.state.key) {
                         // its this device..
                         var data: any = this.state.data;
@@ -54,6 +54,9 @@ export default class WidgetCanvas extends WidgetComponent {
                         this.setState({ data })
                     }
                 }
+
+
+
             })
 
         }

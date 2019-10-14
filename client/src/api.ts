@@ -162,6 +162,9 @@ export class API extends EventEmitter {
             this.mergeState(data);
         }
 
+        console.log("----", data);
+        this.emit("state", data);
+
         // let the app know:
         this.emit("states", this.data.states);
     }
