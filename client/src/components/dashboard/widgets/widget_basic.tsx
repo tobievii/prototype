@@ -47,7 +47,7 @@ export default class WidgetBasic extends WidgetComponent {
                 wordBreak: "break-all",
                 height: "100%",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
             }}>
 
                 <div style={{
@@ -57,17 +57,19 @@ export default class WidgetBasic extends WidgetComponent {
                     alignItems: "center", /* align vertical */
                     fontSize: "150%",
                     textAlign: "center",
-                    padding: colors.padding
-                    //background: "rgba(0,0,0,0.2)"
+                    padding: 0,
+                    margin: 0
                 }}>{display}</div>
 
                 <div style={{
                     flex: "0",
                     textAlign: "center",
-                    padding: colors.padding,
                     opacity: 0.5,
                     width: "100%",
-                    boxSizing: "border-box"
+                    boxSizing: "border-box",
+                    padding: 0,
+                    margin: 0,
+                    paddingBottom: colors.padding
                 }}>{datapath}</div>
 
             </div>
