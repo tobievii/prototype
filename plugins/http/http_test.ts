@@ -46,7 +46,7 @@ export default function test(props: PluginConfigTestProps) {
         // test route 
         /** ----------------------------------------------------------------- */
 
-        it("Can delete a gateway", function (done) {
+        it("Can remove a route", function (done) {
             request.post(props.uri + "/api/v3/http/removeroute",
                 {
                     headers: props.headers,

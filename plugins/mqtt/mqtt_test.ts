@@ -2,6 +2,7 @@ import { PluginConfigTestProps } from "../../server/tests/tests"
 import { describe, it } from "mocha";
 
 import * as request from "request";
+import { generateDifficult } from "../../server/utils/utils";
 var mqtt = require('mqtt');
 
 export default function mqtt_test(props: PluginConfigTestProps) {
@@ -28,7 +29,7 @@ export default function mqtt_test(props: PluginConfigTestProps) {
             this.timeout(props.timeout); // crazy slow on prod.
 
             var packet = {
-                id: "prottesthttpmqtt",
+                id: "prottesthttpmqtt" + generateDifficult(8), // more unique devid
                 data: { random: Math.random() }
             }
 
@@ -63,12 +64,12 @@ export default function mqtt_test(props: PluginConfigTestProps) {
             this.timeout(props.timeout); // crazy slow on prod.
 
             var packet = {
-                id: "prottesthttpmqtt",
+                id: "prottesthttpmqtt" + generateDifficult(8), // more unique devid
                 data: { random: Math.random() }
             }
 
             var dummypacket = {
-                id: "shouldnotseethis",
+                id: "shouldnotseethis" + generateDifficult(8), // more unique devid
                 data: { random: Math.random() }
             }
 
