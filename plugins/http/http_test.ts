@@ -2,7 +2,7 @@ import { PluginConfigTestProps } from "../../server/tests/tests"
 import { describe, it, reporters } from "mocha";
 import * as request from "request";
 import { generate } from "../../server/utils/utils"
-import { HTTPRoute } from "./http_server";
+import { HTTPRoute } from "./interfaces";
 
 export default function test(props: PluginConfigTestProps) {
 

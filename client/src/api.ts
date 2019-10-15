@@ -8,15 +8,21 @@ import { PrototypeWS } from "../../server/shared/prototypews"
 
 // v5.0
 
+interface Data {
+    account?: User
+    states: CorePacket[],
+    packets: CorePacket[]
+}
+
 export class API extends EventEmitter {
     uri: string = ""
     headers = {};
     apikey: string;
     accountData: User | undefined;
-    socket;
-    prototypews;
+    socket: any;
+    prototypews: PrototypeWS;
 
-    data = {
+    data: Data = {
         account: undefined,
         states: [],
         packets: []
@@ -74,7 +80,7 @@ export class API extends EventEmitter {
         logger.log({ message: "api account load", level: "verbose" })
 
         var opt;
-        var callback;
+        var callback: Function;
         if (typeof options == "function") {
             callback = options;
         } else {
@@ -126,6 +132,7 @@ export class API extends EventEmitter {
     }
 
     connectSocket() {
+        console.log("connecting websocket...")
         var uri = "ws://localhost:8080"
         if (location) {
             uri = location.origin.replace("http", "ws")
@@ -138,8 +145,13 @@ export class API extends EventEmitter {
             logger.log({ message: "Websocket auth success", level: "verbose" })
         });
 
-        this.prototypews.on("states", (states) => {
+        this.prototypews.on("states", (states: CorePacket) => {
             this.updateStates(states)
+        })
+
+        this.prototypews.on("account", (account: User) => {
+            this.data.account = account;
+            this.emit("account", account);
         })
     }
 
@@ -147,11 +159,11 @@ export class API extends EventEmitter {
         location.origin
     }
 
-    listenSocketChannel = (channel) => {
+    listenSocketChannel = (channel: any) => {
         channel.on("states", this.updateStates);
     }
 
-    updateStates = (data) => {
+    updateStates = (data: CorePacket) => {
 
         // merge state into states:
         if (Array.isArray(data)) {
@@ -162,14 +174,13 @@ export class API extends EventEmitter {
             this.mergeState(data);
         }
 
-        console.log("----", data);
         this.emit("state", data);
 
         // let the app know:
         this.emit("states", this.data.states);
     }
 
-    mergeState = (data) => {
+    mergeState = (data: CorePacket) => {
         let found: boolean = false;
         for (var s in this.data.states) {
             if (this.data.states[s].key == data.key) {
@@ -202,13 +213,13 @@ export class API extends EventEmitter {
         })
     }
 
-    post(packet: CorePacket, cb?: (err, result?) => void) {
+    post(packet: CorePacket, cb?: (err: Error | undefined, result?: any) => void) {
         request.post(this.uri + "/api/v4/data/post", { json: packet },
             (err, res, body: any) => {
                 if (err) if (cb) cb(err);
                 if (body) {
                     if (body.result == "success") {
-                        if (cb) cb(null, body);
+                        if (cb) cb(undefined, body);
                         return;
                     }
                     if (cb) cb(body);
@@ -251,15 +262,15 @@ export class API extends EventEmitter {
         retrieve a single device state in detail.
     */
 
-    state(query: object, cb: (err: Error, state?: CorePacket) => void) {
+    state(query: object, cb: (err: Error | undefined, state?: CorePacket) => void) {
 
         if (typeof query == "object") {
             request.post(this.uri + "/api/v4/state",
                 { json: query },
-                (err, res, body: CorePacket) => {
+                (err: Error, res: boolean, body: any) => {
                     if (err) cb(err);
                     if (body) {
-                        cb(null, body);
+                        cb(undefined, body);
                     }
                 })
         }
@@ -283,9 +294,9 @@ export class API extends EventEmitter {
         provides all device states in an array
     */
 
-    states = (options?, cb?: (err, states?: object) => void) => {
+    states = (options?: any, cb?: (err: Error | undefined, states?: object) => void) => {
         logger.log({ message: "api states", data: { options }, level: "verbose" })
-        var callback;
+        var callback: Function;
         var opt;
         if (cb) {
             //options - POST
@@ -320,7 +331,7 @@ export class API extends EventEmitter {
      *   deletes a device/state. Device history is not deleted.
      * 
     */
-    delete(options: { id?: string }, cb?: (err: Error, result?: any) => void) {
+    delete(options: { id?: string }, cb?: (err: Error | undefined, result?: any) => void) {
 
         if (typeof options != "object") {
             let err = new Error("delete expects an object {id?,key?}");
@@ -338,7 +349,7 @@ export class API extends EventEmitter {
                 if (body) {
                     if (body.ok == 1) {
                         this.data.states = this.data.states.filter((dev) => { (dev.id != options.id) })
-                        if (cb) { cb(null, body); }
+                        if (cb) { cb(undefined, body); }
                     } else {
                         if (cb) { cb(body); }
                     }
@@ -352,11 +363,11 @@ export class API extends EventEmitter {
 
     ////////////////////// WEB API
 
-    location = (location) => {
+    location = (location: any) => {
         this.emit("location", location);
     }
 
-    subscribe = (options, cb?: Function) => {
+    subscribe = (options: { username?: string, publickey?: string }, cb?: Function) => {
 
         if (options.username) {
             this.search({ username: options.username }, (e, r) => {
@@ -380,32 +391,32 @@ export class API extends EventEmitter {
 
     /// STANDARDIZED:
 
-    search = (options, cb?: (err: Error, result?: any) => void) => {
+    search = (options: any, cb?: (err: Error | undefined, result?: any) => void) => {
         request.post(this.uri + "/api/v4/search",
             { json: options },
             (err, res, body: any) => {
-                if (err) cb(err);
+                if (err) if (cb) cb(err);
                 if (body) {
-                    if (body.error) { cb(body); return; }
-                    cb(null, body);
+                    if (body.error) { if (cb) cb(body); return; }
+                    if (cb) cb(undefined, body);
                 }
             })
     }
 
-    stateupdate = (options, cb?) => {
+    stateupdate = (options: any, cb?: Function) => {
         request.post(this.uri + "/api/v4/stateupdate",
             { json: options },
             (err, res, body: any) => {
-                if (err) cb(err);
+                if (err) if (cb) cb(err);
                 if (body) {
-                    if (body.error) { cb(body); return; }
-                    cb(null, body);
+                    if (body.error) { if (cb) cb(body); return; }
+                    if (cb) cb(null, body);
                 }
             })
     }
 
 
-    activity = (options, cb) => {
+    activity = (options: any, cb: Function) => {
         request.post(this.uri + "/api/v4/activity",
             { json: options },
             (err, res, body: any) => {
@@ -417,7 +428,7 @@ export class API extends EventEmitter {
             })
     }
 
-    getapispec = (cb) => {
+    getapispec = (cb: Function) => {
         request.get(this.uri + "/api/v4",
             { json: true },
             (err, res, body: any) => { cb(err, body); });
@@ -427,7 +438,7 @@ export class API extends EventEmitter {
      * 
      *  eg: api.users({publickey: xxxxxxxx}, (e,user)=>{})
     */
-    users = (options, cb) => {
+    users = (options: any, cb: Function) => {
         request.post(this.uri + "/api/v4/users",
             { json: options },
             (err, res, body: any) => {

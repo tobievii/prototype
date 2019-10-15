@@ -33,6 +33,11 @@ export class PrototypeWS extends EventEmitter {
                     if (msg.states) {
                         this.emit("states", msg.states)
                     }
+
+                    if (msg.account) {
+                        this.emit("account", msg.account)
+                    }
+
                 } catch (err) {
                     console.error(err);
                 }

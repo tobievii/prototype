@@ -5,7 +5,7 @@ import { CodeBlock } from "../../client/src/components/codeblock"
 
 import { AddRoute } from "./components/addRouteForm"
 import { PortList } from "./components/routeList"
-import { HTTPRoute } from './http_server';
+import { HTTPRoute } from './interfaces';
 
 /** TEMPLATE PLUGIN 
  * 

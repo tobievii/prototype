@@ -126,7 +126,7 @@ export class DocumentStore extends EventEmitter {
     }
 
     /** enables plugins to watch for cluster db changes. very useful for coordination across the cluster */
-    watch(db: string, cb) {
+    watch(db: string, cb: Function) {
         mongoose.connection.collection(db).watch().on("change", (change) => {
             if (change.fullDocument) {
                 delete change.fullDocument["_id"]

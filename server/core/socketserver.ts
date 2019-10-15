@@ -106,6 +106,15 @@ export class SocketServer extends EventEmitter {
 
         })
 
+        /** this enabled logged in users to instantly update UI if account changes. */
+        this.on("users", (account) => {
+            for (var socket of this.connections) {
+                if (socket.user.apikey == account.apikey) {
+                    socket.send(JSON.stringify({ account }))
+                }
+            }
+        })
+
         this.on("states", (states: CorePacket) => {
             if ((states.apikey) && (states.id)) {
 

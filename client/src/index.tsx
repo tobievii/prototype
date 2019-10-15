@@ -26,6 +26,7 @@ import { UserLogin } from "./components/user_login";
 import { RegisterPage } from "./pages/register";
 import { LoginPage } from "./pages/login";
 import { RecoverPage } from "./pages/recover";
+import { UserVerify } from "./components/user_verify";
 
 export default class App extends React.Component {
   state = {
@@ -229,6 +230,9 @@ export default class App extends React.Component {
       <div >
         <BGgrad />
         <NavBar />
+
+        {(!api.data.account.emailverified) && <UserVerify />}
+
         <div style={{ minHeight: "500px" }}>
           {size == "small"
             ? <DeviceList />

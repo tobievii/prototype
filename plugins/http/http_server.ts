@@ -6,12 +6,8 @@ import { generateDifficult } from "../../server/utils/utils";
 
 import { logger } from "../../server/shared/log";
 
-export interface HTTPRoute {
-    id: string;
-    method: string; // "get" | "post" | "delete" | "put"
-    route?: string;
-    apikey?: string;
-}
+import { HTTPRoute } from "./interfaces"
+
 
 export default class HTTP extends PluginSuperServerside {
 
@@ -53,7 +49,7 @@ export default class HTTP extends PluginSuperServerside {
                     if (err) { res.json({ error: "db err" }); return; }
 
                     if (conflictingroutes.length == 0) {
-                        this.documentstore.db.plugins_http.save(newroute, (e, r) => {
+                        this.documentstore.db.plugins_http.save(newroute, (e: Error, r: any) => {
                             res.json({ result: "success" })
                         });
                     } else {
@@ -97,7 +93,7 @@ export default class HTTP extends PluginSuperServerside {
             });
         })
 
-        this.documentstore.watch("plugins_http", (err, data) => {
+        this.documentstore.watch("plugins_http", (err: Error, data: HTTPRoute) => {
             console.log("DB CHANGE DETECTED! HTTP")
             console.log(data);
             if (!data.id) { return; }

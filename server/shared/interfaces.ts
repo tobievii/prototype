@@ -47,12 +47,14 @@ export interface DBchange {
 }
 
 export interface User {
+    _id?: string;
     email: string;
     username: string;
     apikey: string;
     publickey: string;
     level: number;
     admin: boolean;
+    emailverified?: boolean;
 }
 
 export interface ConfigFile {

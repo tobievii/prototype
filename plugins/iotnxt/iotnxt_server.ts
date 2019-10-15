@@ -13,7 +13,7 @@ export default class Iotnxt extends PluginSuperServerside {
 
     iotnxt: IotnxtCore;
 
-    checker: NodeJS.Timeout;
+    checker: any;
 
     constructor(props: { core: Core, documentstore: DocumentStore, webserver: Webserver, plugins: any }) {
         super(props);
@@ -145,7 +145,7 @@ export default class Iotnxt extends PluginSuperServerside {
                 console.log(packet);
                 if (packet.message == "disconnectGateway") {
                     // check if we are connected to a gateway and disconnect from it, remove from our list.
-                    this.iotnxt.disconnectGateway(packet.data.gateway, (e, r) => {
+                    this.iotnxt.disconnectGateway(packet.data.gateway, (e: Error, r: any) => {
                         this.iotnxt.emit("updatestate"); //update cluster state
                     })
                 }
@@ -162,7 +162,7 @@ export default class Iotnxt extends PluginSuperServerside {
 
     /** this function goes through the gateways and 
      * checks if the listed gateway cluster worker still exists, if not then marks this gateway as not connected. */
-    clearOldConnections(cb) {
+    clearOldConnections(cb: any) {
         //this.plugins.cluster.
         this.plugins.cluster.getlist((err, workers) => {
             this.documentstore.db["plugins_iotnxt"].find({}, (err: Error, gateways: GatewayType[]) => {
