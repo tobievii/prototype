@@ -214,6 +214,7 @@ export class Dashboard extends React.Component<MyProps, MyState> {
         return (action) => {
             console.log("dashboard.handleWidgetActions", widget, action)
             if (action.remove) { this.removeWidget(widget) }
+            if (action.datapath) { this.changeWidgetDatapath(widget, action.datapath) }
             if (action.type) { this.changeWidgetType(widget, action.type) }
             if (action.option) { this.changeWidgetOption(widget, action.option); }
             if (action.save) {
@@ -235,6 +236,27 @@ export class Dashboard extends React.Component<MyProps, MyState> {
             return w
         })
         this.setState({ layout })
+    }
+
+    /** change the type of a widget */
+    changeWidgetDatapath(widget: { i: string }, datapath: string) {
+        api.stateupdate({
+            query: { key: this.props.state.key, "layout.i": widget.i },
+            update: { $set: { "layout.$.datapath": datapath } }
+        }, (err, result) => {
+            if (err) { console.log(err); }
+            if (result) {
+                if (result.nModified == 1) {
+                    /** successfully changed in db*/
+                    // - - - - 
+                    var layout = clone(this.state.layout)
+                    for (var w of layout) { if (w.i == widget.i) { w.datapath = datapath } }
+                    this.updatesource = "user"; // if updatesource == user then server will be updated
+                    this.setState({ layout }, () => { this.updateServer() })
+                    // - - - - 
+                }
+            }
+        })
     }
 
     /** change the type of a widget */

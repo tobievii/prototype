@@ -22,8 +22,15 @@ interface OptionMenuProps {
 /** This builds the option menu */
 export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
     state = {
-        options: []
+        options: [],
+        datapath: ""
     };
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.widget.datapath) {
+            return { datapath: props.widget.datapath };
+        }
+    }
 
     action = (optionName) => {
         return (data) => {
@@ -76,15 +83,40 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
                 </div>
             </div>
 
-            <div style={{ padding: colors.padding, background: "rgba(0,0,0,0.1)" }}>Change type:
-                <select
-                    value={this.props.widgettypename}
-                    onChange={(e => this.props.action({ type: e.target.value }))}>
-                    {this.props.widgettypes.map((widgettype, i) => {
-                        return <option key={i}>{widgettype}</option>
-                    })}
-                </select>
+            <div style={{ padding: colors.padding, background: "rgba(0,0,0,0.1)" }}>
+                <div>Widget type:</div>
+                <div>
+                    <select
+                        style={{ width: "100%" }}
+                        value={this.props.widgettypename}
+                        onChange={(e => this.props.action({ type: e.target.value }))}>
+                        {this.props.widgettypes.map((widgettype, i) => {
+                            return <option key={i}>{widgettype}</option>
+                        })}
+                    </select>
+                </div>
             </div>
+
+            <div style={{ background: "rgba(0,0,0,0.1)", padding: colors.padding }}>
+                <div>Datapath:</div>
+                <div style={{
+                    display: "flex", flexDirection: "row",
+                }}>
+                    <div style={{ flex: "1" }}>
+                        <input style={{ width: "100%" }} value={this.state.datapath} onChange={(e) => {
+                            this.setState({ datapath: e.target.value })
+                        }} />
+                    </div>
+                    <div style={{ flex: "0" }}>
+                        <button onClick={() => {
+                            this.props.action({ datapath: this.state.datapath })
+                        }}>set</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ paddingTop: colors.padding, paddingLeft: colors.padding }}>Widget Options:</div>
+
 
             {
                 Object.keys(options).map((x, i) => {
