@@ -1,10 +1,9 @@
 import { describe, it } from "mocha";
 import { generateDifficult } from "../../utils/utils"
-//import { Prototype } from "../../utils/api" // removed because we're trying to simplify the api tests.
 
 import * as _ from "lodash"
-import request = require("request");
-var mqtt = require('mqtt');
+import * as request from "request";
+import * as mqtt from "mqtt";
 
 interface TESTCONFIG {
     hostname: string
@@ -252,7 +251,7 @@ export function webapi_v3() {
             this.timeout(timeout); // crazy slow on prod.
 
             var packet = {
-                id: "prottesthttpmqtt",
+                id: "prottesthttpmqtt"+generateDifficult(8),  // make the test id more unique
                 data: { random: generateDifficult(32) }
             }
 
@@ -269,8 +268,16 @@ export function webapi_v3() {
 
             client.on('message', (topic: string, message: Buffer) => {
                 var parsed = JSON.parse(message.toString());
-                if (parsed.data.random == packet.data.random) { done(); } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
-                client.end();
+                if (parsed.data.random == packet.data.random) { 
+                    // wait for close ACK then done().
+                    client.end(false,()=>{
+                        done(); 
+                    }); 
+                } else { 
+                    // we might get more packets on this apikey, so removing this.
+                    // done(new Error("MQTT Packet does not match posted over HTTP")) 
+                }
+                
             })
 
         })
@@ -282,7 +289,7 @@ export function webapi_v3() {
             this.timeout(timeout); // crazy slow on prod.
 
             var packet = {
-                id: "prottesthttpmqtt",
+                id: "prottesthttpmqtt"+generateDifficult(8), // more unique devid
                 data: { random: generateDifficult(32) }
             }
 
@@ -308,8 +315,10 @@ export function webapi_v3() {
             client.on('message', (topic: string, message: Buffer) => {
                 var parsed = JSON.parse(message.toString());
                 if (parsed.data.random == packet.data.random) {
-                    done();
-                    client.end();
+                    // wait for close ACK then done()
+                    client.end(false,()=>{
+                        done();                    
+                    });
                 } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
             })
 

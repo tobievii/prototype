@@ -43,8 +43,17 @@ export default function mqtt_test(props: PluginConfigTestProps) {
 
             client.on('message', (topic: string, message: Buffer) => {
                 var parsed = JSON.parse(message.toString());
-                if (parsed.data.random == packet.data.random) { done(); } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
-                client.end();
+                if (parsed.data.random == packet.data.random) {
+
+                    client.end(false, () => {
+                        done();
+                    });
+
+                } else {
+                    // might recieve multiple packets so removing this.
+                    // done(new Error("MQTT Packet does not match posted over HTTP"))
+                }
+
             })
         })
 
@@ -80,9 +89,12 @@ export default function mqtt_test(props: PluginConfigTestProps) {
             client.on('message', (topic: string, message: Buffer) => {
                 var parsed = JSON.parse(message.toString());
                 if (parsed.data.random == packet.data.random) {
-                    done();
-                    client.end();
-                } else { done(new Error("MQTT Packet does not match posted over HTTP")) }
+                    client.end(false, () => {
+                        done();
+                    });
+                } else {
+                    done(new Error("MQTT Packet does not match posted over HTTP"))
+                }
             })
         })
 
