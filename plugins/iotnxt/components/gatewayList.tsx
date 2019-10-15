@@ -4,6 +4,7 @@ import { moment } from "../../../client/src/utils/momentalt"
 import { PopupConfirm } from "../../../client/src/components/popups/popup_confirm";
 
 import { GatewayType } from "../lib/iotnxtqueue"
+import { colors } from "../../../client/src/theme";
 
 //import { cellstyle, gridHeadingStyle, blockstyle } from "../../styles.jsx"
 
@@ -143,6 +144,7 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
             {gateways.map((gateway: GatewayType, i) => {
 
+              var background = (i % 2 == 1) ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0)"
               // var accountdefault = false;
               // if (this.state.accountgatewaydefault) {
               //   if (this.state.accountgatewaydefault.GatewayId && this.state.accountgatewaydefault.GatewayId) {
@@ -156,8 +158,8 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
 
               if (gateway.lastactive == undefined) { gateway.lastactive = new Date("1970") }
               return (
-                <div key={i} style={{ display: "flex", flexDirection: "row" }} >
-                  <div style={{ flex: 1 }}>
+                <div key={i} style={{ display: "flex", flexDirection: "row", background }} >
+                  <div style={{ flex: 1, padding: colors.padding, whiteSpace: "nowrap" }}>
 
                     <div title={this.valueToggle(gateway.connected,
                       [{ value: true, result: "connected" },
@@ -191,19 +193,21 @@ export class GatewayList extends React.Component<GatewayListProps, GatewayListSt
                   </div>
 
                   {/* ENV */}
-                  <div style={{ flex: 1 }}>
+                  {(window.innerWidth > 800) && <div style={{ flex: 1, padding: colors.padding }}>
                     {gateway.HostAddress.split(".")[1].toUpperCase()}
                   </div>
+                  }
+
 
                   {/* CONNECTED */}
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, padding: colors.padding }}>
                     <span title={gateway["lastactive"].toString()}>{moment(gateway["lastactive"]).fromNow()}</span>
                   </div>
 
                   {/* CLUSTER */}
-                  <div style={{ flex: 1 }}>
+                  {(window.innerWidth > 800) && <div style={{ flex: 1, padding: colors.padding }}>
                     {gateway.hostname} - {gateway.instance_id}
-                  </div>
+                  </div>}
 
                   <div style={{ flex: 1 }}>
                     <button onClick={() => { this.props.action({ reconnectGateway: gateway }) }}><i className="fas fa-sync-alt"></i></button>
