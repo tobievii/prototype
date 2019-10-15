@@ -34,7 +34,7 @@ class Logger {
   log(event: LogEvent) {
 
     // less logging.. we only want to know about errors.
-    if (event.level != "error") { return; }
+    //if (event.level != "error") { return; }
 
     if (event.message) {
       var tabs = "\t"

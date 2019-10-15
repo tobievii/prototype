@@ -18,7 +18,7 @@ export const colors = {
   checkmark: "#16d271", //green
   transparent: 0.15,
   lines: "#333", //same as borders below
-  borders: "1px solid rgba(128,128,128,0.03)", // 
+  borders: "1px solid rgba(255,255,255,0.2)", // 
   padding: 10,
   widgetDefault: "#11CC88",
   backgroundPopup: "rgba(32, 32, 32, 0.95)",

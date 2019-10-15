@@ -1,4 +1,4 @@
-import express = require("express")
+import * as express from "express"
 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -161,14 +161,14 @@ export class Webserver extends EventEmitter {
 
         // ADD CATCH 404 INVALID PATHS AT THE END.
 
-        this.app.get("*", (req, res) => {
-            //res.status(404).end(reactHtml);
-            res.status(404).json({ err: 404 })
-        })
+        // this.app.get("*", (req, res) => {
+        //     //res.status(404).end(reactHtml);
+        //     res.status(404).json({ err: 404 })
+        // })
 
-        this.app.post("*", (req, res) => {
-            res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
-        })
+        // this.app.post("*", (req, res) => {
+        //     res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
+        // })
 
         if (!this.server) { console.error("http/s server not initialized"); return; }
         this.server.listen(this.port, () => {

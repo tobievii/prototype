@@ -124,4 +124,16 @@ export class DocumentStore extends EventEmitter {
         // this.db.users.createIndex({ email: 1 }, { background: 1 }) // gert's fix
         // this.db.users.createIndex({ email: "text", username: "text" }, { background: 1 })
     }
+
+    /** enables plugins to watch for cluster db changes. very useful for coordination across the cluster */
+    watch(db: string, cb) {
+        mongoose.connection.collection(db).watch().on("change", (change) => {
+            if (change.fullDocument) {
+                delete change.fullDocument["_id"]
+                cb(undefined, change.fullDocument);
+            }
+        })
+    }
+
+
 }
