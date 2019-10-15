@@ -29,17 +29,46 @@ export default class WidgetBasic extends WidgetComponent {
             }
         }
 
+        if (!this.props.value) {
+            return <div>Blank widget. Please edit or remove.</div>
+        }
+
+        var datapath = ""
+
+        if (this.props.widget.datapath) {
+            if (this.props.widget.datapath.indexOf("data.") == 0) {
+                datapath = this.props.widget.datapath.slice(5)
+            }
+        }
+
         return (
             <div style={{
                 color: this.state.options.color.value,
-                wordBreak: "break-all"
+                wordBreak: "break-all",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column"
             }}>
-                <div style={{ textAlign: "center", padding: colors.padding, opacity: 0.5 }}>
-                    {this.props.widget.datapath}
-                </div>
-                <div style={{ fontSize: "150%", textAlign: "center", padding: colors.padding }}>
-                    {display}
-                </div>
+
+                <div style={{
+                    flex: "1",
+                    display: "flex",
+                    justifyContent: "center", /* align horizontal */
+                    alignItems: "center", /* align vertical */
+                    fontSize: "150%",
+                    textAlign: "center",
+                    padding: colors.padding
+                    //background: "rgba(0,0,0,0.2)"
+                }}>{display}</div>
+
+                <div style={{
+                    flex: "0",
+                    textAlign: "center",
+                    padding: colors.padding,
+                    opacity: 0.5,
+                    width: "100%",
+                    boxSizing: "border-box"
+                }}>{datapath}</div>
 
             </div>
         );

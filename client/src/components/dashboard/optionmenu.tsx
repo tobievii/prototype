@@ -17,6 +17,7 @@ interface OptionMenuProps {
     widgettypes: string[]
     widget: WidgetType
     state: CorePacket
+    style?: any
 }
 
 /** This builds the option menu */
@@ -57,10 +58,9 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
                     }
                 })
             }
-
         }
 
-        return (<div className="widgetMenu" style={{
+        var style: any = {
             position: "absolute",
             zIndex: 100,
             width: "auto",
@@ -69,7 +69,11 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
             top: 35,
             background: colors.panels,
             border: colors.borders
-        }} >
+        }
+
+        //if (this.props.style) { style = { ...style, ...this.props.style } }
+
+        return (<div className="widgetMenu" style={style} >
 
             <div style={{ display: "flex", flexDirection: "row" }}>
                 <div style={{ flex: 1 }}>
