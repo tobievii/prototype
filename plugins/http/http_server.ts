@@ -22,6 +22,12 @@ export default class HTTP extends PluginSuperServerside {
         this.webserver.app.get("/api/v3/http/routes", (req: any, res: any) => {
             this.documentstore.db.plugins_http.find({ apikey: req.user.apikey }, (err: Error, routes: any) => {
                 if (err) res.json({ err: err.toString() });
+
+                for (var r in routes) {
+                    delete routes[r]["_id"]
+                    delete routes[r]["apikey"]
+                }
+
                 res.json(routes);
             });
         });
@@ -70,7 +76,7 @@ export default class HTTP extends PluginSuperServerside {
                 method: req.body.method
             }, (err: Error, result: any) => {
                 if (err) res.json({ err: err.toString() });
-                res.json(result);
+                res.json({ result: "success", deletedCount: result.deletedCount })
             });
         });
 

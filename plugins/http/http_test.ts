@@ -2,87 +2,62 @@ import { PluginConfigTestProps } from "../../server/tests/tests"
 import { describe, it, reporters } from "mocha";
 import * as request from "request";
 import { generate } from "../../server/utils/utils"
+import { HTTPRoute } from "./http_server";
 
 export default function test(props: PluginConfigTestProps) {
 
     describe("PLUGIN [HTTP]", () => {
-
-
-
+        var route: HTTPRoute = {
+            id: "somedevice",
+            method: "post"
+        }
         /** ----------------------------------------------------------------- */
 
-        it("Can add a http endpoint", done => {
-            done();
-            // request.post(props.uri + "/api/v3/iotnxt/addgateway",
-            //     { headers: props.headers, json: gateway }, (err, res, response) => {
-            //         if (err) done(err);
-            //         if (!response) { done(new Error("invalid response")); return; }
+        it("add route", done => {
+            request.post(props.uri + "/api/v3/http/addroute",
+                {
+                    headers: props.headers,
+                    json: route
+                }, (err, res, response) => {
+                    if (err) { done(new Error("error")); console.log(err); return; }
+                    if (response.result == "success") {
+                        done();
+                    } else {
+                        done(new Error("invalid response")); console.log(response);
+                    }
+                });
 
-            //         if (response.GatewayId != gateway.GatewayId.toUpperCase()) {
-            //             done(new Error("GatewayId does not match!"));
-            //             return;
-            //         }
-
-            //         if (response.Secret != gateway.Secret) {
-            //             done(new Error("Secret does not match!"));
-            //             return;
-            //         }
-
-            //         if (response.HostAddress != gateway.HostAddress) {
-            //             done(new Error("HostAddress does not match!"));
-            //             return;
-            //         }
-
-            //         if (!response.unique) {
-            //             done(new Error("Missing unique parameter"));
-            //             return;
-            //         }
-
-            //         if (!response["_created_on"]) {
-            //             done(new Error("Missing _created_on parameter"));
-            //             return;
-            //         }
-
-            //         if (!response["_created_by"]) {
-            //             done(new Error("Missing _created_by parameter"));
-            //             return;
-            //         }
-
-            //         if (!response._created_by.publickey) {
-            //             done(new Error("Missing user publickey on _created_by"));
-            //             return;
-            //         }
-
-
-            //         done();
-
-            //     })
         })
 
         /** ----------------------------------------------------------------- */
 
+        it("list routes", (done) => {
+            request.get(props.uri + "/api/v3/http/routes", { headers: props.headers, json: true }, (err, res, response) => {
+                if (!Array.isArray(response)) { done(new Error("expected an array")); return; }
+                if (response.length != 1) { done(new Error("expected only one route in array")) }
+                if (response[0].id != route.id) { done(new Error("id mismatch")); return; }
+                if (response[0].method != route.method) { done(new Error("method mismatch")); return; }
+                if (!response[0].route) { done(new Error("expected route data")); return; }
+                done();
+            })
+        })
+
+        /** ----------------------------------------------------------------- */
+        // test route 
+        /** ----------------------------------------------------------------- */
 
         it("Can delete a gateway", function (done) {
-            // this.timeout(props.timeout); // crazy slow on prod.
+            request.post(props.uri + "/api/v3/http/removeroute",
+                {
+                    headers: props.headers,
+                    json: route
+                }, (err, res, response) => {
+                    if (response.result != "success") { done(new Error("Expected result success string")); return; }
+                    if (response.deletedCount == 1) {
+                        done();
+                    }
 
-            // const gatewayremove: GatewayRemove = {
-            //     GatewayId: gateway.GatewayId,
-            //     HostAddress: gateway.HostAddress
-            // }
-
-            // request.post(props.uri + "/api/v3/iotnxt/removegateway",
-            //     { headers: props.headers, json: gatewayremove },
-            //     (err, res, response) => {
-
-            //         if (response.deletedCount == 1) {
-            //             done();
-            //         } else {
-            //             console.log(err, response);
-            //         }
-            //     })
-
-            /** ----------------------------------------------------------------- */
-
+                });
         });
     });
 }
