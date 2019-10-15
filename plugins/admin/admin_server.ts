@@ -6,6 +6,12 @@ import { logger } from "../../server/shared/log";
 import { EmailService } from "./emailservice"
 import { AccountRecovery } from "./accountrecovery";
 import { AccountVerification } from "./accountverification"
+import { validEmail } from "../../server/shared/shared";
+import { User } from "../../server/shared/interfaces";
+
+
+var mongojs = require('mongojs')
+var ObjectId = mongojs.ObjectId;
 
 export default class Admin extends PluginSuperServerside {
     emailservice: EmailService;
@@ -29,7 +35,38 @@ export default class Admin extends PluginSuperServerside {
         this.accountverificationservice.on("sendmail", (mail, cb) => {
             this.emailservice.sendmail(mail, cb);
         })
+
+        // -------------------------------------------
+        // user account email change:
+        this.webserver.app.post("/api/v4/admin/emailchange", (req: any, res) => {
+            if (!req.user) { res.json({ result: "error", message: "user not authenticated" }); return; }
+            if (!req.body.email) { res.json({ result: "error", message: "expecting email string" }); return; }
+            if (!validEmail(req.body.email)) { res.json({ result: "error", message: "not a valid email" }); return; }
+            ///
+            this.documentstore.db.users.findOne({ "apikey": req.user.apikey }, (e: Error, user: User) => {
+                if (user) {
+                    ////
+                    delete user["_id"];
+                    user.email = req.body.email;
+                    user.emailverified = false;
+
+                    this.documentstore.db.users.update({ "apikey": req.user.apikey }, user, (err: Error, result: any) => {
+                        if (err) { console.log(err); return; }
+                        if (result) {
+                            res.json({ result: "success", message: "email successfully changed" })
+                        }
+                    })
+
+                    ////
+                }
+
+            })
+            ///
+        })
+
+        // -----------------------------------------------
     }
+
 
 }
 
