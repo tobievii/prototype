@@ -222,7 +222,7 @@ export class mqttConnection extends EventEmitter {
             if (packet.cmd == "subscribe") {
                 var count = 0;
                 for (var sub of packet.subscriptions) {
-                    this.emit("subscribe", { subscribe: sub.topic }, () => {
+                    this.emit("subscribe", { subscribe: sub.topic.toLowerCase() }, () => {
                         count++;
 
                         if (count == packet.subscriptions.length) {
