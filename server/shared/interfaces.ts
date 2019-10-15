@@ -55,6 +55,9 @@ export interface User {
     level: number;
     admin: boolean;
     emailverified?: boolean;
+    /** describes what type of account this is: 
+     * undefined == free, can also be "free", "pro", "business", "enterprise" */
+    type?: string;
 }
 
 export interface ConfigFile {
