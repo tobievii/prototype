@@ -352,6 +352,8 @@ export class Dashboard extends React.Component<MyProps, MyState> {
                         onLayoutChange={this.gridOnLayoutChange}
                         useCSSTransforms={false}
                         onResizeStop={this.gridOnResizeStop}
+                        containerPadding={[2, 2]}
+                        margin={[2, 2]}
                         layout={this.state.layout}
                         cols={this.state.grid.cols}
                         draggableHandle=".widgetGrab"   // drag handle class
