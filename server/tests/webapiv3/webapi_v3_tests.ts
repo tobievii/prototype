@@ -308,7 +308,7 @@ export function webapi_v3() {
                         // once done we post the real one.
                         request.post(uri + "/api/v3/data/post", { headers, json: packet });
                     })
-
+                    
                 })
             })
 
@@ -360,107 +360,6 @@ export function webapi_v3() {
 
 TODO:::::
 
-    })
-    
-    describe("PLUGINS", () => {
-        describe("TELTONIKA", () => {
-            var portInfo: any;
-    
-            it("Register Port", function (done) {
-                //this.timeout(5000);
-                new Prototype(testAccount).setTeltonikaPort((err: any, response: any) => {
-    
-                    if (err) { done(new Error(err)); return }
-                    if (response) {
-                        portInfo = response;
-                        if (response.apikey == testAccount.apikey && response.port) {
-                            done(); return
-                        } else {
-                            done(new Error("The port was assigned to a different user.")); return
-                        }
-                    }
-                })
-            })
-    
-            it("Get Port", function (done) {
-                //this.timeout(5000);
-                new Prototype(testAccount).getTeltonikaPort((err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    if (response) {
-                        if (response.port == portInfo.port) {
-                            done(); return
-                        } else {
-                            done(new Error("The port returned it not the same as the port just created.")); return
-                        }
-                    }
-                })
-            })
-    
-            it("send data", function (done: any) {
-                new Prototype(testAccount).teltonikaTest(portInfo.port, testAccount.host, (e: Error, result: any) => {
-                    if (e) { done(e); }
-                    if (result) { done(); }
-                });
-            });
-        })
-    
-        describe("IOTNXT", () => {
-            var options: any;
-            var packet = {
-                id: "protTestHttpSocket",
-                data: { random: generateDifficult(32) }
-            }
-            var packet2 = {
-                id: "protTestHttpMqtt",
-                data: { random: generateDifficult(32) }
-            }
-            var gateway = {
-                GatewayId: "gateway",
-                Secret: generateDifficult(16),
-                HostAddress: "greenqueue.prod.iotnxt.io",
-                PublicKey: "<RSAKeyValue><Exponent>AQAB</Exponent><Modulus>rbltknM3wO5/TAEigft0RDlI6R9yPttweDXtmXjmpxwcuVtqJgNbIQ3VduGVlG6sOg20iEbBWMCdwJ3HZTrtn7qpXRdJBqDUNye4Xbwp1Dp+zMFpgEsCklM7c6/iIq14nymhNo9Cn3eBBM3yZzUKJuPn9CTZSOtCenSbae9X9bnHSW2qB1qRSQ2M03VppBYAyMjZvP1wSDVNuvCtjU2Lg/8o/t231E/U+s1Jk0IvdD6rLdoi91c3Bmp00rVMPxOjvKmOjgPfE5LESRPMlUli4kJFWxBwbXuhFY+TK2I+BUpiYYKX+4YL3OFrn/EpO4bNcI0NHelbWGqZg57x7rNe9Q==</Modulus></RSAKeyValue>"
-            }
-    
-            it("Add Gateway", function (done) {
-                new Prototype(testAccount).addgateway(gateway, (err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    else if (response) { done(); return }
-                })
-            })
-    
-            it("Set Device Gateway(KEY)", function (done) {
-                options = "key"
-                new Prototype(testAccount).setdevicegateway(packet.id, gateway.GatewayId, gateway.HostAddress, options, (err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    else if (response) { done(); return }
-                })
-            })
-    
-            it("Set Device Gateway(DEVID)", function (done) {
-                options = "devid"
-                new Prototype(testAccount).setdevicegateway(packet2.id, gateway.GatewayId, gateway.HostAddress, options, (err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    else if (response) { done(); return }
-                })
-            })
-    
-            it("Get Gateways", function (done) {
-                new Prototype(testAccount).getgateways((err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    else if (response) { done(); return }
-                })
-            })
-    
-            it("Remove Gateway", function (done) {
-                new Prototype(testAccount).deletegateway((err: any, response: any) => {
-                    if (err) { done(new Error(err)); return }
-                    else if (response) {
-                        done(); return
-                    }
-                })
-            })
-        })
-    })
     
     describe("FEATURES", () => {
         var packet = {
