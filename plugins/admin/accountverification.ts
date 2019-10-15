@@ -7,6 +7,7 @@ import { User } from "../../server/shared/interfaces";
 import { validEmail } from "../../server/shared/shared";
 import { EmailFormat } from "./emailservice"
 
+import { URL } from "url"
 
 var mongojs = require('mongojs')
 var ObjectId = mongojs.ObjectId;
@@ -67,8 +68,8 @@ export class AccountVerification extends PluginSuperServerside {
             return;
         }
 
-
-        this.emit("sendmail", this.generateVerificationEmail(req.headers.referer, user), (err, result) => {
+        const myURL = new URL(req.headers.referer);
+        this.emit("sendmail", this.generateVerificationEmail(myURL.origin, user), (err, result) => {
             if (result) {
                 res.json({
                     result: "success",
@@ -85,8 +86,8 @@ export class AccountVerification extends PluginSuperServerside {
     }
 
 
-    generateVerificationEmail = (referer, user: User) => {
-        var verifyLink = referer + "verify/" + user._id
+    generateVerificationEmail = (origin, user: User) => {
+        var verifyLink = origin + "/verify/" + user._id
 
         var mail: EmailFormat = {
             from: "",
