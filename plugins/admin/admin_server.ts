@@ -65,6 +65,7 @@ export default class Admin extends PluginSuperServerside {
         })
 
         // ------------------------------------------------------------------------------------------
+        /** please note that username changes cause device states to have the old usernames, thus we have to update all device states with the new username. */
         this.webserver.app.post("/api/v4/admin/usernamechange", (req: any, res) => {
             if (!req.user) { res.json({ result: "error", message: "user not authenticated" }); return; }
             if (!req.body.username) { res.json({ result: "error", message: "expecting username string" }); return; }
@@ -91,7 +92,11 @@ export default class Admin extends PluginSuperServerside {
                     user.username = req.body.username
                     this.documentstore.db.users.update({ apikey: req.user.apikey }, user, (e, result) => {
                         if (result) {
-                            res.json({ result: "success", message: "username changed to " + req.body.username, db: result })
+
+                            this.documentstore.db.states.update({ userpublickey: user.publickey }, { $set: { username: req.body.username } }, (e, r) => {
+                                res.json({ result: "success", message: "username changed to " + req.body.username, db: result })
+                            })
+
                         } else {
                             res.json({ result: "error", message: "db error" })
                         }
