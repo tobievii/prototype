@@ -6,7 +6,7 @@ import { logger } from "../../server/shared/log";
 import { EmailService } from "./emailservice"
 import { AccountRecovery } from "./accountrecovery";
 import { AccountVerification } from "./accountverification"
-import { validEmail, validUsername } from "../../server/shared/shared";
+import { validEmail, validUsername, validPassword } from "../../server/shared/shared";
 import { User } from "../../server/shared/interfaces";
 
 
@@ -102,6 +102,35 @@ export default class Admin extends PluginSuperServerside {
 
         })
         // --------------------------------------------------------------------------------------
+        this.webserver.app.post("/api/v4/admin/passwordchange", (req: any, res: any) => {
+            console.log(req.body);
+
+            if (!req.body.currentpassword) { res.json({ result: "error", message: "current password invalid" }); return; }
+            if (!req.body.newpassword) { res.json({ result: "error", message: "new password invalid" }); return; }
+            if (!validPassword(req.body.newpassword).valid) { res.json({ result: "error", message: "new password invalid password string" }); return; }
+
+            console.log("1")
+            this.core.checkPassword({ pass: req.body.currentpassword, apikey: req.user.apikey }, (e, user) => {
+                console.log("2")
+                if (user) {
+                    console.log("3")
+                    this.core.encryptPass(req.body.newpassword, (e, encryptednewpass) => {
+                        console.log("4")
+                        this.documentstore.db.users.update({ apikey: req.user.apikey },
+                            { $set: { password: encryptednewpass } }, (e, r) => {
+                                console.log("5")
+                                console.log("new password set")
+                                res.json({ result: "success", message: "password set" })
+                            })
+                    })
+
+                } else {
+                    res.json({ result: "error", message: "current password mismatch." })
+                }
+            })
+        })
+        // --------------------------------------------------------------------------------------
+
     }
 
 

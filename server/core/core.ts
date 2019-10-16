@@ -128,6 +128,49 @@ export class Core extends EventEmitter {
     }
     // end account
 
+    /** used when changing passwords to verify if the user typed in the correct password */
+    checkPassword(options: {
+        pass: string,
+        apikey: string
+    }, cb: (err: Error | undefined, user?: any) => void) {
+        this.db.users.findOne({ apikey: options.apikey }, (err: any, user: User) => {
+            if (user) {
+                // check password:
+                var passbuf: any = options.pass;
+                crypto.scrypt(passbuf, this.salt, 64, (err, derivedKey) => {
+                    if (err) { logger.log({ message: "core user signedin password match scrypt error", data: { err }, level: "error" }); }
+                    if (derivedKey) {
+                        if (derivedKey.toString("hex") == user.password) {
+                            logger.log({ message: "core user email password match", data: {}, level: "info" });
+                            cb(undefined, user);
+                        } else {
+                            logger.log({ message: "core user email password mismatch!", data: {}, level: "warn" });
+                            cb(new Error("username/password incorrect"))
+                        }
+                    }
+                });
+            }
+
+        })
+    }
+
+    /** encrypts a string for use to update a password in db */
+    encryptPass(password: string, cb: (e: Error | undefined, encrypted: string) => void) {
+        var passbuf: any = password;
+        crypto.scrypt(passbuf, this.salt, 64, (err, derivedKey) => {
+            if (err) {
+                logger.log({
+                    message: "encryption error",
+                    data: { err }, level: "error"
+                });
+            }
+
+            if (derivedKey) {
+                cb(undefined, derivedKey.toString("hex"));
+            }
+        })
+    }
+
     /** Everything to do with finding a user */
     user(options: { username?: string, uuid?: string, apikey?: string, email?: string, pass?: string, authorization?: string }, cb: (err: Error | undefined, user?: any) => void) {
         logger.log({ message: "core.user", data: options, level: "verbose" });

@@ -55,6 +55,8 @@ export interface User {
     level: number;
     admin: boolean;
     emailverified?: boolean;
+    /** encrypted form of password. most instances of users wont even have this encrypted string present. */
+    password?: string;
     /** describes what type of account this is: 
      * undefined == free, can also be "free", "pro", "business", "enterprise" */
     type?: string;

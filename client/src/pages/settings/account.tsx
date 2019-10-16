@@ -7,6 +7,7 @@ import { colors } from "../../theme";
 import { AccountTypeBadge } from "../../components/account_type_badge";
 import { AccountEmail } from "./account_email";
 import { AccountUsername } from "./account_username";
+import { AccountPassword } from "./account_password";
 
 interface MyProps { }
 interface MyState { }
@@ -22,8 +23,9 @@ export class Account extends React.Component<MyProps, MyState> {
 
                 <AccountUsername />
                 <AccountEmail />
+                <AccountPassword />
 
-                <div style={{ paddingBottom: colors.padding * 2 }}>
+                <div style={{ paddingTop: colors.padding * 2, paddingBottom: colors.padding * 2 }}>
                     <AccountTypeBadge />
                 </div>
 
