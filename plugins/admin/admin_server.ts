@@ -93,7 +93,7 @@ export default class Admin extends PluginSuperServerside {
                     this.documentstore.db.users.update({ apikey: req.user.apikey }, user, (e, result) => {
                         if (result) {
 
-                            this.documentstore.db.states.update({ userpublickey: user.publickey }, { $set: { username: req.body.username } }, (e, r) => {
+                            this.documentstore.db.states.update({ apikey: user.apikey }, { $set: { username: req.body.username } }, (e, r) => {
                                 res.json({ result: "success", message: "username changed to " + req.body.username, db: result })
                             })
 
