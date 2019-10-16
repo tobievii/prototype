@@ -95,7 +95,7 @@ export class Documentation extends React.Component<MyProps, MyState> {
 
 
         return (
-            <div className="apiInfo" style={{ padding: colors.padding * 2 }} >
+            <div className="apiInfo" style={{ padding: 0 }} >
                 <div style={{ display: "flex", flexDirection: "row" }}>
 
                     <div style={{ flex: "0" }}>

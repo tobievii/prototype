@@ -88,7 +88,7 @@ export class DocsHTTPS extends React.Component<MyProps, MyState> {
 
         //responsive
         var columnStyles: any = (window.innerWidth < 800)
-            ? { width: "100%", boxSizing: "border-box", padding: colors.padding, paddingRight: colors.padding * 4 }
+            ? { width: "100%", boxSizing: "border-box" }
             : { width: "50%", float: "left", boxSizing: "border-box", padding: colors.padding, paddingRight: colors.padding * 4 };
 
         return (

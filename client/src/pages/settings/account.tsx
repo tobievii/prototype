@@ -29,8 +29,6 @@ export class Account extends React.Component<MyProps, MyState> {
                     <AccountTypeBadge />
                 </div>
 
-
-                <button style={{ background: colors.spotB }}>change password</button><br /><br />
                 <button onClick={() => { api.location("/signout") }}>Sign out</button>
             </div>
         );
