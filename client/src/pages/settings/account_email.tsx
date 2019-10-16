@@ -48,14 +48,14 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
             <div style={{
                 display: "flex",
                 flexDirection: "row",
-                background: "rgba(0,0,0,0.2)"
+                marginTop: colors.padding
             }}>
-                <div style={{ flex: "0", padding: colors.padding, }}>
-                    EMAIL
+                <div style={{ textAlign: "right", width: "90px", padding: colors.padding, color: "rgba(255,255,255,0.5)" }}>
+                    EMAIL:
                 </div>
 
                 {(!this.state.changeEmail) &&
-                    <div style={{ flex: "1", padding: colors.padding }}>
+                    <div style={{ background: "rgba(0,0,0,0.2)", flex: "1", padding: colors.padding }}>
                         <span>{this.state.email}</span> {(api.data.account.emailverified)
                             ? <span style={{ color: colors.good }}>Verified</span>
                             : <div style={{ color: colors.alarm }}>Unverified
@@ -74,6 +74,7 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
                             this.setState({ email: e.target.value })
                         }}
                         style={{
+                            background: "rgba(0,0,0,0.2)",
                             boxSizing: "border-box",
                             padding: colors.padding,
                             width: "100%"

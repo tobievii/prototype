@@ -6,7 +6,7 @@ import { logger } from "../../server/shared/log";
 import { EmailService } from "./emailservice"
 import { AccountRecovery } from "./accountrecovery";
 import { AccountVerification } from "./accountverification"
-import { validEmail } from "../../server/shared/shared";
+import { validEmail, validUsername } from "../../server/shared/shared";
 import { User } from "../../server/shared/interfaces";
 
 
@@ -36,7 +36,7 @@ export default class Admin extends PluginSuperServerside {
             this.emailservice.sendmail(mail, cb);
         })
 
-        // -------------------------------------------
+        // --------------------------------------------------------------------------------------
         // user account email change:
         this.webserver.app.post("/api/v4/admin/emailchange", (req: any, res) => {
             if (!req.user) { res.json({ result: "error", message: "user not authenticated" }); return; }
@@ -64,7 +64,45 @@ export default class Admin extends PluginSuperServerside {
             ///
         })
 
-        // -----------------------------------------------
+        // ------------------------------------------------------------------------------------------
+        this.webserver.app.post("/api/v4/admin/usernamechange", (req: any, res) => {
+            if (!req.user) { res.json({ result: "error", message: "user not authenticated" }); return; }
+            if (!req.body.username) { res.json({ result: "error", message: "expecting username string" }); return; }
+            //if (!validUsername(req.body.username)) { res.json({ result: "error", message: "not a valid email" }); return; }
+
+            var usernameTest = validUsername(req.body.username);
+            console.log(usernameTest);
+
+            if (req.body.username == req.user.username) {
+                res.json({ result: "error", message: "username already set to " + req.body.username })
+                return;
+            }
+
+            if (!usernameTest.valid) {
+                res.json({ result: "error", message: "username is invalid", validation: usernameTest })
+                return;
+            }
+
+            this.core.users({ request: { find: { username: req.body.username } }, user: req.user }, (e, user) => {
+                if (user.length != 0) { res.json({ result: "error", message: "username is already taken." }) }
+                if (user.length == 0) {
+                    //available.
+                    var user = req.user;
+                    delete user["_id"]
+                    user.username = req.body.username
+                    this.documentstore.db.users.update({ apikey: req.user.apikey }, user, (e, result) => {
+                        if (result) {
+                            res.json({ result: "success", message: "username changed to " + req.body.username, db: result })
+                        } else {
+                            res.json({ result: "error", message: "db error" })
+                        }
+
+                    })
+                }
+            })
+
+        })
+        // --------------------------------------------------------------------------------------
     }
 
 

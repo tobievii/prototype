@@ -732,15 +732,19 @@ export class Core extends EventEmitter {
     // ----------------------------------------------------------------------------------
 
     users(options: any, cb: any) {
-        console.log("=============== USERS")
-        console.log(options);
         if (options.request.find) {
+
+            //if you have the publickey you may know the username
             if (options.request.find.publickey) {
                 this.db.users.find(options.request.find, { username: 1, publickey: 1 }, cb);
             }
+
+            //only check if username exists (for changing username without conflict)
+            if (options.request.find.username) {
+                this.db.users.find(options.request.find, { username: 1 }, cb);
+            }
         }
 
-        //this.db.users.find(options)
     }
 
 }

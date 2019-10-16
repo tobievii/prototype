@@ -6,6 +6,7 @@ import { User } from "../../../../server/shared/interfaces"
 import { colors } from "../../theme";
 import { AccountTypeBadge } from "../../components/account_type_badge";
 import { AccountEmail } from "./account_email";
+import { AccountUsername } from "./account_username";
 
 interface MyProps { }
 interface MyState { }
@@ -18,11 +19,9 @@ export class Account extends React.Component<MyProps, MyState> {
 
         return (
             <div>
+
+                <AccountUsername />
                 <AccountEmail />
-
-
-                <span>level: {account.level}</span> <br />
-                <span>username: {account.username}</span> <br /><br />
 
                 <div style={{ paddingBottom: colors.padding * 2 }}>
                     <AccountTypeBadge />

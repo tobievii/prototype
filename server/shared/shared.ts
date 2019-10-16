@@ -37,6 +37,8 @@ export function validEmail(input: string) {
 
 export const passwordSettings = { minlength: 5 }
 
+export const usernameSettings = { minlength: 4, maxlength: 15 }
+
 export interface passwordValidation {
     valid: boolean
     capitals: boolean
@@ -68,4 +70,22 @@ export function validPassword(pw) {
         length: (pw.length >= passwordSettings.minlength)
     }
 
+}
+
+
+export function validUsername(username) {
+
+    var test = {
+        valid: false,
+        capitals: /[A-Z]/.test(username),
+        lowercase: /[a-z]/.test(username),
+        numbers: /[0-9]/.test(username),
+        symbols: /[^A-Za-z0-9]/.test(username),
+        noSpace: (username.indexOf(" ") < 0),
+        length: ((username.length >= usernameSettings.minlength) && (username.length <= usernameSettings.maxlength))
+    }
+
+    test.valid = ((!test.capitals) && (test.length) && (test.noSpace) && (!test.symbols));
+
+    return test;
 }
