@@ -138,7 +138,15 @@ export class AccountUsername extends React.Component<MyProps, MyState> {
 
                 <div style={optionStyle}>
                     <span className="button"
-                        onClick={() => { this.setState({ changeUsername: !this.state.changeUsername }) }}>
+                        onClick={() => {
+                            this.setState({
+                                username: api.data.account.username,
+                                validUsername: validUsername(api.data.account.username),
+                                changeUsername: !this.state.changeUsername
+                            }, () => {
+                                this.checkIfUsernameAvailable();
+                            })
+                        }}>
                         {(this.state.changeUsername) ? "cancel" : "change"}</span>
                 </div>
 

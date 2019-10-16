@@ -16,6 +16,7 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
         email: undefined,
         emailverified: false,
         changeEmail: false,
+        verifyClicked: false
     }
 
     static getDerivedStateFromProps(props, state) {
@@ -57,10 +58,8 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
                 {(!this.state.changeEmail) &&
                     <div style={{ background: "rgba(0,0,0,0.2)", flex: "1", padding: colors.padding }}>
                         <span>{this.state.email}</span> {(api.data.account.emailverified)
-                            ? <span style={{ color: colors.good }}>Verified</span>
-                            : <div style={{ color: colors.alarm }}>Unverified
-
-                            </div>}
+                            ? <span style={{ color: colors.good, paddingTop: colors.padding, whiteSpace: "nowrap" }}><i className="fas fa-check" /> Verified</span>
+                            : <span style={{ color: colors.warning, paddingTop: colors.padding, whiteSpace: "nowrap" }}><i className="fas fa-exclamation-triangle" /> Unverified</span>}
                     </div>}
 
                 {(this.state.changeEmail) && <div style={{
@@ -95,11 +94,18 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
                         {(this.state.changeEmail) ? "cancel" : "change"}
                     </span>
 
-                    {(!api.data.account.emailverified) && <div>
-                        <span onClick={() => {
-                            this.requestVerificationMail();
-                        }} style={{ marginLeft: colors.padding }} className="button">verify</span>
-                    </div>}
+                    {(!api.data.account.emailverified)
+                        && <div>
+
+                            {(this.state.verifyClicked)
+                                ? <span style={{ whiteSpace: "nowrap", color: colors.public }}><i className="fas fa-envelope" /> sent</span>
+                                : <span onClick={() => {
+                                    this.setState({ verifyClicked: true });
+                                    this.requestVerificationMail();
+                                }} style={{ marginLeft: colors.padding }} className="button">verify</span>}
+
+                        </div>
+                    }
 
                 </div>
 

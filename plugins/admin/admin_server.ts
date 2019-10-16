@@ -71,7 +71,6 @@ export default class Admin extends PluginSuperServerside {
             //if (!validUsername(req.body.username)) { res.json({ result: "error", message: "not a valid email" }); return; }
 
             var usernameTest = validUsername(req.body.username);
-            console.log(usernameTest);
 
             if (req.body.username == req.user.username) {
                 res.json({ result: "error", message: "username already set to " + req.body.username })

@@ -8,6 +8,8 @@ import { colors } from "../theme";
 import { validEmail, passwordSettings, validPassword } from "../../../server/shared/shared";
 import { request } from "../utils/requestweb";
 
+var parse = require('color-parse')
+
 interface MyProps { }
 
 interface MyState { }
@@ -29,27 +31,31 @@ export class UserVerify extends React.Component<MyProps, MyState> {
 
   render() {
 
+    var col = parse(colors.warning);
+    console.log(col);
+
     var notificationBlock: any = {
-      border: "1px solid rgba(255, 57, 67, 0.35)",
+      border: "1px solid " + "rgba(" + col.values[0] + "," + col.values[1] + "," + col.values[2] + ",1)",
       boxSizing: "border-box",
-      background: "rgba(255, 57, 67, 0.15)",
-      margin: "20px",
-      padding: "10px",
+      background: "rgba(" + col.values[0] + "," + col.values[1] + "," + col.values[2] + ",0.15)",
       fontWeight: "normal",
       fontSize: "12px",
-      borderRadius: "1px",
-      color: "#ff3943"
+      borderRadius: "1px"
     }
 
     return (
       <div style={notificationBlock} >
-        <span>
-          <i className="fas fa-exclamation-triangle"></i> Your email address has not been verified yet.
-          Please check your inbox for your auth link.
-        </span>
-
-        <button onClick={this.requestVerificationMail}><i className="fas fa-envelope"></i> send new</button>
+        <div style={{ padding: colors.padding }} >
+          <span style={{ color: colors.warning }} >
+            <i className="fas fa-exclamation-triangle" /> Your email address ({api.data.account.email}) has not been verified yet.
+          </span> <br />
+          <span>
+            If this is not the correct email address or you need to request a new verification mail please go to <a className="dotted" style={{ color: colors.warning }} href="/settings/account">settings/account</a>.
+          </span>
+        </div>
       </div>
+
+
     );
   }
 }

@@ -28,7 +28,6 @@ export class Account extends React.Component<MyProps, MyState> {
                 </div>
 
 
-                <button style={{ background: colors.spotB }}>change username</button><br /><br />
                 <button style={{ background: colors.spotB }}>change password</button><br /><br />
                 <button onClick={() => { api.location("/signout") }}>Sign out</button>
             </div>
