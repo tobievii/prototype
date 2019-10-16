@@ -13,8 +13,6 @@ import { validPassword } from "../../../../server/shared/shared";
 interface MyProps { }
 interface MyState { }
 
-///// CURTEMP: ASDFasdf1234!@#$
-///// NEWTEMP: ZXCVzxcv0987)(*&
 
 /** allows user to change password in account/settings */
 export class AccountPassword extends React.Component<MyProps, MyState> {
