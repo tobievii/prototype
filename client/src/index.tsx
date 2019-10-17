@@ -27,6 +27,7 @@ import { RegisterPage } from "./pages/register";
 import { LoginPage } from "./pages/login";
 import { RecoverPage } from "./pages/recover";
 import { UserVerify } from "./components/user_verify";
+import { RecoverSetpassPage } from "./pages/recoverSetpass";
 
 export default class App extends React.Component {
   state = {
@@ -135,7 +136,8 @@ export default class App extends React.Component {
             <Route path="/u/:username/view/:id" component={this.deviceView} />
             <Route path="/login" component={this.login} />
             <Route path="/register" component={this.register} />
-            <Route path="/recover" component={this.recover} />
+            <Route exact path="/recover" component={this.recover} />
+            <Route exact path="/recover/:code" component={this.recoverCode} />
             <Route component={this.NoMatch} />
           </Switch>
         </BrowserRouter>
@@ -322,10 +324,20 @@ export default class App extends React.Component {
     </div>)
   };
 
+  /** ACCOUNT RECOVERY FORM */
   recover = props => {
     return (<div>
       <NavBar onlyLogo={true} />
       <RecoverPage />
+    </div>)
+  }
+
+  /** CHECKING RECOVERY CODE AND SETTING NEW PASSWORD: */
+  recoverCode = props => {
+    return (<div>
+      <NavBar onlyLogo={true} />
+      {/* <RecoverPage /> */}
+      <RecoverSetpassPage code={props.match.params.code} />
     </div>)
   }
 

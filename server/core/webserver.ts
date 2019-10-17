@@ -26,7 +26,7 @@ export class Webserver extends EventEmitter {
     port: number = 8080;
     core: Core;
 
-
+    reactHtml: any;
 
     constructor(options: { core: Core, config: ConfigFile }) {
         super();
@@ -83,7 +83,10 @@ export class Webserver extends EventEmitter {
         webapiv4(this.app, this.core);
 
         var reactHtml = "";
-        fs.readFile(path.resolve(__dirname, '../../../public/react.html'), (err, data: any) => { reactHtml = data.toString(); })
+        fs.readFile(path.resolve(__dirname, '../../../public/react.html'), (err, data: any) => {
+            this.reactHtml = data.toString();
+            reactHtml = data.toString();
+        })
 
         this.app.get("/", (req: any, res) => { res.end(reactHtml); })
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })

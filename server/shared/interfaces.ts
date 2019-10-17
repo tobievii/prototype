@@ -60,6 +60,10 @@ export interface User {
     /** describes what type of account this is: 
      * undefined == free, can also be "free", "pro", "business", "enterprise" */
     type?: string;
+    recover?: {
+        code: string
+        timestamp: Date
+    }
 }
 
 export interface ConfigFile {
