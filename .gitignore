@@ -234,7 +234,7 @@ FakesAssemblies/
 
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
-node_modules/
+node_modules
 
 # Typescript v1 declaration files
 typings/
@@ -297,3 +297,10 @@ client/dist
 client/node_modules
 client/dist/bundle.js
 codealike.json
+PROTOTYP3-win32-x64
+
+
+client_old/
+design/
+
+iotconfig.json

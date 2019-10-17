@@ -1,20 +1,86 @@
+# PROTOTYPE
+
+dev branch [v 5.1.0-beta](https://github.com/IoT-nxt/prototype/tree/dev):   
+[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=dev)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=dev)   
+
+master branch [v 5.0.43-prod](https://github.com/IoT-nxt/prototype/tree/master):   
+[![Build Status](https://dev.azure.com/iotnxt/CustomDev/_apis/build/status/Prototype/CustomDev-Prototype?branchName=master)](https://dev.azure.com/iotnxt/CustomDev/_build/latest?definitionId=255&branchName=master)   
+
+After a mayor refactor from 5.0 to 5.1 we are now entering dev testing and QA.   
+This should last until end of October 2019 giving us one month of polish and testing   
+before production release to `master` branch.
+
+# Getting started
+
+Ideally you should run your own instance, but if that is not an option or you just want to give it a try you can use our live server(s):
+
+Production: https://prototype.iotnxt.io   
+development: https://prototype.dev.iotnxt.io
+
+
+# Running your own instance:
+
+Ideally run linux. Ubuntu does fine.
+
+https://www.pluralsight.com/guides/typescript-react-getting-started   
+
+## 5.0 to 5.1 Migration notes:
+
+We now rely on mongodb change streams https://pusher.com/tutorials/mongodb-change-streams instead of redis. This is not set in stone, and dependant on 5.1 beta phase tests. To get change streams to work you have to set mongo into replica/sharded mode:
+
+Edit `mongod.conf` and add:
+
+```
+replication:
+  replSetName: "rs"
+```
+
+Restart the service with `sudo service mongod restart`
+
+Then open the mongo client by running:
+
+```
+mongo
+```
+
+You should see `rs:PRIMARY` if not then run:
+
+```
+rs.initiate()
+```
+
+You might notice that database object format has also changed and is now more consistent between the API and the storage format. You might experience workflow scripts need to migrate to the new data structure:
+
+```js
+// instead of:
+state.payload.data
+// now:
+state.data
+```
+
+Also `data` is optional on incoming packets.
+
+
+
+
 ![alt text](https://i.imgur.com/FpnXB3n.png)
 
-Live: https://prototype.iotnxt.io   
+Live: https://prototype.iotnxt.io  
 Discord: https://discord.gg/rTQmvbT
 
-IoT framework for general purpose remote monitoring/control.   
+IoT framework for general purpose remote monitoring/control.  
 Built using [typescrypt](https://www.typescriptlang.org/), [webpack](https://webpack.js.org/),[react](https://reactjs.org/), [mongoDB](https://www.mongodb.com/), [express](https://expressjs.com/) and [socket.io](https://socket.io/).
 
 ## Features
 
 - Simple as possible to connect your devices. See /examples or the documentation below.
-- Multi protocol support: HTTP/S, MQTT, socketio, raw TCP, USB serialports and more. 
+- Multi protocol support: HTTP/S, MQTT, socketio, raw TCP, USB serialports and more.
 - Opensource so you can be sure what happens with your data.
 - Runs on windows/mac/linux, in the cloud or even a raspberry pi.
 - Fast mongodb for the data.
 - Extendable plugin architecture.
 - Edit code in the browser using the VSCode editor with intellisense autocompletion and deploy custom code instantly.
+- Multithreaded/Cluster support through redis.
 
 See a live realtime list of your devices, when they were last active and a summary of the raw data state.
 
@@ -36,8 +102,14 @@ git clone https://github.com/IoT-nxt/prototype.git
 
 You'll need to install [Node.js](https://nodejs.org/en/) and [MongoDB](https://www.mongodb.com/download-center/community) as a minimum.
 
-Useful additional tools include [Visual Studio Code](https://code.visualstudio.com/), 
-[Robo 3T](https://robomongo.org/), 
+## mongod service autostart:
+
+```
+systemctl enable mongod.service
+```
+
+Useful additional tools include [Visual Studio Code](https://code.visualstudio.com/),
+[Robo 3T](https://robomongo.org/),
 
 ## _Step 1_ **_Build the client side app_**
 
@@ -63,8 +135,20 @@ npm run build       # or build for production
 
 ## _Step 3_ **_Run the backend server_**
 
+Install [nodemon](https://nodemon.io/) globally (if server filewatch is needed)
 ```sh
-cd build
+npm install -g nodemon
+```
+Run the server start command
+
+```sh
+npm run watchserver
+```
+
+or
+
+```sh
+cd build/server
 node main.js        # runs the server
 
 # or even better, auto restart on file changes:
@@ -73,9 +157,8 @@ nodemon main.js     # npm i nodemon -g
 
 Go to [http://localhost:8080/](http://localhost:8080/) and log in with the default account:
 
-       email: admin@localhost.com
+    email: admin@localhost.com
     password: admin
-
 
 # Configuration
 
@@ -89,7 +172,7 @@ Create a text file named `iotconfig.json` and place it 2 folders up from prototy
 # PLACE CONFIG FILE HERE
 ~/iot/iotconfig.json    # config file
 
-# ANY SUB FOLDER 
+# ANY SUB FOLDER
 # git clone https://github.com/IoT-nxt/prototype.git
 ~/iot/prod                     # any folder name (we use different branch names here)
 
@@ -115,11 +198,9 @@ All values are optional. See /src/config.ts for defaults values.
   },
   "httpPort": 80,
   "httpsPort": 443,
-  "mongoConnection": "mongodb://testuser:testpass@mongotest.iotnxt.io:27017/prototype"
+  "mongoConnection": "testuser:testpass@mongotest.iotnxt.io:27017/prototype"
 }
 ```
-
-
 
 # Roadmap
 
@@ -127,36 +208,34 @@ All values are optional. See /src/config.ts for defaults values.
 
 This was the stealth phase. It has been built and is being used on a daily basis by multiple parties.
 
-* Users can register. (Landing page, registration, email verification)
-* Users can add (any*) device, (Documentation)
-* Devices can send data in various protocols/formats. (HTTP/SOCKETIO/MQTT/TELTONIKA etc..)
-* Devices can be linked to IoTnxt platform. (IoTnxt gateway management, bidirectional)
-* Platform can emit commands to devices. (From commander to device)
-* Users can reprogram how the platform handles and propagates data. (Workflow/processing functionality)
+- Users can register. (Landing page, registration, email verification)
+- Users can add (any\*) device, (Documentation)
+- Devices can send data in various protocols/formats. (HTTP/SOCKETIO/MQTT/TELTONIKA etc..)
+- Devices can be linked to IoTnxt platform. (IoTnxt gateway management, bidirectional)
+- Platform can emit commands to devices. (From commander to device)
+- Users can reprogram how the platform handles and propagates data. (Workflow/processing functionality)
 
-
-## Phase 2 (Foundation) - 50% - In progress 
+## Phase 2 (Foundation) - 50% - In progress
 
 During this phase we focus on building the foundation strong and elegantly.
 With our end goals in sight there will be basic functionality or structure we'd need to refine to be able to build the functionality we plan to meet.
 
-* Dashboard - Basic widgets for viewing historical data. As well as the api/db calls needed to make this happen.
+- Dashboard - Basic widgets for viewing historical data. As well as the api/db calls needed to make this happen.
 
       * Calendar (DONE)
       * Line graphs (DONE)
       * Gauge widget (DONE)
       * UI Button widget (DONE)
 
-
-* 3D capability - Built to handle current and future demand on spacial awareness. (Factory/Space/City) This includes VR interface to view data as well as set up areas for triggers.   
+* 3D capability - Built to handle current and future demand on spacial awareness. (Factory/Space/City) This includes VR interface to view data as well as set up areas for triggers.
 
       * 3D Widget (80%)
-      * VR compatible   
+      * VR compatible
       * Vector math functions in workflows
-      * 3D area triggers   
-      * Documentation for the workflow/processing editor   
+      * 3D area triggers
+      * Documentation for the workflow/processing editor
 
-* Social - Here we will focus on the social aspects of IoT. Sharing of devices, security and permissions, groups and ease of use. We need to make it possible to copy paste a URL, and the new user would be able to simply click the link and directly gain the value of the information shared. This could be a local weather station device, traffic camera, parking sensor and so on. From here it should be as simple as possible to link this data to a third party service (api), website (embed snippet)  and so on.
+* Social - Here we will focus on the social aspects of IoT. Sharing of devices, security and permissions, groups and ease of use. We need to make it possible to copy paste a URL, and the new user would be able to simply click the link and directly gain the value of the information shared. This could be a local weather station device, traffic camera, parking sensor and so on. From here it should be as simple as possible to link this data to a third party service (api), website (embed snippet) and so on.
 
       * Extend API documentation/
       * Develop tutorial content
@@ -166,7 +245,7 @@ With our end goals in sight there will be basic functionality or structure we'd 
 
       * Colour/logo variables at the top of the scss stylesheet
       * Simplification/optimization of style classes
-      * Cleanup of hardcoded react html code 
+      * Cleanup of hardcoded react html code
 
 * Streamlining adding devices - Prototype/develop some IoT devices that are SUPER easy to add to the platform.
 
@@ -176,15 +255,14 @@ With our end goals in sight there will be basic functionality or structure we'd 
 
 ## Phase 3 (Expansion)
 
-* Mission critical dashboards - Harden the system to survive severe data spikes or timeouts. Maintain uptime and handle high datarates.
+- Mission critical dashboards - Harden the system to survive severe data spikes or timeouts. Maintain uptime and handle high datarates.
 
-* Mobile - Fix all mobile usage issues for chrome browser. 
-Investigate possibility of converting React app to apple/android app.
+- Mobile - Fix all mobile usage issues for chrome browser.
+  Investigate possibility of converting React app to apple/android app.
 
-* High datarate streams -  Video/audio/telemetry or even realtime robotic control. Enable the system to handle raw video/audio and telemetry data streams. Perform cloud machine vision, backup and retrieval. Another use case would be highdata rate vehicle telemetry like racecars, aerospace and drones.
+- High datarate streams - Video/audio/telemetry or even realtime robotic control. Enable the system to handle raw video/audio and telemetry data streams. Perform cloud machine vision, backup and retrieval. Another use case would be highdata rate vehicle telemetry like racecars, aerospace and drones.
 
-* Integrations - At this stage we should have a large amount of devices/individuals/companies using the platform. We need to enable deep integration between these and develop the components that are missing. Integrations from home assistant and other IoT platforms can enable rapid growth and increased capability.
-
+- Integrations - At this stage we should have a large amount of devices/individuals/companies using the platform. We need to enable deep integration between these and develop the components that are missing. Integrations from home assistant and other IoT platforms can enable rapid growth and increased capability.
 
 # DOCUMENTATION
 
@@ -248,7 +326,7 @@ You can post JSON formatted data to the api as a device.
 RESPONSE:
 
 ```json
-{"result":"success"}
+{ "result": "success" }
 ```
 
 ---
@@ -412,7 +490,6 @@ Returns your account's full device states. Includes additional meta data as well
 ]
 ```
 
-
 # PLUGINS
 
 ## Plugin: Iot.nxt
@@ -428,8 +505,6 @@ Enables linking device state bidirectionally to the [Iot.nxt](https://www.iotnxt
 ![serialport autodetect](https://i.imgur.com/bIEqUL6.png)
 
 The serialports plugin enables autodetection of arduino or similar serialport devices. Also enables the serialports object in process scripts that enables listing of devices and writing to ports.
-
-
 
 # Developers
 
@@ -465,7 +540,6 @@ git push origin branch_name
 
 ```
 
-
 # Cluster
 
 http://pm2.keymetrics.io/
@@ -478,6 +552,7 @@ pm2 start main.js -i 0
 # Redis
 
 https://tecadmin.net/install-redis-ubuntu/
+
 ```
 # install
 sudo apt-get install redis-server
@@ -493,4 +568,75 @@ Add redis to iotconfig.json
   "host": "localhost",
   "port": 6379
 }
+```
+
+
+# Setup as a service
+
+Create service config file:
+
+```bash
+nano /etc/systemd/system/prototype.service
+```
+
+Contents:
+
+In this example we use [forever](https://github.com/foreverjs/forever) to keep the service running, however you can also use [pm2](http://pm2.keymetrics.io/).
+
+```
+[Unit]
+Description=Prototype
+After=network.target
+
+[Service]
+WorkingDirectory=/home/yourusername/prototype/build
+ExecStart=/home/yourusername/n/lib/node_modules/forever/bin/forever main.js
+Restart=on-failure
+User=yourusername
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## Enable the service
+
+```bash
+# enable the service
+systemctl enable prototype.service
+
+# control the service
+systemctl start prototype.service
+systemctl stop prototype.service
+systemctl status prototype.service
+systemctl restart prototype.service
+
+```
+
+```bash
+# If you need to modify the config file make sure to:
+systemctl daemon-reload
+systemctl restart prototype.service
+```
+
+```bash
+# view realtime stdout logs
+sudo journalctl -u prototype -f
+```
+
+source: https://www.axllent.org/docs/view/nodejs-service-with-systemd/
+
+
+## 5.1 BETA Service worker build:
+
+```
+cd client
+npm run buildsw
+```
+
+
+## To create a local ssl certificate you can use:
+
+
+```
+openssl req -nodes -new -x509 -keyout server.key -out server.cert
 ```
