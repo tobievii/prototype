@@ -374,6 +374,17 @@ export class Core extends EventEmitter {
             logger.log({ message: "core.datapost workflow", level: "verbose" });
 
             // workflow just before saving to db.
+            if (!packet.data) packet.data = {};
+
+            // 5.0 to 5.1 compatibility hack
+            if (packet.workflowCode) {
+                packet.workflowCode = packet.workflowCode.split("state.payload").join("state");
+            }
+            // 5.0 to 5.1 compatibility hack
+            if (state.workflowCode) {
+                state.workflowCode = state.workflowCode.split("state.payload").join("state");
+            }
+
             this.workflow({ packet, state }, (err, processedPacket) => {
                 logger.log({ message: "core.datapost workflow processed", level: "verbose" });
 
