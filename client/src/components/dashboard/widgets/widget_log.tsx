@@ -47,8 +47,6 @@ export default class WidgetLog extends WidgetComponent {
             api.on("packet", (packet) => {
                 if (Array.isArray(packet) == false) {
                     if (packet.key == this.props.state.key) {
-                        console.log("its this device..");
-                        console.log(packet);
                         var data: any = this.state.data;
                         data.push(packet);
                         this.setState({ data })
@@ -59,9 +57,7 @@ export default class WidgetLog extends WidgetComponent {
         }
     }
 
-    componentDidUpdate() {
-        console.log("graph did update")
-    }
+
 
     render() {
 
