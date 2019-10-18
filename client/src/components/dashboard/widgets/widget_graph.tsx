@@ -3,7 +3,8 @@ import { WidgetComponent } from "./widgetcomponent"
 import { api } from "../../../api"
 import { colors } from "../../../theme"
 
-import { Line } from 'react-chartjs-2';
+//import { Line } from 'react-chartjs-2';
+import { AreaChart, AreaSeries, Area, Stripes, Gradient, GradientStop, Line } from 'reaviz';
 
 import { objectByString } from "../../../../../server/shared/shared"
 
@@ -29,7 +30,7 @@ export default class WidgetCanvas extends WidgetComponent {
                 mask: {
                     [this.props.widget.datapath]: 1
                 },
-                sort: { "timestamp": 1 },
+                sort: { "_id": -1 },
                 limit: 50
             }
 
@@ -40,6 +41,7 @@ export default class WidgetCanvas extends WidgetComponent {
                 if (err) { console.log(err); }
                 if (data) {
                     console.log(data);
+                    data = data.reverse(); // flip order
                     this.setState({ data })
                 }
             })
@@ -72,50 +74,79 @@ export default class WidgetCanvas extends WidgetComponent {
         for (var d of this.state.data) {
             //var value = objectByString(this.props.state, this.props.widget.datapath)
             var entry = {
-                timestamp: d["timestamp"],
-                value: objectByString(d, this.props.widget.datapath)
+                key: new Date(d["timestamp"]),
+                data: parseFloat(objectByString(d, this.props.widget.datapath))
             }
 
-            if (entry.value != undefined) {
-                labels.push(entry.timestamp);
-                data.push(entry.value)
+            if (!Number.isNaN(entry.data)) {
+                data.push(entry)
             }
 
 
         }
 
-        var graph = {
-            labels: labels,
-            datasets: [
-                {
-                    label: this.props.widget.dataname,
-                    fill: false,
-                    lineTension: 0.1,
-                    backgroundColor: this.state.options.color.value,
-                    borderColor: this.state.options.color.value,
-                    borderCapStyle: 'butt',
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    borderJoinStyle: 'miter',
-                    pointBorderColor: this.state.options.color.value,
-                    pointBackgroundColor: '#000',
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 5,
-                    pointHoverBackgroundColor: this.state.options.color.value,
-                    pointHoverBorderColor: this.state.options.color.value,
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHitRadius: 10,
-                    data: data
-                }
-            ]
-        };
+
+        var style = {
+            width: "100%", height: "100%"
+        }
+
+        // For documentation see: 
+        // see https://reaviz.io/?path=/docs/docs-chart-types-area-chart--page
+
+        //var color = select('Color Scheme', schemes, 'cybertron');
 
         return (
-            <Line
-                data={graph}
-                options={{ maintainAspectRatio: false }}
+            <AreaChart style={style}
+                data={data}
+
+                series={
+                    <AreaSeries
+
+                        area={
+                            <Area
+                                mask={<Stripes />}
+                                style={{ fill: this.state.options.color.value }}
+                                gradient={
+                                    <Gradient
+                                        stops={[
+                                            <GradientStop offset="10%" stopOpacity={0} />,
+                                            <GradientStop offset="80%" stopOpacity={1} />
+                                        ]}
+                                    />
+                                }
+                            />
+                        }
+                        line={<Line strokeWidth={3} style={{ stroke: this.state.options.color.value }} />}
+                    />
+                }
             />
+
+
+            // <AreaChart style={style}
+            //     data={data}
+
+            //     series={
+            //         <AreaSeries
+
+            //             area={
+            //                 <Area
+            //                     mask={<Stripes />}
+            //                     //style={{ fill: this.state.options.color.value }}
+            //                     gradient={
+            //                         <Gradient
+            //                             stops={[
+            //                                 <GradientStop offset="10%" stopOpacity={0} />,
+            //                                 <GradientStop offset="80%" stopOpacity={1} />
+            //                             ]}
+            //                         />
+            //                     }
+            //                 />
+            //             }
+            //             line={<Line strokeWidth={3} style={{ stroke: this.state.options.color.value }} />}
+            //         />
+            //     }
+            // />
+
         )
     }
 };
