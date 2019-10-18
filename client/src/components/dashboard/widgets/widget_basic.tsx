@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { WidgetComponent } from "./widgetcomponent"
-import { colors } from '../../../theme';
+import { colors, opacity } from '../../../theme';
 
 export default class WidgetBasic extends WidgetComponent {
     state = {
@@ -30,7 +30,15 @@ export default class WidgetBasic extends WidgetComponent {
         }
 
         if (!this.props.value) {
-            return <div style={{ opacity: 0.5, padding: colors.padding * 2, paddingTop: colors.padding * 5 }}>Blank widget. Please edit or remove.</div>
+            return <div style={{
+                padding: colors.padding * 2,
+                paddingTop: colors.padding * 4,
+                background: opacity(colors.share, 0.15),
+                border: "1px solid " + colors.share,
+                color: colors.share,
+                height: "100%",
+                boxSizing: "border-box"
+            }}><i className="fas fa-exclamation-triangle" /> Blank widget. Please edit or remove.</div>
         }
 
         var datapath = ""
