@@ -58,6 +58,24 @@ export class Widget extends React.Component<MyProps, WidgetState> {
 
             onDrag={e => { e.preventDefault(); e.stopPropagation(); }} >
 
+
+            <div style={{
+                boxSizing: "border-box",
+                padding: "1px",
+                overflowY: "auto",
+                height: "100%",
+                width: "100%"
+            }}>
+                {(WidgetToDraw != undefined)
+                    ? <div style={{ height: "100%" }}><WidgetToDraw
+                        widget={this.props.widget}
+                        state={this.props.state}
+                        value={value}
+                    /></div>
+                    : <div>Error {this.props.widget.type.toLowerCase()} widget not found</div>}
+            </div>
+
+
             {(this.props.edit) &&
                 <div style={{
                     boxSizing: "border-box",
@@ -71,17 +89,14 @@ export class Widget extends React.Component<MyProps, WidgetState> {
                     <div style={{ display: "flex", flexDirection: "row", background: colors.panels }}  >
                         <div className="widgetGrab"
                             style={{
-                                zIndex: 99,
-
                                 flex: "1 auto",
                                 cursor: "grab",
                                 textAlign: "center",
                                 opacity: 1,
                             }}> </div>
 
-                        <div className="widgetOptions" style={{}}>
-                            <div className="widgetOptionsButton"
-                                onClick={() => { this.setState({ showMenu: !this.state.showMenu }) }}
+                        <div style={{}}>
+                            <div onClick={() => { this.setState({ showMenu: !this.state.showMenu }) }}
                                 style={{
                                     cursor: "pointer",
                                     padding: "7px",
@@ -99,21 +114,6 @@ export class Widget extends React.Component<MyProps, WidgetState> {
                     </div>
                 </div>}
 
-            <div style={{
-                boxSizing: "border-box",
-                padding: "1px",
-                overflowY: "auto",
-                height: "100%",
-                width: "100%"
-            }}>
-                {(WidgetToDraw != undefined)
-                    ? <div style={{ height: "100%" }}><WidgetToDraw
-                        widget={this.props.widget}
-                        state={this.props.state}
-                        value={value}
-                    /></div>
-                    : <div>Error {this.props.widget.type.toLowerCase()} widget not found</div>}
-            </div>
         </div >)
     }
 }
