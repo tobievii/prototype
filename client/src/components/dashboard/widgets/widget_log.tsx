@@ -44,12 +44,13 @@ export default class WidgetLog extends WidgetComponent {
                 }
             })
 
-            api.on("state", (state) => {
-                if (Array.isArray(state) == false) {
-                    if (state.key == this.props.state.key) {
-                        // its this device..
+            api.on("packet", (packet) => {
+                if (Array.isArray(packet) == false) {
+                    if (packet.key == this.props.state.key) {
+                        console.log("its this device..");
+                        console.log(packet);
                         var data: any = this.state.data;
-                        data.push(state);
+                        data.push(packet);
                         this.setState({ data })
                     }
                 }
@@ -80,7 +81,11 @@ export default class WidgetLog extends WidgetComponent {
                 timestamp: d.timestamp,
                 value: objectByString(d, this.props.widget.datapath)
             }
-            data.push(entry)
+
+            if (entry.value != undefined) {
+                data.push(entry)
+            }
+
         }
 
         if (data.length == 0) {
