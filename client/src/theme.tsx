@@ -1,3 +1,7 @@
+import { string } from "prop-types";
+
+var parse = require('color-parse')
+
 export const prototypeTheme = {
   padding: "10px"
 };
@@ -272,6 +276,12 @@ export function shadeColor(color, percent) {
 }
 
 export var icons = [];
+
+export function opacity(color: string, opacity: number): string {
+  var col = parse(color);
+  const colourout: string = "rgba(" + col.values[0] + "," + col.values[1] + "," + col.values[2] + "," + opacity + ")"
+  return colourout;
+}
 
 /*
  ,
