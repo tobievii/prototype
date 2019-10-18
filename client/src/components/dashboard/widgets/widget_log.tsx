@@ -29,7 +29,7 @@ export default class WidgetLog extends WidgetComponent {
                 mask: {
                     [this.props.widget.datapath]: 1
                 },
-                sort: { "timestamp": 1 },
+                sort: { "timestamp": -1 },
                 limit: 50
             }
 
@@ -40,6 +40,7 @@ export default class WidgetLog extends WidgetComponent {
                 if (err) { console.log(err); }
                 if (data) {
                     console.log(data);
+                    data = data.reverse(); // flip order
                     this.setState({ data })
                 }
             })

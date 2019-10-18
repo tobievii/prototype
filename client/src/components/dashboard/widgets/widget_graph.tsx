@@ -30,12 +30,9 @@ export default class WidgetCanvas extends WidgetComponent {
                 mask: {
                     [this.props.widget.datapath]: 1
                 },
-                sort: { "_id": -1 },
+                sort: { "timestamp": -1 },
                 limit: 50
             }
-
-            console.log("query", query)
-            //query.find[this.props.widget.datapath] = { $exists: true }
 
             api.packets(query, (err, data: any) => {
                 if (err) { console.log(err); }
@@ -122,30 +119,7 @@ export default class WidgetCanvas extends WidgetComponent {
             />
 
 
-            // <AreaChart style={style}
-            //     data={data}
 
-            //     series={
-            //         <AreaSeries
-
-            //             area={
-            //                 <Area
-            //                     mask={<Stripes />}
-            //                     //style={{ fill: this.state.options.color.value }}
-            //                     gradient={
-            //                         <Gradient
-            //                             stops={[
-            //                                 <GradientStop offset="10%" stopOpacity={0} />,
-            //                                 <GradientStop offset="80%" stopOpacity={1} />
-            //                             ]}
-            //                         />
-            //                     }
-            //                 />
-            //             }
-            //             line={<Line strokeWidth={3} style={{ stroke: this.state.options.color.value }} />}
-            //         />
-            //     }
-            // />
 
         )
     }
