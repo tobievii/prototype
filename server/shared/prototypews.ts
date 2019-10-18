@@ -38,6 +38,10 @@ export class PrototypeWS extends EventEmitter {
                         this.emit("account", msg.account)
                     }
 
+                    if (msg.packet) {
+                        this.emit("packet", msg.packet)
+                    }
+
                 } catch (err) {
                     console.error(err);
                 }

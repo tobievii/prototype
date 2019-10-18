@@ -149,6 +149,11 @@ export class API extends EventEmitter {
             this.updateStates(states)
         })
 
+        this.prototypews.on("packet", (packet: CorePacket) => {
+
+            this.emit("packet", packet);
+        })
+
         this.prototypews.on("account", (account: User) => {
             this.data.account = account;
             this.emit("account", account);

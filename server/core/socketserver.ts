@@ -106,6 +106,7 @@ export class SocketServer extends EventEmitter {
 
         })
 
+        // ------------------------------------------------------------------------------------------------------------
         /** this enabled logged in users to instantly update UI if account changes. */
         this.on("users", (account) => {
             for (var socket of this.connections) {
@@ -115,6 +116,8 @@ export class SocketServer extends EventEmitter {
             }
         })
 
+        // ------------------------------------------------------------------------------------------------------------
+        /** updates connected users full device states */
         this.on("states", (states: CorePacket) => {
             if ((states.apikey) && (states.id)) {
 
@@ -138,6 +141,36 @@ export class SocketServer extends EventEmitter {
                 }
             }
         })
+
+        // ------------------------------------------------------------------------------------------------------------
+        /** updates connected users per packet per device (useful for graphs and log widgets) */
+        this.on("packets", (packet: CorePacket) => {
+
+            if ((packet.apikey) && (packet.id)) {
+
+                let cleanPacket = _.clone(packet);
+                delete cleanPacket["apikey"]
+                delete cleanPacket["state"]
+
+                for (var socket of this.connections) {
+
+                    if (socket.user.apikey == packet.apikey) {
+                        socket.send(JSON.stringify({ packet: cleanPacket }))
+                    }
+
+                    if (packet.public) {
+                        // subscriptions
+                        for (var sub of socket.subscriptions) {
+                            if (sub == packet.publickey) {
+                                socket.send(JSON.stringify({ packet: cleanPacket }))
+                            }
+                        }
+                    }
+                }
+            }
+
+        })
+        // ------------------------------------------------------------------------------------------------------------
     }
 }
 
