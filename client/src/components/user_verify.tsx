@@ -4,11 +4,10 @@ import { BrowserRouter, Route, Link, NavLink } from "react-router-dom";
 
 import { api } from "../api";
 import { emit } from "cluster";
-import { colors } from "../theme";
+import { colors, opacity } from "../theme";
 import { validEmail, passwordSettings, validPassword } from "../../../server/shared/shared";
 import { request } from "../utils/requestweb";
 
-var parse = require('color-parse')
 
 interface MyProps { }
 
@@ -30,14 +29,10 @@ export class UserVerify extends React.Component<MyProps, MyState> {
   }
 
   render() {
-
-    var col = parse(colors.warning);
-    console.log(col);
-
     var notificationBlock: any = {
-      border: "1px solid " + "rgba(" + col.values[0] + "," + col.values[1] + "," + col.values[2] + ",1)",
+      border: "1px solid " + colors.warning,
       boxSizing: "border-box",
-      background: "rgba(" + col.values[0] + "," + col.values[1] + "," + col.values[2] + ",0.15)",
+      background: opacity(colors.warning, 0.15),
       fontWeight: "normal",
       fontSize: "12px",
       borderRadius: "1px"
