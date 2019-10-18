@@ -49,8 +49,8 @@ export class Dashboard extends React.Component<MyProps, MyState> {
     }
 
     onDrop = (e, f) => {
-        if (!this.state.editMode) { return; }
-        console.log("...")
+        //if (!this.state.editMode) { return; }
+        //console.log("...")
         e.preventDefault();
         var typel = undefined;
         // pixel location
