@@ -33,32 +33,32 @@ export default class WidgetLog extends WidgetComponent {
                 limit: 50
             }
 
-            console.log("query", query)
-            //query.find[this.props.widget.datapath] = { $exists: true }
-
             api.packets(query, (err, data: any) => {
                 if (err) { console.log(err); }
                 if (data) {
-                    console.log(data);
                     data = data.reverse(); // flip order
                     this.setState({ data })
                 }
             })
 
-            api.on("packet", (packet) => {
-                if (Array.isArray(packet) == false) {
-                    if (packet.key == this.props.state.key) {
-                        var data: any = this.state.data;
-                        data.push(packet);
-                        this.setState({ data })
-                    }
-                }
-            })
+            api.on("packet", this.packetHandler)
 
         }
     }
 
+    componentWillUnmount() {
+        api.removeListener("packet", this.packetHandler);
+    }
 
+    packetHandler = (packet) => {
+        if (Array.isArray(packet) == false) {
+            if (packet.key == this.props.state.key) {
+                var data: any = this.state.data;
+                data.push(packet);
+                this.setState({ data })
+            }
+        }
+    }
 
     render() {
 
