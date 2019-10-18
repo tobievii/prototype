@@ -30,7 +30,7 @@ export default class WidgetBasic extends WidgetComponent {
         }
 
         if (!this.props.value) {
-            return <div>Blank widget. Please edit or remove.</div>
+            return <div style={{ opacity: 0.5, padding: colors.padding * 2, paddingTop: colors.padding * 5 }}>Blank widget. Please edit or remove.</div>
         }
 
         var datapath = ""
