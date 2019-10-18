@@ -112,6 +112,7 @@ export class DocumentStore extends EventEmitter {
         // this.db.states.createIndex({ "plugins_iotnxt_gateway.GatewayId": 1, "plugins_iotnxt_gateway.HostAddress": 1 }, { background: 1 })
 
         // this.db.packets.createIndex({ "_created_on": 1 })
+        this.db.packets.createIndex({ key: 1 }, { background: 1 })
         this.db.packets.createIndex({ apikey: 1, id: 1 })
         // this.db.packets.createIndex({ apikey: 1, devid: 1, "created_on": 1 })
         // this.db.packets.createIndex({ key: 1 }, { background: 1 })
