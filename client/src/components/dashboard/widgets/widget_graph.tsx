@@ -44,27 +44,20 @@ export default class WidgetCanvas extends WidgetComponent {
                 }
             })
 
-            api.on("state", (state) => {
-                console.log("graph new state", state)
-                if (Array.isArray(state) == false) {
-                    if (state.key == this.props.state.key) {
-                        // its this device..
+            api.on("packet", (packet) => {
+                if (Array.isArray(packet) == false) {
+                    if (packet.key == this.props.state.key) {
                         var data: any = this.state.data;
-                        data.push(state);
+                        data.push(packet);
                         this.setState({ data })
                     }
                 }
-
-
-
             })
 
         }
     }
 
-    componentDidUpdate() {
-        console.log("graph did update")
-    }
+
 
     render() {
 
@@ -78,8 +71,17 @@ export default class WidgetCanvas extends WidgetComponent {
 
         for (var d of this.state.data) {
             //var value = objectByString(this.props.state, this.props.widget.datapath)
-            labels.push(d["timestamp"])
-            data.push(objectByString(d, this.props.widget.datapath))
+            var entry = {
+                timestamp: d["timestamp"],
+                value: objectByString(d, this.props.widget.datapath)
+            }
+
+            if (entry.value != undefined) {
+                labels.push(entry.timestamp);
+                data.push(entry.value)
+            }
+
+
         }
 
         var graph = {
