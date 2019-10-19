@@ -14,7 +14,8 @@ export default class WidgetCanvas extends WidgetComponent {
             color: { type: "color", default: colors.widgetDefault, value: "" }
         },
         gettingdata: false,
-        data: []
+        data: [],
+        loading: true,
     }
 
     componentDidMount() {
@@ -38,7 +39,7 @@ export default class WidgetCanvas extends WidgetComponent {
                 if (err) { console.log(err); }
                 if (data) {
                     data = data.reverse(); // flip order
-                    this.setState({ data })
+                    this.setState({ data, loading: false })
                 }
             })
 
@@ -61,7 +62,30 @@ export default class WidgetCanvas extends WidgetComponent {
         }
     }
 
-    noData() {
+    displayLoading() {
+        return <div style={{
+            color: "rgba(255,255,255,0.1)",
+            display: "flex",
+            flexDirection: "column",
+            padding: 0,
+            margin: 0,
+            height: "100%",
+            boxSizing: "border-box"
+        }}>
+
+            <div style={{ flex: 1, textAlign: "center", position: "relative", width: "100%" }}>
+                <div style={{ textAlign: "center", position: "absolute", bottom: -20, width: "100%" }}>
+                    <div className="fa-3x">
+                        <i className="fas fa-circle-notch fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div style={{ flex: 1, textAlign: "center", width: "100%", paddingTop: 20 }}>loading chart</div>
+        </div>
+
+    }
+
+    displayNoData() {
         return <div style={{
             padding: colors.padding * 2,
             paddingTop: colors.padding * 4,
@@ -75,8 +99,9 @@ export default class WidgetCanvas extends WidgetComponent {
 
     render() {
 
+        if (this.state.loading == true) { return this.displayLoading() }
         //if (this.props.widget.datapath) { return <div>{this.props.widget.datapath}</div> }
-        if (this.state.data.length == 0) { return this.noData() }
+        if (this.state.data.length == 0) { return this.displayNoData() }
 
         var labels = [];
         var data = [];
@@ -110,7 +135,7 @@ export default class WidgetCanvas extends WidgetComponent {
         // see https://reaviz.io/?path=/docs/docs-chart-types-area-chart--page
         // and https://github.com/jask-oss/reaviz
 
-        if (data.length == 0) { return this.noData() }
+        if (data.length == 0) { return this.displayNoData() }
 
         return (
             <AreaChart style={style}
