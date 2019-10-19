@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { WidgetComponent } from "./widgetcomponent"
 import { api } from "../../../api"
-import { colors } from "../../../theme"
+import { colors, opacity } from "../../../theme"
 
 //import { Line } from 'react-chartjs-2';
-import { AreaChart, AreaSeries, Area, Stripes, Gradient, GradientStop, Line } from 'reaviz';
+import { AreaChart, AreaSeries, Area, Stripes, Gradient, GradientStop, Line, LinearAxis, LinearAxisLine, LinearAxisTickSeries, LinearYAxis } from 'reaviz';
 
 import { objectByString } from "../../../../../server/shared/shared"
 
@@ -61,15 +61,28 @@ export default class WidgetCanvas extends WidgetComponent {
         }
     }
 
+    noData() {
+        return <div style={{
+            padding: colors.padding * 2,
+            paddingTop: colors.padding * 4,
+            background: opacity(colors.share, 0.15),
+            border: "1px solid " + colors.share,
+            color: colors.share,
+            height: "100%",
+            boxSizing: "border-box"
+        }}><i className="fas fa-exclamation-triangle" /> Chart has no data.</div>
+    }
 
     render() {
 
         //if (this.props.widget.datapath) { return <div>{this.props.widget.datapath}</div> }
-        if (this.state.data.length == 0) { return <div></div> }
+        if (this.state.data.length == 0) { return this.noData() }
 
         var labels = [];
         var data = [];
 
+        var min = Infinity;
+        var max = -Infinity;
 
 
         for (var d of this.state.data) {
@@ -80,6 +93,8 @@ export default class WidgetCanvas extends WidgetComponent {
             }
 
             if (!Number.isNaN(entry.data)) {
+                if (entry.data < min) { min = entry.data }
+                if (entry.data > max) { max = entry.data }
                 data.push(entry)
             }
 
@@ -93,13 +108,18 @@ export default class WidgetCanvas extends WidgetComponent {
 
         // For documentation see: 
         // see https://reaviz.io/?path=/docs/docs-chart-types-area-chart--page
+        // and https://github.com/jask-oss/reaviz
 
-        //var color = select('Color Scheme', schemes, 'cybertron');
+        if (data.length == 0) { return this.noData() }
 
         return (
             <AreaChart style={style}
                 data={data}
-
+                yAxis={<LinearYAxis
+                    type="value"
+                    scaled={true}
+                    domain={[min, max]}
+                />}
                 series={
                     <AreaSeries
 
