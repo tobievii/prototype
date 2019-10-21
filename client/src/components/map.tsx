@@ -127,6 +127,11 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
   }
 
   calculateCenterFromDeviceLocations = () => {
+
+    /** if we already have a position do not re center on every packet. */
+    if (this.state.center) {
+      return;
+    }
     var center = [0, 0];
 
     if (api.mapFocusDevice) {
