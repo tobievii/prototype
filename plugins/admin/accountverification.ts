@@ -25,13 +25,13 @@ export class AccountVerification extends PluginSuperServerside {
         // we handle incoming verification requests
         this.webserver.app.get("/verify/:id", (req, res) => {
 
-            this.documentstore.db.users.findOne({ "_id": ObjectId(req.params.id) }, (e: Error, user: User) => {
+            this.documentstore.db.users.findOne({ "_id": ObjectId(req.params["id"]) }, (e: Error, user: User) => {
                 if (user) {
                     ////
                     delete user["_id"];
                     user.emailverified = true;
 
-                    this.documentstore.db.users.update({ "_id": ObjectId(req.params.id) }, user, (err: Error, result: any) => {
+                    this.documentstore.db.users.update({ "_id": ObjectId(req.params["id"]) }, user, (err: Error, result: any) => {
                         if (err) { console.log(err); return; }
                         if (result) {
                             res.redirect("/")
