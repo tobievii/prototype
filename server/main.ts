@@ -113,7 +113,8 @@ if (cluster.isMaster) {
         core = new Core({ documentstore, config: cfg.config })
         webserver = new Webserver({ core, config: cfg.config });
 
-        if (webserver.server) socketserver = new SocketServer({ server: webserver.server, core });
+        if (webserver.serverhttp) socketserver = new SocketServer({ server: webserver.serverhttp, core });
+        if (webserver.serverhttps) socketserver = new SocketServer({ server: webserver.serverhttps, core });
 
         ///////////////////////////////////////////////////////////////////
 

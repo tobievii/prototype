@@ -22,8 +22,10 @@ import { LogEvent, ConfigFile } from '../shared/interfaces';
 export class Webserver extends EventEmitter {
     app: express.Application;
     ssl: any;
-    server: http.Server | undefined;
-    port: number = 8080;
+    serverhttp: http.Server | undefined;
+    serverhttps: https.Server | undefined;
+    httpPort: number = 8080;
+    httpsPort: number = 443;
     core: Core;
 
     reactHtml: any;
@@ -137,26 +139,29 @@ export class Webserver extends EventEmitter {
             res.redirect('/');
         });
 
-
+        if (options.config.httpPort) {
+            this.httpPort = options.config.httpPort;
+        }
 
         if (options.config.ssl) {
             if (!options.config.sslOptions) { console.error("missing sslOptions from config"); return; }
-            this.server = https.createServer(options.config.sslOptions, this.app);
+            this.serverhttps = https.createServer(options.config.sslOptions, this.app);
             if (!options.config.httpsPort) { console.error("missing httpsPort setting from config"); return; }
-            this.port = options.config.httpsPort
-
+            this.httpsPort = options.config.httpsPort
+            this.serverhttp = http.createServer(this.app);
 
             //REDIR TO HTTPS
             /*
              * Forward port 80 to https 
              */
-            http.createServer(function (req: any, res: any) {
-                res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-                res.end();
-            }).listen(80);
+            // OCT 21 removed to allow port 80 api access.
+            // http.createServer(function (req: any, res: any) {
+            //     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+            //     res.end();
+            // }).listen(80);
 
         } else {
-            this.server = http.createServer(this.app);
+            this.serverhttp = http.createServer(this.app);
         }
     }
 
@@ -173,11 +178,21 @@ export class Webserver extends EventEmitter {
         //     res.status(404).json({ error: "404 not found " + req.method + " " + req.url, url: req.url, method: req.method })
         // })
 
-        if (!this.server) { console.error("http/s server not initialized"); return; }
-        this.server.listen(this.port, () => {
-            logger.log({ message: "webserver started", data: { port: this.port }, level: "info" })
-            if (cb) cb();
-        });
+        if (this.serverhttp) {
+            this.serverhttp.listen(this.httpPort, () => {
+                logger.log({ message: "webserver started", data: { port: this.httpPort }, level: "info" })
+                if (cb) cb();
+            });
+        }
+
+        if (this.serverhttps) {
+            this.serverhttps.listen(this.httpsPort, () => {
+                logger.log({ message: "webserver started", data: { port: this.httpsPort }, level: "info" })
+                if (cb) cb();
+            });
+        }
+
+
     }
 
     safeParser(req: any, res: any, next: any) {
