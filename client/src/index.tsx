@@ -28,6 +28,7 @@ import { LoginPage } from "./pages/login";
 import { RecoverPage } from "./pages/recover";
 import { UserVerify } from "./components/user_verify";
 import { RecoverSetpassPage } from "./pages/recoverSetpass";
+import { MobileNavBottom } from "./components/mobile_nav_bottom";
 
 export default class App extends React.Component {
   state = {
@@ -36,7 +37,9 @@ export default class App extends React.Component {
     account: undefined,
     states: undefined,
     height: window.innerHeight,
-    ready: false
+    ready: false,
+    action: undefined,
+    view: "list"
   };
 
   constructor(props) {
@@ -59,6 +62,10 @@ export default class App extends React.Component {
     window.addEventListener("resize", () => {
       this.setState({ height: window.innerHeight });
     });
+
+    api.on("mapGoto", (device) => {
+      this.setState({ view: "map" })
+    })
 
     registerServiceWorker();
 
@@ -222,39 +229,77 @@ export default class App extends React.Component {
     );
   };
 
+  action = (action) => {
+    if (action.view) {
+      this.setState({ view: action.view });
+    }
+
+  }
+
   home = props => {
-    var size = window.innerWidth < 800 ? "small" : "large";
+    var size = (window.innerWidth < 800) ? "small" : "large";
 
-    var wrapper = clone(theme.global.responsive.wrapper);
-    wrapper.height = this.state.height;
+    // var wrapper = clone(theme.global.responsive.wrapper);
+    // wrapper.height = this.state.height;
+    console.log("---------", size)
 
-    return (
-      <div >
+    if (size == "large") {
+      var styleLarge: any = {}
+      return <div style={styleLarge}>
         <BGgrad />
         <NavBar />
 
         {(!api.data.account.emailverified) && <UserVerify />}
-
+        <div>action: {JSON.stringify(this.state.action)}</div>
         <div style={{ minHeight: "500px" }}>
-          {size == "small"
-            ? <DeviceList />
-            : <div style={{
-              boxSizing: "border-box", display: "flex",
-              flexDirection: "row", width: "100%"
-            }}>
-              <div style={{ flex: "0", height: "500px", minWidth: "600px" }}>
-                <DeviceList />
-              </div>
-              <div style={{ flex: "1" }}>
-                <Map />
-              </div>
+
+          <div style={{
+            boxSizing: "border-box", display: "flex",
+            flexDirection: "row", width: "100%"
+          }}>
+            <div style={{ flex: "0", height: "500px", minWidth: "600px" }}>
+              <DeviceList />
             </div>
-          }
+            <div style={{ flex: "1" }}>
+              <Map />
+            </div>
+          </div>
+
         </div>
 
         <div style={{ flex: "0 1 40px" }}><Documentation /></div>
       </div>
-    );
+    }
+
+    if (size == "small") {
+      ///mobile:
+      var styleSmall: any = { height: window.innerHeight, width: window.innerWidth, overflow: "hidden", position: "relative" }
+      var view = "list"; //default
+
+
+      if (this.state.view) {
+        view = this.state.view;
+      }
+
+
+
+      return (
+        <div style={styleSmall}>
+          <BGgrad />
+          <NavBar />
+
+          {(!api.data.account.emailverified) && <UserVerify />}
+
+          {(view == "list") && <DeviceList />}
+          {(view == "map") && <Map />}
+          {(view == "docs") && <Documentation />}
+
+          <MobileNavBottom action={this.action} />
+        </div>
+      );
+    }
+
+
   };
 
 

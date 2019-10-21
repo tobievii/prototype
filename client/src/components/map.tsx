@@ -28,14 +28,9 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
   componentDidMount() {
     this.updateDimensions();
     window.addEventListener("resize", this.updateDimensions);
-
-
     this.calculateCenterFromDeviceLocations();
-
     api.on("states", this.calculateCenterFromDeviceLocations)
-
     api.on("mapGoto", this.gotoDevice)
-
   }
 
   gotoDevice = (device: CorePacket) => {
@@ -108,8 +103,43 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     console.log(`Marker #${payload} clicked at: `, anchor);
   };
 
+  /** TODO: move to seperate component just for showing loading spinners. */
+  displayLoading() {
+    return <div style={{
+      color: "rgba(255,255,255,0.1)",
+      display: "flex",
+      flexDirection: "column",
+      padding: 0,
+      margin: 0,
+      height: "100%",
+      boxSizing: "border-box"
+    }}>
+
+      <div style={{ flex: 1, textAlign: "center", position: "relative", width: "100%" }}>
+        <div style={{ textAlign: "center", position: "absolute", bottom: 10, width: "100%" }}>
+          <div className="fa-3x">
+            <i className="fas fa-circle-notch fa-spin"></i>
+          </div>
+        </div>
+      </div>
+      <div style={{ flex: 1, textAlign: "center", width: "100%", paddingTop: 0 }}>loading map</div>
+    </div>
+  }
+
   calculateCenterFromDeviceLocations = () => {
     var center = [0, 0];
+
+    if (api.mapFocusDevice) {
+      if (api.mapFocusDevice.data) {
+        if (api.mapFocusDevice.data.gps) {
+          var gps = api.mapFocusDevice.data.gps;
+          if ((gps.lat) && (gps.lon)) {
+            this.gotoDevice(api.mapFocusDevice);
+            return;
+          }
+        }
+      }
+    }
 
     var devicegpslocsLat = []
     var devicegpslocsLon = []
@@ -153,6 +183,10 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
   render() {
 
+    if (this.state.resizing) {
+      return this.displayLoading();
+    }
+
 
     return (
       <div
@@ -167,13 +201,14 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
         ref={this.mapwrapper}
       >
         {this.state.resizing ? (
-          <div style={{ width: "100%", height: "100%" }}></div>
+          <div style={{ width: "100%", height: "100%" }}>loading...</div>
         ) : (
             <div
               style={{ width: "100%", height: "100%" }}
               onMouseMove={this.mouseMove}
               onWheel={this.wheelHandler}
             >
+
               {(this.state.center) &&
                 <Map
                   onBoundsChanged={this.onBoundsChanged}

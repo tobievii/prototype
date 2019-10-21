@@ -30,6 +30,9 @@ export class API extends EventEmitter {
 
     subscriptions: any = [];
 
+    /** used by mobile for viewing a device chosen on device list */
+    mapFocusDevice;
+
     constructor() {
         super();
         logger.log({ message: "API initialized", level: "verbose" })
@@ -457,6 +460,7 @@ export class API extends EventEmitter {
 
 
     mapGoto = (device: CorePacket) => {
+        this.mapFocusDevice = device;
         this.emit("mapGoto", device);
     }
 
