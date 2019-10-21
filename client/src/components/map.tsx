@@ -3,6 +3,7 @@ import Map from "pigeon-maps";
 import Marker from "./mapmarker";
 import { api } from "../api";
 import { colors } from "../theme";
+import { CorePacket } from "../../../server/shared/interfaces";
 interface MapProps { }
 interface MapState { }
 
@@ -33,13 +34,28 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
     api.on("states", this.calculateCenterFromDeviceLocations)
 
+    api.on("mapGoto", this.gotoDevice)
+
   }
 
+  gotoDevice = (device: CorePacket) => {
+    console.log("mapGoto", device);
+    if (device.data) {
+      if (device.data.gps) {
+        if ((device.data.gps.lat) && (device.data.gps.lon)) {
+          var center = [device.data.gps.lat, device.data.gps.lon]
+          console.log(center);
+          this.setState({ center, zoom: 14 })
+        }
+      }
+    }
 
+  }
 
   componentWillUnmount() {
     window.removeEventListener("resize", this.updateDimensions);
     api.removeListener("states", this.calculateCenterFromDeviceLocations);
+    api.removeListener("mapGoto", this.gotoDevice);
   }
 
   updateDimensions = () => {

@@ -455,6 +455,11 @@ export class API extends EventEmitter {
             })
     }
 
+
+    mapGoto = (device: CorePacket) => {
+        this.emit("mapGoto", device);
+    }
+
     // httpget = (url, cb) => {
     //     request.get(this.uri + url,
     //         { json: true },

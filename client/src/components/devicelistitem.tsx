@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { moment } from "../utils/momentalt"
 import { JSONviewer } from "./jsonviewer";
 import { PopupShare } from "./popups/popup_share";
+import { api } from "../api";
 
 interface MyState {
     [index: string]: any;
@@ -98,6 +99,15 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
         var showtimeago = (window.innerWidth < 800) ? false : true;
         var fontSize = (window.innerWidth < 800) ? "150%" : "100%"
 
+        var gps = false;
+        if (this.props.device.data) {
+            if (this.props.device.data.gps) {
+                if ((this.props.device.data.gps.lat) && (this.props.device.data.gps.lon)) {
+                    gps = true;
+                }
+            }
+        }
+
         return (
             <div style={{ background: "#202020", padding: 0, margin: 0, fontSize }}>
 
@@ -163,6 +173,14 @@ export class DeviceListItem extends React.Component<DeviceProps, MyState> {
                         {(this.props.device.public)
                             ? <Link to={"/v/" + this.props.device.publickey} ><i style={{ color: colors.public }} className="fas fa-globe-africa" /></Link>
                             : <i style={{ opacity: colors.transparent }} className="fas fa-globe-africa" />}
+                    </div>
+
+                    <div style={theme.global.devicelist.columns}>
+                        {(gps) ? <i style={{ color: colors.spotA }} onClick={() => {
+                            api.mapGoto(this.props.device)
+                        }} className="button fas fa-map-marker-alt" />
+                            : <i style={{ opacity: colors.transparent }} className="fas fa-map-marker-alt" />
+                        }
                     </div>
                 </div>
 
