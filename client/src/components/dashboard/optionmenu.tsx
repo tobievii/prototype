@@ -24,13 +24,22 @@ interface OptionMenuProps {
 export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
     state = {
         options: [],
-        datapath: ""
+        datapath: "",
+        /** if the user types in a new datapath we ignore datapath settings from parent object. */
+        datapathEdit: false
     };
 
     static getDerivedStateFromProps(props, state) {
-        if (props.widget.datapath) {
-            return { datapath: props.widget.datapath };
+        // console.log("asdf")
+        // console.log(props, state);
+        if (state.datapathEdit) {
+            return null;
+        } else {
+            if (props.widget.datapath) {
+                return { datapath: props.widget.datapath };
+            }
         }
+
     }
 
     action = (optionName) => {
@@ -108,7 +117,7 @@ export class OptionMenu extends React.Component<OptionMenuProps, MyState> {
                 }}>
                     <div style={{ flex: "1" }}>
                         <input style={{ width: "100%" }} value={this.state.datapath} onChange={(e) => {
-                            this.setState({ datapath: e.target.value })
+                            this.setState({ datapath: e.target.value, datapathEdit: true })
                         }} />
                     </div>
                     <div style={{ flex: "0" }}>
