@@ -520,11 +520,9 @@ export class Core extends EventEmitter {
      *  
      * */
     packets(options: { request: ClientPacketOptions, user: User }, cb: any) {
-        console.log(options)
+
         var { request, user } = options;
         logger.log({ message: "core.packets", data: options, level: "verbose" });
-
-
 
         if ((request.find) && (request.sort) && (request.limit)) {
             var { find, sort, limit } = request
@@ -538,7 +536,6 @@ export class Core extends EventEmitter {
             // please note the toLowerCase() since all devices are forced to lowercase when stored to db.
             // the reason for this so we can use device id names for url's
             var query = { id: request.id.toLowerCase(), apikey: user.apikey }
-            console.log(query);
             this.db.packets.find(query).limit(100, cb);
         }
     }

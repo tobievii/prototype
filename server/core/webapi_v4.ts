@@ -170,7 +170,7 @@ export function webapiv4(app: express.Application, core: Core) {
     app.post("/api/v4/states", (req: any, res) => {
         var options = _.clone(req.body)
         options.user = req.user;
-        console.log(options);
+        //console.log(options);
         core.view(options, (err, result) => {
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
