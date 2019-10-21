@@ -89,7 +89,7 @@ export default class WidgetMap extends WidgetComponent {
                     zoom={parseInt(this.state.options.zoom.value)}
                     width={this.state.width}
                     height={this.state.height} >
-                        <Marker anchor={center} payload={1}
+                        <Marker device={this.props.state} anchor={center} payload={1}
                             onClick={this.handleMarkerClick}
                         />
                     </Map>

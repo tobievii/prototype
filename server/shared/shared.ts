@@ -89,3 +89,9 @@ export function validUsername(username) {
 
     return test;
 }
+
+
+
+export function escapeNonUnicode(str: any) {
+    return str.replace(/[^a-z0-9{}\"\[\]: \.,_-]/gim, "");
+}
