@@ -250,7 +250,6 @@ export default class App extends React.Component {
         <NavBar />
 
         {(!api.data.account.emailverified) && <UserVerify />}
-        <div>action: {JSON.stringify(this.state.action)}</div>
         <div style={{ minHeight: "500px" }}>
 
           <div style={{
