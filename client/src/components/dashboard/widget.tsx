@@ -48,6 +48,10 @@ export class Widget extends React.Component<MyProps, WidgetState> {
             value = objectByString(this.props.state, this.props.widget.datapath)
         }
 
+
+
+
+
         return (<div style={{
             background: "rgba(0,0,0,0.1)",
             height: "100%",
@@ -84,16 +88,22 @@ export class Widget extends React.Component<MyProps, WidgetState> {
                     top: 0,
                     right: 0,
                     left: 0,
-                    background: "rgba(0,0,0,0.3)",
+                    background: "rgba(0,0,0,0.3)"
                 }}>
                     <div style={{ display: "flex", flexDirection: "row", background: colors.panels }}  >
                         <div className="widgetGrab"
                             style={{
                                 flex: "1 auto",
                                 cursor: "grab",
-                                textAlign: "center",
+                                display: "flex",
+                                flexDirection: "row",
+                                paddingTop: 7,
                                 opacity: 1,
-                            }}> </div>
+                            }}>
+                            {(this.props.widget.datapath) && <div style={{ flex: "1", paddingLeft: 7 }}>{this.props.widget.datapath}</div>}
+                            <div style={{ flex: "1", textAlign: "right", opacity: 0.5 }}>{this.props.widget.type}</div>
+
+                        </div>
 
                         <div style={{}}>
                             <div onClick={() => { this.setState({ showMenu: !this.state.showMenu }) }}
