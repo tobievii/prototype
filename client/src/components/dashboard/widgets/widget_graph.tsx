@@ -201,39 +201,6 @@ export default class WidgetCanvas extends WidgetComponent {
 
     return (
       <div style={style}>
-        <div style={{ flex: "1", display: "flex" }}>
-          <AreaChart
-            data={data}
-            yAxis={
-              <LinearYAxis type="value" scaled={true} domain={[min, max]} />
-            }
-            series={
-              <AreaSeries
-                area={
-                  <Area
-                    mask={<Stripes />}
-                    style={{ fill: this.state.options.color.value }}
-                    gradient={
-                      <Gradient
-                        stops={[
-                          <GradientStop offset="10%" stopOpacity={0} />,
-                          <GradientStop offset="80%" stopOpacity={1} />
-                        ]}
-                      />
-                    }
-                  />
-                }
-                line={
-                  <Line
-                    strokeWidth={3}
-                    style={{ stroke: this.state.options.color.value }}
-                  />
-                }
-              />
-            }
-          />
-        </div>
-
         <div
           style={{
             flex: "0",
@@ -248,6 +215,37 @@ export default class WidgetCanvas extends WidgetComponent {
         >
           {datapath}
         </div>
+        <AreaChart
+          style={{ width: "100%", height: "100%", background: "#f00" }}
+          data={data}
+          yAxis={
+            <LinearYAxis type="value" scaled={true} domain={[min, max]} />
+          }
+          series={
+            <AreaSeries
+              area={
+                <Area
+                  mask={<Stripes />}
+                  style={{ fill: this.state.options.color.value }}
+                  gradient={
+                    <Gradient
+                      stops={[
+                        <GradientStop offset="10%" stopOpacity={0} />,
+                        <GradientStop offset="80%" stopOpacity={1} />
+                      ]}
+                    />
+                  }
+                />
+              }
+              line={
+                <Line
+                  strokeWidth={3}
+                  style={{ stroke: this.state.options.color.value }}
+                />
+              }
+            />
+          }
+        />
       </div>
     );
   }
