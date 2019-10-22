@@ -12,8 +12,9 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     width: 800,
     height: 400,
     resizing: false,
-    zoom: 8,
-    center: undefined
+    zoom: 1.5,
+    center: [-40, 0],
+    alreadyDefault: false
   };
 
   mapwrapper;
@@ -33,6 +34,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     api.on("mapGoto", this.gotoDevice)
   }
 
+
   gotoDevice = (device: CorePacket) => {
     console.log("mapGoto", device);
     if (device.data) {
@@ -40,7 +42,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
         if ((device.data.gps.lat) && (device.data.gps.lon)) {
           var center = [device.data.gps.lat, device.data.gps.lon]
           console.log(center);
-          this.setState({ center, zoom: 14 })
+          this.setState({ center, zoom: 12 })
         }
       }
     }
@@ -91,7 +93,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
   onBoundsChanged = e => {
     //console.log(e);
-    this.setState({ center: e.center });
+    this.setState({ center: e.center, zoom: e.zoom });
   };
 
   mouseMove = e => {
@@ -129,15 +131,11 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
   calculateCenterFromDeviceLocations = () => {
 
     /** if we already have a position do not re center on every packet. */
-    if (this.state.center) {
-      if ((this.state.center[0] == 0) && (this.state.center[1] == 0)) {
-        //continue...
-      } else {
-        return;
-      }
-
+    if (this.state.alreadyDefault) {
+      return;
     }
-    var center = [0, 0];
+
+    var center = [0, 0]; //default
 
     if (api.mapFocusDevice) {
       if (api.mapFocusDevice.data) {
@@ -154,7 +152,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     var devicegpslocsLat = []
     var devicegpslocsLon = []
 
-    console.log(api.data.states)
+    //console.log(api.data.states)
 
 
     for (var state of api.data.states) {
@@ -168,8 +166,9 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
       }
     }
 
-
+    var deviceGpsSet = false;
     if (devicegpslocsLon.length > 0) {
+      deviceGpsSet = true;
       var totalTempLon = 0;
       for (var lon of devicegpslocsLon) {
         totalTempLon += lon;
@@ -179,6 +178,7 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     }
 
     if (devicegpslocsLat.length > 0) {
+      deviceGpsSet = true;
       var totalTempLat = 0;
       for (var lat of devicegpslocsLat) {
         totalTempLat += lat;
@@ -187,8 +187,14 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
       center[0] = totalTempLat;
     }
 
-    console.log(center);
-    this.setState({ center });
+    //console.log(center);
+
+    if (deviceGpsSet) {
+      this.setState({ center, alreadyDefault: true });
+    } else {
+      this.setState({ center: [-40, 0], alreadyDefault: true });
+    }
+
   }
 
   render() {

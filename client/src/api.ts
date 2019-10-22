@@ -461,7 +461,11 @@ export class API extends EventEmitter {
 
     mapGoto = (device: CorePacket) => {
         this.mapFocusDevice = device;
+
         this.emit("mapGoto", device);
+        setTimeout(() => {
+            this.emit("mapGoto", device);
+        }, 1000)
     }
 
     // httpget = (url, cb) => {
