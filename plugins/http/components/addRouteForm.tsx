@@ -75,8 +75,8 @@ export class AddRoute extends React.Component<Props, State> {
           <div className="col-8" style={{}}>
             <select name="method"
               onChange={this.changeInput("method")} >
-              <option value="get">GET</option>
               <option value="post">POST</option>
+              <option value="get">GET</option>
               <option value="put">PUT</option>
               <option value="delete">DELETE</option>
             </select>
