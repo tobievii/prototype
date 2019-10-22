@@ -130,7 +130,12 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
     /** if we already have a position do not re center on every packet. */
     if (this.state.center) {
-      return;
+      if ((this.state.center[0] == 0) && (this.state.center[1] == 0)) {
+        //continue...
+      } else {
+        return;
+      }
+
     }
     var center = [0, 0];
 

@@ -4,6 +4,8 @@ import { colors, opacity } from "../theme";
 import { CorePacket } from "../../../server/shared/interfaces";
 import { escapeNonUnicode } from "../../../server/shared/shared";
 import { Link } from "react-router-dom";
+import { blendrgba } from "../../../server/utils/utils";
+import { moment } from "../utils/momentalt";
 
 // import pin from './img/pin.png'
 // import pinRetina from './img/pin@2x.png'
@@ -120,7 +122,37 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
         this.setState({ showDetails: false })
     }
 
+    /** same as device list item */
 
+    /* returns a ratio of how long ago something occurred between 0 and 1. Intended to be used as a time fade. */
+    timeratio(timestamp, duration, options?: ({ clamp: boolean })): number {
+        var activity = new Date(timestamp);
+        var clock = new Date();
+        var delta = clock.getTime() - activity.getTime();
+
+        var ratio = (duration - delta) / duration
+        if (options) {
+            if (options.clamp == true) {
+                if (ratio < 0) {
+                    ratio = 0;
+                }
+                if (ratio > 1) {
+                    ratio = 1;
+                }
+            }
+        }
+
+        return ratio
+    }
+
+    calcColorFade = () => {
+        var quickfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60, { clamp: true });
+        var slowfade = this.timeratio(this.props.device["_last_seen"], 1000 * 60 * 60 * 24, { clamp: true });
+
+
+
+        return blendrgba({ r: 75, g: 75, b: 75, a: 1 }, { r: 25, g: 179, b: 109, a: 1.0 }, slowfade)
+    }
 
     // render
 
@@ -134,7 +166,7 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
             //transform: `translate(${left - imageOffset.left}px, ${top - imageOffset.top}px)`,
             transform: `translate(${left - 9}px, ${top - 26}px)`,
             cursor: onClick ? 'pointer' : 'default',
-            color: colors.spotA,
+            color: this.calcColorFade(),
             fontSize: "24px"
         }
 
@@ -144,9 +176,9 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
             ...colors.quickShadow, ...{
                 position: 'absolute',
                 //transform: `translate(${left - imageOffset.left}px, ${top - imageOffset.top}px)`,
-                transform: `translate(${left - 100}px, ${top - 66}px)`,
+                transform: `translate(${left - 100}px, ${top - 116}px)`,
                 width: 200,
-                height: 50,
+                height: 100,
                 background: opacity(colors.panels, 0.8),
                 borderRadius: "2px",
                 padding: colors.padding,
@@ -161,7 +193,9 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
 
             {(this.state.showDetails) &&
                 <div className="arrow_box" style={styleHover}>
-                    <Link to={"/u/" + this.props.device.username + "/view/" + escapeNonUnicode(this.props.device.id)} >{this.props.device.id}</Link>
+                    <Link to={"/u/" + this.props.device.username + "/view/" + escapeNonUnicode(this.props.device.id)} >{this.props.device.id}</Link><br />
+                    <span style={{ fontSize: "75%", opacity: 0.5, fontWeight: "bold", paddingTop: 10 }}>last seen:</span><br />
+                    {moment(this.props.device["_last_seen"]).fromNow()}
                 </div>
             }
 
