@@ -6,16 +6,19 @@ import { CodeBlock } from "../../components/codeblock"
 interface MyProps { }
 
 interface MyState {
-    //[index: string]: any
+  //[index: string]: any
 }
 
 export class DocsWebsocket extends React.Component<MyProps, MyState> {
-    state = {}
+  state = {}
 
-    render() {
-        return (
-            <div>
-                <h4>WEBSOCKET</h4>
+  render() {
+    return (
+      <div>
+        <h4>WEBSOCKET</h4>
+
+        <p>BEING UPDATED FOR 5.1 please standby</p>
+        {/*                 
                 <p>This webapp uses websockets for real-time connectivity in the browser.
                     This can also be used from the command line.</p>
 
@@ -51,10 +54,10 @@ setInterval( ()=>{
 $ npm install socket.io-client
 // run your code
 $ node test.js
-connected.`} />
+connected.`} /> */}
 
-            </div>
-        );
-    }
+      </div>
+    );
+  }
 }
 
