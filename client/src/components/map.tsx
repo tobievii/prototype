@@ -22,17 +22,29 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
   constructor(props) {
     super(props);
     this.mapwrapper = React.createRef();
+
+
   }
 
 
 
   componentDidMount() {
+    console.log("map componentDidMount....!!")
     this.updateDimensions();
     window.addEventListener("resize", this.updateDimensions);
-    this.calculateCenterFromDeviceLocations();
-    api.on("states", this.calculateCenterFromDeviceLocations)
+
+    // check if we need to focus on a device.
+
+    var focus = api.mapGetFocusDevice();
+    if (focus) {
+      this.gotoDevice(focus);
+    }
+
+    // this.calculateCenterFromDeviceLocations();
+    // api.on("states", this.calculateCenterFromDeviceLocations)
     api.on("mapGoto", this.gotoDevice)
   }
+
 
 
   gotoDevice = (device: CorePacket) => {
@@ -91,9 +103,15 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     this.setState({ zoom });
   };
 
+  /** if the user changed location */
   onBoundsChanged = e => {
     //console.log(e);
-    this.setState({ center: e.center, zoom: e.zoom });
+
+    if (this.state.resizing == false) {
+      console.log("onBoundsChange", e)
+      this.setState({ center: e.center, zoom: e.zoom, lock: true });
+    }
+
   };
 
   mouseMove = e => {

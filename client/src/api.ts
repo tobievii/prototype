@@ -461,11 +461,22 @@ export class API extends EventEmitter {
 
     mapGoto = (device: CorePacket) => {
         this.mapFocusDevice = device;
-
         this.emit("mapGoto", device);
         setTimeout(() => {
             this.emit("mapGoto", device);
         }, 1000)
+    }
+
+    /** used on mobile to check if the map should focus on a certain device.. */
+    mapGetFocusDevice = () => {
+        if (this.mapFocusDevice) {
+            if (this.mapFocusDevice.retrieved) {
+                return undefined;
+            } else {
+                this.mapFocusDevice.retrieved = true;
+                return this.mapFocusDevice;
+            }
+        } else return undefined;
     }
 
     // httpget = (url, cb) => {
