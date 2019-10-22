@@ -179,8 +179,7 @@ export default class WidgetCanvas extends WidgetComponent {
       height: "100%",
       padding: colors.padding / 2,
       boxSizing: "border-box",
-      display: "flex",
-      flexDirection: "column"
+      paddingTop: colors.padding * 2
     };
 
     // For documentation see:
@@ -203,24 +202,20 @@ export default class WidgetCanvas extends WidgetComponent {
       <div style={style}>
         <div
           style={{
-            flex: "0",
-            textAlign: "center",
-            opacity: 0.5,
             width: "100%",
-            boxSizing: "border-box",
-            padding: 0,
-            margin: 0,
-            paddingBottom: colors.padding
+            textAlign: "center",
+            position: "absolute",
+            paddingTop: 7,
+            top: 0
           }}
         >
           {datapath}
         </div>
+
         <AreaChart
           style={{ width: "100%", height: "100%", background: "#f00" }}
           data={data}
-          yAxis={
-            <LinearYAxis type="value" scaled={true} domain={[min, max]} />
-          }
+          yAxis={<LinearYAxis type="value" scaled={true} domain={[min, max]} />}
           series={
             <AreaSeries
               area={
