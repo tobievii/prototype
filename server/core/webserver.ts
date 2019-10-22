@@ -90,7 +90,21 @@ export class Webserver extends EventEmitter {
             reactHtml = data.toString();
         })
 
-        this.app.get("/", (req: any, res) => { res.end(reactHtml); })
+        this.app.get("/", (req: any, res) => {
+
+            if (options.config.httpsPort) {
+                // check if incoming request is on http or https and redirect to https if needed.
+                console.log(req.socket.encrypted)
+                if (req.socket.encrypted) {
+                    res.end(reactHtml);
+                } else {
+                    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+                    res.end();
+                }
+                ////     
+                //     
+            } else res.end(reactHtml);
+        })
         this.app.get("/resources", (req, res) => { res.end(reactHtml); })
         this.app.get("/features", (req, res) => { res.end(reactHtml); })
         this.app.get("/products", (req, res) => { res.end(reactHtml); })
@@ -179,6 +193,7 @@ export class Webserver extends EventEmitter {
         // })
 
         if (this.serverhttp) {
+
             this.serverhttp.listen(this.httpPort, () => {
                 logger.log({ message: "webserver started", data: { port: this.httpPort }, level: "info" })
                 if (cb) cb();
