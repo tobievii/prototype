@@ -63,14 +63,19 @@ export default class WidgetBasic extends WidgetComponent {
 
                 <div style={{
                     flex: "0",
-                    textAlign: "center",
-                    opacity: 0.5,
+                    opacity: 0.25,
                     width: "100%",
                     boxSizing: "border-box",
                     padding: 0,
                     margin: 0,
-                    paddingBottom: colors.padding
-                }}>{datapath}</div>
+                    paddingBottom: colors.padding,
+                    display: "flex",
+                    flexDirection: "row"
+                }}><div style={{
+                    flex: "1",
+                    paddingRight: 7, paddingTop: 7,
+                    textAlign: "right"
+                }}>{moment(valueTimestamp).fromNow()}</div></div>
 
                 <div style={{
                     flex: "1",
@@ -87,13 +92,13 @@ export default class WidgetBasic extends WidgetComponent {
                 <div style={{
                     flex: "0",
                     textAlign: "center",
-                    opacity: 0.5,
+                    opacity: 1,
                     width: "100%",
                     boxSizing: "border-box",
                     padding: 0,
                     margin: 0,
                     paddingBottom: colors.padding
-                }}>{moment(valueTimestamp).fromNow()}</div>
+                }}>{datapath}</div>
             </div>
         );
     }

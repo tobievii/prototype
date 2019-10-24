@@ -19,6 +19,7 @@ import {
 } from "reaviz";
 
 import { objectByString } from "../../../../../server/shared/shared";
+import { moment } from "../../../utils/momentalt";
 
 export default class WidgetCanvas extends WidgetComponent {
   state = {
@@ -175,11 +176,10 @@ export default class WidgetCanvas extends WidgetComponent {
     }
 
     var style: any = {
-      width: "100%",
+      wordBreak: "break-all",
       height: "100%",
-      padding: colors.padding / 2,
-      boxSizing: "border-box",
-      paddingTop: colors.padding * 2
+      display: "flex",
+      flexDirection: "column",
     };
 
     // For documentation see:
@@ -198,49 +198,82 @@ export default class WidgetCanvas extends WidgetComponent {
       }
     }
 
+    //timestamp
+    var valueTimestamp = (this.props.valueTimestamp)
+      ? this.props.valueTimestamp
+      : undefined
+
     return (
       <div style={style}>
-        <div
-          style={{
-            width: "100%",
-            textAlign: "center",
-            position: "absolute",
-            paddingTop: 7,
-            top: 0
-          }}
-        >
-          {datapath}
+        <div style={{
+          flex: "0",
+          width: "100%",
+          boxSizing: "border-box",
+          padding: 0,
+          margin: 0,
+          paddingBottom: colors.padding,
+          display: "flex",
+          flexDirection: "row"
+        }}>
+
+          <div style={{
+            flex: "1",
+            opacity: 0.25,
+            paddingRight: 7, paddingTop: 7,
+            textAlign: "right"
+          }}>{moment(valueTimestamp).fromNow()}</div>
         </div>
 
-        <AreaChart
-          style={{ width: "100%", height: "100%", background: "#f00" }}
-          data={data}
-          yAxis={<LinearYAxis type="value" scaled={true} domain={[min, max]} />}
-          series={
-            <AreaSeries
-              area={
-                <Area
-                  mask={<Stripes />}
-                  style={{ fill: this.state.options.color.value }}
-                  gradient={
-                    <Gradient
-                      stops={[
-                        <GradientStop offset="10%" stopOpacity={0} />,
-                        <GradientStop offset="80%" stopOpacity={1} />
-                      ]}
+        <div style={{
+          flex: "1",
+          padding: 0,
+          margin: 0,
+          overflow: "hidden",
+        }}>
+          <div style={{ width: "100%", height: "100%" }}>
+            <AreaChart
+              style={{ width: "100%", height: "100%", background: "#f00" }}
+              data={data}
+              yAxis={<LinearYAxis type="value" scaled={true} domain={[min, max]} />}
+              series={
+                <AreaSeries
+                  area={
+                    <Area
+                      mask={<Stripes />}
+                      style={{ fill: this.state.options.color.value }}
+                      gradient={
+                        <Gradient
+                          stops={[
+                            <GradientStop offset="10%" stopOpacity={0} />,
+                            <GradientStop offset="80%" stopOpacity={1} />
+                          ]}
+                        />
+                      }
+                    />
+                  }
+                  line={
+                    <Line
+                      strokeWidth={3}
+                      style={{ stroke: this.state.options.color.value }}
                     />
                   }
                 />
               }
-              line={
-                <Line
-                  strokeWidth={3}
-                  style={{ stroke: this.state.options.color.value }}
-                />
-              }
             />
-          }
-        />
+          </div>
+        </div>
+
+        <div style={{
+          flex: "0",
+          textAlign: "center",
+          opacity: 1,
+          width: "100%",
+          boxSizing: "border-box",
+          padding: 0,
+          margin: 0,
+          paddingBottom: colors.padding
+        }}>{datapath}</div>
+
       </div>
     );
   }
