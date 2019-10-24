@@ -118,6 +118,9 @@ export function ifValidGps(state: CorePacket) {
  * @returns {object}
  */
 export function recursiveSetValue(inputOrig: any, setval: any): object {
+    if (inputOrig == undefined) { return setval }
+    if (inputOrig == null) { return setval }
+
     var input = JSON.parse(JSON.stringify(inputOrig));
     Object.keys(input).map((val, index) => {
         if ((typeof input[val] == "object") && (Array.isArray(input[val]) == false)) {
