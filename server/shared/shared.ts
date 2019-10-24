@@ -1,3 +1,5 @@
+import { CorePacket } from "./interfaces";
+
 /**  Removes any non standard characters. */
 export function cleanString(str: string) {
     return str.replace(/[^a-z0-9]/gim, "").toLowerCase();
@@ -94,4 +96,14 @@ export function validUsername(username) {
 
 export function escapeNonUnicode(str: any) {
     return str.replace(/[^a-z0-9{}\"\[\]: \.,_-]/gim, "");
+}
+
+
+export function ifValidGps(state: CorePacket) {
+    if (!state) return false;
+    if (!state.data) return false;
+    if (!state.data.gps) return false;
+    if (!state.data.gps.lat) return false;
+    if (!state.data.gps.lon) return false;
+    return [state.data.gps.lat, state.data.gps.lon]
 }

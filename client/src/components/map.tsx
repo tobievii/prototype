@@ -4,6 +4,9 @@ import Marker from "./mapmarker";
 import { api } from "../api";
 import { colors } from "../theme";
 import { CorePacket } from "../../../server/shared/interfaces";
+import { MapLines } from "./maplines";
+import { ifValidGps } from "../../../server/shared/shared";
+
 interface MapProps { }
 interface MapState { }
 
@@ -14,7 +17,8 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     resizing: false,
     zoom: 1.5,
     center: [-40, 0],
-    alreadyDefault: false
+    alreadyDefault: false,
+    states: [[], [], []]
   };
 
   mapwrapper;
@@ -29,20 +33,21 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
 
   componentDidMount() {
-    console.log("map componentDidMount....!!")
+
     this.updateDimensions();
     window.addEventListener("resize", this.updateDimensions);
 
     // check if we need to focus on a device.
 
-    var focus = api.mapGetFocusDevice();
-    if (focus) {
-      this.gotoDevice(focus);
-    }
+    // var focus = api.mapGetFocusDevice();
+    // if (focus) {
+    //   this.gotoDevice(focus);
+    // }
 
-    // this.calculateCenterFromDeviceLocations();
-    // api.on("states", this.calculateCenterFromDeviceLocations)
-    api.on("mapGoto", this.gotoDevice)
+
+
+
+    //api.on("mapGoto", this.gotoDevice)
   }
 
 
@@ -215,6 +220,29 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
 
   }
 
+
+
+
+  // markerChainLines = (deviceHistory: CorePacket[], key) => {
+
+
+  //   var coordsArray = [];
+
+
+  //   if (deviceHistory.length >= 2) {
+  //     for (var x = 0; x < (deviceHistory.length); x += 1) {
+
+  //       var gps = this.ifValidGps(deviceHistory[x]);
+  //       if (gps) {
+  //         coordsArray.push(gps)
+  //       }
+  //     }
+  //   }
+
+  //   return <MapLine coordsArray={coordsArray} />
+
+  // }
+
   render() {
 
     if (this.state.resizing) {
@@ -253,19 +281,12 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
                   width={this.state.width}
                   height={this.state.height}
                 >
+
                   {api.data.states.map((dev, i) => {
-                    if (!dev.data) {
+                    if (!ifValidGps(dev)) {
                       return;
                     }
-                    if (!dev.data.gps) {
-                      return;
-                    }
-                    if (!dev.data.gps.lat) {
-                      return;
-                    }
-                    if (!dev.data.gps.lon) {
-                      return;
-                    }
+
                     return (
                       <Marker
                         device={dev}
@@ -275,7 +296,11 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
                         onClick={this.handleMarkerClick}
                       />
                     );
+
                   })}
+
+                  <MapLines statesHistory={api.data.statesHistory} />
+
                 </Map>}
             </div>
           )}
@@ -283,3 +308,5 @@ export class ProtoMap extends React.Component<MapProps, MapState> {
     );
   } //end render
 }
+
+

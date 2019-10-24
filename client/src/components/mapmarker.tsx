@@ -22,6 +22,7 @@ interface MarkerProps {
     anchor: any;
     payload: any;
     onClick: Function;
+    opacity?: number;
     [index: string]: any;
 }
 
@@ -34,28 +35,28 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
         showDetails: false
     }
 
-    static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
-        // input, passed to events
-        anchor: PropTypes.array.isRequired,
-        payload: PropTypes.any,
+    // static propTypes = process.env.BABEL_ENV === 'inferno' ? {} : {
+    //     // input, passed to events
+    //     anchor: PropTypes.array.isRequired,
+    //     payload: PropTypes.any,
 
-        // optional modifiers
-        hover: PropTypes.bool,
+    //     // optional modifiers
+    //     hover: PropTypes.bool,
 
-        // callbacks
-        onClick: PropTypes.func,
-        onContextMenu: PropTypes.func,
-        onMouseOver: PropTypes.func,
-        onMouseOut: PropTypes.func,
+    //     // callbacks
+    //     onClick: PropTypes.func,
+    //     onContextMenu: PropTypes.func,
+    //     onMouseOver: PropTypes.func,
+    //     onMouseOut: PropTypes.func,
 
-        // pigeon variables
-        left: PropTypes.number,
-        top: PropTypes.number,
+    //     // pigeon variables
+    //     left: PropTypes.number,
+    //     top: PropTypes.number,
 
-        // pigeon functions
-        latLngToPixel: PropTypes.func,
-        pixelToLatLng: PropTypes.func
-    }
+    //     // pigeon functions
+    //     latLngToPixel: PropTypes.func,
+    //     pixelToLatLng: PropTypes.func
+    // }
 
     constructor(props) {
         super(props)
@@ -160,14 +161,15 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
         const { left, top, onClick } = this.props
 
         var color = (this.state.showDetails) ? colors.good : colors.spotA
-
+        var opacityFade = (this.props.opacity) ? this.props.opacity : 1
         const style: any = {
             position: 'absolute',
             //transform: `translate(${left - imageOffset.left}px, ${top - imageOffset.top}px)`,
-            transform: `translate(${left - 9}px, ${top - 26}px)`,
+            transform: `translate(${left - 9}px, ${top - 24}px)`,
             cursor: onClick ? 'pointer' : 'default',
             color: this.calcColorFade(),
-            fontSize: "24px"
+            fontSize: "24px",
+            opacity: opacityFade
         }
 
 
@@ -176,7 +178,7 @@ export default class Marker extends React.Component<MarkerProps, MarkerState> {
             ...colors.quickShadow, ...{
                 position: 'absolute',
                 //transform: `translate(${left - imageOffset.left}px, ${top - imageOffset.top}px)`,
-                transform: `translate(${left - 100}px, ${top - 116}px)`,
+                transform: `translate(${left - 100}px, ${top - 114}px)`,
                 width: 200,
                 height: 100,
                 background: opacity(colors.panels, 0.8),

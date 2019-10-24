@@ -5,6 +5,8 @@ import { api } from "../../../api"
 import Map from "pigeon-maps";
 import Marker from "../../mapmarker";
 import { colors } from "../../../theme";
+import { ifValidGps } from '../../../../../server/shared/shared';
+import { MapLines } from '../../maplines';
 
 export default class WidgetMap extends WidgetComponent {
     state = {
@@ -89,9 +91,32 @@ export default class WidgetMap extends WidgetComponent {
                     zoom={parseInt(this.state.options.zoom.value)}
                     width={this.state.width}
                     height={this.state.height} >
-                        <Marker device={this.props.state} anchor={center} payload={1}
+
+                        {/* <Marker device={this.props.state} anchor={center} payload={1}
                             onClick={this.handleMarkerClick}
-                        />
+                        /> */}
+
+
+                        {api.data.states.map((dev, i) => {
+                            if (!ifValidGps(dev)) {
+                                return;
+                            }
+
+                            return (
+                                <Marker
+                                    device={dev}
+                                    key={i}
+                                    anchor={[dev.data.gps.lat, dev.data.gps.lon]}
+                                    payload={1}
+                                    onClick={this.handleMarkerClick}
+                                />
+                            );
+
+                        })}
+
+                        <MapLines statesHistory={api.data.statesHistory} />
+
+
                     </Map>
                 </div>
             );

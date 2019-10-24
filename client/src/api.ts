@@ -11,6 +11,8 @@ import { PrototypeWS } from "../../server/shared/prototypews"
 interface Data {
     account?: User
     states: CorePacket[],
+    /** this is for storing packet history of many devices locally. Used for map view. */
+    statesHistory: CorePacket[][]
     packets: CorePacket[]
 }
 
@@ -25,6 +27,7 @@ export class API extends EventEmitter {
     data: Data = {
         account: undefined,
         states: [],
+        statesHistory: [],
         packets: []
     }
 
@@ -189,6 +192,39 @@ export class API extends EventEmitter {
     }
 
     mergeState = (data: CorePacket) => {
+
+        var stateHistoryUpdated = false;
+
+        const maxhistory = 10;
+        // merge statesHistory
+        var foundStatesHistory = false;
+        for (var s in this.data.statesHistory) {
+            if (this.data.statesHistory[s].length != 0) {
+                if (this.data.statesHistory[s][0].key == data.key) {
+                    foundStatesHistory = true;
+                    // check if duplicate..
+                    var duplicate = false;
+                    for (var st of this.data.statesHistory[s]) {
+                        if (st.timestamp == data.timestamp) { duplicate = true; }
+                    }
+                    if (!duplicate) this.data.statesHistory[s].push(data); // if found we add this packet to this array.
+                    stateHistoryUpdated = true;
+                }
+            }
+
+            if (this.data.statesHistory[s].length > 10) {
+                this.data.statesHistory[s].shift();
+            }
+        }
+
+        if (foundStatesHistory == false) {
+            this.data.statesHistory.push([data]);
+            stateHistoryUpdated = true;
+        }
+
+        if (stateHistoryUpdated) this.emit("stateHistoryUpdated")
+
+        /***** */
         let found: boolean = false;
         for (var s in this.data.states) {
             if (this.data.states[s].key == data.key) {
