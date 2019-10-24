@@ -14,7 +14,7 @@ import * as vm2 from "vm2"
 
 import { User, CorePacket, CorePacketsOptions, ClientPacketOptions } from "../shared/interfaces"
 
-import { cleanString } from "../shared/shared";
+import { cleanString, recursiveSetValue } from "../shared/shared";
 
 export class Core extends EventEmitter {
     db: any;
@@ -393,6 +393,7 @@ export class Core extends EventEmitter {
                 delete state["_id"]
 
                 // idea: possibly store previous state into packet aswell so we have both the before and after in each packet?
+                if (processedPacket) processedPacket.timestamps = recursiveSetValue(processedPacket, new Date());
 
                 var stateMerged = _.merge(state, processedPacket);
                 if (processedPacket == undefined) { console.log("ERROR packet undefined after workflow!"); return; }

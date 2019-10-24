@@ -107,3 +107,25 @@ export function ifValidGps(state: CorePacket) {
     if (!state.data.gps.lon) return false;
     return [state.data.gps.lat, state.data.gps.lon]
 }
+
+
+/** Loops over an "JSON" object and sets all values to setval. 
+ * Prototype uses this to record the timestamps of values as they enter the system 
+ * so we can display timestamps per value in the UI.
+ * 
+ * @param {any} inputOrig The input object to recursively loop over.
+ * @param {any} setval The value you want to set each nested property to.
+ * @returns {object}
+ */
+export function recursiveSetValue(inputOrig: any, setval: any): object {
+    var input = JSON.parse(JSON.stringify(inputOrig));
+    Object.keys(input).map((val, index) => {
+        if ((typeof input[val] == "object") && (Array.isArray(input[val]) == false)) {
+            input[val] = recursiveSetValue(input[val], setval)
+        } else {
+            input[val] = setval
+        }
+    });
+
+    return input;
+}
