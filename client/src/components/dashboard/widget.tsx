@@ -44,8 +44,11 @@ export class Widget extends React.Component<MyProps, WidgetState> {
         if (WidgetToDraw) WidgetOptions = new WidgetToDraw().options()
 
         var value;
+        var valueTimestamp;
         if (this.props.widget.datapath) {
             value = objectByString(this.props.state, this.props.widget.datapath)
+            // get the timestamp for the main value for this widget
+            if (this.props.state.timestamps) valueTimestamp = objectByString(this.props.state, "timestamps." + this.props.widget.datapath)
         }
 
 
@@ -75,6 +78,7 @@ export class Widget extends React.Component<MyProps, WidgetState> {
                         widget={this.props.widget}
                         state={this.props.state}
                         value={value}
+                        valueTimestamp={valueTimestamp}
                     /></div>
                     : <div>Error {this.props.widget.type.toLowerCase()} widget not found</div>}
             </div>

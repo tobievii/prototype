@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { WidgetComponent } from "./widgetcomponent"
 import { colors, opacity } from '../../../theme';
+import { moment } from '../../../utils/momentalt';
 
 export default class WidgetBasic extends WidgetComponent {
     state = {
@@ -49,6 +50,8 @@ export default class WidgetBasic extends WidgetComponent {
             }
         }
 
+        var valueTimestamp = (this.props.valueTimestamp) ? this.props.valueTimestamp : undefined
+
         return (
             <div style={{
                 color: this.state.options.color.value,
@@ -57,17 +60,6 @@ export default class WidgetBasic extends WidgetComponent {
                 display: "flex",
                 flexDirection: "column",
             }}>
-
-                <div style={{
-                    flex: "1",
-                    display: "flex",
-                    justifyContent: "center", /* align horizontal */
-                    alignItems: "center", /* align vertical */
-                    fontSize: "150%",
-                    textAlign: "center",
-                    padding: 0,
-                    margin: 0
-                }}>{display}</div>
 
                 <div style={{
                     flex: "0",
@@ -80,6 +72,28 @@ export default class WidgetBasic extends WidgetComponent {
                     paddingBottom: colors.padding
                 }}>{datapath}</div>
 
+                <div style={{
+                    flex: "1",
+                    display: "flex",
+                    justifyContent: "center", /* align horizontal */
+                    alignItems: "center", /* align vertical */
+                    fontSize: "150%",
+                    textAlign: "center",
+                    padding: 0,
+                    margin: 0
+                }}>{display}</div>
+
+
+                <div style={{
+                    flex: "0",
+                    textAlign: "center",
+                    opacity: 0.5,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    padding: 0,
+                    margin: 0,
+                    paddingBottom: colors.padding
+                }}>{moment(valueTimestamp).fromNow()}</div>
             </div>
         );
     }

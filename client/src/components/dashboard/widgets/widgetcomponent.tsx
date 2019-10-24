@@ -8,6 +8,8 @@ export interface WidgetComponentProps {
     state: CorePacket
     /** Data value if drag and dropped from endpoint */
     value?: any
+    /** Timestamp for this specific value */
+    valueTimestamp?: Date
 }
 
 interface WidgetOption {
