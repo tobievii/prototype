@@ -13,7 +13,7 @@ export class AddRoute extends React.Component<Props, State> {
   state = {
     form: {
       id: "deviceid",
-      method: "get"
+      method: "post"
     },
     message: "", messageOpacity: 0
   };
@@ -76,9 +76,9 @@ export class AddRoute extends React.Component<Props, State> {
             <select name="method"
               onChange={this.changeInput("method")} >
               <option value="post">POST</option>
-              <option value="get">GET</option>
+              {/* <option value="get">GET</option>
               <option value="put">PUT</option>
-              <option value="delete">DELETE</option>
+              <option value="delete">DELETE</option> */}
             </select>
           </div>
         </div>
