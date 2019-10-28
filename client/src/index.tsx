@@ -158,7 +158,7 @@ export default class App extends React.Component {
           <Switch>
             <Route path="/signout" component={this.signout} />
 
-            <Route exact path="/" component={this.home} />
+            <Route exact path="/" component={this.userView} />
             <Route exact path="/u/:username" component={this.userView} />
 
             <Route exact path="/u/:username/view/:id" component={this.deviceView} />
@@ -236,7 +236,7 @@ export default class App extends React.Component {
 
   }
 
-  home = props => {
+  userView = props => {
     var size = (window.innerWidth < 800) ? "small" : "large";
 
     // var wrapper = clone(theme.global.responsive.wrapper);
@@ -257,7 +257,7 @@ export default class App extends React.Component {
             flexDirection: "row", width: "100%"
           }}>
             <div style={{ flex: "0", height: "500px", minWidth: "600px" }}>
-              <DeviceList />
+              <DeviceList username={props.match.params.username} />
             </div>
             <div style={{ flex: "1" }}>
               <Map />
@@ -289,7 +289,7 @@ export default class App extends React.Component {
 
           {(!api.data.account.emailverified) && <UserVerify />}
 
-          {(view == "list") && <DeviceList />}
+          {(view == "list") && <DeviceList username={props.match.params.username} />}
           {(view == "map") && <Map />}
           {(view == "docs") && <Documentation />}
 
@@ -303,39 +303,39 @@ export default class App extends React.Component {
 
 
 
-  userView = props => {
-    var size = window.innerWidth < 800 ? "small" : "large";
+  //userView = props => {
+  // var size = window.innerWidth < 800 ? "small" : "large";
 
-    return (
-      <div>
-        <BGgrad />
-        <NavBar />
+  // return (
+  //   <div>
+  //     <BGgrad />
+  //     <NavBar />
 
-        <div style={{ margin: colors.padding * 2, minHeight: "500px" }}>
-          {size == "small" ? (
-            <DeviceView
-              username={props.match.params.username}
-              id={props.match.params.id}
-            />
-          ) : (
-              <div style={{
-                boxSizing: "border-box", display: "flex",
-                flexDirection: "row", width: "100%"
-              }}>
-                <div style={{ flex: "0", height: "500px", minWidth: "400px" }}>
-                  <DeviceList username={props.match.params.username} />
-                </div>
-                <div style={{ flex: "1" }}>
-                  <Map />
-                </div>
-              </div>
-            )}
-        </div>
+  //     <div style={{ margin: colors.padding * 2, minHeight: "500px" }}>
+  //       {size == "small" ? (
+  //         <DeviceView
+  //           username={props.match.params.username}
+  //           id={props.match.params.id}
+  //         />
+  //       ) : (
+  //           <div style={{
+  //             boxSizing: "border-box", display: "flex",
+  //             flexDirection: "row", width: "100%"
+  //           }}>
+  //             <div style={{ flex: "0", height: "500px", minWidth: "400px" }}>
+  //               <DeviceList username={props.match.params.username} />
+  //             </div>
+  //             <div style={{ flex: "1" }}>
+  //               <Map />
+  //             </div>
+  //           </div>
+  //         )}
+  //     </div>
 
-        <div style={{ flex: "0 1 40px" }}>footer</div>
-      </div>
-    );
-  };
+  //     <div style={{ flex: "0 1 40px" }}>footer</div>
+  //   </div>
+  // );
+  //};
 
   viewByPublickey = props => {
     return (<div>
