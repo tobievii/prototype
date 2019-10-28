@@ -4,6 +4,7 @@ import { generateDifficult } from "../../utils/utils"
 
 import * as _ from "lodash"
 import request = require("request");
+import { PluginConfigTestProps } from "../tests";
 var mqtt = require('mqtt');
 
 interface TESTCONFIG {
@@ -13,43 +14,9 @@ interface TESTCONFIG {
     mqttprot: string
 }
 
-export function webapi_v4() {
-
-    var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
+export function webapi_v4(config:PluginConfigTestProps) {
 
 
-    var preset = "localhost";
-    //var preset = "dev";
-    //var preset = "prod";
-    //var preset = "8bo";
-
-    if (preset == "localhost") {
-        testconfig.hostname = "localhost"
-        testconfig.httpport = ":8080"
-        testconfig.httpprot = "http://"
-        testconfig.mqttprot = "mqtt://"
-    }
-
-    if (preset == "dev") {
-        testconfig.hostname = "prototype.dev.iotnxt.io"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtts://"
-    }
-
-    if (preset == "prod") {
-        testconfig.hostname = "prototype.iotnxt.io"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtt://"
-    }
-
-    if (preset == "8bo") {
-        testconfig.hostname = "8bo.org"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtt://"
-    }
 
 
 
@@ -57,8 +24,8 @@ export function webapi_v4() {
 
 
 
-    var uri = testconfig.httpprot + testconfig.hostname + testconfig.httpport;
-    var mqtturi = testconfig.mqttprot + testconfig.hostname
+    var uri = config.uri
+    var mqtturi = config.mqtturi
 
     var headers = { Authorization: "" };
     var timeout = 5000;

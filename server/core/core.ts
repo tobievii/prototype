@@ -416,22 +416,63 @@ export class Core extends EventEmitter {
     }
 
     // ---------------------------------------
+    /** used by POST /api/v4/states */
+    states(options: any,
+        cb: (error: { error: string } | undefined,
+            result?: CorePacket | CorePacket[] | any) => void) {
+        logger.log({ message: "core.states", data: options, level: "verbose" });
+        if (options.request) {
 
+            logger.log({ message: "core.states by username", data: options, level: "verbose" });
+            if (options.request.username) {
+                console.log(1)
+                this.user({ username: options.request.username }, (err, user) => {
+                    console.log(2)
+                    if (!user) {
+                        cb({ error: "could not find data" })
+                    }
+
+                    if (user) {
+                        console.log(3)
+                        /**
+                         * if a user visits another user's account they will only be able to access
+                         * devices that have been shared with them.
+                         */
+                        this.db.states.find({ apikey: user.apikey, access: options.user.publickey }, (err, states) => {
+                            if (err) {
+                                cb(err);
+                            }
+                            console.log(err);
+                            console.log(4)
+                            console.log(states);
+                            if (states) {
+                                cb(undefined, states)
+                            }
+                        })
+
+                    }
+                });
+            }
+            // --
+
+        }
+    };
+
+    // ---------------------------------------
     view(options: any, cb: (error: { error: string } | undefined, result?: CorePacket | CorePacket[] | any) => void) {
         logger.log({ message: "core.view", data: options, level: "verbose" });
-
-
         // var logopt = _.clone(options);
         // delete logopt.user;
         // logger.log({ message: "core view", data: logopt, level: "verbose" })
-        if ((options.user && options.username)) {
-            if (options.username == options.user.username) {
-                delete options.username;
-            }
-        }
+        // if ((options.user && options.username)) {
+        //     if (options.username == options.user.username) {
+        //         delete options.username;
+        //     }
+        // }
+
+
 
         if (options.publickey) {
-
             this.db.states.findOne({ publickey: options.publickey }, (err: Error, result: CorePacket) => {
                 if (err) { cb({ error: err.toString() }) }
                 if (result) {
@@ -500,7 +541,9 @@ export class Core extends EventEmitter {
         }
 
         // all visible devices from a username
+
         if ((options.username) && (options.user) && (options.id == undefined)) {
+            console.log("----")
             logger.log({ message: "core view devices by username", data: { username: options.username }, level: "verbose" })
             let username = options.username;
             this.user({ username }, (err, user) => {
@@ -512,7 +555,6 @@ export class Core extends EventEmitter {
                     })
                 }
             })
-
         }
     }
 

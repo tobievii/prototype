@@ -94,8 +94,53 @@ export function webapiv4(app: express.Application, core: Core) {
             "layout": []
         }]
     })
+
     app.get("/api/v4/states", (req: any, res) => {
         core.view({ user: req.user }, (err, result) => {
+            if (err) { res.status(400).json(err); }
+            if (result) { res.json(result); }
+        })
+    })
+
+    // ----------------------------------------------------------------------------------
+
+    apispec.push({
+        description: "Get allowed device states from any account.",
+        method: "post",
+        path: "/api/v4/states",
+        post: { username: "someusername" },
+        response: [{
+            "_created_on": "2019-09-04T12:34:23.196Z",
+            "_last_seen": "2019-09-11T15:29:36.870Z",
+            "_recieved": "2019-09-11T15:29:36.870Z",
+            "_timestamp": "2019-09-11T15:29:36.868Z",
+            "publickey": "xxxx",
+            "key": "xxxx",
+            "id": "poolsensor",
+            "data": {
+                "temperature": 30,
+                "gps": {
+                    "lat": -24.12435,
+                    "lon": 21.586536
+                }
+            },
+            "public": true,
+            "userpublickey": "xxxx",
+            "username": "joe",
+            "meta": {},
+            "history": [],
+            "layout": []
+        }]
+    })
+
+    app.post("/api/v4/states", (req: any, res) => {
+        //var options = _.clone(req.body)
+        var options: any = {
+            user: req.user,
+            request: req.body
+        };
+
+        core.states(options, (err, result) => {
             if (err) { res.status(400).json(err); }
             if (result) { res.json(result); }
         })
@@ -166,16 +211,7 @@ export function webapiv4(app: express.Application, core: Core) {
 
 
 
-    //apispec.push({ method: "post", path: "/api/v4/states" })
-    app.post("/api/v4/states", (req: any, res) => {
-        var options = _.clone(req.body)
-        options.user = req.user;
-        //console.log(options);
-        core.view(options, (err, result) => {
-            if (err) { res.status(400).json(err); }
-            if (result) { res.json(result); }
-        })
-    })
+
 
     /** Todo switch to method DELETE */
     //apispec.push({ method: "post", path: "/api/v4/state/delete" })

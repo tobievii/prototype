@@ -4,60 +4,16 @@ import { generateDifficult } from "../../utils/utils"
 import * as _ from "lodash"
 import * as request from "request";
 import * as mqtt from "mqtt";
+import { PluginConfigTestProps } from "../tests";
 
-interface TESTCONFIG {
-    hostname: string
-    httpprot: string
-    httpport: string
-    mqttprot: string
-}
-
-export function webapi_v3() {
-
-    var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttprot: "" };
-
-
-    var preset = "localhost";
-    //var preset = "dev";
-    //var preset = "prod";
-    //var preset = "8bo";
-
-    if (preset == "localhost") {
-        testconfig.hostname = "localhost"
-        testconfig.httpport = ":8080"
-        testconfig.httpprot = "http://"
-        testconfig.mqttprot = "mqtt://"
-    }
-
-    if (preset == "dev") {
-        testconfig.hostname = "prototype.dev.iotnxt.io"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtts://"
-    }
-
-    if (preset == "prod") {
-        testconfig.hostname = "prototype.iotnxt.io"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtt://"
-    }
-
-    if (preset == "8bo") {
-        testconfig.hostname = "8bo.org"
-        testconfig.httpport = "" // default to 443
-        testconfig.httpprot = "https://"
-        testconfig.mqttprot = "mqtt://"
-    }
-
-
+export function webapi_v3(config:PluginConfigTestProps) {
 
     var testAccount: any = { email: "test" + generateDifficult(32) + "@iotlocalhost.com", password: "newUser" };
 
 
 
-    var uri = testconfig.httpprot + testconfig.hostname + testconfig.httpport;
-    var mqtturi = testconfig.mqttprot + testconfig.hostname
+    var uri = config.uri
+    var mqtturi = config.mqtturi
 
     var headers = { Authorization: "" };
     var timeout = 5000;

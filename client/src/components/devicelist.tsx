@@ -11,18 +11,38 @@ import { logger } from "../../../server/shared/log"
 import { PopupShare } from "./popups/popup_share";
 import { PopupConfirm } from "./popups/popup_confirm";
 import { PopupAddWizard } from "./popups/popup_addwizard";
+import { Loading } from "./loading";
 
 interface MyProps {
     username?: string;
 }
 
 interface MyState {
-    [index: string]: any;
+    sort: {
+        selected: "none" | "up" | "down",
+        id: "none" | "up" | "down",
+        lastseen: "none" | "up" | "down",
+        alarm: "none" | "up" | "down",
+        warning: "none" | "up" | "down",
+        shared: "none" | "up" | "down",
+        public: "none" | "up" | "down"
+    },
+    search: string,
+    filter: string,
+    states: any,
+    statesraw: any,
+    sharedevicepopupvisible: boolean,
+    deletedevicepopupvisible: boolean,
+    addDeviceWizardPopupVisible: boolean,
+    username: string,
+    /** by default be start on loading screen */
+    loading: boolean
+    needToGetData: boolean
 }
 
 /** This component is the entire box containing add device, the modify menu, and the list of devices. */
 export class DeviceList extends React.Component<MyProps, MyState> {
-    state = {
+    state: MyState = {
         sort: {
             selected: "none",
             id: "none",
@@ -38,17 +58,44 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         statesraw: [],
         sharedevicepopupvisible: false,
         deletedevicepopupvisible: false,
-        addDeviceWizardPopupVisible: false
+        addDeviceWizardPopupVisible: false,
+        username: undefined,
+        loading: true,
+        needToGetData: true
     }
 
     constructor(props) {
         super(props);
     }
 
-    componentDidMount = () => {
+    static getDerivedStateFromProps = (props, current_state) => {
+        if (current_state.username !== props.username) {
+            console.log("username changed from " + current_state.username + " to " + props.username)
+            return {
+                username: props.username,
+                loading: true,
+                needToGetData: true
+            }
+        }
+        return null
+    }
 
-        this.getData();
-        //dynamic updates:
+    componentDidUpdate = () => {
+        console.log("deviceList", "this.componentDidUpdate")
+
+        if (this.state.needToGetData) {
+
+            this.getData();
+
+        }
+    }
+
+
+    componentDidMount = () => {
+        console.log("deviceList", "this.componentDidMount")
+
+        // this.getData();
+        // //dynamic updates:
         api.on("states", this.stateUpdater)
 
         api.on("doupdate", () => {
@@ -65,7 +112,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
                 if (err) console.error(err);
                 if (states) {
                     logger.log({ message: "states return", data: { states }, level: "verbose" })
-                    this.applySortFilter(states);
+                    this.applySortFilter(states, () => {
+                        this.setState({ loading: false, needToGetData: false })
+                    });
                 }
             })
 
@@ -73,7 +122,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
             // own account
             api.states((err, states: CorePacket[]) => {
                 if (states) {
-                    this.applySortFilter(states);
+                    this.applySortFilter(states, () => {
+                        this.setState({ loading: false, needToGetData: false })
+                    });
                 }
             })
         }
@@ -88,7 +139,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         this.applySortFilter(states);
     }
 
-    applySortFilter = (states: CorePacket[]) => {
+    applySortFilter = (states: CorePacket[], cb?: Function) => {
         // transfer select state
         for (var dev of this.state.states) {
             for (var dev2 of states) {
@@ -185,7 +236,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
         // var states: CorePacket[] = filter(clone(api.data.states), (dev: CorePacket) => {
         //     if (dev.id.indexOf("") >= 0) { return true } else return false
         // })
-        this.setState({ states: tempstates });
+        this.setState({ states: tempstates }, () => { if (cb) cb(); });
     }
 
 
@@ -273,6 +324,10 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     render() {
+
+        if (this.state.loading) {
+            return <Loading />
+        }
 
         return (
             <div style={{
