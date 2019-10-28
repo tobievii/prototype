@@ -19,6 +19,9 @@ export { default as teltonika } from './teltonika/teltonika_server'
 import { default as http } from './http/http_server'
 export { default as http } from './http/http_server'
 
+import { default as groups } from './groups/groups_server'
+export { default as groups } from './groups/groups_server'
+
 export interface plugins {
     iotnxt: iotnxt,
     myplugin: myplugin,
@@ -26,5 +29,6 @@ export interface plugins {
     cluster: cluster,
     mqtt: mqtt,
     teltonika: teltonika,
-    http: http
+    http: http,
+    groups: groups
 }
