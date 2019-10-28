@@ -44,7 +44,7 @@ export default class HTTP extends PluginSuperServerside {
             }
 
             // check for existing
-            this.documentstore.db.plugins_http.find({ id: newroute.id, method: newroute.method, apikey: newroute.apikey },
+            this.documentstore.db.plugins_http.find({ id: newroute.id, apikey: newroute.apikey },
                 (err: Error, conflictingroutes: any) => {
                     if (err) { res.json({ error: "db err" }); return; }
 

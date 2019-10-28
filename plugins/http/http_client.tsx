@@ -67,7 +67,7 @@ export default class HTTP extends PluginSuperClientside {
             <div>
                 <p>
                     Here you can set up custom HTTP routes. <br />
-                    These are useful when accepting HTTP GET/POST calls from external apis without authorization headers. <br />
+                    These are useful when accepting HTTP POST calls from external apis without authorization headers. <br />
                     Github webhooks being a great example of this.
                 </p>
                 <AddRoute formSubmit={this.addroute} />
