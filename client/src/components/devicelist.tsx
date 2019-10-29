@@ -69,6 +69,9 @@ export class DeviceList extends React.Component<MyProps, MyState> {
     }
 
     static getDerivedStateFromProps = (props, current_state) => {
+
+
+
         if (current_state.username !== props.username) {
             console.log("username changed from " + current_state.username + " to " + props.username)
             return {
@@ -82,20 +85,20 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
     componentDidUpdate = () => {
         console.log("deviceList", "this.componentDidUpdate")
-
+        console.log("loading", this.state.loading);
+        console.log("needToGetData", this.state.needToGetData);
+        console.log("username", this.state.username);
         if (this.state.needToGetData) {
-
             this.getData();
-
         }
     }
 
 
     componentDidMount = () => {
-        console.log("deviceList", "this.componentDidMount")
+        //console.log("deviceList", "this.componentDidMount")
 
-        // this.getData();
-        // //dynamic updates:
+        this.getData();
+        //dynamic updates:
         api.on("states", this.stateUpdater)
 
         api.on("doupdate", () => {
@@ -120,6 +123,7 @@ export class DeviceList extends React.Component<MyProps, MyState> {
 
         } else {
             // own account
+            console.log("devicelist", "loading own data")
             api.states((err, states: CorePacket[]) => {
                 if (states) {
                     this.applySortFilter(states, () => {
