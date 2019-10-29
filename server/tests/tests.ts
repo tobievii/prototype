@@ -39,7 +39,7 @@ var testconfig: TESTCONFIG = { hostname: "", httpprot: "", httpport: "", mqttpro
 
 var preset = "localhost";
 //var preset = "dev";
-//var preset = "prod";
+//var preset = "prod"; // last 100% test Oct 28 2019
 //var preset = "8bo";
 
 if (preset == "localhost") {
@@ -163,6 +163,9 @@ function runPluginTests() {
         mqtturi
     }
 
+    webapi_v3(config)
+    webapi_v4(config)
+
     // TEST PLUGINS
     for (var pluginName of Object.keys(pluginTests)) {
 
@@ -176,7 +179,6 @@ function runPluginTests() {
 }
 
 // uncomment to run old tests
-webapi_v3()
-webapi_v4()
+
 
 //test_websockets();

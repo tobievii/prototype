@@ -6,7 +6,7 @@ import { User } from "../../../../server/shared/interfaces"
 import { colors } from "../../theme";
 import { AccountTypeBadge } from "../../components/account_type_badge";
 import { request } from "../../utils/requestweb";
-
+import { color } from "../../components/dashboard/options";
 
 interface MyProps { }
 interface MyState { }
@@ -98,11 +98,11 @@ export class AccountEmail extends React.Component<MyProps, MyState> {
                         && <div>
 
                             {(this.state.verifyClicked)
-                                ? <span style={{ whiteSpace: "nowrap", color: colors.public }}><i className="fas fa-envelope" /> sent</span>
-                                : <span onClick={() => {
+                                ? <span style={{ whiteSpace: "nowrap", color: colors.public }}><i className="fas fa-envelope" />Mail sent!</span>
+                                : <button onClick={() => {
                                     this.setState({ verifyClicked: true });
                                     this.requestVerificationMail();
-                                }} style={{ marginLeft: colors.padding }} className="button">verify</span>}
+                                }} style={{ whiteSpace: "nowrap", marginLeft: colors.padding, color: colors.warning }} ><i className="fas fa-envelope" /> Send mail</button>}
 
                         </div>
                     }
